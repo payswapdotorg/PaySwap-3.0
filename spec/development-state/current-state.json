@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "architecture_version": "3.0-foundation-2026-10-08",
+  "repository": "payswapdotorg/PaySwap-3.0",
+  "branch": "main",
+  "source_of_truth": "repository",
+  "upstream": {
+    "repository": "zai-org/ZCode",
+    "commit": "29628c9acdb81b703bbd4080c207a0e7ce5e276e",
+    "version": "3.14.3",
+    "materialized": true
+  },
+  "max_concurrent_workers": 3,
+  "worker_lanes": {
+    "worker-1": "platform-lineage-and-economic-kernel",
+    "worker-2": "financial-authority-and-trust-security",
+    "worker-3": "migration-experience-and-integrations"
+  },
+  "frontier": [
+    "P0-W1",
+    "P0-W2",
+    "P0-W3"
+  ],
+  "active_work_orders": [
+    {
+      "id": "P0-W1",
+      "owner": "worker-1",
+      "status": "READY"
+    },
+    {
+      "id": "P0-W2",
+      "owner": "worker-2",
+      "status": "READY"
+    },
+    {
+      "id": "P0-W3",
+      "owner": "worker-3",
+      "status": "READY"
+    }
+  ],
+  "completed_work_orders": [],
+  "policies": {
+    "repository_is_sole_source_of_truth": true,
+    "pairwise_disjoint": true,
+    "no_fourth_coding_lane": true,
+    "no_parallel_financial_authority": true,
+    "blockchain_is_one_rail_family": true,
+    "external_balances_are_observations": true,
+    "unknown_is_not_failed": true,
+    "raw_secrets_never_enter_model_context": true,
+    "simulation_never_production_authority": true,
+    "security_block_cannot_be_downgraded": true,
+    "provider_catalogue_never_authorizes": true,
+    "provider_native_baseline_preserved": true,
+    "surface_contracts_are_framework_independent": true
+  },
+  "gates": [
+    "upstream_lineage_verified",
+    "architecture_lock_verified",
+    "authority_boundaries_machine_checked",
+    "invariant_suite_green",
+    "package_dependency_rules_green",
+    "migration_matrix_verified",
+    "real_provider_integration_evidence",
+    "real_onchain_evidence",
+    "mixed_rail_execution_evidence",
+    "merchant_crypto_evidence",
+    "opportunity_discovery_evidence",
+    "adversarial_security_evidence",
+    "surface_api_verified",
+    "web_browser_verification",
+    "desktop_verification",
+    "extension_api_verification",
+    "reproducible_production_release",
+    "rollback_verified"
+  ]
+}
