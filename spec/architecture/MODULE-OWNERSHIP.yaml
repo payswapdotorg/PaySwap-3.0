@@ -1,0 +1,67 @@
+version: 1
+architecture: payswap-3.0
+rule: domain-authority-isolation
+
+layers:
+  platform:
+    owner: platform
+    examples: [rpc, transport, session, client, web, desktop, cli, telemetry, browser, plugins]
+    may_depend_on: [contracts]
+    must_not_depend_on: [financial-implementation]
+  contracts:
+    owner: architecture
+    examples: [shared-protocols, surface-contracts]
+    may_depend_on: []
+  economic:
+    owner: economic
+    examples: [goals, intents, execution-graph, strategy, opportunities]
+    may_depend_on: [contracts]
+    must_not_depend_on: [ui, model-runtime, provider-sdk]
+  trust:
+    owner: trust
+    examples: [principals, mandates, delegation, approvals, credentials]
+    may_depend_on: [contracts]
+  capability:
+    owner: network
+    examples: [capability-definition, provider-implementation, connected-instance, observation, certification]
+    may_depend_on: [contracts, trust]
+  financial:
+    owner: financial
+    examples: [money, obligations, clearing, netting, settlement, reconciliation, evidence]
+    may_depend_on: [contracts, trust, capability]
+    must_not_depend_on: [ui, model-runtime, lab]
+  rails:
+    owner: network
+    examples: [fiat, payment, fx, onchain, future]
+    may_depend_on: [contracts, capability, trust, financial]
+    must_not_depend_on: [ui, model-runtime]
+  intelligence:
+    owner: intelligence
+    examples: [agents, organizations, director, lab, optimization]
+    may_depend_on: [economic, capability, contracts]
+    cannot_authorize_financial_effects: true
+  security:
+    owner: security
+    examples: [policy, threat-intel, deterministic-gates, security-epoch]
+    may_depend_on: [trust, capability, contracts]
+    cannot_downgrade_block: true
+  experience:
+    owner: experience
+    examples: [surface, web-ui, desktop-ui, mobile, extension]
+    may_depend_on: [contracts]
+    must_not_own_financial_truth: true
+
+authority:
+  financial_truth: financial
+  delegated_power: trust
+  capability_certification: capability
+  hard_constraints: security
+  intelligence_proposals: intelligence
+  application_permission: platform
+
+dependency_rules:
+  forbid_cycles: true
+  forbid_deep_imports: true
+  domain_contracts_framework_free: true
+  platform_permission_not_financial_authorization: true
+  no_parallel_financial_authority: true
