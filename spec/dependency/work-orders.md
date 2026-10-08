@@ -1,7 +1,7 @@
 # PaySwap 3.0 Work Order Catalog
 
-## P0-W1 - upstream/platform bootstrap
-Materialize and verify the pinned ZCode baseline, rename product identity, establish reproducible root tooling, classify inherited modules and preserve upstream lineage.
+## P0-W1 - upstream/platform baseline and repository integration
+Verify the already-materialized pinned ZCode fork lineage, rename product identity where appropriate, establish reproducible root tooling, classify inherited modules, and confirm the inherited platform remains buildable before PaySwap feature migration.
 
 ## P0-W2 - architecture governance
 Turn architecture, authority, invariants and ownership into machine-checkable repository controls where practical; establish PaySwap module policy without breaking inherited runtime unnecessarily.
