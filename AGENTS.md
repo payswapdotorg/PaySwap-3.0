@@ -18,6 +18,7 @@ Read before coding:
 - `spec/UPSTREAM-BASE.md`
 - `spec/MIGRATION-FROM-PAYSWAP-ORG.md`
 - `spec/MIGRATION-FROM-ZCODE.md`
+- `docs/ZCODE-PLATFORM-BASELINE.md`
 
 ## TL governance
 
