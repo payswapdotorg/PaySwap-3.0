@@ -73,5 +73,16 @@
     "extension_api_verification",
     "reproducible_production_release",
     "rollback_verified"
+  ],
+  "reference_sources": {
+    "old_payswap_repository": "payswapdotorg/payswap.org",
+    "reviewed_reference_commit": "8a735bf1639198c43115087a2992555166a9acf9",
+    "note": "Used only as verified historical/reference implementation; PaySwap 3.0 architecture and source win."
+  },
+  "repository_setup_verified_at": "2026-10-08",
+  "notes": [
+    "main is a GitHub fork lineage of zai-org/ZCode with pinned baseline 29628c9acdb81b703bbd4080c207a0e7ce5e276e.",
+    "Canonical PaySwap governance files are committed under spec/ and docs/.",
+    "P0-W1 must verify/adapt the inherited platform baseline rather than re-materialize upstream."
   ]
 }
