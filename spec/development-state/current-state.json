@@ -18,8 +18,7 @@
   },
   "frontier": [
     "P1-W1",
-    "P1-W2",
-    "P1-W3"
+    "P1-W2"
   ],
   "active_work_orders": [
     {
@@ -52,22 +51,6 @@
         "docs/protocol-evidence/**"
       ],
       "chat_id": "e06e3cef-01a8-4bb2-bf45-84d222b71914",
-      "dispatch_verified": "agents-tab, GLM-5.3, Full-Stack, insert 100%, send server-verified"
-    },
-    {
-      "id": "P1-W3",
-      "owner": "worker-3",
-      "status": "DISPATCHED",
-      "session": "payswap3-p1-w3",
-      "branch": "work/p1-w3",
-      "base_sha": "0a5b9765edfb65a502dfd388f30b471854531a36",
-      "scope": "trust/policy/security boundary: principals, mandates + policy-constraint family, AmountSpec wire type + structural validation, strict child-delegation attenuation (INV-12), approval artifacts, security-epoch + policy-epoch linkage (BLOCK survives, INV-21)",
-      "write_surface": [
-        "packages/trust/**",
-        "spec/trust/**",
-        "docs/trust-evidence/**"
-      ],
-      "chat_id": "e1d3dfff-f65e-450d-b01c-8a63165caa66",
       "dispatch_verified": "agents-tab, GLM-5.3, Full-Stack, insert 100%, send server-verified"
     }
   ],
@@ -164,6 +147,32 @@
         "F1/F2/F3 from P0-W1 (tooling contract, lockfile drift, test-contract gap) remain queued"
       ],
       "completed_at": "2026-10-10T11:15:00Z"
+    },
+    {
+      "id": "P1-W3",
+      "owner": "worker-3",
+      "status": "COMPLETE",
+      "session": "payswap3-p1-w3",
+      "chat_id": "e1d3dfff-f65e-450d-b01c-8a63165caa66",
+      "worker_branch": "work/p1-w3",
+      "worker_head_sha": "0e9e7929b9eb3d661bd08dbc0181706244eae78c",
+      "base_sha": "0a5b9765edfb65a502dfd388f30b471854531a36",
+      "provenance": "Single-turn execution (30 min dispatch-to-complete); workspace reaped post-completion but pod+files recovered via the status/files API addressed by pod name (c-6aca2dd1) — patches harvested 3/3 with SHA exact-match before any loss; recovery path recorded as a platform lesson.",
+      "accepted_via_merge": "3-patch series applied from 0a5b976 (packages/trust/** 30 files, spec/trust/TRUST-BOUNDARY.md, docs/trust-evidence/BASELINE-VERIFICATION-RECORD.md)",
+      "evidence": [
+        "packages/trust/src/** (principal, mandate, amount-spec, attenuation, attenuation-rules, grants, scoped-gate, approval-artifacts, authorization, security-epoch, policy-epoch, security-block, minor-units internal)",
+        "packages/trust/test/** (11 files: 79/79 old-suite tests ported + 59 net-new)",
+        "spec/trust/TRUST-BOUNDARY.md",
+        "docs/trust-evidence/BASELINE-VERIFICATION-RECORD.md"
+      ],
+      "tl_battery": "Independent re-run EXACT match: npm install exit 0; tsc --noEmit 0 diagnostics (strict + exactOptionalPropertyTypes); vitest 138/138 in 11 files (attenuation 30, authorization 17, approval-artifacts 12, grants 12, scoped-execution 8, epoch 9, epoch-linkage 19, security-block 10, minor-units 13, boundary 7, smoke 1); import smoke EXPORTS 47; minor-units helpers verified NOT exported (single-owner law); leaf law verified (zero @zcode/* + zero sibling @payswap imports); max file 399 lines; root oxlint on package 0w/0e; root architecture:check 0 violations",
+      "gates_closed": [],
+      "findings_queued": [
+        "F-1 (ACCEPTED scoped exception): internal canonical-integer ordering/summation in src/minor-units.ts for INV-12/limit law enforcement — not exported, no Money/currency semantics; single-authority intent preserved (D-2)",
+        "F-2: artifact signature verification out of lane — signatures opaque non-empty strings until platform/capability lane owns cryptography (INV-19 boundary)",
+        "F-3: principal lifecycle model without runtime binding; registries in-memory (persistence/distribution out of P1-W3 scope)"
+      ],
+      "completed_at": "2026-10-10T13:30:00Z"
     }
   ],
   "policies": {
@@ -322,7 +331,21 @@
         }
       ],
       "base": "0a5b9765edfb65a502dfd388f30b471854531a36"
+    },
+    {
+      "ts": "2026-10-10T13:30:00Z",
+      "actor": "resident-TL",
+      "action": "P1_W3_ACCEPT",
+      "detail": "P1-W3 ACCEPTED after evidence-based TL review. Lane completed 13:17Z (queue_watch server-confirmed marker; single-turn execution). Workspace had been REAPED post-completion (not merely inactive — absent from the user-fc listing): recovered via /api/v1/web-dev/workspaces/status (chat_id -> pod c-6aca2dd1 Running) + files APIs addressed by pod name; delivery/p1-w3/ harvested 3/3 with patch SHAs exact-matching the report (a272913/be9dc3c/0e9e792). TL review: write surface clean; AmountSpec pin byte-identical (interface + /^[A-Z]{3}$/ + /^(0|[1-9][0-9]*)$/ patterns); single-owner law preserved (minor-units internal, verified not exported); INV-12 attenuation machine-checked (27 old widening rejections + net-new); epoch linkage TB-5 end-to-end; INV-21 BLOCK-survives with append-only revocation-only exit. TL battery independently re-run EXACT match (138/138, exports 47, tsc clean). Merge --no-ff onto main. AmountSpec wire now has its authoritative type landing first; W1/W2 structural pins reconcile against this at their acceptance.",
+      "merge": "P1-W3 ACCEPT merge commit on main",
+      "lanes": [
+        {
+          "id": "P1-W3",
+          "session": "payswap3-p1-w3",
+          "branch": "work/p1-w3"
+        }
+      ]
     }
   ],
-  "last_tl_action_at": "2026-10-10T12:50:00Z"
+  "last_tl_action_at": "2026-10-10T13:30:00Z"
 }
