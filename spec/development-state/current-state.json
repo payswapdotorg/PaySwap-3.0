@@ -16,21 +16,8 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [
-    "P0-W2"
-  ],
-  "active_work_orders": [
-    {
-      "id": "P0-W2",
-      "owner": "worker-2",
-      "status": "DISPATCHED",
-      "session": "payswap3-p0-w2",
-      "chat_id": "48211b09-9e26-4d3b-a5b8-c34890edeb95",
-      "branch": "work/p0-w2",
-      "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e",
-      "note": "Original task-creation send was a spawn-wall casualty (recorded, never entered model context; no pod). TL re-sent the full work order as a plain chat message 2026-10-10T07:08Z after freeing sandbox slots; turn spawned + pod provisioned; lane generating."
-    }
-  ],
+  "frontier": [],
+  "active_work_orders": [],
   "completed_work_orders": [
     {
       "id": "P0-W1",
@@ -91,6 +78,39 @@
         "GAP-05 developer-API ZCode-equivalent partial (P7-W3 boundary)"
       ],
       "completed_at": "2026-10-10T08:55:00Z"
+    },
+    {
+      "id": "P0-W2",
+      "owner": "worker-2",
+      "status": "COMPLETE",
+      "session": "payswap3-p0-w2",
+      "chat_id": "48211b09-9e26-4d3b-a5b8-c34890edeb95",
+      "worker_branch": "work/p0-w2",
+      "worker_head_sha": "f2b31f138dbdc1e31c61dee0ea5a3f5cb0802776",
+      "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e",
+      "provenance": "Lane survived a spawn-wall casualty + two zombie turns + repeated peak-capacity cuts (turns 1-7; 453K->802K chars accumulated); queue_watch re-aimed at its recreated tab detected the server-verified COMPLETION REPORT and retired cleanly.",
+      "accepted_via_merge": "6-patch series applied from e40f2b9 (tools/architecture-governance/** 14 files, spec/architecture/invariants.json, MODULE-OWNERSHIP.yaml +49/-0, docs/architecture-governance/** 4 files)",
+      "evidence": [
+        "tools/architecture-governance/check-module-ownership.mjs",
+        "tools/architecture-governance/check-invariants.mjs",
+        "spec/architecture/invariants.json",
+        "docs/architecture-governance/VIOLATION-REGISTER.md",
+        "docs/architecture-governance/reports/module-ownership-report.json",
+        "docs/architecture-governance/INTEGRATION-PROPOSAL.md"
+      ],
+      "tl_battery": "validator re-run exit-1 honest baseline EXACT (32 packages, 76 edges, 54 violations R3x51+R6x3, 7 PASS/25 FAIL); unit tests 28/28 exit 0; invariant lint 4/4 exit 0; all tool files <=400 lines (max 398); MODULE-OWNERSHIP.yaml verified additive-only (+49/-0); invariants.json 29 entries with INV-16/26/27 machine-checked",
+      "gates_closed": [
+        "architecture_lock_verified",
+        "authority_boundaries_machine_checked"
+      ],
+      "findings_queued": [
+        "S1 contracts->platform edge (packages/shared imports @zcode/model-option-map) - ADR territory P1",
+        "S1 contracts->contracts edge (cli/contracts -> shared) - empty allow-list violation, ADR needed",
+        "S2 platform->platform 49 edges outside may_depend_on (ui->services 191 occ, bootstrap->adapters 162) - sub-layering ADR or composition-root exemption",
+        "queue_watch server_alive probe marker hardcode ('Base SHA' vs 'base_sha') - daemon revision",
+        "F1/F2/F3 from P0-W1 (tooling contract, lockfile drift, test-contract gap) remain queued"
+      ],
+      "completed_at": "2026-10-10T11:15:00Z"
     }
   ],
   "policies": {
@@ -137,7 +157,8 @@
   "notes": [
     "main is a GitHub fork lineage of zai-org/ZCode with pinned baseline 29628c9acdb81b703bbd4080c207a0e7ce5e276e.",
     "Canonical PaySwap governance files are committed under spec/ and docs/.",
-    "P0-W1 must verify/adapt the inherited platform baseline rather than re-materialize upstream."
+    "P0-W1 must verify/adapt the inherited platform baseline rather than re-materialize upstream.",
+    "Phase 0 complete (2026-10-10): all three P0 work orders accepted and durable on main. Next: TL stages P1 work orders per spec/dependency/graph.md; findings F1-F3 (P0-W1) and S1/S2 (P0-W2) queued for TL/ADR decisions."
   ],
   "dispatch_log": [
     {
@@ -208,7 +229,20 @@
           "outcome": "IN FLIGHT (generating after two zombie stop-cures + continuations)"
         }
       ]
+    },
+    {
+      "ts": "2026-10-10T11:15:00Z",
+      "actor": "resident-TL",
+      "action": "P0_W2_ACCEPT",
+      "detail": "P0-W2 ACCEPTED after evidence-based TL review. Lane fought through a spawn-wall casualty, two zombie turns (stop-cures applied), and repeated peak-capacity cuts (7 turns, 802K chars total); final delivery 6 patches harvested 6/6 (head f2b31f13 == report; workspace delivery commit 27fe90e). Station integration clean from e40f2b9; write surface clean (20 files); MODULE-OWNERSHIP.yaml additive-only verified. TL battery exact match: validator exit-1 honest baseline (54 violations, none hidden), tests 28/28, invariant lint 4/4. Gates architecture_lock_verified + authority_boundaries_machine_checked CLOSED. S1/S2 structural findings queued as ADR territory. PHASE 0 COMPLETE: all three work orders accepted (P0-W1 lineage+baseline, P0-W2 architecture governance, P0-W3 migration matrix).",
+      "lanes": [
+        {
+          "id": "P0-W2",
+          "session": "payswap3-p0-w2",
+          "outcome": "ACCEPT"
+        }
+      ]
     }
   ],
-  "last_tl_action_at": "2026-10-10T08:55:00Z"
+  "last_tl_action_at": "2026-10-10T11:15:00Z"
 }
