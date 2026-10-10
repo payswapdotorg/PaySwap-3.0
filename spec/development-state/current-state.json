@@ -16,8 +16,55 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [],
-  "active_work_orders": [],
+  "frontier": [
+    "P1-W1",
+    "P1-W2",
+    "P1-W3"
+  ],
+  "active_work_orders": [
+    {
+      "id": "P1-W1",
+      "owner": "worker-1",
+      "status": "DISPATCHED",
+      "session": "payswap3-p1-w1",
+      "branch": "work/p1-w1",
+      "base_sha": "0a5b9765edfb65a502dfd388f30b471854531a36",
+      "scope": "economic model: EconomicGoal (net-new per GAP-01), intents (MoneyMovementIntent ADAPT from old route-compiler, ServiceAccessIntent, PaymentIntent type-level, IntentArchetype), deterministic fail-closed validation, candidate compilation (rail-agnostic; EEG formalism P3-W2, routing P5-W1)",
+      "write_surface": [
+        "packages/economic/**",
+        "spec/economic/**",
+        "docs/economic-evidence/**"
+      ]
+    },
+    {
+      "id": "P1-W2",
+      "owner": "worker-2",
+      "status": "DISPATCHED",
+      "session": "payswap3-p1-w2",
+      "branch": "work/p1-w2",
+      "base_sha": "0a5b9765edfb65a502dfd388f30b471854531a36",
+      "scope": "financial protocol: exact Money primitive + arithmetic authority, obligations/clearing, reservations, netting (same-currency v1), settlement, finality, reconciliation (sole definitive resolver), evidence lineage; AmountSpec bridge; fx/liquidity/credit/collateral + persistence adapters deferred with register",
+      "write_surface": [
+        "packages/protocol/**",
+        "spec/protocol/**",
+        "docs/protocol-evidence/**"
+      ]
+    },
+    {
+      "id": "P1-W3",
+      "owner": "worker-3",
+      "status": "DISPATCHED",
+      "session": "payswap3-p1-w3",
+      "branch": "work/p1-w3",
+      "base_sha": "0a5b9765edfb65a502dfd388f30b471854531a36",
+      "scope": "trust/policy/security boundary: principals, mandates + policy-constraint family, AmountSpec wire type + structural validation, strict child-delegation attenuation (INV-12), approval artifacts, security-epoch + policy-epoch linkage (BLOCK survives, INV-21)",
+      "write_surface": [
+        "packages/trust/**",
+        "spec/trust/**",
+        "docs/trust-evidence/**"
+      ]
+    }
+  ],
   "completed_work_orders": [
     {
       "id": "P0-W1",
@@ -35,7 +82,7 @@
         "docs/platform-lineage/MECHANICAL-RENAME-PLAN.md",
         "spec/UPSTREAM-BASE.md#verification-record--p0-w1-2026-10-10"
       ],
-      "tl_battery": "architecture:check 0 violations (re-run); lint 70w/0e (re-run, exact match); typecheck 8/11 roots green at TL station (ui/web/desktop OOM = documented environmental F4; diff touches zero TS files so typecheck@HEAD \u2261 typecheck@base; worker full-root receipt B3 green); lineage claims L3=25/L4=28@base/L5/L7/L8 re-verified exact including live ls-remote of upstream pin",
+      "tl_battery": "architecture:check 0 violations (re-run); lint 70w/0e (re-run, exact match); typecheck 8/11 roots green at TL station (ui/web/desktop OOM = documented environmental F4; diff touches zero TS files so typecheck@HEAD ≡ typecheck@base; worker full-root receipt B3 green); lineage claims L3=25/L4=28@base/L5/L7/L8 re-verified exact including live ls-remote of upstream pin",
       "gates_closed": [
         "upstream_lineage_verified"
       ],
@@ -66,7 +113,7 @@
         "docs/migration-evidence/OLD-REPO-TEST-RECEIPTS.md",
         "docs/migration-evidence/DEPENDENCY-INVENTORY.md"
       ],
-      "tl_battery": "matrix consistency checker re-run: 550 checks 0 violations (exact match, with old-repo arg); old-repo suites independently re-run via the repo's own per-workspace contract: 393 files / 5,192 tests all-PASS (exact match with worker receipt; the 13 live-gated suites confirmed gated \u2014 they only run unfiltered and fail without credentials, per GAP-02); old-repo HEAD 8a735bf == recorded reference commit; ADAPT claims spot-verified exact (protocol/src/money.ts 419 lines, trust/src/mandate.ts AmountSpec); 36 packages confirmed",
+      "tl_battery": "matrix consistency checker re-run: 550 checks 0 violations (exact match, with old-repo arg); old-repo suites independently re-run via the repo's own per-workspace contract: 393 files / 5,192 tests all-PASS (exact match with worker receipt; the 13 live-gated suites confirmed gated — they only run unfiltered and fail without credentials, per GAP-02); old-repo HEAD 8a735bf == recorded reference commit; ADAPT claims spot-verified exact (protocol/src/money.ts 419 lines, trust/src/mandate.ts AmountSpec); 36 packages confirmed",
       "gates_closed": [
         "migration_matrix_verified"
       ],
@@ -158,7 +205,7 @@
     "main is a GitHub fork lineage of zai-org/ZCode with pinned baseline 29628c9acdb81b703bbd4080c207a0e7ce5e276e.",
     "Canonical PaySwap governance files are committed under spec/ and docs/.",
     "P0-W1 must verify/adapt the inherited platform baseline rather than re-materialize upstream.",
-    "Phase 0 complete (2026-10-10): all three P0 work orders accepted and durable on main. Next: TL stages P1 work orders per spec/dependency/graph.md; findings F1-F3 (P0-W1) and S1/S2 (P0-W2) queued for TL/ADR decisions."
+    "Phase 1 dispatched (2026-10-10): economic kernel in three pairwise-disjoint lanes on base 0a5b976. Shared pinned wire contract across lanes: AmountSpec { currency: /^[A-Z]{3}$/, minorUnits: canonical non-negative decimal integer string } — trust lane owns the wire type, protocol lane owns exact-integer semantics + the bridge; duplicate structural declarations are TL-reconciled at integration. F3 resolution for P1: workers run package-local batteries (npm install --no-workspaces + tsc --noEmit + vitest run inside their package dir; no root lockfile writes); the TL performs workspace integration (pnpm root install, MODULE-OWNERSHIP.yaml layer annotations, root test wiring) at acceptance. Deferred-by-design registers: P1-W2 defers fx/liquidity/credit/collateral kernels (P5-W1 dependency) and persistence adapters (infrastructure decision pending)."
   ],
   "dispatch_log": [
     {
@@ -192,7 +239,7 @@
       "ts": "2026-10-10T07:40:00Z",
       "actor": "resident-TL",
       "action": "P0_W1_ACCEPT",
-      "detail": "P0-W1 ACCEPTED after evidence-based TL review. Worker lane completed 05:56Z (queue_watch marker, server-side verified COMPLETION REPORT); sandbox had gone inactive post-completion \u2014 TL re-provisioned it via viewer-tab reload, harvested the 5-patch series from delivery/p0-w1/ (5/5 files, 0 failures, final patch SHA 39ea6f7c == reported head), released the slot. Station integration: patches applied clean from e40f2b9 on work/p0-w1-int; write surface verified clean (README*, docs/platform-lineage/**, spec/UPSTREAM-BASE.md only). TL battery: architecture:check 0 violations, lint 70w/0e exact match, typecheck 8/11 roots green (ui/web/desktop station-OOM = documented environmental; zero-TS diff), lineage claims re-verified exact (25 governance commits, 28 total @ base, root 77432b6, live upstream ls-remote == pin). Merge --no-ff onto main. Gate upstream_lineage_verified CLOSED. Findings F1/F2/F3 recorded for TL follow-up. Spawn-wall casualties on P0-W2/P0-W3 (task-creation sends recorded but never entered model context; no pods) \u2014 both lanes re-kicked with full-packet plain-message re-sends after slot release; P0-W2 turn live 07:11Z, P0-W3 retry daemon armed 07:22Z. FOLLOW-UP (07:5xZ): P0-W2's first turn stalled mid-reasoning (zombie, 35 min static) \u2014 stop-cured + continuation sent; worker resumed cleanly from the top ('No prior clone exists \u2014 resume from the top of the execution phase'). P0-W3's original chat VANISHED (wedge) during re-sends; lane voided + auto re-dispatched by its queue_watch as chat 29897b09 (pod provisioned); the TL's parallel w3b create was a phantom and was voided.",
+      "detail": "P0-W1 ACCEPTED after evidence-based TL review. Worker lane completed 05:56Z (queue_watch marker, server-side verified COMPLETION REPORT); sandbox had gone inactive post-completion — TL re-provisioned it via viewer-tab reload, harvested the 5-patch series from delivery/p0-w1/ (5/5 files, 0 failures, final patch SHA 39ea6f7c == reported head), released the slot. Station integration: patches applied clean from e40f2b9 on work/p0-w1-int; write surface verified clean (README*, docs/platform-lineage/**, spec/UPSTREAM-BASE.md only). TL battery: architecture:check 0 violations, lint 70w/0e exact match, typecheck 8/11 roots green (ui/web/desktop station-OOM = documented environmental; zero-TS diff), lineage claims re-verified exact (25 governance commits, 28 total @ base, root 77432b6, live upstream ls-remote == pin). Merge --no-ff onto main. Gate upstream_lineage_verified CLOSED. Findings F1/F2/F3 recorded for TL follow-up. Spawn-wall casualties on P0-W2/P0-W3 (task-creation sends recorded but never entered model context; no pods) — both lanes re-kicked with full-packet plain-message re-sends after slot release; P0-W2 turn live 07:11Z, P0-W3 retry daemon armed 07:22Z. FOLLOW-UP (07:5xZ): P0-W2's first turn stalled mid-reasoning (zombie, 35 min static) — stop-cured + continuation sent; worker resumed cleanly from the top ('No prior clone exists — resume from the top of the execution phase'). P0-W3's original chat VANISHED (wedge) during re-sends; lane voided + auto re-dispatched by its queue_watch as chat 29897b09 (pod provisioned); the TL's parallel w3b create was a phantom and was voided.",
       "merge": "P0-W1 ACCEPT merge commit on main",
       "lanes": [
         {
@@ -242,7 +289,31 @@
           "outcome": "ACCEPT"
         }
       ]
+    },
+    {
+      "ts": "2026-10-10T12:35:00Z",
+      "actor": "resident-TL",
+      "action": "P1_DISPATCH",
+      "detail": "Phase 1 (economic kernel) dispatched: all three lanes concurrent per the graph (pairwise-disjoint). Contract-first parallelism: the AmountSpec wire shape is pinned verbatim in all three packets so the lanes compose at integration without cross-lane imports in flight. Dependency-direction decision recorded: old-repo trust->protocol money import is REVERSED per the new layer law (financial may_depend_on trust, trust is a leaf) — protocol implements a local AmountSpec bridge against the pinned shape; TL swaps type imports at integration. queue_watch daemon revision applied pre-dispatch: the tab-lost server_alive probe marker fixed from 'Base SHA' to 'COMPLETION REPORT' (Task-26 latent bug — payswap3 packets emit 'base_sha:' so the fallback could never self-confirm; probe_chat's filled-regex keeps echo-rejection). Watch protocol: monitor -> harvest -> TL battery/evidence review -> accept -> push after review; workers hold no push credentials.",
+      "lanes": [
+        {
+          "id": "P1-W1",
+          "session": "payswap3-p1-w1",
+          "branch": "work/p1-w1"
+        },
+        {
+          "id": "P1-W2",
+          "session": "payswap3-p1-w2",
+          "branch": "work/p1-w2"
+        },
+        {
+          "id": "P1-W3",
+          "session": "payswap3-p1-w3",
+          "branch": "work/p1-w3"
+        }
+      ],
+      "base": "0a5b9765edfb65a502dfd388f30b471854531a36"
     }
   ],
-  "last_tl_action_at": "2026-10-10T11:15:00Z"
+  "last_tl_action_at": "2026-10-10T12:35:00Z"
 }
