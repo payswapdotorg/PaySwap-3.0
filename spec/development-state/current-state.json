@@ -36,10 +36,10 @@
       "owner": "worker-3",
       "status": "DISPATCHED",
       "session": "payswap3-p0-w3",
-      "chat_id": "a0ce5fb9-1331-48bd-be94-be1b9216c37f",
+      "chat_id": "29897b09-26bf-4c15-9164-48a204b1c426",
       "branch": "work/p0-w3",
       "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e",
-      "note": "Same spawn-wall casualty class as P0-W2; TL packet re-send in flight (patient retry daemon armed 2026-10-10T07:22Z)."
+      "note": "Original chat a0ce5fb9 VANISHED server-side (wedge pattern) during TL packet re-sends after the spawn-wall casualty — absent from all 221 chats. Lane voided and auto re-dispatched by its queue_watch (new chat 29897b09, title 'PaySwap 3.0 Migration Inventory Report', glm-5.3 general_agent, pod ws-d6f171e2 provisioned 07:39Z). A TL-initiated parallel re-dispatch attempt (payswap3-p0-w3b) produced a phantom create and was voided."
     }
   ],
   "completed_work_orders": [
@@ -147,7 +147,7 @@
       "ts": "2026-10-10T07:40:00Z",
       "actor": "resident-TL",
       "action": "P0_W1_ACCEPT",
-      "detail": "P0-W1 ACCEPTED after evidence-based TL review. Worker lane completed 05:56Z (queue_watch marker, server-side verified COMPLETION REPORT); sandbox had gone inactive post-completion — TL re-provisioned it via viewer-tab reload, harvested the 5-patch series from delivery/p0-w1/ (5/5 files, 0 failures, final patch SHA 39ea6f7c == reported head), released the slot. Station integration: patches applied clean from e40f2b9 on work/p0-w1-int; write surface verified clean (README*, docs/platform-lineage/**, spec/UPSTREAM-BASE.md only). TL battery: architecture:check 0 violations, lint 70w/0e exact match, typecheck 8/11 roots green (ui/web/desktop station-OOM = documented environmental; zero-TS diff), lineage claims re-verified exact (25 governance commits, 28 total @ base, root 77432b6, live upstream ls-remote == pin). Merge --no-ff onto main. Gate upstream_lineage_verified CLOSED. Findings F1/F2/F3 recorded for TL follow-up. Spawn-wall casualties on P0-W2/P0-W3 (task-creation sends recorded but never entered model context; no pods) — both lanes re-kicked with full-packet plain-message re-sends after slot release; P0-W2 turn live 07:11Z, P0-W3 retry daemon armed 07:22Z.",
+      "detail": "P0-W1 ACCEPTED after evidence-based TL review. Worker lane completed 05:56Z (queue_watch marker, server-side verified COMPLETION REPORT); sandbox had gone inactive post-completion — TL re-provisioned it via viewer-tab reload, harvested the 5-patch series from delivery/p0-w1/ (5/5 files, 0 failures, final patch SHA 39ea6f7c == reported head), released the slot. Station integration: patches applied clean from e40f2b9 on work/p0-w1-int; write surface verified clean (README*, docs/platform-lineage/**, spec/UPSTREAM-BASE.md only). TL battery: architecture:check 0 violations, lint 70w/0e exact match, typecheck 8/11 roots green (ui/web/desktop station-OOM = documented environmental; zero-TS diff), lineage claims re-verified exact (25 governance commits, 28 total @ base, root 77432b6, live upstream ls-remote == pin). Merge --no-ff onto main. Gate upstream_lineage_verified CLOSED. Findings F1/F2/F3 recorded for TL follow-up. Spawn-wall casualties on P0-W2/P0-W3 (task-creation sends recorded but never entered model context; no pods) — both lanes re-kicked with full-packet plain-message re-sends after slot release; P0-W2 turn live 07:11Z, P0-W3 retry daemon armed 07:22Z. FOLLOW-UP (07:5xZ): P0-W2's first turn stalled mid-reasoning (zombie, 35 min static) — stop-cured + continuation sent; worker resumed cleanly from the top ('No prior clone exists — resume from the top of the execution phase'). P0-W3's original chat VANISHED (wedge) during re-sends; lane voided + auto re-dispatched by its queue_watch as chat 29897b09 (pod provisioned); the TL's parallel w3b create was a phantom and was voided.",
       "merge": "P0-W1 ACCEPT merge commit on main",
       "lanes": [
         {
