@@ -144,7 +144,7 @@ export function loadPolicy(root, policyPath = "spec/architecture/MODULE-OWNERSHI
     }
   }
 
-  return { layers, dependencyRules, packageLayers };
+  return { layers, dependencyRules, packageLayers, authority: doc.authority ?? null };
 }
 
 /**
