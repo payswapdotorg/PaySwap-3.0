@@ -91,8 +91,12 @@ evidence in `reports/module-ownership-report.json` → `violations[]`.)
   imports — INV-27 is machine-checked green today.
 - **Unresolved external specifiers: 248** (not violations): tooling scripts
   importing build-time externals (esbuild, typescript) not declared in their
-  package.json, plus test-time imports. Enumerated (first 50) in the report
-  for dependency-hygiene follow-up; out of P0-W2 scope to remediate.
+  package.json, plus test-time imports. 40 of them are `#`-prefixed
+  subpath-import specifiers (package.json `imports` field), which the
+  resolver classifies as external — a documented scanner limitation recorded
+  in the report, harmless for layer-direction analysis (`#` imports stay
+  inside the importing package). Enumerated (first 50) in the report for
+  dependency-hygiene follow-up; out of P0-W2 scope to remediate.
 
 ## What was deliberately NOT done
 
