@@ -34,7 +34,9 @@
         "packages/economic/**",
         "spec/economic/**",
         "docs/economic-evidence/**"
-      ]
+      ],
+      "chat_id": "bc34d8c0-55fe-4396-9218-025142b320a1",
+      "dispatch_verified": "agents-tab, GLM-5.3, Full-Stack, insert 100%, send server-verified"
     },
     {
       "id": "P1-W2",
@@ -48,7 +50,9 @@
         "packages/protocol/**",
         "spec/protocol/**",
         "docs/protocol-evidence/**"
-      ]
+      ],
+      "chat_id": "e06e3cef-01a8-4bb2-bf45-84d222b71914",
+      "dispatch_verified": "agents-tab, GLM-5.3, Full-Stack, insert 100%, send server-verified"
     },
     {
       "id": "P1-W3",
@@ -62,7 +66,9 @@
         "packages/trust/**",
         "spec/trust/**",
         "docs/trust-evidence/**"
-      ]
+      ],
+      "chat_id": "e1d3dfff-f65e-450d-b01c-8a63165caa66",
+      "dispatch_verified": "agents-tab, GLM-5.3, Full-Stack, insert 100%, send server-verified"
     }
   ],
   "completed_work_orders": [
@@ -294,26 +300,29 @@
       "ts": "2026-10-10T12:35:00Z",
       "actor": "resident-TL",
       "action": "P1_DISPATCH",
-      "detail": "Phase 1 (economic kernel) dispatched: all three lanes concurrent per the graph (pairwise-disjoint). Contract-first parallelism: the AmountSpec wire shape is pinned verbatim in all three packets so the lanes compose at integration without cross-lane imports in flight. Dependency-direction decision recorded: old-repo trust->protocol money import is REVERSED per the new layer law (financial may_depend_on trust, trust is a leaf) — protocol implements a local AmountSpec bridge against the pinned shape; TL swaps type imports at integration. queue_watch daemon revision applied pre-dispatch: the tab-lost server_alive probe marker fixed from 'Base SHA' to 'COMPLETION REPORT' (Task-26 latent bug — payswap3 packets emit 'base_sha:' so the fallback could never self-confirm; probe_chat's filled-regex keeps echo-rejection). Watch protocol: monitor -> harvest -> TL battery/evidence review -> accept -> push after review; workers hold no push credentials.",
+      "detail": "Phase 1 (economic kernel) dispatched: all three lanes concurrent per the graph (pairwise-disjoint). Contract-first parallelism: the AmountSpec wire shape is pinned verbatim in all three packets so the lanes compose at integration without cross-lane imports in flight. Dependency-direction decision recorded: old-repo trust->protocol money import is REVERSED per the new layer law (financial may_depend_on trust, trust is a leaf) — protocol implements a local AmountSpec bridge against the pinned shape; TL swaps type imports at integration. queue_watch daemon revision applied pre-dispatch: the tab-lost server_alive probe marker fixed from 'Base SHA' to 'COMPLETION REPORT' (Task-26 latent bug — payswap3 packets emit 'base_sha:' so the fallback could never self-confirm; probe_chat's filled-regex keeps echo-rejection). Watch protocol: monitor -> harvest -> TL battery/evidence review -> accept -> push after review; workers hold no push credentials. Dispatch verified: all three sessions server-accepted (registry records: agents-tab mode, model GLM-5.3, skill Full-Stack, insert 100%, sent=true). Lane watchers armed (queue_watch, finite, non-push, spec-file supervised).",
       "lanes": [
         {
           "id": "P1-W1",
           "session": "payswap3-p1-w1",
-          "branch": "work/p1-w1"
+          "branch": "work/p1-w1",
+          "chat": "bc34d8c0-55fe-4396-9218-025142b320a1"
         },
         {
           "id": "P1-W2",
           "session": "payswap3-p1-w2",
-          "branch": "work/p1-w2"
+          "branch": "work/p1-w2",
+          "chat": "e06e3cef-01a8-4bb2-bf45-84d222b71914"
         },
         {
           "id": "P1-W3",
           "session": "payswap3-p1-w3",
-          "branch": "work/p1-w3"
+          "branch": "work/p1-w3",
+          "chat": "e1d3dfff-f65e-450d-b01c-8a63165caa66"
         }
       ],
       "base": "0a5b9765edfb65a502dfd388f30b471854531a36"
     }
   ],
-  "last_tl_action_at": "2026-10-10T12:35:00Z"
+  "last_tl_action_at": "2026-10-10T12:50:00Z"
 }
