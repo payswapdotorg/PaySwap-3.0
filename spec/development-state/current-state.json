@@ -17,20 +17,10 @@
     "worker-3": "migration-experience-and-integrations"
   },
   "frontier": [
-    "P0-W1",
     "P0-W2",
     "P0-W3"
   ],
   "active_work_orders": [
-    {
-      "id": "P0-W1",
-      "owner": "worker-1",
-      "status": "DISPATCHED",
-      "session": "payswap3-p0-w1",
-      "chat_id": "6a2889e3-2e8f-494b-9249-c28c633ca923",
-      "branch": "work/p0-w1",
-      "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e"
-    },
     {
       "id": "P0-W2",
       "owner": "worker-2",
@@ -38,7 +28,8 @@
       "session": "payswap3-p0-w2",
       "chat_id": "48211b09-9e26-4d3b-a5b8-c34890edeb95",
       "branch": "work/p0-w2",
-      "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e"
+      "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e",
+      "note": "Original task-creation send was a spawn-wall casualty (recorded, never entered model context; no pod). TL re-sent the full work order as a plain chat message 2026-10-10T07:08Z after freeing sandbox slots; turn spawned + pod provisioned; lane generating."
     },
     {
       "id": "P0-W3",
@@ -47,10 +38,37 @@
       "session": "payswap3-p0-w3",
       "chat_id": "a0ce5fb9-1331-48bd-be94-be1b9216c37f",
       "branch": "work/p0-w3",
-      "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e"
+      "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e",
+      "note": "Same spawn-wall casualty class as P0-W2; TL packet re-send in flight (patient retry daemon armed 2026-10-10T07:22Z)."
     }
   ],
-  "completed_work_orders": [],
+  "completed_work_orders": [
+    {
+      "id": "P0-W1",
+      "owner": "worker-1",
+      "status": "COMPLETE",
+      "session": "payswap3-p0-w1",
+      "chat_id": "6a2889e3-2e8f-494b-9249-c28c633ca923",
+      "worker_branch": "work/p0-w1",
+      "worker_head_sha": "39ea6f7c9ba2d1f2cf117f54efc2ad282f6feac0",
+      "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e",
+      "accepted_via_merge": "6-file diff applied from the harvested 5-patch series (docs/platform-lineage/BASELINE-VERIFICATION-RECORD.md, MECHANICAL-RENAME-PLAN.md, module-inventory.json; README.md/README.en.md identity; spec/UPSTREAM-BASE.md receipt)",
+      "evidence": [
+        "docs/platform-lineage/BASELINE-VERIFICATION-RECORD.md",
+        "docs/platform-lineage/module-inventory.json",
+        "docs/platform-lineage/MECHANICAL-RENAME-PLAN.md",
+        "spec/UPSTREAM-BASE.md#verification-record--p0-w1-2026-10-10"
+      ],
+      "tl_battery": "architecture:check 0 violations (re-run); lint 70w/0e (re-run, exact match); typecheck 8/11 roots green at TL station (ui/web/desktop OOM = documented environmental F4; diff touches zero TS files so typecheck@HEAD ≡ typecheck@base; worker full-root receipt B3 green); lineage claims L3=25/L4=28@base/L5/L7/L8 re-verified exact including live ls-remote of upstream pin",
+      "gates_closed": ["upstream_lineage_verified"],
+      "findings_queued": [
+        "F1 tooling contract (corepack vs bare pnpm)",
+        "F2 inherited apps/zcode-cli lockfile drift (follow-up WO candidate)",
+        "F3 no root test contract (needed before P1)"
+      ],
+      "completed_at": "2026-10-10T07:40:00Z"
+    }
+  ],
   "policies": {
     "repository_is_sole_source_of_truth": true,
     "pairwise_disjoint": true,
@@ -124,7 +142,31 @@
         }
       ],
       "base": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e"
+    },
+    {
+      "ts": "2026-10-10T07:40:00Z",
+      "actor": "resident-TL",
+      "action": "P0_W1_ACCEPT",
+      "detail": "P0-W1 ACCEPTED after evidence-based TL review. Worker lane completed 05:56Z (queue_watch marker, server-side verified COMPLETION REPORT); sandbox had gone inactive post-completion — TL re-provisioned it via viewer-tab reload, harvested the 5-patch series from delivery/p0-w1/ (5/5 files, 0 failures, final patch SHA 39ea6f7c == reported head), released the slot. Station integration: patches applied clean from e40f2b9 on work/p0-w1-int; write surface verified clean (README*, docs/platform-lineage/**, spec/UPSTREAM-BASE.md only). TL battery: architecture:check 0 violations, lint 70w/0e exact match, typecheck 8/11 roots green (ui/web/desktop station-OOM = documented environmental; zero-TS diff), lineage claims re-verified exact (25 governance commits, 28 total @ base, root 77432b6, live upstream ls-remote == pin). Merge --no-ff onto main. Gate upstream_lineage_verified CLOSED. Findings F1/F2/F3 recorded for TL follow-up. Spawn-wall casualties on P0-W2/P0-W3 (task-creation sends recorded but never entered model context; no pods) — both lanes re-kicked with full-packet plain-message re-sends after slot release; P0-W2 turn live 07:11Z, P0-W3 retry daemon armed 07:22Z.",
+      "merge": "P0-W1 ACCEPT merge commit on main",
+      "lanes": [
+        {
+          "id": "P0-W1",
+          "session": "payswap3-p0-w1",
+          "outcome": "ACCEPT"
+        },
+        {
+          "id": "P0-W2",
+          "session": "payswap3-p0-w2",
+          "outcome": "RE-KICKED (spawn-wall casualty, generating)"
+        },
+        {
+          "id": "P0-W3",
+          "session": "payswap3-p0-w3",
+          "outcome": "RE-KICKED (retry daemon armed)"
+        }
+      ]
     }
   ],
-  "last_tl_action_at": "2026-10-10T05:54:00Z"
+  "last_tl_action_at": "2026-10-10T07:40:00Z"
 }
