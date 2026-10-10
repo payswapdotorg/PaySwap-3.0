@@ -1,7 +1,7 @@
-# ZCode
+# PaySwap 3.0
 
 <div align="center">
-  <img src="public/logo/icons/1024x1024.png" alt="ZCode" width="128" height="128" />
+  <img src="public/logo/icons/1024x1024.png" alt="PaySwap 3.0" width="128" height="128" />
 </div>
 <p align="center">
   <a href="https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=47ag983c-8fcb-4d6d-814b-5395193a712c&amp;qr_code=true">Feishu community</a> ·
@@ -11,11 +11,11 @@
   <a href="README.md">简体中文</a> | English
 </p>
 
-ZCode is an AI coding workspace with desktop, browser, and terminal interfaces. This repository contains the clients, backend services, shared UI, and Agent CLI and runtime source code.
+PaySwap 3.0 is a universal economic operating system built from the ZCode platform substrate — an AI workspace platform with desktop, browser, and terminal interfaces. This repository is a fork of `zai-org/ZCode` pinned at baseline `29628c9acdb81b703bbd4080c207a0e7ce5e276e` (ZCode v3.14.3). It contains the inherited platform substrate (clients, backend services, shared UI, and Agent CLI and runtime source code) plus PaySwap governance and economic-layer work governed under `spec/`. Upstream attribution, license and third-party notices are preserved. Package names (`@zcode/*`), the `zcode` command and `ZCODE_*` environment variables intentionally keep the upstream scope until the mechanical rename plan in `docs/platform-lineage/MECHANICAL-RENAME-PLAN.md` is accepted.
 
-## Updates
+## Upstream baseline
 
-- 2026-9-23: Updated to ZCode v3.14.3.
+- 2026-9-23: Pinned upstream ZCode v3.14.3 (`29628c9acdb81b703bbd4080c207a0e7ce5e276e`). Do not silently track upstream `main`; see `spec/UPSTREAM-BASE.md`.
 
 ## Setup
 

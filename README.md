@@ -1,6 +1,6 @@
 # PaySwap 3.0
 
-PaySwap 3.0 is a universal economic operating system built from the ZCode platform substrate and governed by a deterministic PaySwap financial protocol.
+PaySwap 3.0 is a universal economic operating system built from the ZCode platform substrate and governed by a deterministic PaySwap financial protocol. This repository is a GitHub fork of `zai-org/ZCode` pinned at baseline `29628c9acdb81b703bbd4080c207a0e7ce5e276e` (ZCode v3.14.3); upstream attribution, license and third-party notices are preserved, and upstream history is never rewritten.
 
 ## Repository authority
 

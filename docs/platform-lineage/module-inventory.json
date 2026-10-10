@@ -1,0 +1,671 @@
+{
+  "schema": "payswap3-p0-w1-module-inventory/1.0",
+  "generated_at": "2026-10-10",
+  "work_order": "P0-W1",
+  "repository": "payswapdotorg/PaySwap-3.0",
+  "base_sha": "e40f2b9cc8da7d5ccfe15c93b43adc2dbf941b6e",
+  "upstream_pin": "29628c9acdb81b703bbd4080c207a0e7ce5e276e (zai-org/ZCode v3.14.3)",
+  "classification_source": "spec/MIGRATION-FROM-ZCODE.md",
+  "layer_source": "spec/architecture/MODULE-OWNERSHIP.yaml",
+  "scope": "apps/ + packages/ workspace projects including apps/zcode-cli subpackages and tools",
+  "note": "No inherited module maps to the economic/trust/capability/financial layers; those are PaySwap-built. Inherited permission surfaces are platform application permission, never financial authorization.",
+  "summary": {
+    "total_modules": 34,
+    "counts": {
+      "layer": {
+        "platform": 30,
+        "contracts": 3,
+        "experience": 1
+      },
+      "classification": {
+        "KEEP": 27,
+        "GENERALIZE": 4,
+        "PAYSWAP-ADAPT": 1,
+        "DEPRECATE-CANDIDATE": 2
+      }
+    }
+  },
+  "modules": [
+    {
+      "dir": "packages/rpc",
+      "name": "@zcode/rpc",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Product-neutral VS Code-style IPC/RPC communication framework; explicitly KEEP-listed transport substrate.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS (tsc)",
+      "ts_files": 20,
+      "ts_lines": 4078,
+      "local_deps": [],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/server",
+      "name": "@zcode/server",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "HTTP/WebSocket services and remote connections; KEEP-listed session/event transport substrate for all clients.",
+      "key_files": [
+        "src/index.ts",
+        "src/entry-http.ts"
+      ],
+      "build_status": "build PASS (tsup + build:remote); nested bare `pnpm` call requires corepack shim on PATH",
+      "ts_files": 51,
+      "ts_lines": 11025,
+      "local_deps": [
+        "@zcode/client",
+        "@zcode/rpc",
+        "@zcode/services",
+        "@zcode/shared"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/web",
+      "name": "@zcode/web",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Web client substrate (Vite); KEEP-critical platform package; the new PaySwap Web (P7-W1) is built on this substrate.",
+      "key_files": [
+        "index.html",
+        "vite.config.ts"
+      ],
+      "build_status": "build PASS (vite build); first attempt OOM-killed (137) in 4GB container, PASS with capped heap",
+      "ts_files": 16,
+      "ts_lines": 2971,
+      "local_deps": [
+        "@zcode/client",
+        "@zcode/shared",
+        "@zcode/ui"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/client",
+      "name": "@zcode/client",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Agent client SDK consumed by desktop/web/CLI; product-neutral client contract.",
+      "key_files": [
+        "src/index.ts",
+        "src/globals.d.ts"
+      ],
+      "build_status": "no standalone build script; type-checked green via root `pnpm typecheck`",
+      "ts_files": 5,
+      "ts_lines": 413,
+      "local_deps": [
+        "@zcode/rpc",
+        "@zcode/services",
+        "@zcode/shared"
+      ],
+      "has_build_script": false,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/desktop",
+      "name": "@zcode/desktop",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Electron Main/Host/Renderer shell and desktop packaging; P7-W2 adapts it into PaySwap Desktop.",
+      "key_files": [
+        "src/main/index.ts",
+        "src/host/index.ts"
+      ],
+      "build_status": "build:no-runtime-assets PASS; full bundle (remote assets, electron packaging) not executed",
+      "ts_files": 267,
+      "ts_lines": 61965,
+      "local_deps": [
+        "@zcode/client",
+        "@zcode/provider",
+        "@zcode/provider-node",
+        "@zcode/rpc",
+        "@zcode/server",
+        "@zcode/services",
+        "@zcode/shared",
+        "@zcode/ui",
+        "@zcode/zcode-cua"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/formal-proof",
+      "name": "@zcode/formal-proof",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "d3-based decision/trace review tool (standalone Vite app); product-neutral diagnostics tooling, potentially reusable for PaySwap evidence/trace review.",
+      "key_files": [
+        "src/main.ts",
+        "src/model.ts"
+      ],
+      "build_status": "build PASS (vite, 320ms)",
+      "ts_files": 3,
+      "ts_lines": 1838,
+      "local_deps": [],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/model-option-map",
+      "name": "@zcode/model-option-map",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Model-option mapping data; KEEP-listed model/provider selection machinery.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 8,
+      "ts_lines": 875,
+      "local_deps": [],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/provider",
+      "name": "@zcode/provider",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Common provider capability layer; product-neutral model-provider abstraction.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 23,
+      "ts_lines": 4850,
+      "local_deps": [
+        "@zcode/model-option-map",
+        "@zcode/shared"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/provider-node",
+      "name": "@zcode/provider-node",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Node implementation of the provider layer; product-neutral.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 17,
+      "ts_lines": 1912,
+      "local_deps": [
+        "@zcode/provider",
+        "@zcode/shared"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/services",
+      "name": "@zcode/services",
+      "layer": "platform",
+      "classification": "GENERALIZE",
+      "justification": "Business services and persistence (conversations, commands, credentials, subscriptions, bots); coding-workspace concepts must be generalized to serve economic work; command-center subareas are PAYSWAP-ADAPT targets.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "no standalone build script; type-checked green via root `pnpm typecheck`",
+      "ts_files": 327,
+      "ts_lines": 102230,
+      "local_deps": [
+        "@zcode/provider",
+        "@zcode/provider-node",
+        "@zcode/rpc",
+        "@zcode/shared",
+        "@zcode/zcode-cua"
+      ],
+      "has_build_script": false,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/shared",
+      "name": "@zcode/shared",
+      "layer": "contracts",
+      "classification": "GENERALIZE",
+      "justification": "Shared protocols and types; neutral protocol core, but coding-specific vocabulary (assistant message parts, background bash jobs, coding plans) must be generalized.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "no standalone build script; type-checked green via root `pnpm typecheck`",
+      "ts_files": 226,
+      "ts_lines": 41221,
+      "local_deps": [
+        "@zcode/model-option-map"
+      ],
+      "has_build_script": false,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/ui",
+      "name": "@zcode/ui",
+      "layer": "experience",
+      "classification": "PAYSWAP-ADAPT",
+      "justification": "Shared React agent UI components (command center, permission/approval and marketplace UX); explicitly named in the PAYSWAP-ADAPT list of spec/MIGRATION-FROM-ZCODE.md.",
+      "key_files": [
+        "src/index.ts",
+        "src/App.tsx"
+      ],
+      "build_status": "no standalone build script; type-checked green via root `pnpm typecheck`",
+      "ts_files": 1489,
+      "ts_lines": 328912,
+      "local_deps": [
+        "@zcode/provider",
+        "@zcode/rpc",
+        "@zcode/services",
+        "@zcode/shared"
+      ],
+      "has_build_script": false,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/zcode-cua",
+      "name": "@zcode/zcode-cua",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "API-compatible fail-closed Computer Use placeholder; inert stub that preserves API compatibility (ships without Computer Use).",
+      "key_files": [
+        "index.js",
+        "index.d.ts"
+      ],
+      "build_status": "no build/typecheck entry; JS + .d.ts placeholder",
+      "ts_files": 0,
+      "ts_lines": 0,
+      "local_deps": [],
+      "has_build_script": false,
+      "nested_workspace": false
+    },
+    {
+      "dir": "packages/zcode-server-cli",
+      "name": "@zcode/server-cli",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Standalone server startup and process management; neutral CLI substrate.",
+      "key_files": [
+        "src/index.ts",
+        "src/main.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 43,
+      "ts_lines": 5809,
+      "local_deps": [
+        "@zcode/rpc",
+        "@zcode/services",
+        "@zcode/shared"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli",
+      "name": "zcode-cli",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Agent CLI/TUI/runtime distribution workspace (nested pnpm workspace with own lockfile); KEEP-listed CLI substrate; PaySwap command surface (P7-W3) builds on it.",
+      "key_files": [
+        "package.json",
+        "pnpm-workspace.yaml",
+        "turbo.json"
+      ],
+      "build_status": "root-context build PASS; standalone nested install blocked by inherited lockfile drift (see findings)",
+      "ts_files": 1368,
+      "ts_lines": 295917,
+      "local_deps": [],
+      "has_build_script": true,
+      "nested_workspace": true
+    },
+    {
+      "dir": "apps/zcode-cli/packages/adapters",
+      "name": "@zcode/adapters",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Capability adapters (fs, http, mcp, browser, exec, auth, device...); KEEP-listed tool registry/MCP/browser-control machinery.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 202,
+      "ts_lines": 51932,
+      "local_deps": [
+        "@zcode/contracts",
+        "@zcode/dynamic-workflow",
+        "@zcode/model-option-map",
+        "@zcode/provider",
+        "@zcode/shared",
+        "@zcode/zcode-cua"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/bootstrap",
+      "name": "@zcode/bootstrap",
+      "layer": "platform",
+      "classification": "GENERALIZE",
+      "justification": "CLI app wiring: auth login, builtin/custom commands, MCP config, model factory; command concepts need generalization for economic work.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 232,
+      "ts_lines": 65389,
+      "local_deps": [
+        "@zcode/adapters",
+        "@zcode/contracts",
+        "@zcode/core",
+        "@zcode/dynamic-workflow",
+        "@zcode/dynamic-workflow-runtime",
+        "@zcode/i18n",
+        "@zcode/provider",
+        "@zcode/provider-node",
+        "@zcode/shared",
+        "@zcode/telemetry"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/browser-use-plugin",
+      "name": "@zcode/browser-use-plugin",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Browser Use skill and client runtime published as the official built-in plugin; browser control KEEP-listed.",
+      "key_files": [
+        "dist/mcp/server.js"
+      ],
+      "build_status": "build PASS (with @zcode/cli... build)",
+      "ts_files": 1,
+      "ts_lines": 18,
+      "local_deps": [
+        "@zcode/contracts",
+        "@zcode/core",
+        "@zcode/node-repl-host",
+        "@zcode/shared"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/bundled-skills",
+      "name": "bundled-skills",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Bundled skill assets (dynamic-workflows skill docs); skills/plugins KEEP-listed.",
+      "key_files": [
+        "skills/dynamic-workflows/SKILL.md"
+      ],
+      "build_status": "asset directory, no build entry"
+    },
+    {
+      "dir": "apps/zcode-cli/packages/cli",
+      "name": "@zcode/cli",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Main CLI application: the `zcode` command dispatching TUI/Web/Agent modes.",
+      "key_files": [
+        "src/index.ts",
+        "src/main.ts"
+      ],
+      "build_status": "build PASS (zcode.cjs)",
+      "ts_files": 81,
+      "ts_lines": 10732,
+      "local_deps": [
+        "@zcode/adapters",
+        "@zcode/bootstrap",
+        "@zcode/contracts",
+        "@zcode/core",
+        "@zcode/dynamic-workflow-runtime",
+        "@zcode/i18n",
+        "@zcode/provider-node",
+        "@zcode/shared",
+        "@zcode/shared-types",
+        "@zcode/tui"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/contracts",
+      "name": "@zcode/contracts",
+      "layer": "contracts",
+      "classification": "KEEP",
+      "justification": "CLI contracts and types; product-neutral protocol surface.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 113,
+      "ts_lines": 21653,
+      "local_deps": [
+        "@zcode/shared"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/core",
+      "name": "@zcode/core",
+      "layer": "platform",
+      "classification": "GENERALIZE",
+      "justification": "Agent core (sessions, tasks, permission, memory, MCP, browser client, runtime); workspace/session/task concepts must generalize; its permission subsystem is a future trust-boundary adaptation point — platform permission is not financial authorization.",
+      "key_files": [
+        "src/index.ts",
+        "src/runtime.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 500,
+      "ts_lines": 96616,
+      "local_deps": [
+        "@zcode/contracts",
+        "@zcode/dynamic-workflow",
+        "@zcode/shared",
+        "@zcode/shared-types",
+        "@zcode/zcode-cua"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/debug",
+      "name": "debug",
+      "layer": "platform",
+      "classification": "DEPRECATE-CANDIDATE",
+      "justification": "Dev-only diagnostics web UI; no product surface; removal candidate only after callers/dependencies are mapped (per migration map rule).",
+      "key_files": [
+        "src/App.tsx"
+      ],
+      "build_status": "not in root typecheck list; dev tool",
+      "ts_files": 12,
+      "ts_lines": 4791,
+      "local_deps": [],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/dynamic-workflow",
+      "name": "@zcode/dynamic-workflow",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Dynamic workflow engine; subagents/workflows machinery is KEEP-listed.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 95,
+      "ts_lines": 20690,
+      "local_deps": [],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/dynamic-workflow-runtime",
+      "name": "@zcode/dynamic-workflow-runtime",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Workflow runtime library; KEEP-listed machinery.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 5,
+      "ts_lines": 1327,
+      "local_deps": [
+        "@zcode/dynamic-workflow"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/i18n",
+      "name": "@zcode/i18n",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Internationalization data and helpers; product-neutral.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 5,
+      "ts_lines": 1146,
+      "local_deps": [
+        "@zcode/contracts"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/node-repl-host",
+      "name": "@zcode/node-repl-host",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Shared node_repl MCP host owning the JS execution surface and domain bridges; MCP/tool surface KEEP-listed.",
+      "key_files": [
+        "src/server.ts"
+      ],
+      "build_status": "source package; builds with workspace",
+      "ts_files": 8,
+      "ts_lines": 1407,
+      "local_deps": [
+        "@zcode/contracts",
+        "@zcode/core",
+        "@zcode/shared",
+        "@zcode/zcode-cua"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/shared-types",
+      "name": "@zcode/shared-types",
+      "layer": "contracts",
+      "classification": "KEEP",
+      "justification": "CLI shared types; neutral.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 1,
+      "ts_lines": 53,
+      "local_deps": [],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/superpowers-plugin",
+      "name": "superpowers-plugin",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Plugin distribution entry (only LICENSE is version-controlled at HEAD; runtime content materialized outside VCS).",
+      "key_files": [
+        "LICENSE"
+      ],
+      "build_status": "asset directory, no build entry"
+    },
+    {
+      "dir": "apps/zcode-cli/packages/swift-bridge",
+      "name": "@zcode/swift-bridge",
+      "layer": "platform",
+      "classification": "DEPRECATE-CANDIDATE",
+      "justification": "Placeholder Swift interop layer (~21 LOC, inert); removal candidate only after caller mapping.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 1,
+      "ts_lines": 21,
+      "local_deps": [
+        "@zcode/shared-types"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/telemetry",
+      "name": "@zcode/telemetry",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Telemetry library; KEEP-listed.",
+      "key_files": [
+        "src/index.ts"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 10,
+      "ts_lines": 3884,
+      "local_deps": [
+        "@zcode/contracts"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/packages/tui",
+      "name": "@zcode/tui",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Terminal UI for the agent; CLI substrate KEEP-listed.",
+      "key_files": [
+        "src/app.tsx"
+      ],
+      "build_status": "build PASS",
+      "ts_files": 91,
+      "ts_lines": 13846,
+      "local_deps": [
+        "@zcode/contracts",
+        "@zcode/i18n",
+        "@zcode/shared"
+      ],
+      "has_build_script": true,
+      "nested_workspace": false
+    },
+    {
+      "dir": "apps/zcode-cli/tools/prompt-trajectory",
+      "name": "prompt-trajectory",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Dev tooling for prompt trajectory analysis; neutral tooling.",
+      "key_files": [
+        "package.json"
+      ],
+      "build_status": "dev tooling, no build entry"
+    },
+    {
+      "dir": "apps/zcode-cli/tools/typescript",
+      "name": "typescript",
+      "layer": "platform",
+      "classification": "KEEP",
+      "justification": "Vendored TypeScript dev tooling package; neutral tooling.",
+      "key_files": [
+        "package.json"
+      ],
+      "build_status": "dev tooling, no build entry"
+    }
+  ]
+}
