@@ -288,13 +288,87 @@ export function evaluateRules(graph, policy, root) {
     }
   }
 
+  // R7: domain contracts must be framework-free
+  // (dependency_rules.domain_contracts_framework_free).
+  if (policy.dependencyRules.domain_contracts_framework_free) {
+    violations.push(...checkFrameworkFree(graph, declared, root));
+  }
+
   const rulesEvaluated = {
     layerRules: Object.keys(policy.layers).length,
     packageAnnotations: Object.keys(policy.packageLayers).length,
     edges: graph.edges.length,
+    dependencyRules: Object.keys(policy.dependencyRules).length,
   };
 
   return { packages: packages_, violations, declared, rulesEvaluated };
+}
+
+// Framework/runtime packages that provider-neutral contracts must not
+// import (UI frameworks, app runtimes, heavy client libs). Documented list;
+// extension is a policy change, not a code hack.
+const FRAMEWORK_PACKAGES = new Set([
+  "react",
+  "react-dom",
+  "react-dom/client",
+  "vue",
+  "svelte",
+  "angular",
+  "@angular/core",
+  "electron",
+  "next",
+  "express",
+  "@tanstack/react-query",
+  "@tanstack/react-virtual",
+  "tailwindcss",
+  "d3",
+  "zustand",
+  "redux",
+  "@reduxjs/toolkit",
+  "electron/main",
+  "electron/renderer",
+  "electron/common",
+]);
+
+function checkFrameworkFree(graph, declared, root) {
+  const violations = [];
+  for (const pkg of graph.inScope) {
+    const layer = declared.get(pkg.dir);
+    if (layer !== "contracts") continue;
+    const files = graph.filesByPackage.get(pkg.dir) ?? [];
+    for (const file of files) {
+      const source = fs.readFileSync(file, "utf8");
+      for (const occurrence of scanImports(source)) {
+        const rootName = occurrence.specifier.startsWith("@")
+          ? occurrence.specifier.split("/").slice(0, 2).join("/")
+          : occurrence.specifier.split("/")[0];
+        if (FRAMEWORK_PACKAGES.has(occurrence.specifier) || FRAMEWORK_PACKAGES.has(rootName)) {
+          violations.push({
+            rule: "R7-contracts-framework-import",
+            severity: "error",
+            sourcePkg: pkg.dir,
+            targetPkg: null,
+            detail: `contracts-layer package imports framework/runtime "${occurrence.specifier}" (domain_contracts_framework_free)`,
+            occurrences: [
+              {
+                specifier: occurrence.specifier,
+                file: path.relative(root, file),
+                line: occurrence.line,
+                kind: occurrence.kind,
+                typeOnly: occurrence.typeOnly,
+                classification: "external",
+                targetFile: null,
+                deepImport: false,
+                deepImportReason: null,
+                crossPackageRelative: false,
+              },
+            ],
+          });
+        }
+      }
+    }
+  }
+  return violations;
 }
 
 function dedupeCycles(cycles) {
