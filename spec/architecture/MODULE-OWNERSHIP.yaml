@@ -113,3 +113,5 @@ package_layers:
   apps/zcode-cli/packages/tui: platform
   apps/zcode-cli/tools/prompt-trajectory: platform
   apps/zcode-cli/tools/typescript: platform
+  # PaySwap domain packages (P1 landings; TL acceptance integration):
+  packages/trust: trust
