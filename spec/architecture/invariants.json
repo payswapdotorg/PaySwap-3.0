@@ -1,0 +1,188 @@
+{
+  "schema": "payswap3.architecture.invariants/1",
+  "companion_for": "spec/architecture/INVARIANTS.md",
+  "note": "Machine-readable companion (P0-W2). Every INVARIANTS.md invariant carries an id, a one-line statement, an expressibility status, and — where machine-checkable — the automation that checks it today. 'documented-not-expressible' means no honest static/runtime check exists in the repository yet; these become machine-checked in later Work Orders as the financial/trust/capability layers land.",
+  "automation_namespaces": {
+    "ownership:<rule-id>": "tools/architecture-governance/check-module-ownership.mjs implements the rule (registry: lib/rule-ids.mjs)",
+    "invariant-lint:<check-id>": "tools/architecture-governance/check-invariants.mjs implements the check"
+  },
+  "invariants": [
+    {
+      "id": "INV-1",
+      "statement": "One Financial Protocol Authority.",
+      "status": "documented-not-expressible",
+      "notes": "No financial-layer packages exist yet at base e40f2b9; the single-authority property becomes machine-checkable once financial packages exist (ownership validator would flag any second financial_truth owner). Partial guard today: MODULE-OWNERSHIP authority.financial_truth=financial is linted for existence (invariant-lint:C)."
+    },
+    {
+      "id": "INV-2",
+      "statement": "Exact/lossless monetary representation only.",
+      "status": "documented-not-expressible",
+      "notes": "Requires financial-domain type analysis; no money types exist yet at base e40f2b9."
+    },
+    {
+      "id": "INV-3",
+      "statement": "Historical financial facts are immutable and versioned.",
+      "status": "documented-not-expressible",
+      "notes": "Needs financial persistence layer; nothing to check yet at base e40f2b9."
+    },
+    {
+      "id": "INV-4",
+      "statement": "UNKNOWN is distinct from FAILED and is reconciled rather than blindly retried.",
+      "status": "documented-not-expressible",
+      "notes": "Runtime state-machine semantics; requires P1-W2 financial protocol state machines."
+    },
+    {
+      "id": "INV-5",
+      "statement": "Every consequential financial effect has authorization lineage and evidence lineage.",
+      "status": "documented-not-expressible",
+      "notes": "Requires effect-commit machinery; nothing financial exists at base e40f2b9."
+    },
+    {
+      "id": "INV-6",
+      "statement": "State-changing commands are idempotent and replay-safe.",
+      "status": "documented-not-expressible",
+      "notes": "Runtime semantics, not statically decidable; future invariant suite territory (P1)."
+    },
+    {
+      "id": "INV-7",
+      "statement": "External provider/wallet balances are observations, not PaySwap custody.",
+      "status": "documented-not-expressible",
+      "notes": "Requires capability observation model (P2); no provider-balance ingestion exists yet."
+    },
+    {
+      "id": "INV-8",
+      "statement": "PaySwap has no unilateral withdrawal authority over user/provider funds.",
+      "status": "documented-not-expressible",
+      "notes": "Non-custody property over future signing/withdrawal paths; no such code exists yet."
+    },
+    {
+      "id": "INV-9",
+      "statement": "Agents, LLMs, Lab, optimizers and simulations cannot declare financial truth.",
+      "status": "documented-not-expressible",
+      "notes": "Becomes machine-checkable when intelligence-layer packages import financial-truth APIs (ownership validator: intelligence may_depend_on excludes financial). Layer rules already encode it for future packages; no intelligence packages exist yet."
+    },
+    {
+      "id": "INV-10",
+      "statement": "Opportunity/discovery output cannot directly authorize execution.",
+      "status": "documented-not-expressible",
+      "notes": "Same future-mapping as INV-9 (P6-W2 FinancialOpportunity consumers)."
+    },
+    {
+      "id": "INV-11",
+      "statement": "Simulation is never production financial authority.",
+      "status": "documented-not-expressible",
+      "notes": "Lab runtime separation arrives with P6-W1; policy booleans linted (invariant-lint:C)."
+    },
+    {
+      "id": "INV-12",
+      "statement": "Child delegation is strictly attenuated.",
+      "status": "documented-not-expressible",
+      "notes": "Trust-layer delegation semantics (P1-W3); no trust packages exist yet."
+    },
+    {
+      "id": "INV-13",
+      "statement": "Provider catalogue capability is not executable connected capability.",
+      "status": "documented-not-expressible",
+      "notes": "Capability-model runtime distinction (P2); catalogue types not yet present."
+    },
+    {
+      "id": "INV-14",
+      "statement": "Provider state is preserved where needed for action/reconciliation/audit.",
+      "status": "documented-not-expressible",
+      "notes": "Provider-state envelope semantics (P2-W1)."
+    },
+    {
+      "id": "INV-15",
+      "statement": "Provider-native execution remains a candidate baseline.",
+      "status": "documented-not-expressible",
+      "notes": "Route-compiler policy property (P5-W1)."
+    },
+    {
+      "id": "INV-16",
+      "statement": "Provider implementations do not leak into provider-neutral domain contracts.",
+      "status": "machine-checked",
+      "automation": ["ownership:R7-contracts-framework-import", "ownership:R3-not-in-may-depend-on"],
+      "notes": "The contracts-layer packages (shared, cli/contracts, cli/shared-types) are checked for framework/runtime imports and every cross-layer edge is checked against may_depend_on. Provider-specific packages are platform-layer, so contracts->platform edges already FAIL the baseline (R3), which is the honest enforcement of this boundary."
+    },
+    {
+      "id": "INV-17",
+      "statement": "Blockchain is one settlement rail family, not a parallel financial system.",
+      "status": "documented-not-expressible",
+      "notes": "Becomes checkable when rails-layer packages exist (no separate financial ledger authority per chain). current-state policy blockchain_is_one_rail_family=true is linted for doc consistency (invariant-lint:C)."
+    },
+    {
+      "id": "INV-18",
+      "statement": "Supported onchain writes follow prepare -> simulate -> security -> diff -> authorize -> recheck -> execute -> observe/finality -> reconcile.",
+      "status": "documented-not-expressible",
+      "notes": "Requires onchain write machinery (P4); sequence enforcement is a runtime invariant suite task."
+    },
+    {
+      "id": "INV-19",
+      "statement": "Raw private keys, seed phrases, passwords, MFA material, API secrets and protected session cookies never enter model context or ordinary artifacts.",
+      "status": "documented-not-expressible",
+      "notes": "Secret-boundary enforcement needs credential broker (P2-W2) + adversarial tests (P8-W2). Static grep-style heuristics were considered and rejected as dishonest (false positives/negatives); documented instead."
+    },
+    {
+      "id": "INV-20",
+      "statement": "Generic contract writes never execute silently without sufficient identity, semantics, security and authority.",
+      "status": "documented-not-expressible",
+      "notes": "Onchain write authorization semantics (P4-W2)."
+    },
+    {
+      "id": "INV-21",
+      "statement": "Security/adversarial intelligence cannot downgrade BLOCK.",
+      "status": "documented-not-expressible",
+      "notes": "Deterministic gate semantics (P1-W3/P6-W3); policy boolean security_block_cannot_be_downgraded linted for doc consistency (invariant-lint:C)."
+    },
+    {
+      "id": "INV-22",
+      "statement": "Web/Desktop/Mobile/Extension/SDK/API share framework-independent PaySwap Surface contracts.",
+      "status": "documented-not-expressible",
+      "notes": "Surface contracts are P2-W3/P7 deliverables; once experience packages exist, ownership validator enforces experience->contracts-only edges. Policy boolean surface_contracts_are_framework_independent linted (invariant-lint:C)."
+    },
+    {
+      "id": "INV-23",
+      "statement": "UI never owns financial truth.",
+      "status": "documented-not-expressible",
+      "notes": "Encoded in layer rules (experience must_not_own_financial_truth; financial must_not_depend_on ui); fully machine-checkable once experience/financial packages exist. Partial guard: financial layer rule presence linted (invariant-lint:D)."
+    },
+    {
+      "id": "INV-24",
+      "statement": "No dead financial actions, fake success states or fabricated provider effects.",
+      "status": "documented-not-expressible",
+      "notes": "Requires UI + capability integration tests (P7/P8); inherently behavioral."
+    },
+    {
+      "id": "INV-25",
+      "statement": "Test/sandbox/live/mainnet distinctions are explicit and mechanically enforced.",
+      "status": "documented-not-expressible",
+      "notes": "Environment-mode enforcement machinery arrives with provider runtime (P2-W2)."
+    },
+    {
+      "id": "INV-26",
+      "statement": "No circular package dependencies.",
+      "status": "machine-checked",
+      "automation": ["ownership:R4-cycle"],
+      "notes": "Package-level cycle detection over the real import graph. Baseline: 0 cycles."
+    },
+    {
+      "id": "INV-27",
+      "statement": "Domain contracts do not import UI/framework/runtime implementation details.",
+      "status": "machine-checked",
+      "automation": ["ownership:R7-contracts-framework-import"],
+      "notes": "Framework-freedom check for every contracts-layer package. Baseline: 0 violations."
+    },
+    {
+      "id": "INV-28",
+      "statement": "Work Orders are pairwise-disjoint.",
+      "status": "documented-not-expressible",
+      "notes": "Organizational process constraint; write-surface disjointness is verified by the TL at acceptance (repo-history inspection), not by a static tree check."
+    },
+    {
+      "id": "INV-29",
+      "statement": "Frozen architecture changes require ADR + dependency-graph + state updates.",
+      "status": "documented-not-expressible",
+      "notes": "Process constraint on governance workflow; partially witnessed by git history and spec/adr/, not statically checkable in-tree."
+    }
+  ]
+}

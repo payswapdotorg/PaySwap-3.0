@@ -65,3 +65,51 @@ dependency_rules:
   domain_contracts_framework_free: true
   platform_permission_not_financial_authorization: true
   no_parallel_financial_authority: true
+
+# ---------------------------------------------------------------------------
+# ADDITIVE ANNOTATIONS (P0-W2, worker-2) — declared-layer mapping for the
+# inherited workspace packages as of base e40f2b9.
+#
+# Scope law: this block ONLY adds package -> declared-layer declarations.
+# It does not modify any layer rule, may_depend_on, must_not_depend_on,
+# authority, or dependency_rules entry above. Keys are repo-relative package
+# directories; the validator resolves each directory to its package.json name.
+# Per-package mapping rationale: docs/architecture-governance/LAYER-MAPPING.md.
+# Packages without an annotation are reported UNMAPPED (never guessed).
+# ---------------------------------------------------------------------------
+package_layers:
+  # --- contracts layer (provider-neutral shared protocols/types) ---
+  packages/shared: contracts
+  apps/zcode-cli/packages/contracts: contracts
+  apps/zcode-cli/packages/shared-types: contracts
+  # --- platform layer (ZCode substrate: rpc/transport/session/runtime/
+  #     model providers/web/desktop/cli/telemetry/browser/plugins tooling) ---
+  packages/rpc: platform
+  packages/provider: platform
+  packages/provider-node: platform
+  packages/model-option-map: platform
+  packages/services: platform
+  packages/client: platform
+  packages/server: platform
+  packages/zcode-server-cli: platform
+  packages/ui: platform
+  packages/web: platform
+  packages/desktop: platform
+  packages/formal-proof: platform
+  packages/zcode-cua: platform
+  apps/zcode-cli: platform
+  apps/zcode-cli/packages/adapters: platform
+  apps/zcode-cli/packages/bootstrap: platform
+  apps/zcode-cli/packages/browser-use-plugin: platform
+  apps/zcode-cli/packages/cli: platform
+  apps/zcode-cli/packages/core: platform
+  apps/zcode-cli/packages/debug: platform
+  apps/zcode-cli/packages/dynamic-workflow: platform
+  apps/zcode-cli/packages/dynamic-workflow-runtime: platform
+  apps/zcode-cli/packages/i18n: platform
+  apps/zcode-cli/packages/node-repl-host: platform
+  apps/zcode-cli/packages/swift-bridge: platform
+  apps/zcode-cli/packages/telemetry: platform
+  apps/zcode-cli/packages/tui: platform
+  apps/zcode-cli/tools/prompt-trajectory: platform
+  apps/zcode-cli/tools/typescript: platform
