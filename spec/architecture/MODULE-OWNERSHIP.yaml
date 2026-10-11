@@ -128,3 +128,8 @@ package_layers:
   # to external providers; may_depend_on [contracts, capability, trust,
   # financial], zero sibling imports in v1):
   packages/provider-runtime: rails
+  # surface = framework-independent Surface/API contracts + discovery
+  # projections — contracts-grade (provider-neutral types only; UI remains
+  # a projection and cannot own financial truth; P7 experience consumers
+  # are outside this package):
+  packages/surface: contracts

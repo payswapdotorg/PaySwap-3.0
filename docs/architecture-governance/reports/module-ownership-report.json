@@ -5,8 +5,8 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 36,
-    "packages_mapped": 36,
+    "packages_checked": 37,
+    "packages_mapped": 37,
     "packages_unmapped": 0,
     "import_edges": 77,
     "layer_rules": 10,
@@ -932,6 +932,15 @@
       ]
     },
     {
+      "dir": "packages/surface",
+      "name": "@payswap/surface",
+      "declared_layer": "contracts",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
       "dir": "packages/trust",
       "name": "@payswap/trust",
       "declared_layer": "trust",
@@ -1449,7 +1458,6 @@
     "security:threat-intel",
     "security:deterministic-gates",
     "security:security-epoch",
-    "experience:surface",
     "experience:web-ui",
     "experience:desktop-ui",
     "experience:mobile",
