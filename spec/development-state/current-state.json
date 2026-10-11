@@ -17,27 +17,9 @@
   "worker-3": "migration-experience-and-integrations"
  },
  "frontier": [
-  "P1-W1",
   "P1-W2"
  ],
  "active_work_orders": [
-  {
-   "id": "P1-W1",
-   "owner": "worker-1",
-   "status": "DISPATCHED",
-   "session": "payswap3-p1-w1",
-   "branch": "work/p1-w1",
-   "base_sha": "0a5b9765edfb65a502dfd388f30b471854531a36",
-   "scope": "economic model: EconomicGoal (net-new per GAP-01), intents (MoneyMovementIntent ADAPT from old route-compiler, ServiceAccessIntent, PaymentIntent type-level, IntentArchetype), deterministic fail-closed validation, candidate compilation (rail-agnostic; EEG formalism P3-W2, routing P5-W1)",
-   "write_surface": [
-    "packages/economic/**",
-    "spec/economic/**",
-    "docs/economic-evidence/**"
-   ],
-   "chat_id": "bc34d8c0-55fe-4396-9218-025142b320a1",
-   "dispatch_verified": "agents-tab, GLM-5.3, Full-Stack, insert 100%, send server-verified",
-   "platform_verification_2026_10_11": "TL live-verified: prompt admitted server-side 2026-10-10T12:26Z (send verified, insert 100%, server record intact) but generation NEVER started \u2014 platform account usage quota blocked admission (platform banner: usage exceeds personal limit). No worker artifacts exist to recover: the work order has not run. Recovery armed: drought sentinel auto re-dispatches (void + fresh dispatch from staged packet) on first admitted canary; doctrine reset window 05:38Z-09:36Z. This entry stays DISPATCHED until real acceptance evidence lands on main."
-  },
   {
    "id": "P1-W2",
    "owner": "worker-2",
@@ -51,9 +33,9 @@
     "spec/protocol/**",
     "docs/protocol-evidence/**"
    ],
-   "chat_id": "e06e3cef-01a8-4bb2-bf45-84d222b71914",
+   "chat_id": "1a1d6063-c9bd-49b6-b569-a402c0290414",
    "dispatch_verified": "agents-tab, GLM-5.3, Full-Stack, insert 100%, send server-verified",
-   "platform_verification_2026_10_11": "TL live-verified: prompt admitted server-side 2026-10-10T12:26Z (send verified, insert 100%, server record intact) but generation NEVER started \u2014 platform account usage quota blocked admission (platform banner: usage exceeds personal limit). No worker artifacts exist to recover: the work order has not run. Recovery armed: drought sentinel auto re-dispatches (void + fresh dispatch from staged packet) on first admitted canary; doctrine reset window 05:38Z-09:36Z. This entry stays DISPATCHED until real acceptance evidence lands on main."
+   "platform_verification_2026_10_11": "Drought broke 10:59Z (canary PROBE4 admitted after ~22.6h account-quota block). Thrash incident: the sentinel's post-recovery lane-generating trigger voided+re-dispatched this lane 5x (11:03-11:11Z) while W1 generated; sentinel patched (triggers drought-mode-only + 600s admission-window guard). Adopted ghost e6c122fd turned out turn-wedged (platform HTML-error page on turn start); deleted with 8 duplicate ghosts + W1 orphan bc34d8c0 + 6 canary ghosts to protect the recovered quota. FRESH dispatch 11:35:53Z from the 85c8e2f-pinned packet -> chat 1a1d6063 (send VERIFIED) -> GENERATING since 11:36:40Z. This entry stays DISPATCHED until acceptance evidence lands on main."
   }
  ],
  "completed_work_orders": [
@@ -175,6 +157,32 @@
     "F-3: principal lifecycle model without runtime binding; registries in-memory (persistence/distribution out of P1-W3 scope)"
    ],
    "completed_at": "2026-10-10T13:30:00Z"
+  },
+  {
+   "id": "P1-W1",
+   "owner": "worker-1",
+   "status": "COMPLETE",
+   "session": "payswap3-p1-w1",
+   "chat_id": "28ff4d0f-b60c-48ce-bf78-a25c5f301e83",
+   "worker_branch": "work/p1-w1",
+   "worker_head_sha": "d19b10254e6704d5501deea760108fb9065a7ffc",
+   "base_sha": "85c8e2f334e7ab2e51f37265d855dc9fac5ab2af",
+   "provenance": "Post-drought-break execution: sentinel recovery #1 re-dispatched from the 85c8e2f-pinned staged packet at 11:01Z; single-turn 30min execution (879K chars/247 blocks), completed 11:27Z; patches harvested 4/4 from pod ws-e8ac9141 before reaping.",
+   "accepted_via_merge": "aaa9b60 (merge --no-ff of work/p1-w1-int: 4-patch series applied clean from 85c8e2f + integration wiring d454316)",
+   "evidence": [
+    "packages/economic/src/** (15 modules: amount-spec, intent, payment-intent, service-intent, goal, goal-outcome, program, versioned-input, recourse, candidate, compiler, digest, errors, validate, index)",
+    "packages/economic/test/** (11 files, 105 tests: 34 ported/adapted + 71 net-new)",
+    "spec/economic/ECONOMIC-MODEL.md",
+    "docs/economic-evidence/BASELINE-VERIFICATION-RECORD.md"
+   ],
+   "tl_battery": "Independent re-run EXACT match: npm install --no-workspaces exit 0; tsc --noEmit 0 diagnostics; vitest 105/105 in 11 files; import smoke 58 exports; max file 331 lines; AmountSpec structural pin byte-identical to trust (CURRENCY /^[A-Z]{3}$/, MINOR_UNITS /^(0|[1-9][0-9]*)$/); leaf law (zero runtime deps, zero @zcode/* + zero sibling @payswap imports); deterministic src (no clock/network/random); no money arithmetic (INV-01); governance: invariants companion 0 failures, tool tests 28/28, architecture:check 0 new violations, ownership report additive 33->34 (economic PASS, R1-unmapped resolved, 3 pre-existing R6 remain); root pnpm install + --frozen-lockfile verified; oxlint 0 errors (1 non-gating warning)",
+   "gates_closed": [],
+   "findings_queued": [
+    "F-W1-1 (MEDIUM): authorizationRef lineage-slot semantics \u2014 v1 reinterprets the old required non-empty intentAuthorizationRef as an opaque trust-plane DEMAND-REGISTRATION lineage slot (fail-closed non-emptiness preserved, authority never claimed) \u2014 confirm reading with trust lane at P1-W2 integration",
+    "F-W1-2 (MEDIUM): candidate skeletons are deliberately minimal demand graphs (no capability refs/observations/policy verdicts/idempotency/finality semantics; EEG is P3-W2) \u2014 supersession by formatVersion bump only",
+    "F-W1-3 (LOW): parameter substitution is prose-only with no ${ escaping (residual ${ rejects fail-closed); recurrence is bounded fixed-interval (<=64 occurrences, no calendar semantics, no program-level expiry in v1)"
+   ],
+   "completed_at": "2026-10-11T11:45:00Z"
   }
  ],
  "policies": {
@@ -360,7 +368,20 @@
     "docs/architecture-governance/adr/ADR-0003-reclassify-model-option-map-to-contracts.md"
    ],
    "ci": ".github/workflows/ci.yml"
+  },
+  {
+   "ts": "2026-10-11T11:45:00Z",
+   "actor": "resident-TL",
+   "action": "P1_W1_ACCEPT",
+   "detail": "P1-W1 ACCEPTED after evidence-based TL review. Drought broke 10:59Z (canary PROBE4 admitted; ~22.6h block); sentinel recovery #1 auto-fired: W1 re-dispatched from the 85c8e2f-pinned packet -> chat 28ff4d0f (VERIFIED 11:01Z), single-turn completion 11:27Z (879K chars/247 blocks). TL harvested the 4-patch series from pod ws-e8ac9141 (4/4, apply-clean from 85c8e2f; worker head d19b102). Write surface clean (34 files, in-lane only). TL battery independent re-run EXACT match (105/105, tsc clean, 58 exports, max 331 lines); AmountSpec pin byte-identical to trust authority; INV-01 preserved (no money arithmetic); leaf law clean. Incident record: the sentinel's post-recovery lane-generating trigger thrashed the W2 lane (5 void+re-dispatch cycles 11:03-11:11Z while W1 generated); sentinel PATCHED (triggers gated to drought mode; recover() now skips lanes <600s post-dispatch) and bounced onto the patched code; 14 ghost chats deleted (8 duplicate W2 prompts incl. two turn-wedged/HTML-error chats, the voided W1 orphan bc34d8c0, 6 queued canaries) to prevent duplicate executions burning the recovered quota; 3 ghost canary workspaces freed pre-break. outage_hold deployed 11:26Z to protect W1's wedged-API live turn from stall_recovery's dead-turn false positive (hold lifted after harvest). W2 re-dispatched FRESH 11:35:53Z -> chat 1a1d6063 (VERIFIED), GENERATING since 11:36:40Z. Phase 2 remains HELD until P1-W2 acceptance.",
+   "lanes": [
+    {
+     "id": "P1-W2",
+     "session": "payswap3-p1-w2",
+     "outcome": "GENERATING (chat 1a1d6063)"
+    }
+   ]
   }
  ],
- "last_tl_action_at": "2026-10-11T04:40:00Z"
+ "last_tl_action_at": "2026-10-11T11:45:00Z"
 }
