@@ -6,12 +6,18 @@ layers:
   platform:
     owner: platform
     examples: [rpc, transport, session, client, web, desktop, cli, telemetry, browser, plugins]
-    may_depend_on: [contracts]
+    # ADR-0001 (2026-10-11, ACCEPTED): platform-internal composition + composition
+    # roots accepted by additive annotation. See
+    # docs/architecture-governance/adr/ADR-0001-platform-internal-composition.md
+    may_depend_on: [contracts, platform]
     must_not_depend_on: [financial-implementation]
   contracts:
     owner: architecture
     examples: [shared-protocols, surface-contracts]
-    may_depend_on: []
+    # ADR-0002 (2026-10-11, ACCEPTED): contracts may compose contracts (floor
+    # of the graph preserved — nothing outside contracts is allowed). See
+    # docs/architecture-governance/adr/ADR-0002-contracts-compose-contracts.md
+    may_depend_on: [contracts]
   economic:
     owner: economic
     examples: [goals, intents, execution-graph, strategy, opportunities]
@@ -87,7 +93,7 @@ package_layers:
   packages/rpc: platform
   packages/provider: platform
   packages/provider-node: platform
-  packages/model-option-map: platform
+  packages/model-option-map: contracts # ADR-0003 (2026-10-11): leaf, dep-free, deterministic typed surface — contracts-grade
   packages/services: platform
   packages/client: platform
   packages/server: platform

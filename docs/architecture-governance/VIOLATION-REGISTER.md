@@ -24,6 +24,28 @@ The inherited tree predates the ownership map; every violation below is
 inherited ZCode substrate disagree. Remediation proposals are exactly that —
 proposals for later Work Orders with TL acceptance. Nothing here was fixed.
 
+## Disposition (2026-10-11, TL — post-review directive)
+
+External TL progress review (2026-10-11) directed: resolve the architectural
+exceptions through explicit ADRs and schedule safe remediations, without
+rewriting inherited platform code indiscriminately. Disposition applied:
+
+| Class | Count @ e40f2b9 | Disposition | Instrument |
+| --- | --- | --- | --- |
+| S2 platform→platform (V-01..V-49) | 49 | RESOLVED — accepted as policy-conformant (additive layer-rule annotation `platform.may_depend_on: [contracts, platform]`) | ADR-0001 |
+| S1 contracts→contracts (V-50 + same-class edge) | 1 | RESOLVED — accepted (`contracts.may_depend_on: [contracts]`) | ADR-0002 |
+| S1 contracts→platform (`packages/shared -> packages/model-option-map`) | 1 | RESOLVED — target package reclassified platform → contracts (leaf, dependency-free, deterministic typed surface) | ADR-0003 |
+| S3 R6 cross-package relative (V-52..V-54) | 3 | OPEN — real boundary-integrity defects, remediation scheduled with the Phase 2 integration window (register proposals stand; see ADR-0001 §S3) | scheduled |
+
+Current strict baseline after ADR-0001/0002/0003: **3 violations** (all S3 R6),
+regenerated in `reports/module-ownership-report.json` at this commit. CI gates
+on report drift: any NEW violation class fails the build; remediations that
+reduce the count require regenerating and committing the report (the
+discipline this register has followed since P0-W2).
+
+No inherited source file was modified by the ADRs. The historical sections
+below remain the honest P0-W2 baseline record @ e40f2b9.
+
 ## Severity model
 
 - **S1 (structural)** — an edge direction that contradicts the frozen layer

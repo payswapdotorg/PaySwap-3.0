@@ -41,7 +41,7 @@ the additive `package_layers` block of `spec/architecture/MODULE-OWNERSHIP.yaml`
 | packages/rpc | rpc/transport (layer example: "rpc"). |
 | packages/provider | model providers (platform authority owns model/tool selection). |
 | packages/provider-node | provider runtime host. |
-| packages/model-option-map | model option compilation (platform model config data). |
+| packages/model-option-map | model option compilation — reclassified platform → contracts by ADR-0003 (2026-10-11): leaf package, zero runtime deps, zero workspace imports, deterministic restricted-CEL typed surface; consumed by packages/shared (contracts). |
 | packages/services | sessions, storage, process mgmt (layer example: "session"). |
 | packages/client | client connectivity (layer example: "client"). |
 | packages/server | server runtime (transport/session host). |
