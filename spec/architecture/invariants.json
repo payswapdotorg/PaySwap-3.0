@@ -1,7 +1,7 @@
 {
   "schema": "payswap3.architecture.invariants/1",
   "companion_for": "spec/architecture/INVARIANTS.md",
-  "note": "Machine-readable companion (P0-W2). Every INVARIANTS.md invariant carries an id, a one-line statement, an expressibility status, and — where machine-checkable — the automation that checks it today. 'documented-not-expressible' means no honest static/runtime check exists in the repository yet; these become machine-checked in later Work Orders as the financial/trust/capability layers land.",
+  "note": "Machine-readable companion for spec/architecture/INVARIANTS.md. Each invariant carries an id, statement, registry status, and (where registered) automation references. Status is measured against this central governance companion: machine-checked means a registered governance automation references an implemented check; documented-not-expressible means no such central automation reference is currently registered. Package behavioral suites may provide narrower runtime evidence before they are wired into this registry; those are cited in entry notes and do not silently change registry status.",
   "automation_namespaces": {
     "ownership:<rule-id>": "tools/architecture-governance/check-module-ownership.mjs implements the rule (registry: lib/rule-ids.mjs)",
     "invariant-lint:<check-id>": "tools/architecture-governance/check-invariants.mjs implements the check"
@@ -77,7 +77,7 @@
       "id": "INV-12",
       "statement": "Child delegation is strictly attenuated.",
       "status": "documented-not-expressible",
-      "notes": "Trust-layer delegation semantics (P1-W3); no trust packages exist yet."
+      "notes": "P1-W3 now implements strict delegation attenuation. Behavior is covered by packages/trust/test/attenuation.test.ts (widening rejection across mandate dimensions, canonical AmountSpec inputs and epoch-stamp inheritance). The central invariant companion does not yet support package-test automation references, so this is real package-level test evidence but is not registered as machine-checked here; add a supported automation bridge before promoting the registry status."
     },
     {
       "id": "INV-13",
@@ -101,7 +101,10 @@
       "id": "INV-16",
       "statement": "Provider implementations do not leak into provider-neutral domain contracts.",
       "status": "machine-checked",
-      "automation": ["ownership:R7-contracts-framework-import", "ownership:R3-not-in-may-depend-on"],
+      "automation": [
+        "ownership:R7-contracts-framework-import",
+        "ownership:R3-not-in-may-depend-on"
+      ],
       "notes": "The contracts-layer packages (shared, cli/contracts, cli/shared-types) are checked for framework/runtime imports and every cross-layer edge is checked against may_depend_on. Provider-specific packages are platform-layer, so contracts->platform edges already FAIL the baseline (R3), which is the honest enforcement of this boundary."
     },
     {
@@ -132,7 +135,7 @@
       "id": "INV-21",
       "statement": "Security/adversarial intelligence cannot downgrade BLOCK.",
       "status": "documented-not-expressible",
-      "notes": "Deterministic gate semantics (P1-W3/P6-W3); policy boolean security_block_cannot_be_downgraded linted for doc consistency (invariant-lint:C)."
+      "notes": "P1-W3 now implements SecurityBlockRegistry semantics: a BLOCK survives arbitrary epoch advancement and can leave force only through explicit higher-authority revocation. Net-new behavior coverage is in packages/trust/test/security-block.test.ts, executed by the CI packages (trust) job. The central invariant companion does not yet support package-test automation references, so this is real package-level test evidence but is not registered as machine-checked here. P6-W3 adversarial-intelligence integration remains future work."
     },
     {
       "id": "INV-22",
@@ -162,14 +165,18 @@
       "id": "INV-26",
       "statement": "No circular package dependencies.",
       "status": "machine-checked",
-      "automation": ["ownership:R4-cycle"],
+      "automation": [
+        "ownership:R4-cycle"
+      ],
       "notes": "Package-level cycle detection over the real import graph. Baseline: 0 cycles."
     },
     {
       "id": "INV-27",
       "statement": "Domain contracts do not import UI/framework/runtime implementation details.",
       "status": "machine-checked",
-      "automation": ["ownership:R7-contracts-framework-import"],
+      "automation": [
+        "ownership:R7-contracts-framework-import"
+      ],
       "notes": "Framework-freedom check for every contracts-layer package. Baseline: 0 violations."
     },
     {
