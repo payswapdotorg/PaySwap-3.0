@@ -5,10 +5,10 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 34,
-    "packages_mapped": 34,
+    "packages_checked": 35,
+    "packages_mapped": 35,
     "packages_unmapped": 0,
-    "import_edges": 76,
+    "import_edges": 77,
     "layer_rules": 10,
     "violations_total": 3,
     "violations_by_severity": {
@@ -633,6 +633,22 @@
       "dependency_layers": []
     },
     {
+      "dir": "packages/protocol",
+      "name": "@payswap/protocol",
+      "declared_layer": "financial",
+      "status": "PASS",
+      "dependencies": [
+        {
+          "target": "packages/trust",
+          "occurrences": 1
+        }
+      ],
+      "dependents": [],
+      "dependency_layers": [
+        "trust"
+      ]
+    },
+    {
       "dir": "packages/provider",
       "name": "@zcode/provider",
       "declared_layer": "platform",
@@ -912,7 +928,12 @@
       "declared_layer": "trust",
       "status": "PASS",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/protocol",
+          "occurrences": 1
+        }
+      ],
       "dependency_layers": []
     },
     {

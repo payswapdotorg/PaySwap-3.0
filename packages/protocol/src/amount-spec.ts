@@ -1,14 +1,15 @@
 /**
  * @payswap/protocol — AmountSpec bridge (P1-W2).
  *
- * The pinned cross-lane money wire format, byte-identical to the pin held by
- * the trust lane (packages/trust/src/amount-spec.ts, accepted P1-W3) and
- * recorded in the Phase-1 dispatch:
- *
- *   interface AmountSpec {
- *     readonly currency: string;
- *     readonly minorUnits: string;
- *   }
+ * INTEGRATION NOTE (TL, P1 acceptance): the wire TYPE is now imported from
+ * its single authority @payswap/trust (accepted P1-W3) — the local duplicate
+ * structural pin was TL-swapped at integration per the dependency direction
+ * financial -> trust (MODULE-OWNERSHIP: financial may_depend_on
+ * [contracts, trust, capability]). Semantics untouched: THIS package owns
+ * exact-integer money SEMANTICS and the AmountSpec -> Money bridge, and
+ * keeps its own structural VALIDATION over the pinned shape (identical
+ * patterns; the cross-lane consistency is machine-checked by tests on both
+ * sides).
  *
  * - `currency` matches /^[A-Z]{3}$/ — fiat ISO-style and onchain symbols
  *   share the shape.
@@ -18,10 +19,7 @@
  *
  * SINGLE-OWNER LAW (INV-01 — one Financial Protocol Authority): the trust
  * lane owns the wire TYPE and its structural validation; THIS package owns
- * exact-integer money SEMANTICS and the AmountSpec -> Money bridge. The
- * structural declaration below is pinned locally (identical shape) so this
- * package stays dependency-free in flight; the TL swaps the type import to
- * `@payswap/trust` at integration without touching any semantics.
+ * exact-integer money SEMANTICS and the AmountSpec -> Money bridge.
  *
  * Money constructed through this bridge is NON-NEGATIVE by construction
  * (the wire format cannot carry a sign); negative money exists only inside
@@ -32,11 +30,12 @@ import { ValidationError } from './errors.ts';
 import { currencyCode, fromMinorUnits } from './money.ts';
 import type { Money } from './money.ts';
 
+// TL integration swap: the wire type now comes from its single authority.
+// (type-only import — zero runtime coupling; pnpm workspace link)
+import type { AmountSpec as TrustAmountSpec } from '@payswap/trust';
+
 /** Exact monetary amount on the wire: integer minor units as a canonical decimal string. */
-export interface AmountSpec {
-  readonly currency: string;
-  readonly minorUnits: string;
-}
+export type AmountSpec = TrustAmountSpec;
 
 const CURRENCY_PATTERN = /^[A-Z]{3}$/;
 const MINOR_UNITS_PATTERN = /^(0|[1-9][0-9]*)$/;

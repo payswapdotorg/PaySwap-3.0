@@ -64,13 +64,26 @@ describe('architectural boundary: @payswap/protocol', () => {
     expect(sourceFiles.map((file) => relative(packageRoot, file))).toContain('src/index.ts');
   });
 
-  it('contains ONLY relative imports — zero runtime dependencies, zero sibling packages in flight', () => {
+  it('contains ONLY relative imports plus the ONE accepted post-integration sibling: a TYPE-ONLY import of @payswap/trust (the AmountSpec wire authority; TL integration swap, financial -> trust layer law)', () => {
+    const ACCEPTED_SIBLING = '@payswap/trust';
     const offenders: string[] = [];
     for (const file of sourceFiles) {
       const source = readFileSync(file, 'utf8');
       for (const specifier of extractModuleSpecifiers(source)) {
         if (!specifier.startsWith('./') && !specifier.startsWith('../')) {
-          offenders.push(`${relative(packageRoot, file)} -> '${specifier}'`);
+          if (specifier !== ACCEPTED_SIBLING) {
+            offenders.push(`${relative(packageRoot, file)} -> '${specifier}'`);
+          } else {
+            // the accepted sibling import must be TYPE-ONLY (erased at runtime — zero runtime coupling)
+            const importRe = new RegExp(
+              `import\\s+type\\s+\\{[^}]*\\}\\s+from\\s+['\"]${ACCEPTED_SIBLING.replace('/', '\\/')}['\"]`,
+            );
+            if (!importRe.test(source)) {
+              offenders.push(
+                `${relative(packageRoot, file)} -> '${specifier}' (NOT type-only — runtime coupling forbidden)`,
+              );
+            }
+          }
         }
       }
     }
@@ -133,12 +146,12 @@ describe('architectural boundary: @payswap/protocol', () => {
     expect(offenders.join('\n')).toBe('');
   });
 
-  it('the package manifest declares zero runtime dependencies', () => {
+  it('the package manifest declares EXACTLY ONE runtime dependency — @payswap/trust workspace:* (the TL-integrated wire-type authority; type-only consumption)', () => {
     const manifest = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8')) as {
       dependencies?: Record<string, string>;
       devDependencies: Record<string, string>;
     };
-    expect(manifest.dependencies).toBeUndefined();
+    expect(manifest.dependencies).toEqual({ '@payswap/trust': 'workspace:*' });
     expect(Object.keys(manifest.devDependencies).sort()).toEqual(['typescript', 'vitest']);
   });
 });
