@@ -151,7 +151,7 @@ Sources checked on 2026-10-11. Where documentation changes, the implementation o
    Provider-specific status semantics, normal and return flows, unknown state and warning that outgoing_payment_sent does not prove beneficiary credit.
 6. **Wise Platform, Track transfers:** https://docs.wise.com/guides/product/send-money/tracking/track-transfers  
    Tracking/webhook approach and late returns.
-7. **Wise Help Centre, EU safeguarding:** https://wise.com/help/articles/50VrYRVwHcsYeKzvWbjf3n/how-our-eu-entity-wise-europe-sa-safeguards-customer-funds/NQVGuVzZs8.avif  
+7. **Wise Help Centre, EU safeguarding:** https://wise.com/help/articles/50VrYRVwHcsYeKzvWbjf3n/how-our-eu-entity-wise-europe-sa-safeguards-customer-funds  
    The cited safeguarding explanation is about Wise Europe SA and must not be generalized to every Wise entity or to PaySwap.
 
 ## 8. Architectural conclusion
