@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join, relative } from 'node:path';
 
 /**
  * Architectural boundary guard (adapted from the old repository's
@@ -20,7 +19,11 @@ import { fileURLToPath } from 'node:url';
  * (plain-Node type-stripping compatibility for the import smoke battery).
  */
 
-const packageRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
+// CI note (P1-W2 integration): vitest runs with cwd = the package directory
+// (the accepted trust/economic boundary pattern); process.cwd() avoids
+// import.meta.url + node:url, keeping the ambient shim minimal and the
+// package-local battery hermetic on CI runners without @types/node.
+const packageRoot = process.cwd();
 const srcDir = join(packageRoot, 'src');
 
 function listTypeScriptFiles(dir: string): string[] {
