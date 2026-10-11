@@ -48,7 +48,10 @@ export function buildGraph(root, scope) {
       const resolved = resolveSpecifier(occurrence, file, packages, owner.absDir);
       if (resolved.classification === "external" || resolved.classification === "builtin") {
         if (resolved.classification === "external" && !isLikelyDependency(root, owner, resolved.specifier)) {
-          unresolved.push({ file, specifier: resolved.specifier, line: resolved.line });
+          // Machine-independent report: unresolved file paths are repo-relative
+          // so the committed report is byte-stable across checkouts (CI drift
+          // gate depends on this).
+          unresolved.push({ file: path.relative(root, file), specifier: resolved.specifier, line: resolved.line });
         }
         continue;
       }

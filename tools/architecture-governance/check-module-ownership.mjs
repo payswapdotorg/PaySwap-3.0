@@ -128,7 +128,10 @@ function main() {
     validator: "tools/architecture-governance/check-module-ownership.mjs",
     policy_file: policyPath,
     mode: options.mode,
-    root: path.basename(options.root),
+    // Machine-independent: "." (repo-relative marker). The report is committed
+    // to the repository it describes and CI drift-gates it byte-exact, so the
+    // root must never embed a checkout-specific name or absolute path.
+    root: ".",
     ...(options.stamp ? { generated_at: new Date().toISOString() } : {}),
     summary: {
       packages_checked: evaluation.packages.length,

@@ -3,7 +3,7 @@
   "validator": "tools/architecture-governance/check-module-ownership.mjs",
   "policy_file": "spec/architecture/MODULE-OWNERSHIP.yaml",
   "mode": "strict",
-  "root": "payswap3-0",
+  "root": ".",
   "summary": {
     "packages_checked": 33,
     "packages_mapped": 33,
@@ -1115,252 +1115,252 @@
   ],
   "unresolved_specifiers": [
     {
-      "file": "/home/z/payswap3-0/apps/zcode-cli/packages/cli/scripts/build.mjs",
+      "file": "apps/zcode-cli/packages/cli/scripts/build.mjs",
       "specifier": "esbuild",
       "line": 5
     },
     {
-      "file": "/home/z/payswap3-0/apps/zcode-cli/packages/node-repl-host/src/cua-bridge.ts",
+      "file": "apps/zcode-cli/packages/node-repl-host/src/cua-bridge.ts",
       "specifier": "@modelcontextprotocol/sdk/types.js",
       "line": 5
     },
     {
-      "file": "/home/z/payswap3-0/apps/zcode-cli/packages/tui/scripts/build.mjs",
+      "file": "apps/zcode-cli/packages/tui/scripts/build.mjs",
       "specifier": "esbuild",
       "line": 4
     },
     {
-      "file": "/home/z/payswap3-0/apps/zcode-cli/packages/cli/scripts/build.mjs",
+      "file": "apps/zcode-cli/packages/cli/scripts/build.mjs",
       "specifier": "esbuild",
       "line": 5
     },
     {
-      "file": "/home/z/payswap3-0/apps/zcode-cli/packages/node-repl-host/src/cua-bridge.ts",
+      "file": "apps/zcode-cli/packages/node-repl-host/src/cua-bridge.ts",
       "specifier": "@modelcontextprotocol/sdk/types.js",
       "line": 5
     },
     {
-      "file": "/home/z/payswap3-0/apps/zcode-cli/packages/tui/scripts/build.mjs",
+      "file": "apps/zcode-cli/packages/tui/scripts/build.mjs",
       "specifier": "esbuild",
       "line": 4
     },
     {
-      "file": "/home/z/payswap3-0/packages/desktop/scripts/ttft-otlp-receiver.mjs",
+      "file": "packages/desktop/scripts/ttft-otlp-receiver.mjs",
       "specifier": "@opentelemetry/otlp-transformer/build/src/generated/root.js",
       "line": 10
     },
     {
-      "file": "/home/z/payswap3-0/packages/desktop/src/host/storagePreparationProcesses.ts",
+      "file": "packages/desktop/src/host/storagePreparationProcesses.ts",
       "specifier": "zod",
       "line": 5
     },
     {
-      "file": "/home/z/payswap3-0/packages/desktop/src/host/tasksStorageWorker.ts",
+      "file": "packages/desktop/src/host/tasksStorageWorker.ts",
       "specifier": "zod",
       "line": 2
     },
     {
-      "file": "/home/z/payswap3-0/packages/desktop/src/main/manifestUpdateProvider.ts",
+      "file": "packages/desktop/src/main/manifestUpdateProvider.ts",
       "specifier": "builder-util-runtime",
       "line": 2
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bigmodel/codingPlanEntitlement.ts",
+      "file": "packages/services/src/bigmodel/codingPlanEntitlement.ts",
       "specifier": "#src/providers/api/apiJson.js",
       "line": 3
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bigmodel/codingPlanEntitlement.ts",
+      "file": "packages/services/src/bigmodel/codingPlanEntitlement.ts",
       "specifier": "#src/bigmodel/teamPlanApiKey.js",
       "line": 4
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bigmodel/teamPlanApiKey.ts",
+      "file": "packages/services/src/bigmodel/teamPlanApiKey.ts",
       "specifier": "#src/providers/api/apiJson.js",
       "line": 2
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/botRemoteRuntimeServices.ts",
+      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
       "specifier": "#src/session/zcodeTaskService.js",
       "line": 11
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/botRemoteRuntimeServices.ts",
+      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
       "specifier": "#src/zcode-agent/zcodeAgent.js",
       "line": 15
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/botRemoteRuntimeServices.ts",
+      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
       "specifier": "#src/zcode-session/zcodeSession.js",
       "line": 19
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/botRemoteRuntimeServices.ts",
+      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
       "specifier": "#src/model-provider/providerFacadeServices.js",
       "line": 23
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/botRemoteWorkspaceBridge.ts",
+      "file": "packages/services/src/bots/botRemoteWorkspaceBridge.ts",
       "specifier": "#src/bots/botRemoteRuntimeServices.js",
       "line": 16
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/botsService.ts",
+      "file": "packages/services/src/bots/botsService.ts",
       "specifier": "#src/session/sessionModeOptions.js",
       "line": 59
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/botsService.ts",
+      "file": "packages/services/src/bots/botsService.ts",
       "specifier": "#src/session/sessionTitle.js",
       "line": 60
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/botsService.ts",
+      "file": "packages/services/src/bots/botsService.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 70
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/botsService.ts",
+      "file": "packages/services/src/bots/botsService.ts",
       "specifier": "#src/memoryDiagnostics.js",
       "line": 159
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/providers/feishuProvider.ts",
+      "file": "packages/services/src/bots/providers/feishuProvider.ts",
       "specifier": "#src/bots/providers/providerRequest.js",
       "line": 17
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/providers/telegramProvider.ts",
+      "file": "packages/services/src/bots/providers/telegramProvider.ts",
       "specifier": "#src/bots/providers/providerRequest.js",
       "line": 14
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/bots/providers/weixinProvider.ts",
+      "file": "packages/services/src/bots/providers/weixinProvider.ts",
       "specifier": "#src/bots/providers/providerRequest.js",
       "line": 11
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/coding-plan-subscription/bigmodelCodingPlanSubscriptionProvider.ts",
+      "file": "packages/services/src/coding-plan-subscription/bigmodelCodingPlanSubscriptionProvider.ts",
       "specifier": "#src/bigmodel/teamPlanApiKey.js",
       "line": 80
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/commands/commandsService.ts",
+      "file": "packages/services/src/commands/commandsService.ts",
       "specifier": "#src/plugins/installedPluginRoots.js",
       "line": 25
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/conversation-share/conversationShareArtifactSource.ts",
+      "file": "packages/services/src/conversation-share/conversationShareArtifactSource.ts",
       "specifier": "#src/file/file.js",
       "line": 4
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/conversation-share/conversationShareService.ts",
+      "file": "packages/services/src/conversation-share/conversationShareService.ts",
       "specifier": "#src/zcode-session/zcodeSession.js",
       "line": 35
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/conversation-share/conversationShareService.ts",
+      "file": "packages/services/src/conversation-share/conversationShareService.ts",
       "specifier": "#src/paths.js",
       "line": 36
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/conversation-share/conversationShareService.ts",
+      "file": "packages/services/src/conversation-share/conversationShareService.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 37
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/conversation-share/sharedContextFormatter.ts",
+      "file": "packages/services/src/conversation-share/sharedContextFormatter.ts",
       "specifier": "#src/conversation-share/conversationShare.js",
       "line": 5
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/conversation-telemetry/conversationTelemetry.ts",
+      "file": "packages/services/src/conversation-telemetry/conversationTelemetry.ts",
       "specifier": "#src/zcode-agent/zcodeAgent.js",
       "line": 3
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/cua-permission-broker/windowsCuaDevHelperHost.ts",
+      "file": "packages/services/src/cua-permission-broker/windowsCuaDevHelperHost.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 11
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/cua-permission-broker/windowsCuaDevHelperHost.ts",
+      "file": "packages/services/src/cua-permission-broker/windowsCuaDevHelperHost.ts",
       "specifier": "#src/cua-permission-broker/windowsCuaHelperHostSupport.js",
       "line": 25
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/cua-permission-broker/windowsCuaDevHelperHost.ts",
+      "file": "packages/services/src/cua-permission-broker/windowsCuaDevHelperHost.ts",
       "specifier": "#src/cua-permission-broker/windowsCuaHelperHostSupport.js",
       "line": 31
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/cua-permission-broker/windowsCuaHelperHostSupport.ts",
+      "file": "packages/services/src/cua-permission-broker/windowsCuaHelperHostSupport.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 12
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/cua-permission-broker/windowsCuaHelperHostSupport.ts",
+      "file": "packages/services/src/cua-permission-broker/windowsCuaHelperHostSupport.ts",
       "specifier": "#src/cua-permission-broker/windowsCuaDevRuntime.js",
       "line": 13
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/feedback/feedbackHttpClient.ts",
+      "file": "packages/services/src/feedback/feedbackHttpClient.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 29
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/feedback/feedbackHttpClient.ts",
+      "file": "packages/services/src/feedback/feedbackHttpClient.ts",
       "specifier": "#src/providers/api/requestIdHeaders.js",
       "line": 30
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/feedback/feedbackHttpClient.ts",
+      "file": "packages/services/src/feedback/feedbackHttpClient.ts",
       "specifier": "#src/providers/api/networkErrorClassifier.js",
       "line": 34
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/feedback/feedbackHttpClient.ts",
+      "file": "packages/services/src/feedback/feedbackHttpClient.ts",
       "specifier": "#src/runtime-tools/clientPlatform.js",
       "line": 35
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/feedback/feedbackLocalTicketStore.ts",
+      "file": "packages/services/src/feedback/feedbackLocalTicketStore.ts",
       "specifier": "#src/paths.js",
       "line": 5
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/feedback/feedbackService.ts",
+      "file": "packages/services/src/feedback/feedbackService.ts",
       "specifier": "#src/feedback/feedbackLocalTicketStore.js",
       "line": 20
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/fileWatcher/fileWatcherService.ts",
+      "file": "packages/services/src/fileWatcher/fileWatcherService.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 5
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/fileWatcher/fileWatcherService.ts",
+      "file": "packages/services/src/fileWatcher/fileWatcherService.ts",
       "specifier": "#src/memoryDiagnostics.js",
       "line": 7
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/git/gitCommitMessageGenerator.ts",
+      "file": "packages/services/src/git/gitCommitMessageGenerator.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 8
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/git/repo/gitCliHelpers.ts",
+      "file": "packages/services/src/git/repo/gitCliHelpers.ts",
       "specifier": "#src/git/config.js",
       "line": 15
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/git/repo/gitCliRepo.ts",
+      "file": "packages/services/src/git/repo/gitCliRepo.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 19
     },
     {
-      "file": "/home/z/payswap3-0/packages/services/src/hooks/hooksService.ts",
+      "file": "packages/services/src/hooks/hooksService.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 22
     }
