@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/economic",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Economic model kernel for PaySwap 3.0 (Work Order P1-W1): EconomicGoal (net-new per GAP-01), EconomicProgram, MoneyMovementIntent (rail/provider-neutral ADAPT from payswap.org@8a735bf packages/route-compiler/src/intent.ts), ServiceAccessIntent, PaymentIntent (type-level specialization), IntentArchetype, deterministic fail-closed validation and deterministic candidate compilation into versioned candidate skeletons (NOT the EEG — P3-W2). Everything in this package is ADVISORY DEMAND ONLY: it establishes no authorization (trust lane, P1-W3) and no financial finality (protocol lane, P1-W2). Types carry lineage refs for that wiring, never the authority itself. Money is exact-integer minor units via the pinned AmountSpec wire shape; this package owns a STRUCTURAL local declaration only and implements NO money arithmetic (INV-01 single financial authority). Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
