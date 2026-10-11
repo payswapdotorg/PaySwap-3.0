@@ -5,8 +5,8 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 33,
-    "packages_mapped": 33,
+    "packages_checked": 34,
+    "packages_mapped": 34,
     "packages_unmapped": 0,
     "import_edges": 76,
     "layer_rules": 10,
@@ -595,6 +595,15 @@
         "platform",
         "contracts"
       ]
+    },
+    {
+      "dir": "packages/economic",
+      "name": "@payswap/economic",
+      "declared_layer": "economic",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
     },
     {
       "dir": "packages/formal-proof",
