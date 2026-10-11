@@ -123,3 +123,8 @@ package_layers:
   packages/trust: trust
   packages/economic: economic
   packages/protocol: financial
+  # P2 landings (TL acceptance integration; layer mapping per composition
+  # notes: provider-runtime = rails — adapters/connection/execution bridge
+  # to external providers; may_depend_on [contracts, capability, trust,
+  # financial], zero sibling imports in v1):
+  packages/provider-runtime: rails
