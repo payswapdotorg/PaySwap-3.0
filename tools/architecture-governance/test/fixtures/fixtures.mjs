@@ -5,7 +5,14 @@
 //
 // IMPORTANT: the generated tree lives OUTSIDE the repo (under the OS temp
 // dir) so that `node --test tools/architecture-governance/test/` never
-// discovers generated .ts files as test files. Tests reset the fixture
+// discovers generated .ts files as test files. The root is PROCESS-UNIQUE
+// (pid-suffixed): node --test runs each test FILE as a separate process in
+// parallel, and a shared fixed root raced (one file's reset wiped another
+// file's mid-scan tree -> flaky counts and crashed CLI subprocesses; first
+// observed on GitHub Actions runners 2026-10-11). Within a process, tests
+// are sequential and the reset stays idempotent; across processes, the pid
+// suffix gives full isolation. Stale roots from crashed runs are harmless
+// (OS temp cleanup) and never inside the repo. Tests reset the fixture
 // root on every run so runs are idempotent; zero network, zero installs.
 
 import fs from "node:fs";
@@ -17,7 +24,7 @@ const SELF_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 export const FIXTURES_ROOT = path.join(
   fs.realpathSync(os.tmpdir()),
-  "payswap3-w2-test-fixtures",
+  `payswap3-w2-test-fixtures-p${process.pid}`,
   "mini-workspace",
 );
 
