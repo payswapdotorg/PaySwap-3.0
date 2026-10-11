@@ -32,7 +32,8 @@ This repository is the sole source of truth. A fresh TL must not need the archit
 11. `spec/UPSTREAM-BASE.md`, `spec/MIGRATION-FROM-ZCODE.md`, `spec/MIGRATION-FROM-PAYSWAP-ORG.md`
 12. `spec/migration/MIGRATION-MATRIX.md`, `spec/migration/MIGRATION-MATRIX-PACKAGES.md` and `docs/migration-evidence/BASELINE-VERIFICATION-RECORD.md`
 13. `docs/architecture-governance/VIOLATION-REGISTER.md`, `docs/architecture-governance/adr/` and `tools/architecture-governance/README.md`
-14. This handoff is a guide, not a substitute for current state or source/test evidence.
+14. Supplemental provider research: spec/research/WISE-OPERATING-MODEL.md (advisory only; maps to existing Work Orders and does not unlock Phase 2).
+15. This handoff is a guide, not a substitute for current state or source/test evidence.
 
 ## Immediate TL actions
 
