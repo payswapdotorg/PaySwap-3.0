@@ -4,7 +4,7 @@ This repository is the sole source of truth. A fresh TL must not need the archit
 
 ## Current verified takeover snapshot — 2026-10-11
 
-- Audited `main` HEAD: `a1cc2103ae8dde0f02cf859ee1dfdfccf2ec53d1` (ownership-report/CI drift-gate fix).
+- Implementation/source review was performed against code HEAD `a1cc2103ae8dde0f02cf859ee1dfdfccf2ec53d1` before the documentation corrections in this audit. Always read live `main` and `current-state.json` at handoff time; do not treat this historical audit SHA as the active ref.
 - Upstream substrate: `zai-org/ZCode` v3.14.3, pinned at `29628c9acdb81b703bbd4080c207a0e7ce5e276e`. Preserve the real fork lineage; never silently track upstream `main`.
 - **Phase 0 is COMPLETE**: P0-W1 lineage/platform baseline, P0-W2 architecture governance and P0-W3 migration inventory/evidence were accepted and merged.
 - **P1-W3 is COMPLETE/ACCEPTED**: `packages/trust` is the trust/policy/security boundary leaf. Its independent battery passed TypeScript and 138/138 Vitest tests; the package has zero runtime dependencies and no PaySwap sibling imports. See `spec/trust/TRUST-BOUNDARY.md` and `docs/trust-evidence/BASELINE-VERIFICATION-RECORD.md`.
@@ -12,7 +12,7 @@ This repository is the sole source of truth. A fresh TL must not need the archit
 - P1-W1 owns `packages/economic/**`, `spec/economic/**`, `docs/economic-evidence/**`: EconomicGoal (net-new; GAP-01 says the reference repo has no code implementation), intents and deterministic validation/candidate compilation.
 - P1-W2 owns `packages/protocol/**`, `spec/protocol/**`, `docs/protocol-evidence/**`: exact Money/arithmetic, obligations, clearing, reservations, same-currency v1 netting, settlement, finality, reconciliation/evidence. FX/liquidity/credit/collateral and persistence adapters are explicitly deferred in the state record.
 - **Phase 2 dispatch is HELD** until P1-W1/P1-W2 are accepted and their stable contracts are integrated.
-- The latest GitHub Actions run observed during the audit was [CI run 38111858629](https://github.com/payswapdotorg/PaySwap-3.0/actions/runs/38111858629) on the audited HEAD: governance, architecture, lint, typecheck and packages (trust) all succeeded. A successful CI run proves only the gates it runs; the package matrix currently covers trust, not economic/protocol packages.
+- The audited code HEAD's [CI run 38111858629](https://github.com/payswapdotorg/PaySwap-3.0/actions/runs/38111858629) succeeded for governance, architecture, lint, typecheck and packages (trust). Evaluate every later commit against its own Actions run; never infer current green status from this historical receipt. A successful CI run proves only the gates it runs; the package matrix currently covers trust, not economic/protocol packages.
 - The latest strict ownership report has **3 remaining R6 cross-package-relative-import violations** (V-52..V-54), tracked for Phase 2 integration. ADR-0001/0002/0003 accept the platform-internal and contracts-composition policy and reclassify the leaf model-option-map package; these changes do not refactor inherited source.
 - Branch protection was recorded as requested with required checks `governance`, `architecture`, `lint`, `typecheck`, `packages`. Verify that the rule is actually enabled in repository settings before relying on it; a request/commit note alone is not proof of enforcement.
 - Production deployment remains unauthorized pending operator decision.
