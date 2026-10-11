@@ -17,27 +17,11 @@
   "worker-3": "migration-experience-and-integrations"
  },
  "frontier": [
-  "P1-W2"
+  "P2-W1",
+  "P2-W2",
+  "P2-W3"
  ],
- "active_work_orders": [
-  {
-   "id": "P1-W2",
-   "owner": "worker-2",
-   "status": "DISPATCHED",
-   "session": "payswap3-p1-w2",
-   "branch": "work/p1-w2",
-   "base_sha": "0a5b9765edfb65a502dfd388f30b471854531a36",
-   "scope": "financial protocol: exact Money primitive + arithmetic authority, obligations/clearing, reservations, netting (same-currency v1), settlement, finality, reconciliation (sole definitive resolver), evidence lineage; AmountSpec bridge; fx/liquidity/credit/collateral + persistence adapters deferred with register",
-   "write_surface": [
-    "packages/protocol/**",
-    "spec/protocol/**",
-    "docs/protocol-evidence/**"
-   ],
-   "chat_id": "1a1d6063-c9bd-49b6-b569-a402c0290414",
-   "dispatch_verified": "agents-tab, GLM-5.3, Full-Stack, insert 100%, send server-verified",
-   "platform_verification_2026_10_11": "Drought broke 10:59Z (canary PROBE4 admitted after ~22.6h account-quota block). Thrash incident: the sentinel's post-recovery lane-generating trigger voided+re-dispatched this lane 5x (11:03-11:11Z) while W1 generated; sentinel patched (triggers drought-mode-only + 600s admission-window guard). Adopted ghost e6c122fd turned out turn-wedged (platform HTML-error page on turn start); deleted with 8 duplicate ghosts + W1 orphan bc34d8c0 + 6 canary ghosts to protect the recovered quota. FRESH dispatch 11:35:53Z from the 85c8e2f-pinned packet -> chat 1a1d6063 (send VERIFIED) -> GENERATING since 11:36:40Z. This entry stays DISPATCHED until acceptance evidence lands on main."
-  }
- ],
+ "active_work_orders": [],
  "completed_work_orders": [
   {
    "id": "P0-W1",
@@ -183,6 +167,32 @@
     "F-W1-3 (LOW): parameter substitution is prose-only with no ${ escaping (residual ${ rejects fail-closed); recurrence is bounded fixed-interval (<=64 occurrences, no calendar semantics, no program-level expiry in v1)"
    ],
    "completed_at": "2026-10-11T11:45:00Z"
+  },
+  {
+   "id": "P1-W2",
+   "owner": "worker-2",
+   "status": "COMPLETE",
+   "session": "payswap3-p1-w2",
+   "chat_id": "1a1d6063-c9bd-49b6-b569-a402c0290414",
+   "worker_branch": "work/p1-w2",
+   "worker_head_sha": "c3e5c3bfc87176eb137ffa639f4386aea9d0a637",
+   "base_sha": "85c8e2f334e7ab2e51f37265d855dc9fac5ab2af",
+   "provenance": "Post-drought-break execution after thrash recovery: fresh dispatch 11:35:53Z from the 85c8e2f-pinned packet (chat 1a1d6063, send VERIFIED); single-turn 57min execution, completed ~12:33Z; patches harvested 6/6 from pod ws-007aed60.",
+   "accepted_via_merge": "82c07e8 (merge --no-ff of work/p1-w2-int: 6-patch series applied clean on main@5b5b26e + AmountSpec type-authority unification e8ba833)",
+   "evidence": [
+    "packages/protocol/src/** (money, amount-spec bridge, errors, identifiers, envelopes, clock, state-machine, idempotency, aggregate, obligation, obligation-book, reservation, netting, netting-delay, ledger journal/projections, settlement instructions/attempts, rail-operation, finality, reconciliation, evidence, proof-policies, certificates)",
+    "packages/protocol/test/** (21 files, 238 tests: ~201 ported/adapted + 37 net-new)",
+    "spec/protocol/FINANCIAL-PROTOCOL.md",
+    "docs/protocol-evidence/BASELINE-VERIFICATION-RECORD.md"
+   ],
+   "tl_battery": "Independent re-run EXACT match: npm install --no-workspaces exit 0; tsc --noEmit 0 diagnostics; vitest 238/238 in 21 files; 178 exports; max file 399 lines. INTEGRATION: AmountSpec local pin TL-swapped to type-only import from @payswap/trust (single wire authority, financial->trust layer law, workspace:* link, boundary law updated to stricter post-integration contract: exactly-one sibling + type-only + trust only); post-swap battery 238/238 green; economic regression 105/105 green; governance: invariants 0 failures, tool tests 28/28, architecture 0 new violations, ownership report 34->35 packages (protocol PASS, financial layer); root pnpm install + lockfile updated; oxlint 0 errors",
+   "gates_closed": [],
+   "findings_queued": [
+    "F-W2-1 (S2): same-currency v1 netting is a real capability gap vs old repo (MixedCurrencyNettingSetError; P3-W2/P5-W1 must plan two-set netting until the FX kernel lands)",
+    "F-W2-2 (S2): all authority stores in-memory (semantics durable-ready; persistence infrastructure decision pending)",
+    "F-W2-3 (S3): evidence payload hashes are FNV-1a 64 replay-equality bindings, not cryptographic tamper-resistance (platform/capability crypto territory; adjacent to P1-W3 F-2)"
+   ],
+   "completed_at": "2026-10-11T12:42:00Z"
   }
  ],
  "policies": {
@@ -231,7 +241,8 @@
   "Canonical PaySwap governance files are committed under spec/ and docs/.",
   "P0-W1 must verify/adapt the inherited platform baseline rather than re-materialize upstream.",
   "Wise operating-model research is recorded at spec/research/WISE-OPERATING-MODEL.md (retrieved 2026-10-11); advisory Work Order acceptance guidance only, no architecture-lock change, no frontier change, and no Phase 2 authorization.",
-  "Phase 1 dispatched (2026-10-10): economic kernel in three pairwise-disjoint lanes on base 0a5b976. Shared pinned wire contract across lanes: AmountSpec { currency: /^[A-Z]{3}$/, minorUnits: canonical non-negative decimal integer string } \u2014 trust lane owns the wire type, protocol lane owns exact-integer semantics + the bridge; duplicate structural declarations are TL-reconciled at integration. F3 resolution for P1: workers run package-local batteries (npm install --no-workspaces + tsc --noEmit + vitest run inside their package dir; no root lockfile writes); the TL performs workspace integration (pnpm root install, MODULE-OWNERSHIP.yaml layer annotations, root test wiring) at acceptance. Deferred-by-design registers: P1-W2 defers fx/liquidity/credit/collateral kernels (P5-W1 dependency) and persistence adapters (infrastructure decision pending)."
+  "Phase 1 dispatched (2026-10-10): economic kernel in three pairwise-disjoint lanes on base 0a5b976. Shared pinned wire contract across lanes: AmountSpec { currency: /^[A-Z]{3}$/, minorUnits: canonical non-negative decimal integer string } \u2014 trust lane owns the wire type, protocol lane owns exact-integer semantics + the bridge; duplicate structural declarations are TL-reconciled at integration. F3 resolution for P1: workers run package-local batteries (npm install --no-workspaces + tsc --noEmit + vitest run inside their package dir; no root lockfile writes); the TL performs workspace integration (pnpm root install, MODULE-OWNERSHIP.yaml layer annotations, root test wiring) at acceptance. Deferred-by-design registers: P1-W2 defers fx/liquidity/credit/collateral kernels (P5-W1 dependency) and persistence adapters (infrastructure decision pending).",
+  "PHASE 1 COMPLETE 2026-10-11T12:42Z: trust (P1-W3, 138 tests) + economic (P1-W1, 105 tests) + protocol (P1-W2, 238 tests) accepted and integrated. AmountSpec wire: @payswap/trust is the single type authority; protocol consumes it type-only (financial->trust); economic holds a byte-identical structural pin (contracts-only layer law) with cross-lane consistency machine-checked. Phase 2 (capability fabric) unlocked."
  ],
  "dispatch_log": [
   {
@@ -381,7 +392,30 @@
      "outcome": "GENERATING (chat 1a1d6063)"
     }
    ]
+  },
+  {
+   "ts": "2026-10-11T12:42:00Z",
+   "actor": "resident-TL",
+   "action": "P1_W2_ACCEPT_PHASE1_COMPLETE",
+   "detail": "P1-W2 ACCEPTED after evidence-based TL review (merge 82c07e8). TL battery exact match: 238/238 in 21 files, tsc clean, 178 exports; INV-02 float-rejection verified; UNKNOWN!=FAILED end-to-end (OUTCOME_UNKNOWN first-class non-terminal; resolveUnknown sole definitive exit demanding principal+case+evidence; blind retry structurally refused); 7 distinct evidence kinds (funding/conversion/payout/observation/finality never conflated); opaque AuthorizationRef boundary; deterministic-clock edge-adapter separation. AmountSpec type authority UNIFIED at integration: protocol imports the wire type from @payswap/trust (type-only, workspace-linked) \u2014 the economic lane keeps its byte-identical structural pin per its contracts-only layer law, cross-lane consistency machine-checked on both sides. PHASE 1 COMPLETE: P1-W1 (economic, 105 tests) + P1-W2 (protocol, 238 tests) + P1-W3 (trust, 138 tests) all accepted and integrated; CI matrix covers trust+economic+protocol. Phase-2 gate OPEN: P2-W1 (capability fabric), P2-W2 (provider runtime), P2-W3 (Surface/API) dispatch follows immediately from the staged packets (pairwise-disjoint, 3 lanes, from inside the replay).",
+   "lanes": [
+    {
+     "id": "P2-W1",
+     "session": "payswap3-p2-w1",
+     "outcome": "PENDING DISPATCH"
+    },
+    {
+     "id": "P2-W2",
+     "session": "payswap3-p2-w2",
+     "outcome": "PENDING DISPATCH"
+    },
+    {
+     "id": "P2-W3",
+     "session": "payswap3-p2-w3",
+     "outcome": "PENDING DISPATCH"
+    }
+   ]
   }
  ],
- "last_tl_action_at": "2026-10-11T11:45:00Z"
+ "last_tl_action_at": "2026-10-11T12:42:00Z"
 }
