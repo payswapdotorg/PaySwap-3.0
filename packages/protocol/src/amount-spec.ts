@@ -31,7 +31,9 @@ import { currencyCode, fromMinorUnits } from './money.ts';
 import type { Money } from './money.ts';
 
 // TL integration swap: the wire type now comes from its single authority.
-// (type-only import — zero runtime coupling; pnpm workspace link)
+// (type-only import — erased at runtime, zero runtime coupling; resolved at
+// typecheck time via tsconfig paths to ../trust/src — the package keeps ZERO
+// runtime dependencies and the uniform package-local npm battery)
 import type { AmountSpec as TrustAmountSpec } from '@payswap/trust';
 
 /** Exact monetary amount on the wire: integer minor units as a canonical decimal string. */

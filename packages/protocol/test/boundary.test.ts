@@ -146,12 +146,12 @@ describe('architectural boundary: @payswap/protocol', () => {
     expect(offenders.join('\n')).toBe('');
   });
 
-  it('the package manifest declares EXACTLY ONE runtime dependency — @payswap/trust workspace:* (the TL-integrated wire-type authority; type-only consumption)', () => {
+  it('the package manifest declares zero runtime dependencies (the trust wire-type link is type-only, resolved via tsconfig paths — not a package dependency)', () => {
     const manifest = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8')) as {
       dependencies?: Record<string, string>;
       devDependencies: Record<string, string>;
     };
-    expect(manifest.dependencies).toEqual({ '@payswap/trust': 'workspace:*' });
+    expect(manifest.dependencies).toBeUndefined();
     expect(Object.keys(manifest.devDependencies).sort()).toEqual(['typescript', 'vitest']);
   });
 });

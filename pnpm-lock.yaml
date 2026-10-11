@@ -817,10 +817,6 @@ importers:
         version: 6.0.2
 
   packages/protocol:
-    dependencies:
-      '@payswap/trust':
-        specifier: workspace:*
-        version: link:../trust
     devDependencies:
       typescript:
         specifier: ^6.0.3
