@@ -222,6 +222,7 @@
   "main is a GitHub fork lineage of zai-org/ZCode with pinned baseline 29628c9acdb81b703bbd4080c207a0e7ce5e276e.",
   "Canonical PaySwap governance files are committed under spec/ and docs/.",
   "P0-W1 must verify/adapt the inherited platform baseline rather than re-materialize upstream.",
+  "Wise operating-model research is recorded at spec/research/WISE-OPERATING-MODEL.md (retrieved 2026-10-11); advisory Work Order acceptance guidance only, no architecture-lock change, no frontier change, and no Phase 2 authorization.",
   "Phase 1 dispatched (2026-10-10): economic kernel in three pairwise-disjoint lanes on base 0a5b976. Shared pinned wire contract across lanes: AmountSpec { currency: /^[A-Z]{3}$/, minorUnits: canonical non-negative decimal integer string } \u2014 trust lane owns the wire type, protocol lane owns exact-integer semantics + the bridge; duplicate structural declarations are TL-reconciled at integration. F3 resolution for P1: workers run package-local batteries (npm install --no-workspaces + tsc --noEmit + vitest run inside their package dir; no root lockfile writes); the TL performs workspace integration (pnpm root install, MODULE-OWNERSHIP.yaml layer annotations, root test wiring) at acceptance. Deferred-by-design registers: P1-W2 defers fx/liquidity/credit/collateral kernels (P5-W1 dependency) and persistence adapters (infrastructure decision pending)."
  ],
  "dispatch_log": [
