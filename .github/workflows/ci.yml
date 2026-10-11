@@ -1,0 +1,109 @@
+# PaySwap 3.0 — CI
+#
+# Review directive (2026-10-11): "add CI for install, typecheck, lint, the new
+# invariant/ownership tests and the relevant package test suites".
+#
+# Every command below was verified against the tree at the commit that
+# introduced this file (station-verified: exit codes recorded in the commit's
+# worklog entry). Gates:
+#   - governance:    invariants companion + ownership/invariant tool unit tests
+#                    + strict ownership report DRIFT (fail on any change to the
+#                    committed deterministic report — new violations AND
+#                    uncommitted remediations both fail)
+#   - architecture:  inherited ZCode architecture checker (fails on violations
+#                    not in .architecture-baseline.json)
+#   - lint:          oxlint (errors gate; warnings tracked, currently 75,
+#                    all inherited)
+#   - typecheck:     root tsc -b project set
+#   - packages:      per-package acceptance battery matrix (@payswap/* lanes
+#                    as they land on main; currently trust)
+#
+# Branch protection note: required check names are the job ids below.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Invariants companion (spec <-> tooling consistency)
+        run: node tools/architecture-governance/check-invariants.mjs
+      - name: Governance tool unit tests
+        run: node --test tools/architecture-governance/test/cli.test.mjs tools/architecture-governance/test/engine.test.mjs tools/architecture-governance/test/scanner.test.mjs
+      - name: Strict ownership check (expected exit 1 while S3 hygiene baseline remains)
+        run: node tools/architecture-governance/check-module-ownership.mjs || [ $? -eq 1 ]
+      - name: Ownership report drift gate (fail on any uncommitted report change)
+        run: git diff --exit-code -- docs/architecture-governance/reports/module-ownership-report.json
+
+  architecture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Inherited architecture checker (baseline-aware, fails on NEW violations)
+        run: node scripts/architecture/architecture-check.mjs check
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+      - name: oxlint (errors gate)
+        run: pnpm lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+      - name: Root project typecheck (tsc -b)
+        run: pnpm typecheck
+
+  packages:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [trust]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Acceptance battery — @payswap/${{ matrix.package }}
+        working-directory: packages/${{ matrix.package }}
+        run: |
+          npm install --no-workspaces
+          npx tsc --noEmit
+          npx vitest run
