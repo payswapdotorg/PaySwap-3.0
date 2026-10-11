@@ -122,3 +122,4 @@ package_layers:
   # PaySwap domain packages (P1 landings; TL acceptance integration):
   packages/trust: trust
   packages/economic: economic
+  packages/protocol: financial

@@ -1,0 +1,21 @@
+{
+  "name": "@payswap/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Financial Protocol Authority (Work Order P1-W2): exact Money primitive and arithmetic, AmountSpec bridge, protocol kernel (errors, identifiers, envelopes, deterministic clock/epoch, state machines, idempotency, aggregate boundaries), obligations/clearing, reservations, same-currency v1 netting, settlement instructions/attempts with idempotent retry discipline, protocol-owned finality, reconciliation as the only definitive resolver of ambiguous external effects, evidence lineage (distinct funding/conversion/payout/observation/finality kinds), proof policies and settlement certificates",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  },
+  "dependencies": {
+    "@payswap/trust": "workspace:*"
+  }
+}
