@@ -5,8 +5,8 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 35,
-    "packages_mapped": 35,
+    "packages_checked": 36,
+    "packages_mapped": 36,
     "packages_unmapped": 0,
     "import_edges": 77,
     "layer_rules": 10,
@@ -18,7 +18,7 @@
     "violations_by_rule": {
       "R6-cross-package-relative": 3
     },
-    "unresolved_external_specifiers": 248
+    "unresolved_external_specifiers": 251
   },
   "packages": [
     {
@@ -720,6 +720,15 @@
       ]
     },
     {
+      "dir": "packages/provider-runtime",
+      "name": "@payswap/provider-runtime",
+      "declared_layer": "rails",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
       "dir": "packages/rpc",
       "name": "@zcode/rpc",
       "declared_layer": "platform",
@@ -1195,6 +1204,21 @@
       "line": 2
     },
     {
+      "file": "packages/provider-runtime/test/idempotency.test.ts",
+      "specifier": "psp.create_transfer",
+      "line": 47
+    },
+    {
+      "file": "packages/provider-runtime/test/idempotency.test.ts",
+      "specifier": "psp.other_operation",
+      "line": 48
+    },
+    {
+      "file": "packages/provider-runtime/test/idempotency.test.ts",
+      "specifier": "psp.create_payout",
+      "line": 59
+    },
+    {
       "file": "packages/services/src/bigmodel/codingPlanEntitlement.ts",
       "specifier": "#src/providers/api/apiJson.js",
       "line": 3
@@ -1378,21 +1402,6 @@
       "file": "packages/services/src/git/gitCommitMessageGenerator.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 8
-    },
-    {
-      "file": "packages/services/src/git/repo/gitCliHelpers.ts",
-      "specifier": "#src/git/config.js",
-      "line": 15
-    },
-    {
-      "file": "packages/services/src/git/repo/gitCliRepo.ts",
-      "specifier": "#src/logger/serviceLogger.js",
-      "line": 19
-    },
-    {
-      "file": "packages/services/src/hooks/hooksService.ts",
-      "specifier": "#src/logger/serviceLogger.js",
-      "line": 22
     }
   ],
   "example_hints_without_packages": [

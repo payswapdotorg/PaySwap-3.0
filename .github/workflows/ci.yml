@@ -101,7 +101,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [trust, economic, protocol]
+        package: [trust, economic, protocol, provider-runtime]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

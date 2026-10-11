@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/provider-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Provider runtime for PaySwap 3.0 (Work Order P2-W2): connection scope/lifecycle, credential and browser-session ISOLATION (opaque handles only — secret material never enters model context, logs or ordinary artifacts), the execution bridge from an authorized command to an external effect attempt with the CONFIRMED/UNKNOWN/FAILED result envelope (UNKNOWN is never collapsed into FAILED — INV-04), ENDPOINT-SPECIFIC idempotency contracts (per-operation key scope/derivation/replay/conflict — never one universal mechanism, Wise §4.4), authenticated event/webhook ingestion with a PLUGGABLE opaque signature-verifier contract (P1-W3 finding F-2 precedent), duplicate-delivery-harmless and out-of-order-no-regression event handling, lossless versioned immutable raw provider-state retention with a stable PaySwap projection, canonical provider retrieval with provenance and the reconcile-before-consequential-retry gate, correlation/idempotency identifier persistence (INV-05 evidence lineage refs), and the mechanically distinct SANDBOX/LIVE execution-mode law (a sandbox path can never be represented as proof of live behavior — INV-25; live certification is P8). NAME LAW: this package is never named or aliased 'provider' — the inherited packages/provider is ZCode's AI-model provider selection (platform layer), an entirely different concept. Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
