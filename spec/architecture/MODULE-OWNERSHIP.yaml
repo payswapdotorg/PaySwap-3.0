@@ -121,3 +121,4 @@ package_layers:
   apps/zcode-cli/tools/typescript: platform
   # PaySwap domain packages (P1 landings; TL acceptance integration):
   packages/trust: trust
+  packages/economic: economic

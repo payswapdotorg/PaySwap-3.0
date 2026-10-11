@@ -1,0 +1,5 @@
+# Package-local battery artifacts (P1 F3 resolution: package-local
+# npm install --no-workspaces; the TL performs workspace integration with
+# the root pnpm lockfile at acceptance). Mirrors @payswap/trust convention.
+node_modules/
+package-lock.json
