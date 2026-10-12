@@ -31,12 +31,14 @@ declare module "node:path" {
   export function relative(from: string, to: string): string;
 }
 
-declare module "node:process" {
-  const process: {
-    readonly cwd: string;
-  };
-  export = process;
-}
+// P2-W1 integration fix (2026-10-12, P1-W2 CI lesson recurrence): the
+// original shim declared node:process with cwd as a string PROPERTY —
+// masked in the worker sandbox by parent node_modules walk-up, fatal in
+// the CI-faithful battery. The accepted protocol-package pattern is a
+// GLOBAL process declaration with cwd() as a function.
+declare const process: {
+  cwd(): string;
+};
 
 declare const process: {
   readonly cwd: string;
