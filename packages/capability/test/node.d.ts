@@ -39,7 +39,3 @@ declare module "node:path" {
 declare const process: {
   cwd(): string;
 };
-
-declare const process: {
-  readonly cwd: string;
-};
