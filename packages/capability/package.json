@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/capability",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Capability and Network Authority contracts (Work Order P2-W1): the canonical capability fabric — CapabilityDefinition -> ProviderImplementation -> ConnectedCapabilityInstance -> CapabilityObservation, ProviderStateEnvelope (lossless consequential provider-state preservation), explicit versioned execution-mode vocabulary (PASS_THROUGH_NATIVE | COMPOSED_PAYSWAP | OPTIMIZED_MULTI_PROVIDER), the 14-part executable capability declaration law, hierarchical connector capability packs, append-only certification ledger, and the corridor-aware eligibility DISCOVERY PROJECTION (deterministic, versioned, exclusion-reasoned; never an authority). Catalogue data never authorizes an effect (INV-13); observations are evidence, not authorization. AmountSpec wire type is consumed TYPE-ONLY from @payswap/trust (the single accepted sibling import, resolved via tsconfig paths per the accepted P1 integration pattern) — zero runtime dependencies.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
