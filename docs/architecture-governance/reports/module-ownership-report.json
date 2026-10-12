@@ -5,10 +5,10 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 37,
-    "packages_mapped": 37,
+    "packages_checked": 38,
+    "packages_mapped": 38,
     "packages_unmapped": 0,
-    "import_edges": 77,
+    "import_edges": 78,
     "layer_rules": 10,
     "violations_total": 3,
     "violations_by_severity": {
@@ -518,6 +518,22 @@
       "dependency_layers": []
     },
     {
+      "dir": "packages/capability",
+      "name": "@payswap/capability",
+      "declared_layer": "capability",
+      "status": "PASS",
+      "dependencies": [
+        {
+          "target": "packages/trust",
+          "occurrences": 3
+        }
+      ],
+      "dependents": [],
+      "dependency_layers": [
+        "trust"
+      ]
+    },
+    {
       "dir": "packages/client",
       "name": "@zcode/client",
       "declared_layer": "platform",
@@ -947,6 +963,10 @@
       "status": "PASS",
       "dependencies": [],
       "dependents": [
+        {
+          "source": "packages/capability",
+          "occurrences": 3
+        },
         {
           "source": "packages/protocol",
           "occurrences": 1

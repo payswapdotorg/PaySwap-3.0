@@ -133,3 +133,11 @@ package_layers:
   # a projection and cannot own financial truth; P7 experience consumers
   # are outside this package):
   packages/surface: contracts
+  # capability = capability fabric (P2-W1 acceptance integration): the
+  # CapabilityDefinition -> ProviderImplementation -> ConnectedCapabilityInstance
+  # -> CapabilityObservation chain + ProviderStateEnvelope + certification +
+  # execution modes + corridor-aware eligibility discovery projection. Layer
+  # 'capability' (may_depend_on [contracts, trust]); package pinned as a
+  # RUNTIME LEAF — zero runtime deps; the ONE sibling import is TYPE-ONLY
+  # @payswap/trust via tsconfig paths (accepted P1-W2 pattern):
+  packages/capability: capability
