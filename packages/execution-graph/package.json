@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/execution-graph",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Economic Execution Graph (Work Order P3-W2): the canonical typed, versioned representation of proposed or authorized multi-step economic execution — attempts, offers, plans, authorization PROJECTION and reconciliation — plus the strategy model (strategies answer WHAT: settle-now, batch, net-later...) and the Director ADVISORY integration (deterministic controls + replaceable learned components; advisory only, never an authority). ENCODED LAWS: (1) quote/route/provider observation VERSIONS are preserved losslessly (the capability fabric's observations are evidence; the graph keeps the exact version it decided on); (2) affected authorization PROJECTION is invalidated when material execution terms change (the financial protocol layer owns real authorization — this package projects/reconciles, NEVER authorizes; no obligation/clearing/settlement calls); (3) the Director and every strategy artifact is structurally advisory (INV-09/INV-11). Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest). Type-only sibling pins: @payswap/economic, @payswap/protocol, @payswap/capability via tsconfig paths (the accepted P1/P2 integration pattern).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
