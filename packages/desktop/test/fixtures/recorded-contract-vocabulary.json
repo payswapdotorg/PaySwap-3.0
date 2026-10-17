@@ -1,0 +1,354 @@
+{
+  "recordedAt": "2026-10-17",
+  "baseCommit": "2999bbb1658443b72ce9644f32cabbebdbecaa37",
+  "surface": {
+    "packageName": "@payswap/surface",
+    "apiVersion": "1.0.0",
+    "outcomeActions": [
+      {
+        "id": "pay",
+        "label": "Pay",
+        "outcomeLine": "Send money to a recipient through your connected providers.",
+        "advancedDisclosure": [
+          "Route candidates with legs, fees and rails before any submission",
+          "Quote terms with fees, rate provenance, expiry and estimate-vs-guarantee labels",
+          "Security gates and UNKNOWN/risk disclosures per candidate",
+          "Before/after balances as typed observations",
+          "Evidence for every definitive outcome"
+        ],
+        "dispatch": {
+          "authority": "economic-intent-plane",
+          "intentKind": "PaymentIntent",
+          "journeyId": "pay"
+        }
+      },
+      {
+        "id": "receive",
+        "label": "Receive",
+        "outcomeLine": "Request money from a payer — a collect request they can fulfill.",
+        "advancedDisclosure": [
+          "The collect request contract and its payer-visible summary",
+          "Fulfillment attempts with UNKNOWN rendered as reconciliation",
+          "Evidence lineage for the received payment"
+        ],
+        "dispatch": {
+          "authority": "economic-intent-plane",
+          "intentKind": "PaymentIntent",
+          "journeyId": "collect"
+        }
+      },
+      {
+        "id": "move",
+        "label": "Move",
+        "outcomeLine": "Move money to another account you control through the payout journey to a registered settlement destination.",
+        "advancedDisclosure": [
+          "Settlement destination selection (registered destinations only)",
+          "The payout gate report and its authorization lineage",
+          "Custody chain of the movement, leg by leg",
+          "A payout sent is not beneficiary credit — stated on the surface"
+        ],
+        "dispatch": {
+          "authority": "economic-intent-plane",
+          "intentKind": "MoneyMovementIntent",
+          "journeyId": "payout"
+        }
+      },
+      {
+        "id": "convert",
+        "label": "Convert",
+        "outcomeLine": "Convert between currencies and assets — the quoted terms, their fees and honest exclusions, before anything moves.",
+        "advancedDisclosure": [
+          "Every fee line item disclosed verbatim — never a hidden fee",
+          "Rate value, provenance and as-of time",
+          "Expiry and material-change revalidation rules",
+          "Delivery estimate labeled estimate or guarantee — never conflated",
+          "Ineligible candidates with their typed reasons — never silently dropped"
+        ],
+        "dispatch": {
+          "authority": "quote-projection-plane",
+          "intentKind": "MoneyMovementIntent",
+          "journeyId": "convert"
+        }
+      },
+      {
+        "id": "checkout",
+        "label": "Checkout",
+        "outcomeLine": "The merchant checkout journey: fiat-first pricing with the explicit crypto acceptance layer and customer explicit-signing.",
+        "advancedDisclosure": [
+          "Merchant onboarding state (DRAFT → SUBMITTED → VERIFIED → ACTIVE)",
+          "Crypto acceptance policy activation and quote observations with expiry",
+          "The customer payment summary and the typed authorization diff",
+          "Settlement route selection: native provider acceptance vs external PaySwap conversion"
+        ],
+        "dispatch": {
+          "authority": "merchant-checkout-plane",
+          "intentKind": "PaymentIntent",
+          "journeyId": "checkout"
+        }
+      }
+    ],
+    "areaIds": [
+      "overview",
+      "payments",
+      "accounts",
+      "activity",
+      "opportunities",
+      "connections",
+      "capabilities",
+      "security",
+      "reports",
+      "developers",
+      "settings"
+    ],
+    "areas": [
+      {
+        "id": "overview",
+        "label": "Overview",
+        "route": "/app",
+        "purpose": "The home view: what needs attention, recent activity, quick outcomes.",
+        "lawCitations": [
+          "docs/FINAL-TL-HANDOFF.md#product-and-ui-law",
+          "spec/architecture/PAYSWAP-3.0.md#ux-benchmark"
+        ],
+        "emptyState": {
+          "reason": "No session-scoped observations yet — the overview renders only what the authoritative planes provide.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/app/payments"
+          }
+        }
+      },
+      {
+        "id": "payments",
+        "label": "Payments",
+        "route": "/app/payments",
+        "purpose": "Money in and money out: pay, receive, move — plus the payment object spine.",
+        "lawCitations": [
+          "docs/FINAL-TL-HANDOFF.md#product-and-ui-law",
+          "spec/architecture/PAYSWAP-3.0.md#economic-model",
+          "spec/research/WISE-OPERATING-MODEL.md#4.3-one-truthful-financial-lifecycle"
+        ],
+        "emptyState": {
+          "reason": "No connected payment capability yet — journeys start from connected instances only.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/app/connections"
+          }
+        }
+      },
+      {
+        "id": "accounts",
+        "label": "Accounts",
+        "route": "/app/accounts",
+        "purpose": "Balances and positions across providers — every number an OBSERVATION of an external provider, never PaySwap custody.",
+        "lawCitations": [
+          "spec/architecture/INVARIANTS.md#7",
+          "spec/research/WISE-OPERATING-MODEL.md#4.5-custody-safeguarding-and-liquidity-boundary"
+        ],
+        "emptyState": {
+          "reason": "No provider balance observations exist — external provider balances are observations, and none have been observed in this deployment.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/app/connections"
+          }
+        }
+      },
+      {
+        "id": "activity",
+        "label": "Activity",
+        "route": "/app/activity",
+        "purpose": "The chronological ledger of actions with their honest states and evidence links.",
+        "lawCitations": [
+          "docs/FINAL-TL-HANDOFF.md#product-and-ui-law",
+          "spec/research/WISE-OPERATING-MODEL.md#4.3-one-truthful-financial-lifecycle"
+        ],
+        "emptyState": {
+          "reason": "No recorded activity yet — activity rows come from authoritative records, never from the UI.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/app/payments"
+          }
+        }
+      },
+      {
+        "id": "opportunities",
+        "label": "Opportunities",
+        "route": "/app/opportunities",
+        "purpose": "Discovered opportunities with honest risk and eligibility — never guaranteed returns.",
+        "lawCitations": [
+          "spec/architecture/INVARIANTS.md#10",
+          "spec/architecture/PAYSWAP-3.0.md#lab"
+        ],
+        "emptyState": {
+          "reason": "No opportunity observations yet — discovery runs on real capability observations only.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/app/capabilities"
+          }
+        }
+      },
+      {
+        "id": "connections",
+        "label": "Connections",
+        "route": "/app/connections",
+        "purpose": "The connected-instance model: a provider catalogue capability is never a connection — execution is scoped to actual account authorization.",
+        "lawCitations": [
+          "spec/architecture/INVARIANTS.md#13",
+          "spec/architecture/CAPABILITY-MODEL.md"
+        ],
+        "emptyState": {
+          "reason": "No connected instances yet — the catalogue is browsable, but nothing is authorized until you connect.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/connect"
+          }
+        }
+      },
+      {
+        "id": "capabilities",
+        "label": "Capabilities",
+        "route": "/app/capabilities",
+        "purpose": "The honest capability and coverage explorer over recorded provider-probe evidence.",
+        "lawCitations": [
+          "spec/architecture/CAPABILITY-MODEL.md",
+          "spec/architecture/INVARIANTS.md#13"
+        ],
+        "emptyState": {
+          "reason": "Capability coverage renders from recorded probe evidence — the explorer carries the same honesty.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/capabilities"
+          }
+        }
+      },
+      {
+        "id": "security",
+        "label": "Security",
+        "route": "/app/security",
+        "purpose": "Human-readable warnings and blocks — the BLOCK/ALLOW/UNKNOWN gate vocabulary in people language with typed drill-down.",
+        "lawCitations": [
+          "spec/architecture/INVARIANTS.md#4",
+          "spec/architecture/INVARIANTS.md#21",
+          "spec/research/WISE-OPERATING-MODEL.md#3"
+        ],
+        "emptyState": {
+          "reason": "No gate records yet — security findings appear here as they occur in real journeys.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/security"
+          }
+        }
+      },
+      {
+        "id": "reports",
+        "label": "Reports",
+        "route": "/app/reports",
+        "purpose": "Reporting over evidence-backed records — every figure traceable to its evidence.",
+        "lawCitations": [
+          "spec/architecture/INVARIANTS.md#5",
+          "spec/research/WISE-OPERATING-MODEL.md#4.3-one-truthful-financial-lifecycle"
+        ],
+        "emptyState": {
+          "reason": "No reportable records yet — reports generate from the same evidence the activity ledger records.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/app/activity"
+          }
+        }
+      },
+      {
+        "id": "developers",
+        "label": "Developers",
+        "route": "/app/developers",
+        "purpose": "The developer surface: API surface, webhooks, keys — test/live visibly distinct.",
+        "lawCitations": [
+          "spec/architecture/INVARIANTS.md#25",
+          "spec/architecture/PAYSWAP-3.0.md#product-surfaces"
+        ],
+        "emptyState": {
+          "reason": "The developer surface renders the same contracts the programmatic clients consume.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/app/developers"
+          }
+        }
+      },
+      {
+        "id": "settings",
+        "label": "Settings",
+        "route": "/app/settings",
+        "purpose": "Account, role and session preferences — mode switches visible and honest.",
+        "lawCitations": [
+          "spec/architecture/INVARIANTS.md#25",
+          "docs/FINAL-TL-HANDOFF.md#product-and-ui-law"
+        ],
+        "emptyState": {
+          "reason": "Settings render from the session's own authority — nothing is configurable without one.",
+          "nextAction": {
+            "kind": "route",
+            "value": "/app/settings"
+          }
+        }
+      }
+    ],
+    "progressStages": [
+      "INTENT_RECORDED",
+      "ELIGIBILITY_CHECKED",
+      "QUOTE_ACCEPTED",
+      "FUNDING_INSTRUCTED",
+      "FUNDING_RECEIVED",
+      "CONVERSION_EXECUTED",
+      "PAYOUT_INSTRUCTED",
+      "PAYOUT_SUBMITTED",
+      "PAYOUT_SENT",
+      "BENEFICIARY_CREDITED",
+      "FINALITY_RECORDED",
+      "RECONCILED",
+      "RETURNED",
+      "REFUNDED",
+      "CHARGED_BACK",
+      "CANCELLED"
+    ],
+    "authorizationChangeKinds": [
+      "QUOTE_EXPIRED",
+      "QUOTE_TERMS_CHANGED",
+      "RECIPIENT_CHANGED",
+      "AMOUNT_CHANGED",
+      "FUNDING_METHOD_CHANGED",
+      "PROVIDER_OBSERVATION_CHANGED",
+      "SECURITY_EPOCH_ADVANCED",
+      "MANDATE_REVOKED"
+    ]
+  },
+  "protocol": {
+    "packageName": "@payswap/protocol",
+    "attemptStates": [
+      "PENDING",
+      "IN_FLIGHT",
+      "OUTCOME_UNKNOWN",
+      "SUCCEEDED",
+      "FAILED"
+    ],
+    "attemptEvents": [
+      "START",
+      "CONFIRM_SUCCEEDED",
+      "CONFIRM_FAILED",
+      "OUTCOME_UNKNOWN",
+      "RECONCILE_RESOLVED_SUCCEEDED",
+      "RECONCILE_RESOLVED_FAILED"
+    ]
+  },
+  "providerRuntime": {
+    "packageName": "@payswap/provider-runtime",
+    "externalEffectOutcomes": [
+      "CONFIRMED",
+      "UNKNOWN",
+      "FAILED"
+    ],
+    "ambiguityReasons": [
+      "TRANSPORT_TIMEOUT_AFTER_DISPATCH",
+      "TRANSPORT_CONNECTION_LOST_AFTER_DISPATCH",
+      "MALFORMED_RESPONSE_AFTER_DISPATCH"
+    ]
+  }
+}
