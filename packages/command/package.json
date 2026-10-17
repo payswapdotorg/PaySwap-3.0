@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/command",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Universal interaction contracts (Work Order P7-W3): the command surface (typed proposal grammar, command/request/response envelopes, method registry, transport typed shapes), agent interaction protocol boundaries (MCP tool descriptors, A2A agent cards/messages, AG-UI event streams), the permission/confirmation interaction models (approval requests, trusted-surface confirmations, intent-at-most parsing), the browser Extension boundary (versioned, permission-scoped manifests, host-page origin binding, explicit request/response message envelopes — no ambient authority), and the developer/external-agent API contracts (versioned, deterministic, total-error, with explicit capability disclosure). LAWS ENCODED STRUCTURALLY: the command surface NEVER carries financial authorization — commands are proposals/inputs (the authority-firewall law: proposal inputs + observations, never financial authority; INV-9/INV-23); the method effect-class vocabulary has NO financial-execute member; transport contracts are typed shapes, never I/O (hashing/signing are injected ports); every effect-bearing Extension call is an explicit request with a typed response envelope. Framework-independent, deterministic, hermetic: zero runtime dependencies, zero sibling imports, no node: imports in src, no ambient clock/randomness/network (timestamps are DATA).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
