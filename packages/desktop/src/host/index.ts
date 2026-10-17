@@ -65,6 +65,7 @@ import {
   type HostApiNetworkTransport,
   type OffPeakRequestAuthBuilder,
 } from "@zcode/services/node";
+import { registerPaySwapDesktopService } from "./payswap/index.js";
 import { createHostResourceUsageResponder } from "./hostResourceUsage.js";
 import {
   assertBoundSessionDispatchable,
@@ -2895,6 +2896,18 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
           services.register(IZCodeTaskService, reportingZCodeTaskService);
         }
         wireLocalResourceTelemetry(services);
+        // PaySwap Desktop product (P7-W2): the payment mission surface
+        // composed over structurally pinned shared contracts, registered
+        // into the host collection — it rides the SAME service-port
+        // exposure path (Logging + NetworkTelemetry middleware) as every
+        // other host-owned service. Money movement is delegated via typed
+        // references only; no engine lives here.
+        registerPaySwapDesktopService(services, {
+          scope: { kind: "local" },
+          log: (level, message, ...args) => {
+            writeHostLog(level, message, ...args);
+          },
+        });
         hasDisposedHostResources = false;
         disposeHostResourcesInFlight = null;
         const agentWarmupTargets =
