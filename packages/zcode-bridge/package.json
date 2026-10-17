@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/zcode-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ZCode substrate bridge (Work Order P3-W3): typed, versioned, framework-free contracts that expose the pinned ZCode platform substrate — tool registry, tool declarations, model-facing tool wire, MCP server/tool contracts and naming, skills, session events and session/runtime IDs, subagents, model/provider selection, the dynamic-workflow engine vocabulary, its runtime NDJSON protocol, and the RPC transport wire — to PaySwap as TYPED OBSERVATIONS ONLY. The bridge is platform-adjacent (MODULE-OWNERSHIP: treat as platform; may_depend_on [contracts, platform]) and holds ZERO financial authority (no_parallel_financial_authority): no obligation/clearing/settlement/reservation/finality semantics, no proxying of financial calls — substrate capabilities surface as descriptive contracts, never as authorization. Zero runtime dependencies; TypeScript + Vitest dev tooling only; no node: imports in src.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
