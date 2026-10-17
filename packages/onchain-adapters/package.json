@@ -1,0 +1,21 @@
+{
+  "name": "@payswap/onchain-adapters",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Multi-chain adapter contracts for PaySwap 3.0 (Work Order P4-W3, lane R2-W3): EVM, Solana and UTXO chain-family adapters implementing the frozen adapter lifecycle (observe → prepare → simulate → authorize → broadcast → observe → finality → reconcile → evidence) behind injected provider transports. DETERMINISM LAW: transports are CONTRACTS (typed request/response shapes) and never perform I/O; the lifecycle is a pure state machine; everything runs offline. The environment/rail discriminator is STRUCTURAL (chain-identity registry + branded environment types + runtime re-derivation) — testnet/simulation can never be production financial execution. Adapters feed the onchain-security kernel through an INJECTED structural kernel port (the adapter never authorizes; the kernel owns authority) and map observations into the canonical settlement vocabulary behind a production-only gate (finality stays protocol-owned). Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest).",
+  "exports": {
+    ".": "./src/index.ts",
+    "./evm": "./src/evm/index.ts",
+    "./solana": "./src/solana/index.ts",
+    "./utxo": "./src/utxo/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
