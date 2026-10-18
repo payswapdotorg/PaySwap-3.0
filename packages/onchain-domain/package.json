@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/onchain-domain",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Provider-neutral onchain domain (Work Order P4-W1, lane R2-W1): the framework-independent, rail-agnostic chain/asset/protocol/wallet/smart-account vocabulary — chain families and optional family-scoped extensions (family-neutral core, INV-16), chain/asset/protocol catalogue entries and connected instances (catalogue never authorizes — INV-13; observations never custody — INV-7), exact onchain asset amounts (INV-2), the deterministic onchain operation semantics table (unknown generic writes never execute silently — INV-20), wallet/signer/smart-account capability declarations under the non-custody law (INV-8/INV-19; smart-account authority always bounded by an explicit permission envelope), the onchain execution directive/request/observation vocabulary (explicit execution modes, protocol-authorization link, UNKNOWN is not FAILED — INV-4; finality candidates only, finality is protocol-owned — INV-1), and the canonical settlement mapping into the protocol settlement machinery (structural shapes only). Layer law (MODULE-OWNERSHIP layer rails): v1 hermetic — ZERO sibling imports, no tsconfig paths; authority-lane wire shapes are re-declared locally as subset-typed structural pins with authority-naming doc comments (src/pins*.ts). Zero runtime dependencies; devDependencies exactly typescript + vitest.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
