@@ -1,0 +1,25 @@
+{
+  "name": "@payswap/onchain-extensions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Onchain extension-pack vocabulary (Work Order P5-W2, lane R3-W2): the versioned, declarative descriptor language for onchain venue families — DEX, bridge, off-ramp, liquidity, lending/staking and intent-protocol packs. A pack is DATA, never execution: it declares what a venue family offers (capability surface), how it is addressed (canonical pack/protocol/chain identities) and which constraints/assumptions it carries — it can never authorize (constraints carry authorityCarrier: false by literal type; certification status is never carried). Packs compose as versioned sub-pack references resolved by the declarative registry. Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest); the onchain-domain/capability contract shapes are LOCAL STRUCTURAL PINS (leaf-in-flight law — the TL wires the types at integration).",
+  "exports": {
+    ".": "./src/index.ts",
+    "./packs/uniswap-v2": "./src/packs/uniswap-v2.ts",
+    "./packs/zeroswap-aggregator": "./src/packs/zeroswap-aggregator.ts",
+    "./packs/solverbatch-intents": "./src/packs/solverbatch-intents.ts",
+    "./packs/lockport-bridge": "./src/packs/lockport-bridge.ts",
+    "./packs/coinramp-offramp": "./src/packs/coinramp-offramp.ts",
+    "./packs/tidalpools-liquidity": "./src/packs/tidalpools-liquidity.ts",
+    "./packs/meridian-lending": "./src/packs/meridian-lending.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
