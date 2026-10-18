@@ -1,0 +1,10 @@
+/*
+ * Test-side resolution stub for the design-layer stylesheets.
+ *
+ * vitest resolves aliased out-of-root targets unreliably and does not
+ * apply CSS in node/jsdom environments anyway (css processing is off;
+ * markup-level honesty assertions never depend on styling), so the CSS
+ * specifiers are aliased onto this in-root stub. The REAL stylesheets
+ * are exercised by the substrate dev/build pipeline
+ * (packages/web/vite.config.ts -> @zcode/ui exports).
+ */

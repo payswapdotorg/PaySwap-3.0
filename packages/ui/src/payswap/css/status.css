@@ -1,0 +1,254 @@
+/*
+ * @zcode/ui/payswap — PaySwap component styles (ADAPT of
+ * payswap.org@8a735bf packages/design/src/components.css, split by
+ * component group to satisfy the <=400-line file law; no rule changes).
+ * Sections: Badge, StatusPill, StatusChip, Environment.
+ */
+
+/* ============================== Badge ============================== */
+
+.ps-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ps-space-1);
+  border-radius: var(--ps-radius-md);
+  border: 1px solid var(--ps-border);
+  background-color: var(--ps-surface-sunken);
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-xs);
+  font-weight: var(--ps-weight-medium);
+  padding: 2px var(--ps-space-2);
+  white-space: nowrap;
+}
+
+/* ============================== StatusPill ============================== */
+
+.ps-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ps-space-2);
+  border-radius: var(--ps-radius-full);
+  font-size: var(--ps-text-xs);
+  font-weight: var(--ps-weight-medium);
+  padding: 2px var(--ps-space-3);
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.ps-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex: none;
+}
+
+/* ok — emerald (money/positive/confirmed) */
+.ps-pill--ok {
+  color: var(--ps-positive);
+  background-color: var(--ps-positive-tint);
+  border-color: var(--ps-positive);
+}
+
+/* attention — amber, action explicitly required */
+.ps-pill--attention {
+  color: var(--ps-attention);
+  background-color: var(--ps-attention-tint);
+  border-color: var(--ps-attention);
+}
+
+/*
+ * unknown — amber family but DISTINCT from attention (hollow dot) and from
+ * danger (amber ramp, DASHED border, whisper tint). Outcome not yet known;
+ * reconciling. NEVER styled as failure (INV-X01 posture).
+ */
+.ps-pill--unknown {
+  color: var(--ps-unknown);
+  background-color: var(--ps-unknown-tint);
+  border-style: dashed;
+  border-color: var(--ps-unknown);
+}
+.ps-pill--unknown .ps-pill__dot {
+  background-color: transparent;
+  border: 1.5px solid currentColor;
+}
+
+/* blocked — red outline, constructive-but-barred */
+.ps-pill--blocked {
+  color: var(--ps-danger);
+  background-color: transparent;
+  border-color: var(--ps-danger);
+}
+
+/* failed — red tint, terminal failure (the ONLY red-filled pill) */
+.ps-pill--failed {
+  color: var(--ps-danger);
+  background-color: var(--ps-danger-tint);
+  border-color: var(--ps-danger);
+}
+
+/* disabled — neutral muted */
+.ps-pill--disabled {
+  color: var(--ps-fg-muted);
+  background-color: var(--ps-surface-sunken);
+  border-color: var(--ps-border-strong);
+}
+.ps-pill--disabled .ps-pill__dot {
+  background-color: var(--ps-border-strong);
+}
+
+/* ============================== StatusChip ============================== */
+/* THE outcome renderer (contract 03 §2.2): icon + visible word label +
+ * optional tooltip. Color is a secondary carrier — the word always leads.
+ * Per-state colors come ONLY from the --ps-state-* tokens (02 §2). */
+
+.ps-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ps-space-1);
+  border-radius: var(--ps-radius-full);
+  border: 1px solid;
+  font-size: var(--ps-text-xs);
+  font-weight: var(--ps-weight-medium);
+  padding: 2px var(--ps-space-2);
+  white-space: nowrap;
+}
+
+.ps-chip__icon {
+  display: inline-flex;
+  flex: none;
+  width: 0.875em;
+  height: 0.875em;
+}
+
+.ps-chip__icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ps-chip__label {
+  line-height: 1.25;
+}
+
+/* succeeded — emerald tint fill (final success) */
+.ps-chip--succeeded {
+  color: var(--ps-state-succeeded);
+  background-color: var(--ps-state-succeeded-tint);
+  border-color: var(--ps-state-succeeded);
+}
+
+/* processing — amber, DASHED (in-flight; NEVER red) + pulse affordance */
+.ps-chip--processing {
+  color: var(--ps-state-processing);
+  background-color: var(--ps-state-processing-tint);
+  border-color: var(--ps-state-processing);
+  border-style: dashed;
+}
+
+.ps-chip--processing .ps-chip__icon {
+  animation: ps-chip-pulse 1.6s var(--ps-ease-out) infinite;
+}
+
+@keyframes ps-chip-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* failed — red tint fill (terminal failure) */
+.ps-chip--failed {
+  color: var(--ps-state-failed);
+  background-color: var(--ps-state-failed-tint);
+  border-color: var(--ps-state-failed);
+}
+
+/* refunded — quiet stone outline (reversed after success) */
+.ps-chip--refunded {
+  color: var(--ps-state-refunded);
+  background-color: var(--ps-state-refunded-tint);
+  border-color: var(--ps-state-refunded);
+}
+
+/* partially_refunded — stone tint fill (refunded-style + remaining amount) */
+.ps-chip--partially_refunded {
+  color: var(--ps-state-partially_refunded);
+  background-color: var(--ps-state-partially_refunded-tint);
+  border-color: var(--ps-state-partially_refunded);
+}
+
+/* disputed — amber tint fill (contested; evidence due) */
+.ps-chip--disputed {
+  color: var(--ps-state-disputed);
+  background-color: var(--ps-state-disputed-tint);
+  border-color: var(--ps-state-disputed);
+}
+
+/* blocked — red outline (stopped by policy before execution) */
+.ps-chip--blocked {
+  color: var(--ps-state-blocked);
+  background-color: var(--ps-state-blocked-tint);
+  border-color: var(--ps-state-blocked);
+}
+
+/* dropped — amber outline (unknown/timeout after broadcast; never failure) */
+.ps-chip--dropped {
+  color: var(--ps-state-dropped);
+  background-color: var(--ps-state-dropped-tint);
+  border-color: var(--ps-state-dropped);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-chip--processing .ps-chip__icon {
+    animation: none;
+  }
+}
+
+/* ============================== Environment =========================== */
+/* env.test = inverted stone (near-black fill / near-white ink in light).
+ * Distinct from every state treatment: no state uses a dark fill, so
+ * "test" can never read as error or success (contract 02 §2). */
+
+.ps-env-banner {
+  display: block;
+  width: 100%;
+  background-color: var(--ps-env-test);
+  color: var(--ps-env-test-on);
+  font-size: var(--ps-text-xs);
+  font-weight: var(--ps-weight-medium);
+  text-align: left;
+  /* persistent + top-pinned: never dismissible (contract 01 §2) */
+}
+
+.ps-env-banner__message {
+  margin: 0;
+  padding: var(--ps-space-2) var(--ps-space-4);
+}
+
+.ps-env-banner__exit {
+  color: var(--ps-env-test-on);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.ps-env-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--ps-radius-sm);
+  background-color: var(--ps-env-test);
+  color: var(--ps-env-test-on);
+  font-size: var(--ps-text-2xs);
+  font-weight: var(--ps-weight-semibold);
+  letter-spacing: var(--ps-label-tracking);
+  text-transform: uppercase;
+  padding: 2px var(--ps-space-2);
+  white-space: nowrap;
+}

@@ -1,0 +1,23 @@
+/*
+ * @zcode/ui/payswap — the PaySwap component stylesheet entry.
+ *
+ * ADAPT of payswap.org@8a735bf packages/design/src/components.css (2076L):
+ * split into group files under css/ to satisfy the <=400-line file law;
+ * this entry re-aggregates them in the original order so consumers import
+ * exactly one stylesheet (`@zcode/ui/payswap-styles.css`) and the cascade
+ * is unchanged. No rule was modified in the split.
+ *
+ * Consumers bring the tokens first:
+ *   @import "@zcode/ui/payswap-tokens.css";
+ *   @import "@zcode/ui/payswap-styles.css";
+ */
+
+@import "./tokens.css";
+@import "./css/base.css";
+@import "./css/overlay.css";
+@import "./css/nav.css";
+@import "./css/states.css";
+@import "./css/status.css";
+@import "./css/listing.css";
+@import "./css/catalog.css";
+@import "./css/support.css";

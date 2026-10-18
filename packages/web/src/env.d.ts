@@ -15,6 +15,10 @@ interface ImportMetaEnv {
   readonly VITE_ZCODE_BASE_URL?: string;
   readonly VITE_ZCODE_ENDPOINT_ORIGIN?: string;
   readonly VITE_ZCODE_WEB_REMOTE_CONTROL_RELAY_WS_URL?: string;
+  // PaySwap web product (P7-W1): the API runtime base URL. Absent => the
+  // developers page renders the honest "not configured" state (never a
+  // fabricated URL).
+  readonly VITE_PAYSWAP_API_URL?: string;
 }
 
 interface ImportMeta {
