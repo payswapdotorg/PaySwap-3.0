@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/route-compiler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Route optimization contracts and deterministic compiler (Work Order P5-W1): best execution, route scoring and mixed-rail compilation. ONE Money Movement Intent compiles into multi-leg RoutePlans through a deterministic pure function (no ambient clock, no randomness, no network) — the provider-native path is the BASELINE candidate (INV-C08: emitted, never ranked away), and composed/multi-provider routes enter comparison ONLY through the five-requirement comparability gate (current eligibility, credible pricing, actual connection/permission, funding/payout constraints, auditable assumptions per leg). Route, quote, authority and evidence lineage is preserved as exact observation VERSIONS (the graph keeps the versions it decided on); liquidity estimates are ADVISORY ONLY — never custody, never authorization; the scoring engine evaluates declared dimensions through exact rational arithmetic and never consults execution mode or origin (baseline indifference). Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest); every cross-lane contract shape is a LOCAL STRUCTURAL PIN (the v1 intelligence-layer leaf-in-flight law — the TL wires the types at integration).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
