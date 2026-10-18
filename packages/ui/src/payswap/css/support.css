@@ -1,0 +1,252 @@
+/*
+ * @zcode/ui/payswap — PaySwap component styles (ADAPT of
+ * payswap.org@8a735bf packages/design/src/components.css, split by
+ * component group to satisfy the <=400-line file law; no rule changes).
+ * Sections: SetupGuideWidget, RelatedObjects, RecommendationsCard, ConfirmationButton, MoneyInput, Field (convergence).
+ */
+
+/* ============================== SetupGuideWidget ======================= */
+
+.ps-setup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ps-space-2);
+  padding: var(--ps-space-4);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  background-color: var(--ps-surface);
+}
+
+.ps-setup__next {
+  margin: 0;
+  font-size: var(--ps-text-sm);
+  color: var(--ps-fg);
+}
+
+.ps-setup__next-link {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: var(--ps-weight-semibold);
+  color: var(--ps-accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.ps-setup__complete {
+  margin: 0;
+  font-size: var(--ps-text-sm);
+  color: var(--ps-fg-muted);
+}
+
+.ps-setup__toggle {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: var(--ps-space-1) 0;
+  font-family: inherit;
+  font-size: var(--ps-text-xs);
+  color: var(--ps-fg-muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ps-setup__steps {
+  list-style: none;
+  margin: var(--ps-space-1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-1);
+  width: 100%;
+}
+
+.ps-setup__step-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-2);
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: var(--ps-space-1) var(--ps-space-2);
+  border: none;
+  border-radius: var(--ps-radius-sm);
+  background: none;
+  font-family: inherit;
+  font-size: var(--ps-text-xs);
+  color: var(--ps-fg-muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ps-setup__step-btn:hover {
+  background-color: var(--ps-surface-sunken);
+}
+
+.ps-setup__marker {
+  flex: none;
+  display: inline-flex;
+  width: 1.25em;
+  justify-content: center;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-setup__step--done .ps-setup__marker {
+  color: var(--ps-positive);
+}
+
+.ps-setup__step-btn[aria-current="step"] {
+  color: var(--ps-accent-emphasis);
+  font-weight: var(--ps-weight-medium);
+  background-color: var(--ps-accent-tint);
+}
+
+/* ============================== RelatedObjects ========================= */
+
+.ps-related {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-4);
+}
+
+.ps-related__group-title {
+  margin: 0 0 var(--ps-space-1);
+  font-size: var(--ps-text-2xs);
+  font-weight: var(--ps-weight-semibold);
+  letter-spacing: var(--ps-label-tracking);
+  text-transform: uppercase;
+  color: var(--ps-fg-muted);
+}
+
+.ps-related__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-related__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ps-space-3);
+  min-height: 44px;
+  padding: var(--ps-space-1) 0;
+  border-bottom: 1px solid var(--ps-border);
+  color: var(--ps-fg);
+  font-size: var(--ps-text-sm);
+  text-decoration: none;
+}
+
+.ps-related__item:last-child .ps-related__link {
+  border-bottom: none;
+}
+
+.ps-related__link:hover {
+  text-decoration: underline;
+}
+
+.ps-related__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ps-related__meta {
+  flex: none;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================== RecommendationsCard ==================== */
+
+.ps-reco {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ps-space-3);
+  padding: var(--ps-space-5);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-lg);
+  background-color: var(--ps-surface);
+}
+
+.ps-reco__proposition {
+  margin: 0;
+  font-size: var(--ps-text-sm);
+  color: var(--ps-fg);
+}
+
+.ps-reco__cta {
+  font-family: inherit;
+  font-size: var(--ps-text-sm);
+  font-weight: var(--ps-weight-medium);
+  color: var(--ps-accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ============================== ConfirmationButton ==================== */
+/* Built on .ps-button (Button); adds the amount/asset restatement nodes. */
+
+.ps-confirm__amount {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================== MoneyInput ============================= */
+
+.ps-money-input {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.ps-money-input__prefix {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  box-sizing: border-box;
+  min-height: var(--ps-touch);
+  padding: 0 var(--ps-space-3);
+  border: 1px solid var(--ps-border-strong);
+  border-right: none;
+  border-radius: var(--ps-radius-sm) 0 0 var(--ps-radius-sm);
+  background-color: var(--ps-surface-sunken);
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+}
+
+.ps-money-input .ps-input {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* ============================== Field (convergence) =================== */
+/* Dependent-disable reason: human sentence below the control. */
+
+.ps-field__reason {
+  margin: 0;
+  font-size: var(--ps-text-xs);
+  font-style: italic;
+  color: var(--ps-fg-muted);
+}
+
+/* EmptyState additions: docs link + teaching line (contract 03 §2.3). */
+
+.ps-state__docs {
+  font-size: var(--ps-text-sm);
+  color: var(--ps-accent);
+}
+
+.ps-state__teaching {
+  margin: var(--ps-space-1) 0 0;
+  font-size: var(--ps-text-xs);
+  color: var(--ps-fg-subtle);
+}

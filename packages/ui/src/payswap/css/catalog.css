@@ -1,0 +1,340 @@
+/*
+ * @zcode/ui/payswap — PaySwap component styles (ADAPT of
+ * payswap.org@8a735bf packages/design/src/components.css, split by
+ * component group to satisfy the <=400-line file law; no rule changes).
+ * Sections: ActivityTimeline, MetricCard, CreateMenu.
+ */
+
+/* ============================== ActivityTimeline ======================= */
+
+.ps-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-timeline__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 0 var(--ps-space-3);
+  padding-bottom: var(--ps-space-4);
+}
+
+/* connecting spine */
+.ps-timeline__item::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 14px;
+  bottom: -2px;
+  width: 1px;
+  background-color: var(--ps-border);
+}
+
+.ps-timeline__item:last-child::before {
+  display: none;
+}
+
+/* event marker */
+.ps-timeline__marker {
+  width: 11px;
+  height: 11px;
+  margin-top: 4px;
+  border-radius: 50%;
+  border: 2px solid var(--ps-border-strong);
+  background-color: var(--ps-surface);
+}
+
+.ps-timeline__description {
+  margin: 0;
+  font-size: var(--ps-text-sm);
+  color: var(--ps-fg);
+}
+
+.ps-timeline__meta {
+  margin: var(--ps-space-1) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ps-space-2);
+  font-size: var(--ps-text-2xs);
+  color: var(--ps-fg-muted);
+}
+
+.ps-timeline__timestamp {
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-timeline__note {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: var(--ps-space-1) 0 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: var(--ps-text-xs);
+  color: var(--ps-accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ============================== MetricCard ============================= */
+
+.ps-metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-2);
+  padding: var(--ps-space-5);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-lg);
+  background-color: var(--ps-surface);
+}
+
+.ps-metric__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ps-space-3);
+}
+
+.ps-metric__title {
+  margin: 0;
+  font-size: var(--ps-text-xs);
+  font-weight: var(--ps-weight-semibold);
+  color: var(--ps-fg-muted);
+}
+
+.ps-metric__freshness {
+  margin: 0;
+  font-size: var(--ps-text-2xs);
+  color: var(--ps-fg-subtle);
+}
+
+.ps-metric__value {
+  margin: 0;
+  font-size: var(--ps-text-xl);
+  font-weight: var(--ps-weight-semibold);
+  color: var(--ps-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-metric__delta {
+  margin: 0;
+  font-size: var(--ps-text-xs);
+  font-weight: var(--ps-weight-medium);
+  color: var(--ps-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-metric__vs {
+  margin-left: var(--ps-space-1);
+  font-weight: var(--ps-weight-regular);
+  color: var(--ps-fg-muted);
+}
+
+.ps-metric__chart {
+  position: relative;
+  margin-top: var(--ps-space-2);
+}
+
+.ps-metric__sparkline {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ps-metric__axis {
+  stroke: var(--ps-border-strong);
+  stroke-width: 1;
+}
+
+.ps-metric__line {
+  fill: none;
+  stroke: var(--ps-accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ps-metric__previous {
+  fill: none;
+  stroke: var(--ps-fg-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
+}
+
+.ps-metric__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ps-space-1);
+  text-align: center;
+}
+
+.ps-metric__empty-text {
+  margin: 0;
+  font-size: var(--ps-text-xs);
+  color: var(--ps-fg-muted);
+}
+
+.ps-metric__empty-link {
+  font-size: var(--ps-text-xs);
+  color: var(--ps-accent);
+}
+
+.ps-metric__more {
+  margin-top: var(--ps-space-1);
+  font-size: var(--ps-text-xs);
+}
+
+/* ============================== CreateMenu ============================= */
+
+.ps-split {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.ps-split__primary {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* the chord shown beside the primary label */
+.ps-split__chord {
+  display: inline-flex;
+  gap: var(--ps-space-1);
+  margin-left: var(--ps-space-1);
+}
+
+.ps-split__toggle {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  min-height: var(--ps-touch);
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 0 var(--ps-radius-md) var(--ps-radius-md) 0;
+  font-size: var(--ps-text-sm);
+  cursor: pointer;
+  padding: 0 var(--ps-space-2);
+}
+
+.ps-split__toggle--primary {
+  background-color: var(--ps-accent);
+  color: var(--ps-on-accent);
+  border-left: 1px solid var(--ps-accent-emphasis);
+}
+
+.ps-split__toggle--primary:hover {
+  background-color: var(--ps-accent-emphasis);
+}
+
+.ps-split__toggle--secondary {
+  background-color: var(--ps-surface);
+  color: var(--ps-fg);
+  border-color: var(--ps-border-strong);
+  border-left-color: var(--ps-border-strong);
+}
+
+.ps-split__toggle--secondary:hover {
+  background-color: var(--ps-surface-sunken);
+}
+
+.ps-split__toggle--ghost {
+  background-color: transparent;
+  color: var(--ps-fg);
+}
+
+.ps-split__toggle--ghost:hover {
+  background-color: var(--ps-surface-sunken);
+}
+
+.ps-split__toggle--danger {
+  background-color: var(--ps-danger);
+  color: var(--ps-on-accent);
+}
+
+.ps-split__toggle--danger:hover {
+  background-color: var(--ps-danger-emphasis);
+}
+
+.ps-split__toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* the dropdown menu (elevation level 2) */
+.ps-menu {
+  position: absolute;
+  top: calc(100% + var(--ps-space-1));
+  right: 0;
+  z-index: 1001;
+  min-width: 16rem;
+  display: flex;
+  flex-direction: column;
+  padding: var(--ps-space-1);
+  background-color: var(--ps-surface-raised);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  box-shadow: var(--ps-shadow-2);
+}
+
+.ps-menu__item {
+  appearance: none;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ps-space-4);
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: var(--ps-space-2) var(--ps-space-3);
+  border-radius: var(--ps-radius-sm);
+  font-family: inherit;
+  font-size: var(--ps-text-sm);
+  color: var(--ps-fg);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ps-menu__item:hover,
+.ps-menu__item:focus-visible {
+  background-color: var(--ps-surface-sunken);
+}
+
+.ps-menu__chord {
+  display: inline-flex;
+  gap: var(--ps-space-1);
+}
+
+/* visible keyboard chord (menu items + split primary) */
+.ps-kbd {
+  font-family: var(--ps-font-mono);
+  font-size: var(--ps-text-2xs);
+  color: var(--ps-fg-muted);
+  border: 1px solid var(--ps-border);
+  border-bottom-width: 2px;
+  border-radius: var(--ps-radius-sm);
+  padding: 0 var(--ps-space-1);
+  background-color: var(--ps-surface);
+}
+
+.ps-split__toggle--primary .ps-kbd,
+.ps-menu__item:hover .ps-kbd {
+  color: inherit;
+  border-color: currentColor;
+  background-color: transparent;
+}

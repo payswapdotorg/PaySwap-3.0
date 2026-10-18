@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
+    "test": "vitest run",
     "lint:fix": "oxlint --fix"
   },
   "dependencies": {
@@ -23,6 +24,8 @@
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",
     "vite": "^8.0.2",
-    "ws": "^8.20.0"
+    "ws": "^8.20.0",
+    "vitest": "^3.2.7",
+    "jsdom": "^25.0.1"
   }
 }

@@ -1,0 +1,240 @@
+/*
+ * @zcode/web/payswap — the PaySwap web product styles: the home page.
+ *
+ * NET-NEW (P7-W1, MMP-36): hero, outcome-action cards, honest coverage
+ * stats and the non-custody commitments grid. Split from
+ * payswap-product.css to satisfy the <=400-line file law.
+ */
+
+/* ------------------------------ home --------------------------------- */
+
+.ps-home-hero {
+  border-bottom: 1px solid var(--ps-border);
+  background: var(--ps-accent-tint);
+}
+
+.ps-home-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 72px 24px;
+}
+
+.ps-home-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ps-accent);
+  margin: 0;
+}
+
+.ps-home-h1 {
+  margin: 12px 0 0;
+  max-width: 30ch;
+  font-size: 40px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ps-home-lede {
+  margin: 20px 0 0;
+  max-width: 65ch;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ps-fg-muted);
+}
+
+.ps-home-cta-row {
+  margin-top: 36px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ps-home-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ps-home-cta--primary {
+  background: var(--ps-accent);
+  color: var(--ps-on-accent);
+}
+
+.ps-home-cta--primary:hover {
+  background: var(--ps-accent-emphasis);
+}
+
+.ps-home-cta--secondary {
+  border: 1px solid var(--ps-border-strong);
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+}
+
+.ps-home-cta--secondary:hover {
+  background: var(--ps-surface-sunken);
+}
+
+.ps-home-cta--on-dark {
+  background: var(--ps-accent);
+  color: var(--ps-on-accent);
+}
+
+.ps-home-gate-note {
+  margin: 16px 0 0;
+  max-width: 65ch;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ps-fg-muted);
+}
+
+.ps-home-section {
+  background: var(--ps-bg);
+}
+
+.ps-home-section-alt {
+  border-top: 1px solid var(--ps-border);
+  border-bottom: 1px solid var(--ps-border);
+  background: var(--ps-surface-sunken);
+}
+
+.ps-home-section-dark {
+  border-top: 1px solid var(--ps-border);
+  background: var(--ps-neutral-900, #1c1a17);
+  color: #f4f3f0;
+}
+
+.ps-home-h2 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.ps-home-h2-invert {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+}
+
+.ps-home-section-lede {
+  margin: 10px 0 0;
+  max-width: 70ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ps-fg-muted);
+}
+
+.ps-home-section-lede-invert {
+  margin: 10px 0 0;
+  max-width: 70ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #d6d2c9;
+}
+
+.ps-home-grid {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.ps-home-card {
+  border: 1px solid var(--ps-border);
+  border-radius: 12px;
+  background: var(--ps-surface);
+  padding: 20px;
+}
+
+.ps-home-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ps-home-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ps-home-card-body {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ps-fg-muted);
+}
+
+.ps-home-card-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ps-fg-subtle);
+  border-top: 1px dashed var(--ps-border);
+  padding-top: 10px;
+}
+
+.ps-home-unknown-note {
+  margin: 24px 0 0;
+  max-width: 80ch;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ps-attention);
+}
+
+.ps-home-stat {
+  border: 1px solid var(--ps-border);
+  border-radius: 12px;
+  background: var(--ps-surface);
+  padding: 20px;
+}
+
+.ps-home-stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ps-fg-muted);
+}
+
+.ps-home-stat-value {
+  margin: 8px 0 0;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ps-home-stat-value--ok {
+  color: var(--ps-positive);
+}
+
+.ps-home-stat-value--danger {
+  color: var(--ps-danger);
+}
+
+.ps-home-stat-value--attention {
+  color: var(--ps-attention);
+}
+
+.ps-home-stat-note {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ps-fg-muted);
+}
+
+.ps-home-custody-card {
+  height: 100%;
+}

@@ -28,6 +28,12 @@ import {
   isConversationSharePath,
   resolveConversationShareCodeFromPath,
 } from "./share/conversationShareRoute.js";
+// PaySwap web product (P7-W1): the additive product mount. The substrate's
+// own routes (OAuth callback, conversation share, the ZCode client root)
+// are untouched — the PaySwap product renders under /payswap only.
+import { PaySwapWebApp, resolveApiRuntimeInput } from "./payswap/shell/PaySwapWebApp.js";
+import { HONEST_DEPLOYMENT_CONTEXT, NO_EVIDENCE_COVERAGE } from "./payswap/contracts/harness.js";
+import { isPaySwapProductPath } from "./payswap/routes.js";
 import type { IPlatformService, RemoteTarget, ServerRemoteInfo } from "@zcode/shared";
 import { WEB_DEFAULT_THEME, resolveWebInitialTheme } from "./webThemeSeed.js";
 
@@ -426,6 +432,25 @@ async function bootstrapWebApp() {
   const params = new URLSearchParams(window.location.search);
   if (isWebOAuthCallback(params)) {
     renderWebAuthCallbackPage();
+    return;
+  }
+
+  // PaySwap web product (P7-W1, additive): /payswap* renders the PaySwap
+  // product surface — public site + the honest authenticated entry
+  // boundary — with the repository's honest deployment facts as input
+  // (nothing configured, no recorded provider evidence). The ZCode
+  // substrate below this branch is unchanged.
+  if (isPaySwapProductPath(window.location.pathname)) {
+    document.title = "PaySwap";
+    root.render(
+      <PaySwapWebApp
+        input={{
+          deployment: HONEST_DEPLOYMENT_CONTEXT,
+          coverage: NO_EVIDENCE_COVERAGE,
+          apiRuntime: resolveApiRuntimeInput(),
+        }}
+      />,
+    );
     return;
   }
 

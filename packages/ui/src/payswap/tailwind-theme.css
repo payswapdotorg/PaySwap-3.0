@@ -1,0 +1,107 @@
+/*
+ * @zcode/ui/payswap — Tailwind 4 theme bridge (ADAPT of payswap.org@8a735bf packages/design/src/tailwind-theme.css, MMP-10/P7-W1).
+ *
+ * Consumes the same CSS custom properties from tokens.css, so Tailwind
+ * utilities and the component primitives share one token source:
+ *
+ *   @import "./tokens.css";
+ *   @import "./tailwind-theme.css";
+ *
+ * Generates utilities such as bg-ps-surface, text-ps-fg, rounded-ps-md,
+ * duration-ps-fast. This file contains NO component styling.
+ */
+@import "./tokens.css" layer(theme);
+
+@theme inline {
+  /* surfaces & ink */
+  --color-ps-bg: var(--ps-bg);
+  --color-ps-fg: var(--ps-fg);
+  --color-ps-fg-muted: var(--ps-fg-muted);
+  --color-ps-fg-subtle: var(--ps-fg-subtle);
+  --color-ps-surface: var(--ps-surface);
+  --color-ps-surface-raised: var(--ps-surface-raised);
+  --color-ps-surface-sunken: var(--ps-surface-sunken);
+  --color-ps-border: var(--ps-border);
+  --color-ps-border-strong: var(--ps-border-strong);
+
+  /* accent + outcomes */
+  --color-ps-accent: var(--ps-accent);
+  --color-ps-accent-emphasis: var(--ps-accent-emphasis);
+  --color-ps-accent-tint: var(--ps-accent-tint);
+  --color-ps-on-accent: var(--ps-on-accent);
+  --color-ps-positive: var(--ps-positive);
+  --color-ps-positive-tint: var(--ps-positive-tint);
+  --color-ps-attention: var(--ps-attention);
+  --color-ps-attention-tint: var(--ps-attention-tint);
+  --color-ps-unknown: var(--ps-unknown);
+  --color-ps-unknown-tint: var(--ps-unknown-tint);
+  --color-ps-danger: var(--ps-danger);
+  --color-ps-danger-emphasis: var(--ps-danger-emphasis);
+  --color-ps-danger-tint: var(--ps-danger-tint);
+  --color-ps-focus: var(--ps-focus);
+  --color-ps-scrim: var(--ps-scrim);
+
+  /* outcome states (contract 02 §2, v1.1 — eight states) */
+  --color-ps-state-succeeded: var(--ps-state-succeeded);
+  --color-ps-state-succeeded-tint: var(--ps-state-succeeded-tint);
+  --color-ps-state-processing: var(--ps-state-processing);
+  --color-ps-state-processing-tint: var(--ps-state-processing-tint);
+  --color-ps-state-failed: var(--ps-state-failed);
+  --color-ps-state-failed-tint: var(--ps-state-failed-tint);
+  --color-ps-state-refunded: var(--ps-state-refunded);
+  --color-ps-state-refunded-tint: var(--ps-state-refunded-tint);
+  --color-ps-state-partially-refunded: var(--ps-state-partially_refunded);
+  --color-ps-state-partially-refunded-tint: var(--ps-state-partially_refunded-tint);
+  --color-ps-state-disputed: var(--ps-state-disputed);
+  --color-ps-state-disputed-tint: var(--ps-state-disputed-tint);
+  --color-ps-state-blocked: var(--ps-state-blocked);
+  --color-ps-state-blocked-tint: var(--ps-state-blocked-tint);
+  --color-ps-state-dropped: var(--ps-state-dropped);
+  --color-ps-state-dropped-tint: var(--ps-state-dropped-tint);
+
+  /* environment (contract 02 §2) */
+  --color-ps-env-test: var(--ps-env-test);
+  --color-ps-env-test-on: var(--ps-env-test-on);
+  --color-ps-env-live: var(--ps-env-live);
+  --color-ps-env-live-tint: var(--ps-env-live-tint);
+
+  /* type scale */
+  --text-ps-2xs: var(--ps-text-2xs);
+  --text-ps-xs: var(--ps-text-xs);
+  --text-ps-sm: var(--ps-text-sm);
+  --text-ps-base: var(--ps-text-base);
+  --text-ps-lg: var(--ps-text-lg);
+  --text-ps-xl: var(--ps-text-xl);
+  --text-ps-2xl: var(--ps-text-2xl);
+
+  --font-ps-sans: var(--ps-font-sans);
+  --font-ps-mono: var(--ps-font-mono);
+
+  /* spacing (4px grid) */
+  --spacing-ps-1: var(--ps-space-1);
+  --spacing-ps-2: var(--ps-space-2);
+  --spacing-ps-3: var(--ps-space-3);
+  --spacing-ps-4: var(--ps-space-4);
+  --spacing-ps-5: var(--ps-space-5);
+  --spacing-ps-6: var(--ps-space-6);
+  --spacing-ps-8: var(--ps-space-8);
+  --spacing-ps-10: var(--ps-space-10);
+  --spacing-ps-12: var(--ps-space-12);
+  --spacing-ps-16: var(--ps-space-16);
+
+  /* radius */
+  --radius-ps-sm: var(--ps-radius-sm);
+  --radius-ps-md: var(--ps-radius-md);
+  --radius-ps-lg: var(--ps-radius-lg);
+  --radius-ps-full: var(--ps-radius-full);
+
+  /* motion */
+  --duration-ps-fast: var(--ps-duration-fast);
+  --duration-ps-panel: var(--ps-duration-panel);
+  --duration-ps-slow: var(--ps-duration-slow);
+  --ease-ps-out: var(--ps-ease-out);
+
+  /* elevation */
+  --shadow-ps-1: var(--ps-shadow-1);
+  --shadow-ps-2: var(--ps-shadow-2);
+}
