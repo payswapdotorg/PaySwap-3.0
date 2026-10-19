@@ -3,8 +3,8 @@ import test from "node:test";
 import {
   appSettingsSchema,
   appSettingsPatchSchema,
-} from "../../shared/src/validationAppSettings.js";
-import { zcodeTaskMetaSchema } from "../../shared/src/validation.js";
+} from "@zcode/shared/validationAppSettings";
+import { zcodeTaskMetaSchema } from "@zcode/shared";
 import { readAskUserQuestionAnswers } from "../src/lib/askUserQuestion.js";
 import {
   getAgentPrimaryText,

@@ -90,3 +90,73 @@ platform. This is the architectural thesis: "composed, not fused".
 flagged exactly the 2 non-package directories; they were removed from the
 annotation block (34 → 32). Discovered workspace packages: 32 = annotated 32.
 No package is unmapped (R1 = 0 in the baseline).
+
+---
+
+# GOV-W1 reconciliation additions (2026-10-19)
+
+Base `0755624`. 11 lanes merged on main (R1/R2/P7/P6/R3 waves) without
+package_layers annotations (audit finding TL-AUDIT-2026-10-19.md §3.3).
+The validator's fresh run at base: 49 packages checked, 38 mapped,
+11 unmapped (R1 x11). After these 11 additive annotations: 49/49 mapped,
+R1 = 0. Mapping law unchanged: a package's layer is DECLARED per its lane
+spec (the authority), never guessed from imports; the validator checks
+reality against the declaration and reports every disagreement (the honest
+baseline — see ADR-0004/0005 for the disagreements that surfaced).
+
+## intelligence (3)
+
+| Package | Why |
+| --- | --- |
+| packages/agents (@payswap/agents) | Lane spec `spec/agents/AGENT-MODEL.md` "Layer law": layer intelligence; RUNTIME LEAF, zero runtime deps; the ONE accepted sibling import is TYPE-ONLY (`AmountSpec`, `MandateRef`, authority wire types from `@payswap/trust`). R1-W1 rebuild of the accepted-then-lost work/p3-w1; merge 0d0e906. |
+| packages/route-compiler (@payswap/route-compiler) | Lane spec `spec/route-compiler/ROUTE-COMPILER.md` §2: "v1 intelligence-layer package", v1 hermetic with zero sibling imports. R3-W1; merge c5a4dc7. |
+| packages/lab (@payswap/lab) | Layer's own examples list includes "lab"; P6-W1 law (work-orders.md: "Simulated routes/events are advisory/test evidence only; no production financial authority") matches `cannot_authorize_financial_effects: true`. Merge 2251932 (salvage acceptance). |
+
+## economic (1)
+
+| Package | Why |
+| --- | --- |
+| packages/execution-graph (@payswap/execution-graph) | Lane spec `spec/execution-graph/EXECUTION-GRAPH.md` "Layer law": layer economic (the layer's own examples list includes "execution-graph"); RUNTIME LEAF; accepted sibling pins TYPE-ONLY to @payswap/economic, @payswap/protocol, @payswap/capability (wire shapes; ADR-0004). R1-W2; merge 6999888. |
+
+## security (1)
+
+| Package | Why |
+| --- | --- |
+| packages/onchain-security (@payswap/onchain-security) | Lane spec `spec/onchain-security/ONCHAIN-SECURITY.md`: "the security layer (spec/architecture/MODULE-OWNERSHIP.yaml, layer `security`)"; deterministic gates/signer authorization with `cannot_downgrade_block`. R2-W2; merge 95c8d8f. |
+
+## rails (4)
+
+| Package | Why |
+| --- | --- |
+| packages/onchain-domain (@payswap/onchain-domain) | Lane spec `spec/onchain-domain/ONCHAIN-DOMAIN.md`: "Layer: `rails` (owner: network)". R2-W1; merge a86147a. |
+| packages/onchain-adapters (@payswap/onchain-adapters) | Lane spec `spec/onchain-adapters/ONCHAIN-ADAPTERS.md`: "Layer: `rails` (MODULE-OWNERSHIP law: may_depend_on [contracts, capability, trust, financial])"; deliberately dependency-free leaf-in-flight. R2-W3; merge 6402fa9. |
+| packages/onchain-extensions (@payswap/onchain-extensions) | Lane spec `spec/onchain-extensions/ONCHAIN-EXTENSIONS.md` "Layer law (R3-W2)": "MODULE-OWNERSHIP places venue packs in layer `rails`". Merge e80c932. |
+| packages/merchant (@payswap/merchant) | Lane spec declares NO layer (only derivation, recorded here for TL review): graph.md P5-W3 "merchant/Stripe … provider-verified Stripe paths. Reuse the shared funding/payout/observation/finality/reconciliation lifecycle; do not create a parallel payment engine" — a fiat-payment rail integration domain (rails examples: "fiat, payment"), reusing the financial lifecycle (allowed from rails: may_depend_on includes financial), money movement DELEGATED never owned (spec/merchant/MERCHANT.md law 1). Precedent: @payswap/provider-runtime mapped rails for exactly this provider-bridge shape (P2-W2 acceptance integration). Zero sibling imports today; the annotation is a declaration. Merge bbc9a93. |
+
+## platform (2)
+
+| Package | Why |
+| --- | --- |
+| packages/zcode-bridge (@payswap/zcode-bridge) | Lane spec `spec/zcode-bridge/ZCODE-BRIDGE.md`: "Layer: platform-adjacent bridge (MODULE-OWNERSHIP: treat as `platform`)". R1-W3; merge c5c5a23. |
+| packages/command (@payswap/command) | Lane spec `spec/command/COMMAND.md` "Layer law": "MODULE-OWNERSHIP.yaml layer `platform`" (and §"adds `packages/command: platform` … to MODULE-OWNERSHIP.yaml's package_layers" — the lane itself prescribed this exact annotation). P7-W3; merge 2c10a0e. |
+
+## Disagreements surfaced by the honest mapping (not silenced)
+
+- `agents (intelligence) -> trust` and `execution-graph (economic) ->
+  economic/financial/capability` — type-only wire pins; R3 visible; ADR-0004.
+- `web (platform) -> provider-runtime (rails)` — test-only pin-mirror
+  verification edge; R3+R6 visible; ADR-0005.
+- `web -> ui` design-stub relative re-export — toolchain-structural; R6
+  visible; ADR-0006. (The twin `pdfJsCMapsPlugin` build-config imports in
+  web/desktop vite configs were narrow-fixed this lane: new
+  `@zcode/ui/vite/pdfJsCMapsPlugin` package export; the ui test file's
+  cross-package relative imports to shared were narrow-fixed via the new
+  `@zcode/shared/validationAppSettings` export + root re-export.)
+
+## Post-reconciliation counts
+
+49 packages checked, 49 mapped, 0 unmapped. Annotation keys: 38 + 11 = 49.
+Fresh violation totals and per-edge receipts:
+`docs/architecture-governance/reports/module-ownership-report.json`
+(machine-generated by `node tools/architecture-governance/check-module-ownership.mjs`
+— never hand-edited).

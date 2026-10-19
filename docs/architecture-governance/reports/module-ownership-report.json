@@ -5,20 +5,21 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 38,
-    "packages_mapped": 38,
+    "packages_checked": 49,
+    "packages_mapped": 49,
     "packages_unmapped": 0,
-    "import_edges": 78,
+    "import_edges": 84,
     "layer_rules": 10,
-    "violations_total": 3,
+    "violations_total": 8,
     "violations_by_severity": {
-      "error": 3,
+      "error": 8,
       "warn": 0
     },
     "violations_by_rule": {
+      "R3-not-in-may-depend-on": 5,
       "R6-cross-package-relative": 3
     },
-    "unresolved_external_specifiers": 251
+    "unresolved_external_specifiers": 265
   },
   "packages": [
     {
@@ -518,17 +519,38 @@
       "dependency_layers": []
     },
     {
+      "dir": "packages/agents",
+      "name": "@payswap/agents",
+      "declared_layer": "intelligence",
+      "status": "FAIL",
+      "dependencies": [
+        {
+          "target": "packages/trust",
+          "occurrences": 10
+        }
+      ],
+      "dependents": [],
+      "dependency_layers": [
+        "trust"
+      ]
+    },
+    {
       "dir": "packages/capability",
       "name": "@payswap/capability",
       "declared_layer": "capability",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [
         {
           "target": "packages/trust",
           "occurrences": 3
         }
       ],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/execution-graph",
+          "occurrences": 16
+        }
+      ],
       "dependency_layers": [
         "trust"
       ]
@@ -572,10 +594,19 @@
       ]
     },
     {
+      "dir": "packages/command",
+      "name": "@payswap/command",
+      "declared_layer": "platform",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
       "dir": "packages/desktop",
       "name": "@zcode/desktop",
       "declared_layer": "platform",
-      "status": "FAIL",
+      "status": "PASS",
       "dependencies": [
         {
           "target": "packages/client",
@@ -591,7 +622,7 @@
         },
         {
           "target": "packages/services",
-          "occurrences": 60
+          "occurrences": 62
         },
         {
           "target": "packages/shared",
@@ -616,15 +647,64 @@
       "dir": "packages/economic",
       "name": "@payswap/economic",
       "declared_layer": "economic",
+      "status": "FAIL",
+      "dependencies": [],
+      "dependents": [
+        {
+          "source": "packages/execution-graph",
+          "occurrences": 2
+        }
+      ],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/execution-graph",
+      "name": "@payswap/execution-graph",
+      "declared_layer": "economic",
+      "status": "FAIL",
+      "dependencies": [
+        {
+          "target": "packages/capability",
+          "occurrences": 16
+        },
+        {
+          "target": "packages/economic",
+          "occurrences": 2
+        },
+        {
+          "target": "packages/protocol",
+          "occurrences": 18
+        }
+      ],
+      "dependents": [],
+      "dependency_layers": [
+        "capability",
+        "economic",
+        "financial"
+      ]
+    },
+    {
+      "dir": "packages/formal-proof",
+      "name": "@zcode/formal-proof",
+      "declared_layer": "platform",
       "status": "PASS",
       "dependencies": [],
       "dependents": [],
       "dependency_layers": []
     },
     {
-      "dir": "packages/formal-proof",
-      "name": "@zcode/formal-proof",
-      "declared_layer": "platform",
+      "dir": "packages/lab",
+      "name": "@payswap/lab",
+      "declared_layer": "intelligence",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/merchant",
+      "name": "@payswap/merchant",
+      "declared_layer": "rails",
       "status": "PASS",
       "dependencies": [],
       "dependents": [],
@@ -649,17 +729,58 @@
       "dependency_layers": []
     },
     {
+      "dir": "packages/onchain-adapters",
+      "name": "@payswap/onchain-adapters",
+      "declared_layer": "rails",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/onchain-domain",
+      "name": "@payswap/onchain-domain",
+      "declared_layer": "rails",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/onchain-extensions",
+      "name": "@payswap/onchain-extensions",
+      "declared_layer": "rails",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/onchain-security",
+      "name": "@payswap/onchain-security",
+      "declared_layer": "security",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
       "dir": "packages/protocol",
       "name": "@payswap/protocol",
       "declared_layer": "financial",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [
         {
           "target": "packages/trust",
           "occurrences": 1
         }
       ],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/execution-graph",
+          "occurrences": 18
+        }
+      ],
       "dependency_layers": [
         "trust"
       ]
@@ -739,6 +860,20 @@
       "dir": "packages/provider-runtime",
       "name": "@payswap/provider-runtime",
       "declared_layer": "rails",
+      "status": "FAIL",
+      "dependencies": [],
+      "dependents": [
+        {
+          "source": "packages/web",
+          "occurrences": 1
+        }
+      ],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/route-compiler",
+      "name": "@payswap/route-compiler",
+      "declared_layer": "intelligence",
       "status": "PASS",
       "dependencies": [],
       "dependents": [],
@@ -846,7 +981,7 @@
         },
         {
           "source": "packages/desktop",
-          "occurrences": 60
+          "occurrences": 62
         },
         {
           "source": "packages/server",
@@ -870,7 +1005,7 @@
       "dir": "packages/shared",
       "name": "@zcode/shared",
       "declared_layer": "contracts",
-      "status": "FAIL",
+      "status": "PASS",
       "dependencies": [
         {
           "target": "packages/model-option-map",
@@ -951,18 +1086,27 @@
       "dir": "packages/surface",
       "name": "@payswap/surface",
       "declared_layer": "contracts",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/web",
+          "occurrences": 4
+        }
+      ],
       "dependency_layers": []
     },
     {
       "dir": "packages/trust",
       "name": "@payswap/trust",
       "declared_layer": "trust",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [],
       "dependents": [
+        {
+          "source": "packages/agents",
+          "occurrences": 10
+        },
         {
           "source": "packages/capability",
           "occurrences": 3
@@ -1004,7 +1148,7 @@
         },
         {
           "source": "packages/web",
-          "occurrences": 7
+          "occurrences": 18
         }
       ],
       "dependency_layers": [
@@ -1023,19 +1167,37 @@
           "occurrences": 1
         },
         {
+          "target": "packages/provider-runtime",
+          "occurrences": 1
+        },
+        {
           "target": "packages/shared",
           "occurrences": 13
         },
         {
+          "target": "packages/surface",
+          "occurrences": 4
+        },
+        {
           "target": "packages/ui",
-          "occurrences": 7
+          "occurrences": 18
         }
       ],
       "dependents": [],
       "dependency_layers": [
         "platform",
+        "rails",
         "contracts"
       ]
+    },
+    {
+      "dir": "packages/zcode-bridge",
+      "name": "@payswap/zcode-bridge",
+      "declared_layer": "platform",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
     },
     {
       "dir": "packages/zcode-cua",
@@ -1095,22 +1257,706 @@
   ],
   "violations": [
     {
-      "rule": "R6-cross-package-relative",
+      "rule": "R3-not-in-may-depend-on",
       "severity": "error",
-      "sourcePkg": "packages/desktop",
-      "targetPkg": "packages/ui",
-      "detail": "1 relative/alias import(s) cross the package boundary instead of using the package name",
+      "sourcePkg": "packages/agents",
+      "targetPkg": "packages/trust",
+      "detail": "layer \"intelligence\" -> layer \"trust\" is not in may_depend_on [economic, capability, contracts]",
       "occurrences": [
         {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/ui",
-          "specifier": "../ui/vite/pdfJsCMapsPlugin.js",
-          "file": "packages/desktop/vite.config.ts",
-          "line": 8,
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/src/amount.ts",
+          "line": 18,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/src/authority-port.ts",
+          "line": 31,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/src/organization.ts",
+          "line": 22,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/src/organization/execution.ts",
+          "line": 40,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/src/runtime/runtime-seams.ts",
+          "line": 22,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/src/runtime/tool-gate.ts",
+          "line": 15,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/test/authority-port.test.ts",
+          "line": 2,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/test/fixtures.ts",
+          "line": 30,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/test/organization-execution.test.ts",
+          "line": 15,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/agents",
+          "targetPkg": "packages/trust",
+          "specifier": "@payswap/trust",
+          "file": "packages/agents/test/reference-runtime.test.ts",
+          "line": 2,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/execution-graph",
+      "targetPkg": "packages/capability",
+      "detail": "layer \"economic\" -> layer \"capability\" is not in may_depend_on [contracts]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/attempt-contract.ts",
+          "line": 25,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/attempt-ledger.ts",
+          "line": 52,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/attempts.ts",
+          "line": 31,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/execution-modes.ts",
+          "line": 16,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/observation-version-contract.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/observation-versions.ts",
+          "line": 32,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/offer-contract.ts",
+          "line": 29,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/offers.ts",
+          "line": 30,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/plan-contract.ts",
+          "line": 26,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/projection-contract.ts",
+          "line": 24,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/projection-validation.ts",
+          "line": 19,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/reconciliation-contract.ts",
+          "line": 17,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/reconciliation.ts",
+          "line": 28,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/search-contract.ts",
+          "line": 30,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/src/search.ts",
+          "line": 30,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/execution-graph/test/fixtures.ts",
+          "line": 21,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/execution-graph",
+      "targetPkg": "packages/economic",
+      "detail": "layer \"economic\" -> layer \"economic\" is not in may_depend_on [contracts]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/economic",
+          "specifier": "@payswap/economic",
+          "file": "packages/execution-graph/src/offer-contract.ts",
+          "line": 31,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/economic/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/economic",
+          "specifier": "@payswap/economic",
+          "file": "packages/execution-graph/test/fixtures.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/economic/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/execution-graph",
+      "targetPkg": "packages/protocol",
+      "detail": "layer \"economic\" -> layer \"financial\" is not in may_depend_on [contracts]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/attempt-contract.ts",
+          "line": 26,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/attempt-ledger.ts",
+          "line": 53,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/attempts.ts",
+          "line": 32,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/director.ts",
+          "line": 150,
+          "kind": "dynamic-import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/identifiers.ts",
+          "line": 16,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/material-terms-contract.ts",
+          "line": 21,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/material-terms.ts",
+          "line": 25,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/observation-version-contract.ts",
+          "line": 24,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/observation-versions.ts",
+          "line": 33,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/offer-contract.ts",
+          "line": 30,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/plan-contract.ts",
+          "line": 27,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/projection-contract.ts",
+          "line": 25,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/projection-validation.ts",
+          "line": 18,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/projection.ts",
+          "line": 56,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/reconciliation-contract.ts",
+          "line": 18,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/strategy-contract.ts",
+          "line": 25,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/src/strategy.ts",
+          "line": 22,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/execution-graph",
+          "targetPkg": "packages/protocol",
+          "specifier": "@payswap/protocol",
+          "file": "packages/execution-graph/test/fixtures.ts",
+          "line": 22,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/protocol/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/web",
+      "targetPkg": "packages/provider-runtime",
+      "detail": "layer \"platform\" -> layer \"rails\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/web",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/result-envelope.ts",
+          "file": "packages/web/test/payswap/pin-mirror.test.ts",
+          "line": 36,
           "kind": "import",
           "typeOnly": false,
           "classification": "relative",
-          "targetFile": "packages/ui/vite/pdfJsCMapsPlugin.ts",
+          "targetFile": "packages/provider-runtime/src/result-envelope.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -1121,34 +1967,86 @@
     {
       "rule": "R6-cross-package-relative",
       "severity": "error",
-      "sourcePkg": "packages/ui",
-      "targetPkg": "packages/shared",
-      "detail": "2 relative/alias import(s) cross the package boundary instead of using the package name",
+      "sourcePkg": "packages/web",
+      "targetPkg": "packages/provider-runtime",
+      "detail": "1 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
         {
-          "sourcePkg": "packages/ui",
-          "targetPkg": "packages/shared",
-          "specifier": "../../shared/src/validationAppSettings.js",
-          "file": "packages/ui/test/nonCliAcpRetirement.test.ts",
-          "line": 6,
+          "sourcePkg": "packages/web",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/result-envelope.ts",
+          "file": "packages/web/test/payswap/pin-mirror.test.ts",
+          "line": 36,
           "kind": "import",
           "typeOnly": false,
           "classification": "relative",
-          "targetFile": "packages/shared/src/validationAppSettings.ts",
+          "targetFile": "packages/provider-runtime/src/result-envelope.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/web",
+      "targetPkg": "packages/surface",
+      "detail": "4 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/web",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/version.ts",
+          "file": "packages/web/test/payswap/pin-mirror.test.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/version.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
         },
         {
-          "sourcePkg": "packages/ui",
-          "targetPkg": "packages/shared",
-          "specifier": "../../shared/src/validation.js",
-          "file": "packages/ui/test/nonCliAcpRetirement.test.ts",
-          "line": 7,
+          "sourcePkg": "packages/web",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/outcomes.ts",
+          "file": "packages/web/test/payswap/pin-mirror.test.ts",
+          "line": 28,
           "kind": "import",
           "typeOnly": false,
           "classification": "relative",
-          "targetFile": "packages/shared/src/validation.ts",
+          "targetFile": "packages/surface/src/outcomes.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/web",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/areas.ts",
+          "file": "packages/web/test/payswap/pin-mirror.test.ts",
+          "line": 29,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/areas.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/web",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/progress-states.ts",
+          "file": "packages/web/test/payswap/pin-mirror.test.ts",
+          "line": 30,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/progress-states.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -1166,13 +2064,13 @@
         {
           "sourcePkg": "packages/web",
           "targetPkg": "packages/ui",
-          "specifier": "../ui/vite/pdfJsCMapsPlugin.js",
-          "file": "packages/web/vite.config.ts",
-          "line": 7,
-          "kind": "import",
+          "specifier": "../../../ui/src/payswap/index.js",
+          "file": "packages/web/test/payswap/design.ts",
+          "line": 11,
+          "kind": "export",
           "typeOnly": false,
           "classification": "relative",
-          "targetFile": "packages/ui/vite/pdfJsCMapsPlugin.ts",
+          "targetFile": "packages/ui/src/payswap/index.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -1231,6 +2129,71 @@
       "file": "packages/desktop/src/main/manifestUpdateProvider.ts",
       "specifier": "builder-util-runtime",
       "line": 2
+    },
+    {
+      "file": "packages/desktop/test/payswap/delegation.test.ts",
+      "specifier": "vitest",
+      "line": 8
+    },
+    {
+      "file": "packages/desktop/test/payswap/honest-states.test.ts",
+      "specifier": "vitest",
+      "line": 7
+    },
+    {
+      "file": "packages/desktop/test/payswap/mission-surface.test.ts",
+      "specifier": "vitest",
+      "line": 8
+    },
+    {
+      "file": "packages/desktop/test/payswap/money-view.test.ts",
+      "specifier": "vitest",
+      "line": 7
+    },
+    {
+      "file": "packages/desktop/test/payswap/pin-fidelity.test.ts",
+      "specifier": "vitest",
+      "line": 8
+    },
+    {
+      "file": "packages/desktop/test/payswap/ported-ux-vocabulary.test.ts",
+      "specifier": "vitest",
+      "line": 14
+    },
+    {
+      "file": "packages/desktop/test/payswap/progress-timeline.test.ts",
+      "specifier": "vitest",
+      "line": 7
+    },
+    {
+      "file": "packages/desktop/test/payswap/quote-terms.test.ts",
+      "specifier": "vitest",
+      "line": 7
+    },
+    {
+      "file": "packages/desktop/test/payswap/security-gate.test.ts",
+      "specifier": "vitest",
+      "line": 7
+    },
+    {
+      "file": "packages/desktop/test/payswap/shell-integration.test.ts",
+      "specifier": "vitest",
+      "line": 9
+    },
+    {
+      "file": "packages/desktop/vitest.config.ts",
+      "specifier": "vitest/config",
+      "line": 1
+    },
+    {
+      "file": "packages/onchain-extensions/test/registry.test.ts",
+      "specifier": "onchain-pack/dex/absent@1.0.0",
+      "line": 57
+    },
+    {
+      "file": "packages/onchain-extensions/test/registry.test.ts",
+      "specifier": "onchain-pack/dex/uniswap-v2@1.0.0",
+      "line": 61
     },
     {
       "file": "packages/provider-runtime/test/idempotency.test.ts",
@@ -1366,71 +2329,6 @@
       "file": "packages/services/src/cua-permission-broker/windowsCuaDevHelperHost.ts",
       "specifier": "#src/logger/serviceLogger.js",
       "line": 11
-    },
-    {
-      "file": "packages/services/src/cua-permission-broker/windowsCuaDevHelperHost.ts",
-      "specifier": "#src/cua-permission-broker/windowsCuaHelperHostSupport.js",
-      "line": 25
-    },
-    {
-      "file": "packages/services/src/cua-permission-broker/windowsCuaDevHelperHost.ts",
-      "specifier": "#src/cua-permission-broker/windowsCuaHelperHostSupport.js",
-      "line": 31
-    },
-    {
-      "file": "packages/services/src/cua-permission-broker/windowsCuaHelperHostSupport.ts",
-      "specifier": "#src/logger/serviceLogger.js",
-      "line": 12
-    },
-    {
-      "file": "packages/services/src/cua-permission-broker/windowsCuaHelperHostSupport.ts",
-      "specifier": "#src/cua-permission-broker/windowsCuaDevRuntime.js",
-      "line": 13
-    },
-    {
-      "file": "packages/services/src/feedback/feedbackHttpClient.ts",
-      "specifier": "#src/logger/serviceLogger.js",
-      "line": 29
-    },
-    {
-      "file": "packages/services/src/feedback/feedbackHttpClient.ts",
-      "specifier": "#src/providers/api/requestIdHeaders.js",
-      "line": 30
-    },
-    {
-      "file": "packages/services/src/feedback/feedbackHttpClient.ts",
-      "specifier": "#src/providers/api/networkErrorClassifier.js",
-      "line": 34
-    },
-    {
-      "file": "packages/services/src/feedback/feedbackHttpClient.ts",
-      "specifier": "#src/runtime-tools/clientPlatform.js",
-      "line": 35
-    },
-    {
-      "file": "packages/services/src/feedback/feedbackLocalTicketStore.ts",
-      "specifier": "#src/paths.js",
-      "line": 5
-    },
-    {
-      "file": "packages/services/src/feedback/feedbackService.ts",
-      "specifier": "#src/feedback/feedbackLocalTicketStore.js",
-      "line": 20
-    },
-    {
-      "file": "packages/services/src/fileWatcher/fileWatcherService.ts",
-      "specifier": "#src/logger/serviceLogger.js",
-      "line": 5
-    },
-    {
-      "file": "packages/services/src/fileWatcher/fileWatcherService.ts",
-      "specifier": "#src/memoryDiagnostics.js",
-      "line": 7
-    },
-    {
-      "file": "packages/services/src/git/gitCommitMessageGenerator.ts",
-      "specifier": "#src/logger/serviceLogger.js",
-      "line": 8
     }
   ],
   "example_hints_without_packages": [
@@ -1444,7 +2342,6 @@
     "contracts:surface-contracts",
     "economic:goals",
     "economic:intents",
-    "economic:execution-graph",
     "economic:strategy",
     "economic:opportunities",
     "trust:principals",
@@ -1469,10 +2366,8 @@
     "rails:fx",
     "rails:onchain",
     "rails:future",
-    "intelligence:agents",
     "intelligence:organizations",
     "intelligence:director",
-    "intelligence:lab",
     "intelligence:optimization",
     "security:policy",
     "security:threat-intel",
