@@ -2,26 +2,16 @@
  * @payswap/opportunities — the pinned wire shapes of the onchain domain
  * (P6-W2, lane r4-w2; commit 1/4).
  *
- * Authority: @payswap/onchain-domain (P4-W1, lane R2-W1 — the chain/asset/
- * protocol vocabulary authority). This package GENERALIZES the chain law
- * to rails (a FinancialOpportunity is observed ON A RAIL: an onchain
- * chain, a fiat payment scheme or an FX venue corridor), and the
- * generalization is deliberately built ON TOP of the authority's
- * canonical identity law, never beside it:
- * - a rail key is the authority's canonical `${namespace}:${network}`
- *   shape (ethereum:mainnet, fiat:sepa, fx:eur-usd are all valid keys
- *   under the SAME pattern — the namespaces differ, the law does not);
- * - an ONCHAIN-kind rail key must be a canonical chain key in the
- *   authority's vocabulary (a chain is a settlement-rail family member,
- *   INV-17);
- * - a capital asset ref is the authority's canonical
- *   `${railKey}/asset:${SYMBOL}` identity (the asset-ref law, generalized
- *   from `${chainKey}/asset:` verbatim);
- * - the asset symbol pattern is the authority's SYMBOL_PATTERN
- *   byte-identical.
- *
- * VALUE pins here (pattern constants) are pinned byte-identical to the
- * authority; cross-lane consistency is asserted by test/pins.test.ts.
+ * Authority: @payswap/onchain-domain (P4-W1 — the chain/asset/protocol
+ * vocabulary authority). This package GENERALIZES the chain law to rails
+ * (ON A RAIL: an onchain chain, a fiat payment scheme, an FX corridor)
+ * ON TOP of the authority's canonical identity law, never beside it: a
+ * rail key is the authority's `${namespace}:${network}` shape
+ * (ethereum:mainnet, fiat:sepa, fx:eur-usd — same pattern, different
+ * namespaces); an ONCHAIN-kind rail key is a canonical chain key (INV-17);
+ * a capital asset ref is the authority's `${railKey}/asset:${SYMBOL}`
+ * identity; the symbol pattern is byte-identical. VALUE pins asserted by
+ * test/pins.test.ts.
  */
 
 /**

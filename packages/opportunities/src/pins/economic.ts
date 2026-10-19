@@ -2,29 +2,13 @@
  * @payswap/opportunities — the pinned wire shapes of the economic model
  * kernel (P6-W2, lane r4-w2; commit 1/4).
  *
- * Authority: @payswap/economic (P1-W1 — the economic-layer sibling that
- * owns EconomicGoal, MoneyMovementIntent and the pinned cross-lane money
- * wire shape AmountSpec). The opportunities package is in the SAME
- * economic layer (MODULE-OWNERSHIP layer `economic`: goals, intents,
- * execution-graph, strategy, opportunities — may_depend_on [contracts]),
- * and it pins the sibling's wire shapes for exactly three reasons:
- *
- * - AMOUNT SPEC: the three-character-currency + canonical-integer-minor-
- *   units money wire (identical in the economic, protocol and trust
- *   lanes) is the shape an opportunity's FEE-BOUNDED estimates cite when
- *   they reference a numeraire — pinned verbatim, including the law that
- *   this package implements the wire SHAPE and its structural validation
- *   ONLY, never money arithmetic (INV-01 single financial authority).
- * - VERSIONED INPUTS: the authority's VersionedEconomicInput discipline
- *   (typed kind vocabulary + positive integer version + opaque sourceRef
- *   + explicit canonical-JSON content) is the ancestor law of this
- *   package's versioned SupportingObservation evidence; the kind
- *   vocabulary is pinned so an opportunity that cites a QUOTE or
- *   CORRIDOR detail as an economic input cites the authority's kinds.
- * - GOAL/INTENT LINEAGE: an opportunity is ADVISORY DEMAND-side evidence
- *   — it never establishes authorization or finality, and when it cites
- *   the goal it may serve, it cites the authority's intent archetypes
- *   (MONEY_MOVEMENT | PAYMENT | SERVICE_ACCESS) as an opaque lineage ref.
+ * Authority: @payswap/economic (P1-W1 — the economic-layer sibling; this
+ * package is in the SAME layer). Pinned: AMOUNT SPEC (the cross-lane
+ * money wire — SHAPE and structural validation only, never money
+ * arithmetic: INV-01); VERSIONED INPUTS (the kind vocabulary that is the
+ * ancestor law of the versioned SupportingObservation evidence);
+ * GOAL/INTENT LINEAGE (the intent archetypes an opportunity cites as an
+ * ADVISORY lineage ref — never authorization, never finality).
  */
 
 /**

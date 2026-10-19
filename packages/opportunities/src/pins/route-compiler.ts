@@ -2,30 +2,16 @@
  * @payswap/opportunities — the pinned wire shapes of the route-compiler's
  * exact-math + freshness laws (P6-W2, lane r4-w2; commit 1/4).
  *
- * Authority: @payswap/route-compiler (P5-W1 — the best-execution/route
- * optimization lane; the PORT of the old payswap.org@8a735bf
- * packages/best-execution). The old onchain-opportunities package
- * consumed the old lane's ExactRational + QuoteFreshness AS-IS
- * (validateExactRational, compareRationals, isRationalZero,
- * validateQuoteFreshness, isQuoteStale); in PaySwap 3.0 the authority is
- * the route-compiler lane, and under the zero-sibling law this package
- * re-declares the wire shapes as LOCAL STRUCTURAL PINS and implements
- * the value laws LOCALLY (src/rational.ts + src/freshness.ts),
- * behaviour-identical, credited here:
- *
- * - ExactRational: canonical decimal integer strings (numerator
- *   non-negative, denominator positive — NEVER zero), computed with
- *   native BigInt, NOT GCD-reduced (reduction is a canonicalization
- *   choice that would change byte-stability of intermediate traces).
- * - QuoteFreshness: a BOUNDED observation window { asOfMs, maxAgeMs }
- *   with maxAgeMs POSITIVE (a boundless quote is not evidence), and the
- *   INCLUSIVE staleness law: stale iff (at − asOfMs) > maxAgeMs — fresh
- *   at exactly maxAge of age, stale one millisecond later. No ambient
- *   clock; the evaluation instant is always caller-supplied.
- *
- * Cross-lane consistency of both value laws is asserted by
- * test/pins.test.ts (the full resolver/staleness boundary matrix and the
- * rational canonical-form domain this package exercises).
+ * Authority: @payswap/route-compiler (P5-W1 — the port of the old
+ * payswap.org@8a735bf packages/best-execution, which the old
+ * onchain-opportunities package consumed AS-IS). Under the zero-sibling
+ * law the wire shapes are LOCAL STRUCTURAL PINS and the value laws are
+ * implemented LOCALLY (src/rational.ts + src/freshness.ts),
+ * behaviour-identical: ExactRational (canonical decimal integer strings,
+ * BigInt, NOT GCD-reduced — byte-stable traces); QuoteFreshness (bounded
+ * window, maxAgeMs POSITIVE; INCLUSIVE staleness: stale iff
+ * (at − asOfMs) > maxAgeMs; caller-supplied instants only). Cross-lane
+ * consistency asserted by test/pins.test.ts.
  */
 
 /**

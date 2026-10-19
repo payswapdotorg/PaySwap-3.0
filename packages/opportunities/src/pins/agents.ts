@@ -2,34 +2,15 @@
  * @payswap/opportunities — the pinned wire shapes of the agent proposal
  * seam (P6-W2, lane r4-w2; commit 1/4).
  *
- * Authority: @payswap/agents (P3-W1 — the Agent Body/Instance/Package,
- * Organizations and communications authority). The work order's hard law
- * 2 fixes the SEAM: opportunities are INPUTS TO DECISIONS, never
- * financial authority — opportunity -> proposal -> decision, NEVER
- * execution. The proposal wire an opportunity is surfaced through is the
- * authority's AgentProposal (a versioned ADVISORY recommendation record),
- * and the authority's own law carries the package here:
- *
- * - a proposal's payload is OPAQUE ADVISORY DATA that MUST NOT contain
- *   protocol-command fields (the authority's PROTOCOL_COMMAND_MARKER_
- *   FIELDS list — idempotencyKey, commandType, authorization, mandate,
- *   signature, approvals, obligationId, settlementInstructionId, ...);
- * - the schema is VERSIONED (PROPOSAL_SCHEMA_VERSION = 1);
- * - the proposal types include "strategy" and "informational" — the
- *   advisory types an opportunity projection carries.
- *
- * This package pins the marker-field list and the schema version as VALUE
- * pins (byte-identical; cross-lane consistency asserted by
- * test/pins.test.ts) and the AgentProposal shape as a STRUCTURAL pin, so
- * the opportunity -> proposal -> decision seam is TYPED against the
- * authority's wire — never a local invention, never a value import.
- *
- * THE AGENT-CANNOT-EXECUTE LAW (hard law 3) rides this pin: agents may
- * DISCOVER/SURFACE opportunities but cannot EXECUTE them — the marker
- * fields below are exactly the execution/authority vocabulary an
- * opportunity (and its proposal projection) must never carry, and the
- * seam exposes no function that converts an opportunity into anything
- * execution-shaped.
+ * Authority: @payswap/agents (P3-W1). Hard law 2 fixes the SEAM:
+ * opportunity -> proposal -> decision, NEVER execution — typed against
+ * the authority's AgentProposal (a versioned ADVISORY recommendation
+ * record whose payload MUST NOT contain protocol-command marker fields).
+ * The marker list and schema version are VALUE pins (byte-identical,
+ * asserted by test/pins.test.ts); the shape is a STRUCTURAL pin. THE
+ * AGENT-CANNOT-EXECUTE LAW (hard law 3) rides this pin: the marker fields
+ * are exactly the execution/authority vocabulary an opportunity (and its
+ * projection) must never carry.
  */
 
 /**
@@ -103,13 +84,9 @@ export interface PinnedAgentProposal {
 
 /**
  * VALUE PIN — authority: @payswap/agents src/proposal.ts
- * `assertNotProtocolCommand` (behaviour-identical deep scan): asserts a
- * value carries NO protocol-command / authority marker field at ANY
- * nesting depth. Agent proposals pass; protocol commands and authority
- * artifacts do not. Pinned locally so the seam can fail closed without a
- * runtime dependency; cycles are traversed once (seen-set), arrays are
- * scanned element-wise, and the scan is deterministic (key order of the
- * frozen marker list).
+ * `assertNotProtocolCommand` (behaviour-identical deep scan): NO marker
+ * field at ANY nesting depth. Cycles traversed once (seen-set);
+ * deterministic (the frozen marker-list order).
  */
 export function pinnedAssertNotProtocolCommand(candidate: unknown): void {
   const scan = (value: unknown, path: string, seen: Set<unknown>): void => {
