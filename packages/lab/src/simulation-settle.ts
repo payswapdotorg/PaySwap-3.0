@@ -1,23 +1,19 @@
 /**
  * The simulation settle machinery (P6-W1; extracted from the old
- * payswap.org@8a735bf packages/lab simulation.ts engine body, W2-004).
- *
+ * payswap.org@8a735bf packages/lab simulation.ts engine body).
+
  * INV-L01 / canonical INV-11: this module imports ONLY deterministic local
  * utilities — never any pin, seam, rail adapter, connector execution,
  * ledger or authorization code.
  *
  * Rail choice is a two-pass deterministic policy over the program's
  * preference: currency-matching rails first (no FX), cross-currency rails
- * second (converting at the rail's declared spread plus any scenario FX
- * volatility, tracked exactly in bigint minor units). Liquidity gaps are
- * covered by EXPLICIT network credit only when the program declares it
- * (credit exposure is always surfaced, never hidden). The settle path
- * preserves the canonical INV-4 discipline: a delayed write yields
- * UNKNOWN_REQUIRES_RECONCILIATION (never FAILED, never success); a pending
- * customer approval past its deadline is USER_ACTION_REQUIRED (a
- * legitimate waiting terminal state); a latency miss is EXPIRED. Netting
- * coalesces same-(rail, step) batches so internalized value never moves
- * externally (economic compression).
+ * second (converting at the declared spread plus any scenario FX
+ * volatility, exactly in bigint minor units). Liquidity gaps are covered
+ * by EXPLICIT network credit only when declared. The settle path
+ * preserves INV-4: delayed writes are UNKNOWN_REQUIRES_RECONCILIATION;
+ * missed approvals are USER_ACTION_REQUIRED; latency misses are EXPIRED.
+ * Netting coalesces same-(rail, step) batches (economic compression).
  */
 
 import { DeterministicRandom } from "./canonical.ts";

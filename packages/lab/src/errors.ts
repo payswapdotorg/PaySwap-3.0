@@ -97,3 +97,6 @@ export class LabSearchError extends LabError {
     this.name = "LabSearchError";
   }
 }
+// Every family error is fail-closed: constructors validate eagerly, carry
+// field paths in messages, and never expose an override path.
+// The taxonomy is closed: adding a family error requires a law citation.

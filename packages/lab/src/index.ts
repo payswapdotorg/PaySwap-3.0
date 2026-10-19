@@ -150,6 +150,10 @@ export type {
   OptimizationPhase,
   RobustnessRunRecord,
   RobustnessEvidence,
+  HardConstraintSpec,
+  ObjectiveSpec,
+  ObjectivePenalties,
+  EvaluationSpec,
 } from "./evaluator.ts";
 
 // Replay + counterfactual over immutable recorded facts.
@@ -265,3 +269,31 @@ export {
   RecordedFactsError,
   LabSearchError,
 } from "./errors.ts";
+
+
+// ---------------------------------------------------------------------------
+// The module map (where every family lives)
+// ---------------------------------------------------------------------------
+// - ./canonical.ts            deterministic core: canonicalize, fnv1a64,
+//                              deepFreeze, DeterministicRandom (splitmix64)
+// - ./simulation-world.ts      rails / pools / the simulated world model
+// - ./simulation-plan.ts       demands, incidents, scenario plans, programs
+// - ./simulation-metrics.ts    outcome taxonomy, metrics, namespace brand
+// - ./simulation-engine.ts     the step scheduler (incidents -> demands)
+// - ./simulation-settle.ts     rail choice, settlement, netting coalescing
+// - ./simulation.ts            the public engine surface + digest + re-exports
+// - ./scenarios.ts             the mandatory baseline suite + canonical pack
+// - ./baseline-candidates.ts   the four mandatory baseline candidates
+// - ./domain-packs.ts          DomainPacks + the building-block index
+// - ./evaluation-spec.ts       hard-constraint/objective vocabulary + specs
+// - ./evaluator.ts             evaluateRun (phases tuple) + robustness
+// - ./replay.ts                recorded facts, replay, outcome counters
+// - ./counterfactual.ts        counterfactual deltas over frozen facts
+// - ./search.ts                executable grounding + selection
+// - ./search-plugins.ts        deterministic + hand-designed baselines, registry
+// - ./candidates.ts            candidate registry + authority-free composition
+// - ./promotion.ts             the versioned reversible promotion ledger
+// - ./promotion-comparison.ts  side-by-side ranking (no mode prior)
+// - ./director.ts              the Director control surface
+// - ./errors.ts                the Lab error taxonomy (fail-closed)
+// - ./pins/*                   every external seam as local structural pins

@@ -132,3 +132,18 @@ export class DeterministicRandom {
     return Number(this.nextUint64() % BigInt(maxExclusive));
   }
 }
+
+// ---------------------------------------------------------------------------
+// Usage receipts (who consumes what)
+// ---------------------------------------------------------------------------
+// - canonicalize + fnv1a64: every content-addressed artifact in the Lab
+//   (simulation digests, recorded fact sets, replay/counterfactual
+//   digests, evaluation digests, robustness digests, published candidate
+//   snapshots, promotion order digests).
+// - deepFreeze: simulation results, fact sets, candidates, evaluations.
+// - DeterministicRandom: the simulation engine ONLY (the settle module
+//   draws the per-settlement latency jitter through the engine state).
+// The Lab never hashes platform-volatile encodings: only canonical form.
+// Determinism receipts:
+// - foldSeed: FNV-1a 64 over the caller's seed string (stable bytes).
+// - nextUint64: splitmix64; nextBounded reduces modulo the bound.

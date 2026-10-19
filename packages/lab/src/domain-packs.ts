@@ -1,9 +1,6 @@
 /**
- * Lab Domain Packs and the searchable building-block index (P6-W1; the
- * P6 rebuild of the old payswap.org@8a735bf packages/lab domain-packs.ts,
- * W2-004).
- *
- * A Domain Pack declares ALL TEN LAB.md dimensions: domain, scenario
+ * Lab Domain Packs and the searchable building-block index (P6-W1; the P6
+ * rebuild of the old payswap.org@8a735bf packages/lab domain-packs.ts, W2-004). A Domain Pack declares ALL TEN LAB.md dimensions: domain, scenario
  * types, hard constraints, objectives, observables, action space, failure
  * taxonomy, policy set, evaluation suite and provenance requirements.
  *
@@ -16,11 +13,10 @@
  * certified smart-contract capabilities, DECLARED_CAPABILITY blocks, PSP
  * connector capabilities and participation mechanisms. Indexing is
  * DISCOVERY ONLY: a block in this index is a proposal ingredient, never
- * execution authority (INV-9/INV-10 discipline). Provider-backed
- * executable selection happens in search.ts and is grounded in
- * ConnectedCapabilityInstance + CapabilityObservation — never in
- * catalogue definitions alone (INV-13). This module indexes the static
- * vocabulary; search.ts indexes the live, account-scoped truth.
+ * execution authority (INV-9/INV-10 discipline). Provider-backed executable
+ * selection happens in search.ts, grounded in ConnectedCapabilityInstance +
+ * CapabilityObservation — never in catalogue definitions alone (INV-13):
+ * this module indexes the static vocabulary, search.ts the live truth.
  */
 
 import type {

@@ -265,3 +265,14 @@ export class PromotionLedger {
     });
   }
 }
+
+// ---------------------------------------------------------------------------
+// Stage semantics (LAB.md "Promotion")
+// ---------------------------------------------------------------------------
+// DRAFT        the candidate exists (registry territory)
+// BENCHMARKED  baseline-suite evaluation evidence attached
+// VALIDATED    the INV-L02 triple (replay + counterfactual + robustness)
+// SHADOW       side-by-side against the incumbent without customer effect
+// CANARY       a bounded slice of real traffic, shadow report required
+// PRODUCTION   full traffic, canary report required
+// RETIRED      terminal; the append-only history remains queryable

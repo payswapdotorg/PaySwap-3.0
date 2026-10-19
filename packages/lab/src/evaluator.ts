@@ -351,3 +351,14 @@ export {
   defaultEvaluationSpec,
   validateEvaluationSpec,
 } from "./evaluation-spec.ts";
+
+// ---------------------------------------------------------------------------
+// Citation map (old law -> canonical invariant)
+// ---------------------------------------------------------------------------
+// - old AGENTS.md rule 14 (compliance before optimization) -> the
+//   policy/governance authority's compliance-first discipline; enforced
+//   here at runtime (phase order), at the type level (the tuple) and in
+//   ranking (promotion-comparison.ts).
+// - old INV-F01 (exact money) -> canonical INV-2.
+// - old INV-L02 (robustness before promotion) -> promotion.ts evidence
+//   bundles; this module only ACCUMULATES the evidence.

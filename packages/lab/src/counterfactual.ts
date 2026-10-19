@@ -113,3 +113,11 @@ export function runCounterfactual(
     digest,
   });
 }
+// Delta sign convention: variant − base per metric; positive means the
+// variant moved more, paid more or failed more than the base.
+// The counterfactual id embeds the digest (content-addressed evidence).
+// Both branches replay the SAME frozen facts — only the program differs.
+
+// Rejection-free by construction: the counterfactual never rejects a
+// program — it measures. Evidence, not enforcement.
+// Deltas are computed per metric with exact bigint arithmetic for money.

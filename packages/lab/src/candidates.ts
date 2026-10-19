@@ -322,3 +322,12 @@ export class CandidateRegistry {
     return [...(this.published.get(candidateId) ?? [])];
   }
 }
+
+// ---------------------------------------------------------------------------
+// Evidence-stage discipline (registry side)
+// ---------------------------------------------------------------------------
+// DRAFT -> BENCHMARKED requires BASELINE_SUITE_EVALUATION evidence;
+// BENCHMARKED -> VALIDATED requires the full INV-L02 triple; VALIDATED is
+// the registry's terminal stage — every later transition is a promotion
+// LEDGER order (SHADOW/CANARY/PRODUCTION/RETIRED), never a registry
+// mutation. There is no override path anywhere.

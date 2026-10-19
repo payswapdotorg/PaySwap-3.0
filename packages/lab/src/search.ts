@@ -1,30 +1,27 @@
 /**
  * Lab search: executable capability discovery (P6-W1; the P6 rebuild of
- * the old payswap.org@8a735bf packages/lab search.ts, W2-004).
- *
- * INV-13 (old INV-C05) — provider-backed executable selection is grounded
+ * the old payswap.org@8a735bf packages/lab search.ts).
+ INV-13 (old INV-C05) — provider-backed executable selection is grounded
  * in a ConnectedCapabilityInstance + a current CapabilityObservation,
  * NEVER in provider catalogue definitions alone. A catalogue entry with no
  * connected instance is returned as an explicit REJECTED selection with
  * reason CATALOGUE_ENTRY_ONLY; it can never produce an executable block.
  *
  * THE TWO-AXIS LAW (old INV-C01/C02; canonical INV-4/INV-7 discipline):
- * the axes are kept separate and are re-derived here from
- * (capabilityState, sourceAvailability) via the pinned canonical resolver.
- * An observation whose source is UNREACHABLE or UNKNOWN yields effective
- * availability UNKNOWN: it is surfaced as such (never success, never
- * failure) and is never executable. A stored availability that disagrees
- * with the fresh derivation is flagged UNKNOWN (AXES_INCONSISTENT).
- *
- * INV-15 (old INV-C08) — a capability definition declaring
- * nativeOptimization with benchmarkBaseline === true is returned as an
- * INCUMBENT BASELINE block. Search treats it exactly like any other
- * block: it can win or lose on evidence, and nothing here ranks PaySwap
- * composition above it.
- *
+ * the axes are kept separate and re-derived from (capabilityState,
+ * sourceAvailability) via the pinned canonical resolver. An UNREACHABLE or
+ * UNKNOWN source yields effective availability UNKNOWN — surfaced as such
+ * (never success, never failure), never executable. A stored availability
+ * disagreeing with the fresh derivation is flagged AXES_INCONSISTENT.
+
+ * INV-15 (old INV-C08) — a definition declaring nativeOptimization with
+ * benchmarkBaseline === true is an INCUMBENT BASELINE block: exactly like
+ * any other block — it can win or lose on evidence; nothing here ranks
+ * PaySwap composition above it.
+
  * THE ACCEPTED RENAME (P6-W1): the Lab search query's mode field is named
- * `execution` (the old field name was `executionMode`; the vocabulary
- * itself is unchanged and remains credited to the capability lane).
+ * `execution` (the old name was `executionMode`; the vocabulary is
+ * unchanged and credited to the capability lane).
  */
 
 import type {
@@ -48,8 +45,8 @@ import type { SimulationProgram } from "./simulation-plan.ts";
 
 /**
  * A Lab search query. NOTE THE FIELD NAME: `execution` — the accepted
- * P6-W1 rename of the old `executionMode` field (the vocabulary itself is
- * the capability lane's pinned ExecutionMode).
+ * P6-W1 rename of the old `executionMode` field (the vocabulary is the
+ * capability lane's pinned ExecutionMode).
  */
 export interface LabSearchQuery {
   readonly domain: string;

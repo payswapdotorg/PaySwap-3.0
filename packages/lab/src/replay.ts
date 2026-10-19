@@ -281,3 +281,13 @@ export function countOutcomes(
   }
   return counters;
 }
+
+// ---------------------------------------------------------------------------
+// The recorded-facts discipline (old AGENTS.md rule 8 -> canonical
+// "historical financial facts are immutable")
+// ---------------------------------------------------------------------------
+// recordProductionFacts digests + freezes the fact set at recording time;
+// runReplay verifies the digest BEFORE deriving anything (tamper
+// detection) and constructs a NEW scenario plan from the facts — the
+// caller's fact objects are never rewritten, never mutated, and the
+// replay result references them only by id + digest.

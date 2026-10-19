@@ -39,3 +39,20 @@ export * from "./observation.ts";
 export * from "./certification.ts";
 export * from "./agents.ts";
 export * from "./execution-graph.ts";
+
+// ---------------------------------------------------------------------------
+// The pin discipline (why these modules exist)
+// ---------------------------------------------------------------------------
+// The v1 leaf-in-flight law: a package in flight pins the wire shapes of
+// every external seam LOCALLY and imports NOTHING from siblings — the TL
+// wires the real imports at integration, at which point each pin is
+// verified against its authority (byte-identical for VALUE pins,
+// subset-typed for STRUCTURE pins) before it is replaced by the real
+// import. This keeps lanes parallel while guaranteeing that the moment
+// integration happens, the shapes cannot have drifted silently.
+//
+// Accepted renames carried by this pin surface (recorded in the P6-W1
+// work order): executionMode -> execution (field name; vocabulary and
+// no-priority law unchanged) and ServiceAccess -> DECLARED_CAPABILITY
+// (building-block kind; the declared developer-service capability shape
+// is pinned in ./certification.ts).

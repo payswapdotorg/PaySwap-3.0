@@ -359,3 +359,14 @@ export class DirectorControl {
 
 /** Placeholder for strategy programs handed to the Director by callers. */
 export type DirectorStrategyProgram = SimulationProgram;
+
+// ---------------------------------------------------------------------------
+// Authority boundary (old FROZEN-ARCHITECTURE §227 -> canonical INV-9)
+// ---------------------------------------------------------------------------
+// The Director is a deterministic control surface with a replaceable
+// learned-component seam (search plug-ins). LLM reasoning is recorded as
+// a structurally non-authoritative annotation that mutates nothing.
+// Promotion flows ONLY through the versioned ledger path. The candidate
+// organizations it resolves are authority-free DRAFTS (no budgets, no
+// delegation edges) — releasing, budgeting or delegating is exclusively
+// protocol-authority territory outside the Lab.
