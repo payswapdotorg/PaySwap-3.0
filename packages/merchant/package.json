@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/merchant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Merchant checkout + crypto acceptance contracts (Work Order P5-W3, lane R3-W3): the Stripe-class merchant flow rebuilt as ONE deterministic, zero-dependency package. Onboarding (fiat-denominated by default, never implying rail connectivity), crypto acceptance activation (a narrowing statement, never authority), checkout flows with quotes-as-observations and exact bigint cross-multiplication, the wallet-payment path as a TYPED INJECTION PORT with a HANDOFF-ONLY exit (money movement is DELEGATED: the pinned SettlementInstructionId typed reference is the only settlement handle; no parallel engine), local work-item state machines ONLY (UNKNOWN first-class, reconciliation the only ambiguity exit, evidence-mandatory definitive outcomes), typed webhooks (evidence, never authority), refunds only where the typed rail observation supports them, settlement configuration as typed data, and the two provider-verified Stripe paths (NATIVE_STRIPE_CRYPTO vs EXTERNAL_PAYSWAP_CONVERSION — never conflated; SyntheticStripeBalanceError without provider evidence). NEVER infers success from submission; NO Stripe network call exists in this package. Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest); every cross-lane contract shape is a LOCAL STRUCTURAL PIN (leaf-in-flight law — the TL wires the types at integration).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
