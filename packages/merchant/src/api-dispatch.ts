@@ -17,7 +17,7 @@ import { asSettlementInstructionId } from "./identifiers.ts";
 import{ activateCryptoAcceptance, acceptanceOfferView, deactivateCryptoAcceptance } from "./activation.ts";
 import{ activateMerchant, draftMerchant, submitMerchantApplication, updateMerchantProfile, verifyMerchant } from "./onboarding.ts";
 import { openCheckoutFlow } from "./checkout.ts";
-import{ attachMethodToIntent, confirmIntentSubmission, observeAttemptOutcome, resolveAttemptUnknown, settleIntentOutcome, submitWalletPaymentAttempt } from "./lifecycle.ts";
+import{ attachMethodToIntent, confirmIntentSubmission, observeAttemptOutcome, resolveAttemptUnknown, resolveIntentUnknown, settleIntentOutcome, submitWalletPaymentAttempt } from "./lifecycle.ts";
 import { initiateRefund, observeRefundOutcome } from "./refunds.ts";
 import { selectSettlementRoute, settleConfirmedAttempt } from "./settlement-paths.ts";
 import { emptyWebhookInbox, processWebhookEvent } from "./webhooks.ts";
@@ -283,10 +283,17 @@ export function dispatchMerchantCheckoutApi(
         throw new ValidationError("resolving an ambiguity requires an attempt");
       }
       const attempt = resolveAttemptUnknown(attemptRecord, request.resolution, request.now);
-      const nextIntent = settleIntentOutcome(intent, attempt, {
-        evidenceIds: request.resolution.evidenceIds,
-        now: request.now,
-      });
+      // THE AMBIGUITY-EXIT LAW: an intent already settled to
+      // OUTCOME_UNKNOWN leaves ambiguity ONLY through
+      // `resolveIntentUnknown` (the reconciliation resolution); an
+      // intent still PROCESSING settles from the attempt's own state.
+      const nextIntent =
+        intent.state === "OUTCOME_UNKNOWN"
+          ? resolveIntentUnknown(intent, attempt, request.resolution, request.now)
+          : settleIntentOutcome(intent, attempt, {
+              evidenceIds: request.resolution.evidenceIds,
+              now: request.now,
+            });
       return {
         context: { ...base, attempt, intent: nextIntent },
         response: { kind: "payment/attempt", attempt, intent: nextIntent },

@@ -112,15 +112,16 @@ export function journeyRecordDigest(
     stage: record.stage,
     refs: [...record.refs],
     evidenceRefs: [...record.evidenceRefs],
-    portHandoff:
-      record.portHandoff !== undefined
-        ? record.portHandoff.map((entry) => ({
+    ...(record.portHandoff !== undefined
+      ? {
+          portHandoff: record.portHandoff.map((entry) => ({
             kind: entry.kind,
             handoffId: entry.handoffId,
             externalSubmissionRef: entry.externalSubmissionRef,
             evidenceRefs: [...entry.evidenceRefs],
-          }))
-        : undefined,
+          })),
+        }
+      : {}),
   });
 }
 
