@@ -1,0 +1,19 @@
+{
+  "name": "@payswap/adversarial",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Adversarial onchain/provider threat intelligence and immune-system integration (Work Order P6-W3): the security plane's immune system — the component-identity model, the threat-signature registry (matchable indicators scoped to vulnerable component identities and version ranges), the network-wide security-advisory registry with the GLOBAL restriction view (advisory outcomes map to restrict / quarantine / retire), the monotonic security-epoch authority (an epoch advance VOIDS every epoch-scoped authorization issued under it), the quarantine ledger (release ONLY through evidence-backed VERIFIED remediation plus advisory closure — never time-based), the INV-S03-style capability access gate (cached capability state can never bypass an active quarantine), the immutable security-learning feed (capability cases), the expert human-fallback bridge (evidence artifacts, never hidden authority) — PLUS the provider threat-intelligence vocabulary: the eleven provider threat families (deterministic detectors over provider observation bundles: provider outage, ambiguous provider outcomes, lost webhooks, clock skew, duplicated commands, partial payment, account takeover, malicious agents, package compromise, incentive Sybil/collusion/wash, leaderboard gaming), evidence-chain-mandatory signals with integer-bps calibrated confidence, and the adversarial provider agent (recommendation-only). INV-21 encoded: adversarial intelligence can ESCALATE to BLOCK and advise, but can NEVER downgrade or bypass a BLOCK decision (type + runtime + rejection). The D-1 wiring contract composes with the onchain-security kernel seam through STRUCTURAL PINS (zero sibling imports): advisory proposals project onto the kernel's advisory bridge shapes, the immune machinery state projects onto the kernel's composed OnchainSecurityState, and threat/advisory BLOCK-grade intelligence escalates into security-block registration proposals — harden-only, never soften. Deterministic only: pure functions, no ambient clock, no randomness, no network; zero runtime dependencies; devDependencies exactly typescript + vitest.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./provider-intel": "./src/provider/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
