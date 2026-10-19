@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Reality Engineering Lab (Work Order P6-W1, lane R4-W1): replay, counterfactuals, fault injection, Organization/Strategy search, robustness, shadow and canary promotion rebuilt as ONE deterministic, zero-dependency package. Simulation engine (namespaced, bigint-exact, seed-deterministic), scenario composition covering the full incident taxonomy, Domain Packs and the searchable building-block index (certified smart contracts, DECLARED_CAPABILITY blocks, connector capabilities, participation mechanisms), the evaluator (hard constraints BEFORE optimization), replay/counterfactual over immutable recorded facts, executable search grounded in ConnectedCapabilityInstance + CapabilityObservation (never catalogue alone), replaceable search plug-ins, the candidate registry with authority-free composed organization DRAFTs, the versioned reversible shadow/canary promotion ledger and the Director control surface. Simulated routes/events are advisory/test evidence only; NO production financial authority (INV-11); no exported conversion from simulation results to any production-evidence type. Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest); every cross-lane contract shape is a LOCAL STRUCTURAL PIN (leaf-in-flight law — the TL wires the types at integration).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
