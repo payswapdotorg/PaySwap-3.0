@@ -35,7 +35,7 @@ const NO_CAPABILITY_OBSERVATIONS =
   "Quote projection requires fresh capability observations (connected instances and current provider terms). None are configured in this deployment — the honest state is an unavailable preview, never an invented quote.";
 
 const NO_MERCHANT_PLANE =
-  "No merchant checkout plane exists in this deployment — merchant checkout lands with Work Order P5-W3; this surface refuses to fabricate a checkout session before it exists.";
+  "No merchant checkout plane exists in this deployment — the merchant package landed with Work Order P5-W3; wiring its checkout plane into this surface is still pending, and this surface refuses to fabricate a checkout session before it exists.";
 
 function provenance(workOrder: string): SurfaceProvenancePin {
   return { surfaceApiVersion: PINNED_SURFACE_API_VERSION, stability: "stable", workOrder };

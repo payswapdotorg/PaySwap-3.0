@@ -50,7 +50,7 @@ export interface OutcomeDispatchAuthority {
   readonly authority:
     | "economic-intent-plane" // P1-W1 (ACCEPTED): EconomicGoal + typed intent intake & compilation
     | "quote-projection-plane" // P2-W3 (THIS package): quote/terms preview fold — a preview, never execution
-    | "merchant-checkout-plane"; // P5-W3 (PENDING): merchant checkout lands later
+    | "merchant-checkout-plane"; // merchant package landed in P5-W3; checkout-plane wiring pending
   /** The P1-W1 intent kind the action compiles to (pinned by value). */
   readonly intentKind: "MoneyMovementIntent" | "PaymentIntent" | "ServiceAccessIntent";
   /** The certified journey id within this surface contract. */
@@ -109,7 +109,7 @@ export interface OutcomeDeploymentContext {
    * an observation (INV-13).
    */
   readonly capabilityObservationsAvailable: boolean;
-  /** A merchant checkout context is bound (merchant checkout lands P5-W3). */
+  /** A merchant checkout context is bound (checkout-plane wiring pending; merchant package landed in P5-W3). */
   readonly merchantCheckoutContextBound: boolean;
 }
 
@@ -123,7 +123,7 @@ const NO_CAPABILITY_OBSERVATIONS =
   "Quote projection requires fresh capability observations (connected instances and current provider terms). None are configured in this deployment — the honest state is an unavailable preview, never an invented quote.";
 
 const NO_MERCHANT_PLANE =
-  "No merchant checkout plane exists in this deployment — merchant checkout lands with Work Order P5-W3; this surface refuses to fabricate a checkout session before it exists.";
+  "No merchant checkout plane exists in this deployment — the merchant package landed with Work Order P5-W3; wiring its checkout plane into this surface is still pending, and this surface refuses to fabricate a checkout session before it exists.";
 
 function intakeCapability(context: OutcomeDeploymentContext): OutcomeCapabilityState {
   return context.economicIntakeConfigured

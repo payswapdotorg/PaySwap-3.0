@@ -70,7 +70,7 @@ describe("home page", () => {
     expect(html).toContain("Not yet dispatchable");
     expect(html).toContain("The economic intake plane is not configured in this deployment");
     expect(html).toContain(
-      "No merchant checkout plane exists in this deployment — merchant checkout lands with Work Order P5-W3",
+      "No merchant checkout plane exists in this deployment — the merchant package landed with Work Order P5-W3",
     );
   });
 

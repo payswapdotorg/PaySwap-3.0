@@ -67,7 +67,7 @@ function capabilityForAction(
         : {
             dispatchable: false,
             missingPrerequisite:
-              "No merchant checkout plane exists in this deployment — merchant checkout lands with Work Order P5-W3; this surface refuses to fabricate a checkout session before it exists.",
+              "No merchant checkout plane exists in this deployment — the merchant package landed with Work Order P5-W3; wiring its checkout plane into this surface is still pending, and this surface refuses to fabricate a checkout session before it exists.",
           };
   }
 }
