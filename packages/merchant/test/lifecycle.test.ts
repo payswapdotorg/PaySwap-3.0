@@ -22,10 +22,12 @@
 
 import { describe, expect, it } from "vitest";
 import {
-  abandonCheckoutAttempt, activateCryptoAcceptance, attachMethodToIntent,
+  abandonCheckoutAttempt, activateCryptoAcceptance, attachAttemptSettlementRoute,
+  attachAttemptTranslation, attachMethodToIntent,
   attemptMayObserveOutcome, attemptStatusView, beginMerchantPaymentAttempt,
   buildCheckoutAuthorization, confirmIntentSubmission, defineCryptoAssetAcceptance,
-  defineCryptoQuote, defineMerchantCryptoAcceptancePolicy, defineRailAssetBinding,
+  defineCryptoQuote, defineExternalConversionSettlementRoute,
+  defineMerchantCryptoAcceptancePolicy, defineRailAssetBinding,
   materialTermsFromQuote, observeAttemptOutcome, openCheckoutFlow,
   recordAmbiguityEvidence, resolveAttemptUnknown, resolveIntentUnknown,
   settleIntentOutcome, submitWalletPaymentAttempt, walletPaymentAuthorizationLineage,
@@ -81,6 +83,17 @@ function processingIntentFixture() {
 }
 
 /** The canonical SUBMITTED composite. */
+// A local EXTERNAL route for the attach fold (the route suites own the laws).
+const EXTERNAL_ROUTE = defineExternalConversionSettlementRoute({
+  destination: { id: "destination.bank.1", kind: "BANK_ACCOUNT", currency: "USD",
+    externalRef: "external://bank/fixture-account", provenance: { source: "merchant-portal", reference: "kyc-record-1", recordedAt: T60 } },
+  conversionChain: ["cap.convert.usdc-usd", "cap.offramp.bank"],
+});
+function pendingRecordFixture(authorization: WalletAuthorizationLineage = authorizationLineageFixture()): CheckoutPaymentAttempt {
+  const intent = intentFixture();
+  return { attempt: beginMerchantPaymentAttempt({ id: "attempt:lifecycle-pending", intent, quote: KERNEL_QUOTE, now: OBSERVE_AT }), authorization };
+}
+
 function submittedRecordFixture(authorization: WalletAuthorizationLineage = authorizationLineageFixture(), attemptId = "attempt:lifecycle-1"): CheckoutPaymentAttempt {
   return submitWalletPaymentAttempt({ attemptId, intent: processingIntentFixture(), quote: KERNEL_QUOTE, authorization, now: SUBMIT_AT });
 }
@@ -120,6 +133,16 @@ describe("submitWalletPaymentAttempt — the composite over the injection port",
     expect(record.authorization.authorizationRequestHash).toBe(lineage.authorizationRequestHash);
     expect(Object.isFrozen(record)).toBe(true);
     expect(Object.isFrozen(record.attempt)).toBe(true);
+    // FOLD of the old attachSettlementRoute/attachTranslation sites (route
+    // attach legal on SUBMITTED/CONFIRMED only; translation attach typed):
+    const withRoute = attachAttemptSettlementRoute(record, EXTERNAL_ROUTE, OBSERVE_AT);
+    expect(withRoute.attempt.settlementRoute).toBe(EXTERNAL_ROUTE);
+    expect(withRoute.attempt.settlementRoute?.routeFamily).toBe("EXTERNAL_PAYSWAP_CONVERSION");
+    expectReject(() => attachAttemptSettlementRoute(pendingRecordFixture(lineage), EXTERNAL_ROUTE, OBSERVE_AT), /SUBMITTED or CONFIRMED/);
+    const translationFold: PinnedPaymentMethodTranslation = Object.freeze({ id: "translation:lifecycle-fold", requestedMethod: "pm:stablecoin-crypto", materialTerms: materialTermsFromQuote(KERNEL_QUOTE, { completionMs: 3_600_000n, recourse: "MERCHANT_DISPUTE_WINDOW", settlementDestinationId: "destination.bank.1" }) });
+    const withTranslation = attachAttemptTranslation(record, translationFold, OBSERVE_AT);
+    expect(withTranslation.attempt.translation).toBe(translationFold);
+    expect(withTranslation.attempt.translation?.id).toBe("translation:lifecycle-fold");
   });
 
   it("requires the WalletAuthorizationLineage — a hand-made lineage missing fields is fail-closed", () => {
