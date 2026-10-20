@@ -5,8 +5,8 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 49,
-    "packages_mapped": 49,
+    "packages_checked": 51,
+    "packages_mapped": 51,
     "packages_unmapped": 0,
     "import_edges": 84,
     "layer_rules": 10,
@@ -519,6 +519,15 @@
       "dependency_layers": []
     },
     {
+      "dir": "packages/adversarial",
+      "name": "@payswap/adversarial",
+      "declared_layer": "security",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
       "dir": "packages/agents",
       "name": "@payswap/agents",
       "declared_layer": "intelligence",
@@ -759,6 +768,15 @@
       "dir": "packages/onchain-security",
       "name": "@payswap/onchain-security",
       "declared_layer": "security",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/opportunities",
+      "name": "@payswap/opportunities",
+      "declared_layer": "economic",
       "status": "PASS",
       "dependencies": [],
       "dependents": [],
@@ -2343,7 +2361,6 @@
     "economic:goals",
     "economic:intents",
     "economic:strategy",
-    "economic:opportunities",
     "trust:principals",
     "trust:mandates",
     "trust:delegation",
