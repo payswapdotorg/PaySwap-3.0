@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/opportunities",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Evidence-backed FinancialOpportunity discovery across rails (Work Order P6-W2, lane r4-w2): the P6 rebuild of payswap.org@8a735bf packages/onchain-opportunities (P4-W3-002), generalized from onchain-only to rail-aware (ONCHAIN/FIAT/FX rails). Every opportunity carries VERSIONED, lineage-preserved supporting observations (the primary observation grounds identity; the supporting-observation chain is carried verbatim — NO constructor path without evidence); the expected return is an EVIDENCE-BACKED ESTIMATE with explicit uncertainty bounds (exact rationals, no floating point) under a structural no-guaranteed-returns vocabulary law; the deterministic discovery policy surfaces adversarial observations (stale evidence, manipulated APYs, fake incentives, vanished liquidity, honeypot exits, unapproved strategies) as ineligible/UNKNOWN, never as attractive; discovery is NEVER authorization (opportunity -> proposal -> decision seam, pinned against the agents proposal wire — never execution; agents may discover/surface but cannot execute); family capabilities register as pure-data searchable descriptors for the Lab (test-layer composition, INV-L01). Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest); every cross-lane contract shape is a LOCAL STRUCTURAL PIN (leaf-in-flight law — the TL wires the types at integration).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
