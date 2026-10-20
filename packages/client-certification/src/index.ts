@@ -55,3 +55,15 @@ export * from "./recipient-authorization.ts";
 
 // Hard law 6 — sandbox/live structural separation.
 export * from "./sandbox-live.ts";
+
+// Hard law 7 — the accessibility contract.
+export * from "./accessibility.ts";
+
+// Hard law 8 — the responsive/device contract.
+export * from "./responsive-device.ts";
+
+// Hard law 9 — the browser/device verification contract (Gate D prior art).
+export * from "./browser-verification.ts";
+
+// Hard law 10 — the escalate-only gate wall + the composed certification run.
+export * from "./gate-wall.ts";
