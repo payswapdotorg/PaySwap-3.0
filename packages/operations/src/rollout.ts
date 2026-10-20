@@ -280,7 +280,12 @@ export function evaluateRolloutStage(
 // Provider parity (preview/production bindings — explicit differences)
 // ---------------------------------------------------------------------------
 
-/** The ONLY legitimate difference between two tiers' provider bindings. */
+/**
+ * The legitimate difference between two tiers' provider bindings: the
+ * per-environment credential handle. The execution mode is governed by
+ * its own DIRECTIONAL rule inside the check (SANDBOX below -> LIVE in
+ * production is the tier-progressive direction; the inversion is drift).
+ */
 export const PROVIDER_PARITY_ALLOWED_DIFFERENCES: readonly string[] =
   Object.freeze(["credentialHandle"]);
 
@@ -308,7 +313,11 @@ export function verifyProviderParity(
     unexpected.push("credentialConfigKey");
   }
   if (lower.executionMode !== higher.executionMode) {
-    unexpected.push("executionMode");
+    const tierProgressive =
+      lower.executionMode === "SANDBOX" && higher.executionMode === "LIVE";
+    if (!tierProgressive) {
+      unexpected.push("executionMode");
+    }
   }
   if (lower.transportClass !== higher.transportClass) {
     unexpected.push("transportClass");

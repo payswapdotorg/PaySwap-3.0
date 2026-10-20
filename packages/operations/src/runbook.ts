@@ -16,7 +16,7 @@
 import type { AlertRule } from "./alerting.js";
 import { ALERT_RULES } from "./alerting.js";
 import type { OperatorActionDeclaration } from "./operator-actions.js";
-import { OPERATOR_ACTIONS } from "./operator-actions.js";
+import { OPERATOR_ACTIONS } from "./operator-catalog.js";
 
 // ---------------------------------------------------------------------------
 // Runbook entries
