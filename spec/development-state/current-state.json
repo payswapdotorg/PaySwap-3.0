@@ -16,9 +16,7 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [
-    "P8-W3"
-  ],
+  "frontier": [],
   "active_work_orders": [],
   "completed_work_orders": [
     {
@@ -572,6 +570,28 @@
       ],
       "findings_queued": [],
       "completed_at": "2026-10-20T14:05:00Z"
+    },
+    {
+      "id": "P8-W3",
+      "owner": "worker-3",
+      "status": "COMPLETE",
+      "session": "p8-w3-local-lane (resume)",
+      "chat_id": null,
+      "worker_branch": "work/p8-w3",
+      "worker_head_sha": "19db319797fe6df3e3c62b785808cf31d32e3c39",
+      "base_sha": "b01a0a9",
+      "accepted_via_merge": "merge --no-ff ee02e6b (release evidence; operator-authorized P8 wave 2026-10-20; lane resumed once after a context death \u2014 2/4 landed + draft verified file-by-file per the resume protocol)",
+      "evidence": [
+        "docs/release-evidence/P8-W3-VERIFICATION-RECORD.md",
+        "docs/release-evidence/RELEASE-READINESS-RECORD.md",
+        "spec/operations/OPERATIONS.md"
+      ],
+      "tl_battery": "station clean-room re-run: npm install exit 0; tsc exit 0; vitest 18f/134t ALL PASS (oracle-exact); manifest tool selftest 0; write surface 51 files all inside allowed roots; 4 linear commits; oracle accounting 11 slice files = ADAPTED 9 + REWRITTEN 2; GATE E record completed by TL on merged tree (digest 81e51f17... over 8,515 files; 22-lane census 376f/4,092t ALL PASS re-run at b9f9ab7)",
+      "gates_closed": [
+        "release_readiness_evidence_certified"
+      ],
+      "findings_queued": [],
+      "completed_at": "2026-10-20T15:20:00Z"
     }
   ],
   "policies": {
