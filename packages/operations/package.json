@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/operations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Release/operations contracts (Work Order P8-W3, lane p8-w3): the deterministic deployment-identity, reproducible-build, observability, rollback, rollout, runbook, secrets and evidence-lineage contracts that make a PaySwap release VERIFIABLE. Nine hard laws, encoded structurally: (1) DEPLOYMENT IDENTITY — a deployment is identified by exactly (commit SHA, environment record, build digest, manifest digest), all four required, digest-chained, byte-deterministic; (2) REPRODUCIBLE BUILD — the build contract pins the substrate archive tool (scripts/deterministic-tar-archive.mjs: sorted entries, normalized modes/mtimes/metadata, fail-closed on unsupported entries); this package owns the CONTRACT + VERIFICATION, not the tool; identical trees produce byte-identical archives and manifests; (3) OBSERVABILITY — the liveness/readiness law (readiness claims cite contract-backed sources or fail), evidence counters (monotonic, digest-anchored) and the protocol-ID-correlated operational event taxonomy; no health claim without a contract-backed source; (4) PRODUCTION HEALTH + ROLLBACK — rollback is a first-class versioned, digest-chained artifact with compensation evidence; every promotion record has a rollback record; compensations are provably order-independent and idempotent; (5) RUNBOOK CONTRACTS — every operator action is typed with preconditions, effects and evidence obligations; no untyped operational magic; no orphan alerts; (6) PROVIDER ENVIRONMENT + ROLLOUT — progressive exposure gates with hold/rollback criteria, the exact provider environment recorded per step, sandbox/live separation pinned structurally (a fake transport can never serve live behavior); (7) SECRETS HYGIENE — handles never values, a scrubber contract, runtime-assembled fixtures, rotation procedures as data; (8) EVIDENCE LINEAGE — versioned digest-chained records whose deterministic replay verifies the chain; (9) NO DEPLOYMENT EXECUTION — contracts + verification only: the package never executes a deployment, never touches a live provider, never fabricates runtime evidence; production deployment remains OPERATOR-AUTHORIZED. Declared layer: platform (telemetry/operations/deployment substrate class; operational-contract authority, not financial/trust authority). Zero runtime dependencies; devDependencies are exactly the toolchain; every cross-lane contract shape is a LOCAL STRUCTURAL PIN (leaf-in-flight law — the TL wires the types at integration).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
