@@ -35,5 +35,34 @@ export * from "./principal.ts";
 export * from "./chain.ts";
 export * from "./asset.ts";
 export * from "./gates.ts";
-export * from "./threat-intel.ts";
 export * from "./security-epoch.ts";
+// The threat-intel wire pin: every kernel vocabulary EXCEPT the two
+// names this package's own modules canonically own at the root barrel
+// (AdvisorySeverity — advisories.ts; EvidenceRef — quarantine-ledger.ts).
+// The pin files declare them structurally identical to the kernel wire;
+// direct imports from "./threat-intel.ts" remain available where the
+// kernel-shaped surface is needed explicitly.
+export {
+  THREAT_VERDICTS,
+  VERDICT_RANK,
+  THREAT_FAMILIES,
+  THREAT_SEVERITIES,
+  DETECTION_METHODS,
+  IMMUNE_COMPONENT_KINDS,
+} from "./threat-intel.ts";
+export type {
+  ThreatVerdict,
+  ThreatRecommendation,
+  ThreatFamily,
+  ThreatSeverity,
+  DetectionMethod,
+  ThreatEvidence,
+  ThreatSignal,
+  ThreatAssessment,
+  ImmuneComponentKind,
+  ThreatAffectedComponent,
+  ThreatAdvisoryAction,
+  ThreatAdvisoryProposal,
+  ConfidenceFloor,
+  OnchainThreatPolicyView,
+} from "./threat-intel.ts";

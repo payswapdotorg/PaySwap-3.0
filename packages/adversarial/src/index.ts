@@ -27,17 +27,18 @@
  *                quarantine / retire);
  * - epochs.ts:   the monotonic security-epoch authority; an epoch
  *                advance VOIDS every epoch-scoped authorization issued
- *                under it (release from authority is perishable;
- *                blocks survive — INV-21);
+ *                under it (authority is perishable; blocks survive —
+ *                INV-21);
  * - quarantine-ledger.ts: the quarantine ledger — release ONLY through
  *                evidence-backed VERIFIED remediation plus advisory
  *                closure (never time-based);
  * - capability-gate.ts + immune-gate.ts: the cached-state-bypass
  *                rejection + the composed immune gate (enforce advisory
  *                → quarantine/restrict/retire + optional epoch advance);
- * - capability-cases.ts + experts*.ts: the immutable security-learning
- *                feed + the expert human-fallback bridge (evidence
- *                artifacts, never hidden authority);
+ * - capability-cases.ts + experts.ts + expert-resolutions.ts: the
+ *                immutable security-learning feed + the expert
+ *                human-fallback bridge (evidence artifacts, never
+ *                hidden authority);
  * - provider/ (the "./provider-intel" subpath): the provider threat
  *                families — the eleven adversarial fault families
  *                (duplicated commands, lost webhooks, ambiguous
@@ -49,11 +50,13 @@
  *                with integer-bps calibrated confidence, the recovery-
  *                path contracts, and the recommendation-only adversarial
  *                provider agent;
- * - integration/: the D-1 wiring bridges — advisory proposals from
- *                threat assessments (the kernel's advisory-bridge
- *                shape, pinned), the immune state projection onto the
- *                kernel's composed OnchainSecurityState, and the
- *                harden-only BLOCK escalation records.
+ * - integration/: the D-1 wiring bridges — the immune-state projection
+ *                onto the kernel's composed OnchainSecurityState, the
+ *                advisory bridge (kernel-shaped threat proposals → the
+ *                REAL registry → enforcement; provider assessments →
+ *                advisory publications + capability cases; the kernel
+ *                flag channel), and the harden-only BLOCK escalation
+ *                records (the trust plane's registry owns the exits).
  *
  * Boundary law (r4-w3): ZERO sibling imports — no @payswap/* anywhere,
  * tsconfig has NO paths entries; cross-lane shapes live in src/pins/
@@ -65,5 +68,25 @@
 
 export const PACKAGE_NAME = "@payswap/adversarial" as const;
 
-export { IMMUNE_WIRE_VERSION, INTEGRATION_WIRE_VERSION } from "./version.ts";
+export {
+  IMMUNE_WIRE_VERSION,
+  INTEGRATION_WIRE_VERSION,
+  PROVIDER_INTEL_WIRE_VERSION,
+} from "./version.ts";
 export * from "./pins/index.ts";
+export * from "./block-authority.ts";
+export * from "./component-identity.ts";
+export * from "./threat-signatures.ts";
+export * from "./advisories.ts";
+export * from "./advisory-registry.ts";
+export * from "./epochs.ts";
+export * from "./quarantine-ledger.ts";
+export * from "./capability-gate.ts";
+export * from "./immune-gate.ts";
+export * from "./capability-cases.ts";
+export * from "./experts.ts";
+export * from "./expert-resolutions.ts";
+export * from "./integration/immune-projection.ts";
+export * from "./integration/onchain-bridge.ts";
+export * from "./integration/case-bridge.ts";
+export * from "./integration/escalation.ts";
