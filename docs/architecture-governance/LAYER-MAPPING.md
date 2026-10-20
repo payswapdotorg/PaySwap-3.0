@@ -180,4 +180,4 @@ Fresh violation totals and per-edge receipts:
   in experience-layer packages; this package certifies their contracts.
   Authority: spec/client-certification/CLIENT-CERTIFICATION.md.
 
-Counts after this wave: 51 packages checked, 51 mapped, 0 unmapped.
+Counts after this wave: 53 packages checked, 53 mapped, 0 unmapped (machine report; base f9392a3 was 51/51 — the closing report's 49/49 was the GOV-era vintage).
