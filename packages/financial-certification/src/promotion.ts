@@ -155,10 +155,13 @@ export class FinancialPromotionLedger {
       );
     }
 
-    // 1. CERTIFICATION FIRST — collect every failed gate/scenario.
+    // 1. CERTIFICATION FIRST — collect every failed gate/scenario (deduped:
+    // a gate failed at BOTH the wall and the suite evaluation is one halt).
     const failedGates = [
-      ...record.wall.failedGates,
-      ...record.evaluation.failedGates,
+      ...new Set([
+        ...record.wall.failedGates,
+        ...record.evaluation.failedGates,
+      ]),
     ];
     const failedScenarios = [
       ...record.evaluation.failedScenarios,

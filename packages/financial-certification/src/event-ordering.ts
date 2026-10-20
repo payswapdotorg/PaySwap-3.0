@@ -231,6 +231,10 @@ export function reconcileProviderEvents(
     objects: Object.freeze(reconciled),
     conflicts: Object.freeze(conflicts),
     duplicateEventCount: duplicateEventIds.length,
+    // The digest covers the RECONCILED STATE ONLY (canonical object
+    // projections + surfaced conflicts) — duplicate-delivery telemetry is
+    // reported, never state: re-delivering an event an extra time is the
+    // harmless-duplicate law in action and must not change the digest.
     digest: contentDigest({
       objects: reconciled.map((object) => ({
         providerName: object.providerName,
@@ -241,7 +245,6 @@ export function reconcileProviderEvents(
         observations: object.observations,
       })),
       conflicts,
-      duplicateEventCount: duplicateEventIds.length,
     }),
   });
   return state;
