@@ -8,8 +8,8 @@ import {
   ENVIRONMENT_TIERS,
   defineEnvironmentManifest,
   defineEnvironmentRecord,
-  verifyEnvironmentParity,
 } from "../src/environment.js";
+import { verifyEnvironmentParity } from "../src/environment-gates.js";
 import {
   COMMIT_SHA_PATTERN,
   defineDeploymentIdentity,
