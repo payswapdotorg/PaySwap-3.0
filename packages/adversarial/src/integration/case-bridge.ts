@@ -126,12 +126,21 @@ export function capabilityCaseInputsFromProviderAssessment(
   return Object.freeze(cases);
 }
 
-/** The provider component id from a signal's observation refs. */
+/**
+ * The provider component id from a signal's observation refs. The ref
+ * convention is `<source>:<component-id>:<seq>` where the component id
+ * may itself contain colons (e.g. `incident:provider:card-a:3` →
+ * `provider:card-a`): the id spans from the FIRST colon to the LAST.
+ */
 function componentIdForProviderSignal(signal: ProviderThreatSignal): string | undefined {
   for (const ref of signal.evidence.observationRefs) {
-    const segments = ref.split(":");
-    const source = segments[0] ?? "";
-    const id = segments[1] ?? "";
+    const first = ref.indexOf(":");
+    const last = ref.lastIndexOf(":");
+    if (first === -1) {
+      continue;
+    }
+    const source = ref.slice(0, first);
+    const id = first === last ? ref.slice(first + 1) : ref.slice(first + 1, last);
     if (
       ["incident", "webhook", "clock", "idempotency", "capture", "incentive"].includes(source) &&
       id.length > 0

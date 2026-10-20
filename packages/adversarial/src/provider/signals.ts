@@ -136,7 +136,7 @@ export function compareProviderSignals(
 ): number {
   const SEVERITY_ORDER = ["critical", "high", "medium", "low", "info"] as const;
   const rank = (s: ThreatSeverity): number => SEVERITY_ORDER.indexOf(s);
-  const bySeverity = rank(b.severity) - rank(a.severity);
+  const bySeverity = rank(a.severity) - rank(b.severity);
   if (bySeverity !== 0) {
     return bySeverity;
   }

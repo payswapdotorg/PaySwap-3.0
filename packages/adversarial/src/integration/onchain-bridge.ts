@@ -276,28 +276,37 @@ export function advisoryInputsFromProviderAssessment(
   return Object.freeze(publications);
 }
 
-/** Derive the immune target (kind + id) from a signal's observation refs. */
+/**
+ * Derive the immune target (kind + id) from a signal's observation
+ * refs. The ref convention is `<source>:<component-id>:<seq>` where the
+ * component id may itself contain colons (e.g.
+ * `package:pkg:checkout-extension:1.4.2` → `pkg:checkout-extension`):
+ * the id spans from the prefix to the LAST colon.
+ */
 function immuneTargetForSignal(
   signal: ProviderThreatSignal,
 ): { kind: (typeof IMMUNE_COMPONENT_KINDS)[number]; id: string } | undefined {
   for (const ref of signal.evidence.observationRefs) {
-    if (ref.startsWith("agent:")) {
-      const id = ref.slice("agent:".length).split(":")[0] ?? "";
-      if (id.length > 0) {
-        return { kind: "agent_key", id };
+    const idAfter = (prefix: string): string | undefined => {
+      if (!ref.startsWith(prefix)) {
+        return undefined;
       }
+      const rest = ref.slice(prefix.length);
+      const at = rest.lastIndexOf(":");
+      const id = at === -1 ? rest : rest.slice(0, at);
+      return id.length > 0 ? id : undefined;
+    };
+    const agent = idAfter("agent:");
+    if (agent !== undefined) {
+      return { kind: "agent_key", id: agent };
     }
-    if (ref.startsWith("package:")) {
-      const id = ref.slice("package:".length).split(":")[0] ?? "";
-      if (id.length > 0) {
-        return { kind: "agent_package", id };
-      }
+    const pkg = idAfter("package:");
+    if (pkg !== undefined) {
+      return { kind: "agent_package", id: pkg };
     }
-    if (ref.startsWith("credential:")) {
-      const id = ref.slice("credential:".length).split(":")[0] ?? "";
-      if (id.length > 0) {
-        return { kind: "agent_key", id };
-      }
+    const credential = idAfter("credential:");
+    if (credential !== undefined) {
+      return { kind: "agent_key", id: credential };
     }
   }
   return undefined;

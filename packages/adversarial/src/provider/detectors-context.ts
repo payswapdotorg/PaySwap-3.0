@@ -100,7 +100,7 @@ export function validateThresholds(thresholds: ProviderDetectorThresholds): void
   };
   const bps = (value: number, label: string): void => {
     if (!Number.isInteger(value) || value < 0 || value > 10_000) {
-      throw new InvalidThresholdsError(`${label} must be an integer in [0, 10000] bps`);
+      throw new InvalidThresholdsError(`${label} must be an integer in [0, 10000] basis points`);
     }
   };
   ms(thresholds.ongoingOutageHighMs, "ongoingOutageHighMs");
