@@ -5,8 +5,8 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 53,
-    "packages_mapped": 53,
+    "packages_checked": 54,
+    "packages_mapped": 54,
     "packages_unmapped": 0,
     "import_edges": 84,
     "layer_rules": 10,
@@ -786,6 +786,15 @@
       "dir": "packages/onchain-security",
       "name": "@payswap/onchain-security",
       "declared_layer": "security",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/operations",
+      "name": "@payswap/operations",
+      "declared_layer": "platform",
       "status": "PASS",
       "dependencies": [],
       "dependents": [],
