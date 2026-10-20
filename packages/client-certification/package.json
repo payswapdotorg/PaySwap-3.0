@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/client-certification",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Client-surface honesty certification suite (Work Order P8-W2, lane p8-w2): the security-layer gate wall every customer-facing surface (web/desktop/extension/command) must pass before release. Ten hard laws, encoded structurally: (1) SECRET BOUNDARY — secrets never reach client-renderable state, model-visible context, logs or artifacts; a scrubber contract with runtime-assembled fixture shapes; violations BLOCK; (2) DEAD-ACTION AUDIT — every customer-visible action is machine-checkably backed by a real contract -> effect lineage; a dead or fake-success action is a certification FAILURE; (3) TRUTHFUL CUSTOMER-FACING STATES — every consequential state is known-success (evidence-backed), known-failure (reasoned) or UNKNOWN-with-reason-and-reconciliation-pointer; no synthetic success, no hidden mock path; (4) AUTHORIZED RECIPIENT CHANGES — a recipient change after quote/eligibility invalidates prior authorization and forces fresh eligibility + fresh quote conditions; (5) FRESH ELIGIBILITY/QUOTE CONDITIONS — freshness is carried with the state that displays it; stale display is a failure; (6) SANDBOX/LIVE SEPARATION — modes are structurally distinct, pinned per surface state, never ambient; (7) ACCESSIBILITY CONTRACT — name/role/value lineage, announced state changes, keyboard paths for every pointer path, contrast constants; (8) RESPONSIVE/DEVICE CONTRACT — breakpoints and >=44px touch targets as contract constants; (9) BROWSER/DEVICE VERIFICATION CONTRACT — the repeatable deterministic form of the 2026-10-19 Gate D live record (area-map completeness, zero dead actions, console-error law, viewport matrix); (10) GATE WALL — failed client gates halt release and cannot be downgraded or waived (escalate-only). Declared layer: security (hard policy gates, cannot_downgrade_block). The package owns client-certification AUTHORITY, not experience implementation. Zero runtime dependencies; devDependencies are exactly the toolchain; every cross-lane contract shape is a LOCAL STRUCTURAL PIN (leaf-in-flight law — the TL wires the types at integration).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
