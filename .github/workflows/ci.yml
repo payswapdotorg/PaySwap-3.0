@@ -15,8 +15,15 @@
 #   - lint:          oxlint (errors gate; warnings tracked, currently 75,
 #                    all inherited)
 #   - typecheck:     root tsc -b project set
-#   - packages:      per-package acceptance battery matrix (@payswap/* lanes
-#                    as they land on main; currently trust)
+#   - packages:      per-package acceptance battery matrix (the REAL hermetic
+#                    package inventory — every packages/<name> with its own
+#                    package.json + src + test and a self-contained battery
+#                    (typescript + vitest devDeps, zero runtime/workspace
+#                    deps). GOV-W1 expanded 6 -> 17 lanes; battery-verification
+#                    receipts: docs/governance-evidence/GOV-W1-VERIFICATION-RECORD.md.
+#                    Workspace-dependent test packages (ui, web, desktop,
+#                    services) and no-test packages are documented there as
+#                    uncovered — no fake steps invented for them.
 #
 # Branch protection note: required check names are the job ids below.
 
@@ -101,7 +108,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [trust, economic, protocol, provider-runtime, surface, capability]
+        package: [trust, economic, protocol, provider-runtime, surface, capability, agents, command, execution-graph, lab, merchant, onchain-adapters, onchain-domain, onchain-extensions, onchain-security, route-compiler, zcode-bridge]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

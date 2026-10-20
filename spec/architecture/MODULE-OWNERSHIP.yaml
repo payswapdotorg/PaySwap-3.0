@@ -141,3 +141,21 @@ package_layers:
   # RUNTIME LEAF — zero runtime deps; the ONE sibling import is TYPE-ONLY
   # @payswap/trust via tsconfig paths (accepted P1-W2 pattern):
   packages/capability: capability
+  # GOV-W1 reconciliation (2026-10-19): lanes merged on main (R1/R2/P7/P6/R3
+  # waves) whose package_layers annotations were never added — audit finding
+  # TL-AUDIT-2026-10-19.md §3.3 (11 unmapped of 49). Layer per each lane's
+  # own spec (the authority); full per-package rationale appended to
+  # docs/architecture-governance/LAYER-MAPPING.md. Additive-only: no layer
+  # rule, may_depend_on, must_not_depend_on, authority or dependency_rules
+  # entry above is modified.
+  packages/agents: intelligence # spec/agents/AGENT-MODEL.md "Layer law" (type-only @payswap/trust wire pins; R3 honest, ADR-0004)
+  packages/execution-graph: economic # spec/execution-graph/EXECUTION-GRAPH.md "Layer law" (type-only pins to economic/protocol/capability; R3 honest, ADR-0004)
+  packages/zcode-bridge: platform # spec/zcode-bridge/ZCODE-BRIDGE.md ("treat as platform")
+  packages/onchain-domain: rails # spec/onchain-domain/ONCHAIN-DOMAIN.md "Layer law"
+  packages/onchain-adapters: rails # spec/onchain-adapters/ONCHAIN-ADAPTERS.md "Layer law" (leaf-in-flight, zero sibling imports)
+  packages/onchain-extensions: rails # spec/onchain-extensions/ONCHAIN-EXTENSIONS.md "Layer law (R3-W2)"
+  packages/onchain-security: security # spec/onchain-security/ONCHAIN-SECURITY.md (layer security, cannot_downgrade_block)
+  packages/route-compiler: intelligence # spec/route-compiler/ROUTE-COMPILER.md §2 (v1 hermetic, zero sibling imports)
+  packages/command: platform # spec/command/COMMAND.md "Layer law" (P7-W3 platform layer)
+  packages/lab: intelligence # layer examples list lab; P6-W1 no-production-financial-authority law
+  packages/merchant: rails # graph.md P5-W3 payment/Stripe rail integration reusing the financial lifecycle (provider-runtime rails precedent; lane spec declares no layer — derivation recorded in LAYER-MAPPING.md)

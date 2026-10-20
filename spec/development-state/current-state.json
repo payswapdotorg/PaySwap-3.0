@@ -17,7 +17,6 @@
     "worker-3": "migration-experience-and-integrations"
   },
   "frontier": [
-    "GOV-W1",
     "P6-W2",
     "P6-W3",
     "P8-W1",
@@ -274,6 +273,142 @@
       ]
     },
     {
+      "id": "R1-W1",
+      "owner": "worker-1",
+      "status": "COMPLETE",
+      "worker_branch": "work/r1-w1",
+      "worker_head_sha": "f95e1044f1a706b37d754cedfe02a6f2426edd24",
+      "base_sha": "2999bbb1658443b72ce9644f32cabbebdbecaa37",
+      "accepted_via_merge": "merge 0d0e906 (2026-10-17) — first R1 lane, drought-broken wave",
+      "evidence": [
+        "merge commit 0d0e906 message (agents package; battery tsc 0; 18f/158t ALL PASS: 92 ported/adapted + 66 net-new)",
+        "docs/agents-evidence/BASELINE-VERIFICATION-RECORD.md",
+        "spec/agents/AGENT-MODEL.md"
+      ],
+      "completed_at": "2026-10-17T08:47:35Z"
+    },
+    {
+      "id": "R1-W3",
+      "owner": "worker-3",
+      "status": "COMPLETE",
+      "worker_branch": "work/r1-w3",
+      "worker_head_sha": "4d63632fa17c97a5d33337e036c4581e2e872fd6",
+      "base_sha": "2999bbb1658443b72ce9644f32cabbebdbecaa37",
+      "accepted_via_merge": "merge c5c5a23 (2026-10-17)",
+      "evidence": [
+        "merge commit c5c5a23 message (zcode-bridge package; battery tsc 0; 19f/181t ALL PASS)",
+        "docs/zcode-bridge-evidence/BASELINE-VERIFICATION-RECORD.md",
+        "spec/zcode-bridge/ZCODE-BRIDGE.md"
+      ],
+      "completed_at": "2026-10-17T09:08:16Z"
+    },
+    {
+      "id": "R1-W2",
+      "owner": "worker-2",
+      "status": "COMPLETE",
+      "worker_branch": "work/r1-w2",
+      "worker_head_sha": "537405b78d5aa642811614e74354cffa04b393e0",
+      "base_sha": "2999bbb1658443b72ce9644f32cabbebdbecaa37",
+      "accepted_via_merge": "merge 6999888 (2026-10-17) — R1 WAVE COMPLETE",
+      "evidence": [
+        "merge commit 6999888 message (execution-graph package; battery tsc 0; 14f/141t ALL PASS)",
+        "docs/execution-graph-evidence/BASELINE-VERIFICATION-RECORD.md",
+        "spec/execution-graph/EXECUTION-GRAPH.md"
+      ],
+      "completed_at": "2026-10-17T09:48:13Z"
+    },
+    {
+      "id": "R2-W3",
+      "owner": "worker-3",
+      "status": "COMPLETE",
+      "worker_branch": "work/r2-w3",
+      "worker_head_sha": "1e053b4d26c42ca6db5487a3429d048033a74119",
+      "base_sha": "69998881ab71a12e71b2e7d600c07dea292671d1",
+      "accepted_via_merge": "merge 6402fa9 (2026-10-17) — first R2 lane; R2 wave 1/3",
+      "evidence": [
+        "merge commit 6402fa9 message (onchain-adapters package; battery tsc 0; 15f/135t ALL PASS, oracle 13f/126t beaten)",
+        "docs/onchain-adapters-evidence/BASELINE-VERIFICATION-RECORD.md",
+        "spec/onchain-adapters/ONCHAIN-ADAPTERS.md"
+      ],
+      "completed_at": "2026-10-17T13:11:38Z"
+    },
+    {
+      "id": "P7-W2",
+      "owner": "worker-2",
+      "status": "COMPLETE",
+      "worker_branch": "work/p7-w2-r2",
+      "worker_head_sha": "ffa3f39f0bcaf4660b4923f215f9f89f7d786eda",
+      "base_sha": "2999bbb1658443b72ce9644f32cabbebdbecaa37",
+      "accepted_via_merge": "merge fb074b4 (2026-10-17) — P7 wave 1/3 (platform layer, disjoint surface)",
+      "evidence": [
+        "merge commit fb074b4 message (PaySwap Desktop product layer; battery tsc -b desktop-host closure 0 diagnostics; vitest 10f/85t ALL PASS via pnpm --filter @zcode/desktop — workspace battery, node-env)",
+        "docs/desktop-evidence/BASELINE-VERIFICATION-RECORD.md",
+        "spec/desktop/DESKTOP.md"
+      ],
+      "completed_at": "2026-10-17T17:40:14Z"
+    },
+    {
+      "id": "P7-W3",
+      "owner": "worker-3",
+      "status": "COMPLETE",
+      "worker_branch": "work/p7-w3-r2",
+      "worker_head_sha": "2c8207d9a14c6e55e47373860e2fd821c692f8d6",
+      "base_sha": "2999bbb1658443b72ce9644f32cabbebdbecaa37",
+      "accepted_via_merge": "merge 2c10a0e (2026-10-17) — P7 wave 2/3 (platform layer, disjoint surface)",
+      "evidence": [
+        "merge commit 2c10a0e message (command package; battery tsc 0; 19f/221t ALL PASS)",
+        "docs/command-evidence/BASELINE-VERIFICATION-RECORD.md",
+        "spec/command/COMMAND.md"
+      ],
+      "completed_at": "2026-10-17T17:45:22Z"
+    },
+    {
+      "id": "R2-W2",
+      "owner": "worker-2",
+      "status": "COMPLETE",
+      "worker_branch": "work/r2-w2",
+      "worker_head_sha": "ebbfc73065f5773a84251521bcf6fd49738e4d8e",
+      "base_sha": "69998881ab71a12e71b2e7d600c07dea292671d1",
+      "accepted_via_merge": "merge 95c8d8f (2026-10-17) — R2 wave 2/3 (security layer, disjoint surface)",
+      "evidence": [
+        "merge commit 95c8d8f message (onchain-security rebuild; battery tsc 0; 31f/384t ALL PASS, oracle 31/331 exceeded)",
+        "docs/onchain-security-evidence/BASELINE-VERIFICATION-RECORD.md",
+        "spec/onchain-security/ONCHAIN-SECURITY.md"
+      ],
+      "completed_at": "2026-10-17T22:50:42Z"
+    },
+    {
+      "id": "P7-W1",
+      "owner": "worker-1",
+      "status": "COMPLETE",
+      "worker_branch": "work/p7-w1",
+      "worker_head_sha": "6359a302283185677e9e72fe8d9401fa7f1640fc",
+      "base_sha": "2999bbb1658443b72ce9644f32cabbebdbecaa37",
+      "accepted_via_merge": "merge 22b0534 (2026-10-18) — P7 WAVE 3/3 COMPLETE (platform layer)",
+      "evidence": [
+        "merge commit 22b0534 message (web product on ZCode substrate; battery ui 15f/226t + web 14f/116t ALL PASS — workspace batteries via pnpm --filter)",
+        "docs/web-evidence/BASELINE-VERIFICATION-RECORD.md",
+        "docs/web-evidence/E2E-BROWSER-VERIFICATION-RECORD.md",
+        "spec/web/WEB.md"
+      ],
+      "completed_at": "2026-10-18T00:09:33Z"
+    },
+    {
+      "id": "R2-W1",
+      "owner": "worker-1",
+      "status": "COMPLETE",
+      "worker_branch": "work/r2-w1",
+      "worker_head_sha": "43787b0c8a388c80d1f77175bed6075af8405738",
+      "base_sha": "69998881ab71a12e71b2e7d600c07dea292671d1",
+      "accepted_via_merge": "merge a86147a (2026-10-18) — R2 WAVE 3/3 COMPLETE",
+      "evidence": [
+        "merge commit a86147a message (onchain-domain rebuild; battery tsc 0; 14f/197t ALL PASS)",
+        "docs/onchain-domain-evidence/BASELINE-VERIFICATION-RECORD.md",
+        "spec/onchain-domain/ONCHAIN-DOMAIN.md"
+      ],
+      "completed_at": "2026-10-18T00:14:03Z"
+    },
+    {
       "id": "R3-W1",
       "owner": "worker-1",
       "status": "COMPLETE",
@@ -395,7 +530,7 @@
     "note": "Used only as verified historical/reference implementation; PaySwap 3.0 architecture and source win."
   },
   "repository_setup_verified_at": "2026-10-08",
-  "notes": "PHASE 2 COMPLETE: trust 138 + economic 105 + protocol 238 + provider-runtime 159 + surface 106 + capability 230 = 976 tests across 6 domain packages. Frontier recomputed: P3 wave (agents / execution-graph / zcode-bridge) per work-orders.md; composition notes pre-staged (P3-COMPOSITION-NOTES.md) \u2014 base SHAs to re-verify at dispatch. | 2026-10-19 final-handoff: R3 wave 3/3 COMPLETE (route-compiler c5a4dc7, onchain-extensions e80c932, merchant bbc9a93 \u2014 station-verified). Audit + queue: spec/development-state/TL-AUDIT-2026-10-19.md. P3/P4 records + CI matrix + MODULE-OWNERSHIP reconciliation = GOV-W1 (in flight). P6 dispatching; P7 e2e + P8 certification queued. | 2026-10-19T19:40Z TL: P6-W1 (@payswap/lab) accepted via merge 2251932 \u2014 salvage acceptance (worker chat recycled after 3/4; LAW-2 bundle salvage captured commits 1-3 verbatim; 4/4 TL-authored from station receipts: tsc 0, 16f/147t, exports 101, census exact). GOV-W1: two worker attempts lost to chat recycling \u2014 redispatch with hardened packet pending. P6-W2/P6-W3 queued on new base.",
+  "notes": "PHASE 2 COMPLETE: trust 138 + economic 105 + protocol 238 + provider-runtime 159 + surface 106 + capability 230 = 976 tests across 6 domain packages. Frontier recomputed: P3 wave (agents / execution-graph / zcode-bridge) per work-orders.md; composition notes pre-staged (P3-COMPOSITION-NOTES.md) \u2014 base SHAs to re-verify at dispatch. | 2026-10-19 final-handoff: R3 wave 3/3 COMPLETE (route-compiler c5a4dc7, onchain-extensions e80c932, merchant bbc9a93 \u2014 station-verified). Audit + queue: spec/development-state/TL-AUDIT-2026-10-19.md. P3/P4 records + CI matrix + MODULE-OWNERSHIP reconciliation = GOV-W1 (in flight). P6 dispatching; P7 e2e + P8 certification queued. | 2026-10-19T19:40Z TL: P6-W1 (@payswap/lab) accepted via merge 2251932 \u2014 salvage acceptance (worker chat recycled after 3/4; LAW-2 bundle salvage captured commits 1-3 verbatim; 4/4 TL-authored from station receipts: tsc 0, 16f/147t, exports 101, census exact). GOV-W1: two worker attempts lost to chat recycling \u2014 redispatch with hardened packet pending. P6-W2/P6-W3 queued on new base. | 2026-10-19 GOV-W1 (records reconciliation): completed_work_orders now covers EVERY accepted merge on main \u2014 added R1 trio (0d0e906, c5c5a23, 6999888), R2 trio (6402fa9, 95c8d8f, a86147a), P7 trio (fb074b4, 2c10a0e, 22b0534) beside the existing P0\u2013P2 waves, R3 trio, P6-W1 and P7-E2E records; frontier drops GOV-W1 (this lane complete). Derivation + receipts: docs/governance-evidence/GOV-W1-VERIFICATION-RECORD.md.",
   "dispatch_log": [
     {
       "ts": "2026-10-10T05:44:00Z",
