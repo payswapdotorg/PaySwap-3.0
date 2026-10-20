@@ -92,11 +92,11 @@ export function leakyClientStateFixture(): Record<string, unknown> {
   };
 }
 
-/** A log line fixture carrying a secret-shaped value. */
+/** A log line fixture whose field VALUE is a secret-shaped key (verbatim). */
 export function leakyLogFixture(): Record<string, unknown> {
   return {
-    level: "info",
-    message: `signing with key ${bareKeyFixture()}`,
+    level: "debug",
+    keyMaterial: bareKeyFixture(),
   };
 }
 

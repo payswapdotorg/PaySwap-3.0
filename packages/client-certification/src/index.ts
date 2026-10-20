@@ -43,3 +43,15 @@ export * from "./verdict.ts";
 
 // Hard law 3 — truthful customer-facing states.
 export * from "./state-honesty.ts";
+
+// Hard law 1 — the secret boundary + scrubber contract.
+export * from "./secret-boundary.ts";
+
+// Hard law 2 — the dead-action audit (action -> contract -> effect lineage).
+export * from "./dead-action.ts";
+
+// Hard laws 4 + 5 — recipient-authorization + fresh eligibility/quote conditions.
+export * from "./recipient-authorization.ts";
+
+// Hard law 6 — sandbox/live structural separation.
+export * from "./sandbox-live.ts";
