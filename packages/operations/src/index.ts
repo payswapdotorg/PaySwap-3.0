@@ -1,0 +1,19 @@
+/**
+ * @payswap/operations — the release/operations package barrel (P8-W3,
+ * terminal work order of the PaySwap 3.0 program).
+ *
+ * The OPERATIONS package: deterministic contracts, declarations and
+ * checkers that make a release VERIFIABLE — deployment identity,
+ * reproducible builds, observability, rollback, provider rollout,
+ * runbooks, secrets hygiene and evidence lineage. Contracts + verification
+ * ONLY: executing a deployment is the operator-authorized production
+ * console's job, which consumes these declarations (law 9).
+ */
+
+export const PACKAGE_NAME = "@payswap/operations" as const;
+
+export * from "./digest.js";
+export * from "./pins/index.js";
+export * from "./environment.js";
+export * from "./deployment-identity.js";
+export * from "./reproducible-build.js";
