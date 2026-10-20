@@ -5,8 +5,8 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 51,
-    "packages_mapped": 51,
+    "packages_checked": 53,
+    "packages_mapped": 53,
     "packages_unmapped": 0,
     "import_edges": 84,
     "layer_rules": 10,
@@ -603,6 +603,15 @@
       ]
     },
     {
+      "dir": "packages/client-certification",
+      "name": "@payswap/client-certification",
+      "declared_layer": "security",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
+    },
+    {
       "dir": "packages/command",
       "name": "@payswap/command",
       "declared_layer": "platform",
@@ -691,6 +700,15 @@
         "economic",
         "financial"
       ]
+    },
+    {
+      "dir": "packages/financial-certification",
+      "name": "@payswap/financial-certification",
+      "declared_layer": "security",
+      "status": "PASS",
+      "dependencies": [],
+      "dependents": [],
+      "dependency_layers": []
     },
     {
       "dir": "packages/formal-proof",

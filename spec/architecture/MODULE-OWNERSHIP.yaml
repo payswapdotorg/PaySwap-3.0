@@ -161,3 +161,10 @@ package_layers:
   packages/command: platform # spec/command/COMMAND.md "Layer law" (P7-W3 platform layer)
   packages/lab: intelligence # layer examples list lab; P6-W1 no-production-financial-authority law
   packages/merchant: rails # graph.md P5-W3 payment/Stripe rail integration reusing the financial lifecycle (provider-runtime rails precedent; lane spec declares no layer — derivation recorded in LAYER-MAPPING.md)
+  # P8 certification wave (2026-10-20, operator-authorized): both packages own
+  # CERTIFICATION-GATE/EVIDENCE authority, not financial truth — the security
+  # layer's deterministic-gates class (a failed gate halts promotion and cannot
+  # be downgraded/waived: cannot_downgrade_block semantics; money semantics
+  # stay pinned to packages/protocol wires — no parallel financial authority).
+  packages/financial-certification: security # spec/financial-certification/FINANCIAL-CERTIFICATION.md (P8-W1: conformance gate wall; GAP-02 live-corridor limitation)
+  packages/client-certification: security # spec/client-certification/CLIENT-CERTIFICATION.md (P8-W2: client-surface honesty gates; secret boundary + dead-action audit)
