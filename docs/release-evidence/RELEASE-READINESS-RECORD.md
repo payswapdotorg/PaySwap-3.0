@@ -21,8 +21,8 @@ to EXPLICIT OPERATOR AUTHORIZATION (the standing law; see §6).
 |-----------|-------|
 | Base commit (the P8-W1+P8-W2 integration state; 28 work orders) | `b01a0a9` |
 | Release lane branch | `work/p8-w3` — 4 linear commits: `92a6ace` (1/4) → `d234fcc` (2/4) → `8420a4d` (3/4) → 4/4 (this record's commit; see `git log -1`) |
-| Worktree build-manifest digest (tool: `scripts/release/build-release-manifest.mjs`, run at `8420a4d`, the 3/4 code+tooling state; `.git`/`node_modules` ignored per the R6 law) | totalDigest **`a45dd3ba77e0e7717ed482e832e12bea78dd38263872547129d573dd3960127f`** over **8,481 files** (0 symlinks); identity commitSha `8420a4d6dec90007e0ecdb4f008312a5a7429393`, environment label `p8-w3-release-candidate` (labels do not enter the digest) |
-| FINAL merged-tree manifest digest | **FILLED at Gate E integration (TL, 2026-10-20)** — `node scripts/release/build-release-manifest.mjs --env payswap-3.0-gate-e-final` on the merged tree at commit `b9f9ab7bcaf3e24207f412bc766ab78f95928b07`: totalDigest **`81e51f174c943c56b02b6aa4ccaa1597da175699d48e29257977d962746e84d9`** over **8,515 files** (0 symlinks). Reproducibility law: any checkout of `b9f9ab7` reproduces this digest byte-identically (`--verify` mode). |
+| Worktree build-manifest digest (tool: `scripts/release/build-release-manifest.mjs`, run at `8420a4d`, the 3/4 code+tooling state) | **CORRECTED 2026-10-20 (post-Gate E audit — see §8):** the reproducible committed-tree walk at `8420a4d` is totalDigest **`fabaa261a7a30970f633da7ec21cc6f861b83d695ed5235a5692b806ca0bdbd9`** over **8,480 files** (0 symlinks); identity commitSha `8420a4d6dec90007e0ecdb4f008312a5a7429393`, environment label `p8-w3-release-candidate` (labels do not enter the digest). The originally-recorded walk (`a45dd3ba…` over 8,481 files) counted the lane worktree's `.git` pointer FILE — R6 ignores `.git` DIRECTORIES, and a linked worktree carries `.git` as a file. |
+| FINAL merged-tree manifest digest | **CORRECTED 2026-10-20 (post-Gate E audit — see §8):** the reproducible committed-tree digest at commit `b9f9ab7bcaf3e24207f412bc766ab78f95928b07` is totalDigest **`33e05966ea14f5bfa46724ff384adfef5967ad81b45c960cf5eacbd3f3b0835a`** over **8,483 files** (0 symlinks), computed on a clean checkout and machine-verified against the committed artifact `docs/release-evidence/release-manifest-b9f9ab7.json` (`--verify` → PASS, 8,483 files match). Reproducibility law: any clean checkout of `b9f9ab7` (fresh clone or `git archive` export — not a linked worktree, not a battery-dirty tree) reproduces this digest byte-identically. The originally-pinned `81e51f17…` over 8,515 files was produced mid-census over the station working tree and is NOT reproducible from any checkout (§8). |
 
 The deployment-identity contract this feeds is the four-component
 digest-chained identity (commit SHA + environment record + build
@@ -193,3 +193,72 @@ verifiable against this record.
 4. The census table §3's full-tree cells are fill-at-integration
    placeholders; the final merged-tree battery re-run supersedes this
    template's blanks.
+
+---
+
+## 8. Evidence correction — the Gate E manifest digest (2026-10-20, post-closing audit)
+
+A station audit performed after the closing report (resident TL,
+2026-10-20 ~17:30Z) re-ran the release-manifest tool on a clean
+checkout of `b9f9ab7` and found that the pinned final digest DID
+NOT reproduce: a clean checkout walks **8,483 files** (totalDigest
+`33e05966ea14f5bfa46724ff384adfef5967ad81b45c960cf5eacbd3f3b0835a`),
+not the recorded 8,515 / `81e51f17…`.
+
+**Root cause (forensically reconstructed — byte-exact).** The Gate E
+manifest run happened mid-census on the station's main working tree
+(between the `adversarial` and `client-certification` census lanes,
+~16:04Z), and the walk included **32 untracked local artifacts**:
+the 17 `husky` install shims under `.husky/_/`, plus 15 per-package
+`package-lock.json` files left by the census battery installs
+(`trust`, `economic`, `capability`, `agents`, `command`,
+`execution-graph`, `lab`, `merchant`, `onchain-adapters`,
+`onchain-domain`, `onchain-extensions`, `onchain-security`,
+`route-compiler`, `opportunities`, `adversarial`). Reconstructing
+exactly that tree — the committed `b9f9ab7` tree plus those 32
+files — reproduces the recorded digest `81e51f17…` over 8,515 files
+**byte-identically**. The reconstruction is exact; the defect is
+confirmed: the recorded value covered the station's working
+directory, not the repository.
+
+**Why it matters.** The manifest digest is a component of the
+four-component deployment identity (§1). A digest that cannot be
+reproduced from a checkout cannot anchor a verifiable deployment,
+and the original claim — "any checkout of `b9f9ab7` reproduces this
+digest byte-identically" — was false as pinned.
+
+**The correction (docs/state only — zero code change).**
+
+1. §1's final digest is re-pinned to the committed-tree walk:
+   `33e05966…` over 8,483 files. The verification artifact is
+   committed at `docs/release-evidence/release-manifest-b9f9ab7.json`;
+   `node scripts/release/build-release-manifest.mjs --verify
+   docs/release-evidence/release-manifest-b9f9ab7.json` on any clean
+   checkout of `b9f9ab7` prints `verify: PASS` (proved at station on
+   a fresh clone; a deliberately-dirtied tree fails with
+   `extra in tree` + digest mismatch).
+2. The worktree digest row (§1) and the lane record
+   (`docs/release-evidence/P8-W3-VERIFICATION-RECORD.md` §6) are
+   corrected for the same defect class at smaller scope: that walk
+   (8,481 files) counted the lane worktree's `.git` pointer file.
+   The committed-tree walk at `8420a4d` is 8,480 files /
+   `fabaa261a7a30970f633da7ec21cc6f861b83d695ed5235a5692b806ca0bdbd9`.
+3. `spec/development-state/current-state.json` (P8-W3 receipt +
+   notes) and the closing-report addendum are amended to cite the
+   corrected values.
+4. The originally recorded values remain cited here, never hidden:
+   `81e51f17…`/8,515 (station working tree, mid-census) and
+   `a45dd3ba…`/8,481 (worktree including its `.git` pointer) are
+   historical facts of the Gate E session, reproducible only with
+   the local artifacts described above.
+
+**Standing discipline (reaffirmed, extended).** The release-manifest
+ tool walks everything except `.git`/`node_modules` DIRECTORIES —
+ run it only on a clean checkout (fresh clone or `git archive`
+ export), never on a battery-dirty working tree and never on a
+ linked worktree (whose `.git` is a file and gets counted). The
+ P8-W3 worker's record already stated this discipline for npm
+ lockfiles ("local npm lockfile artifact removed first so the walked
+ tree = the committed tree"); this correction extends it to the two
+ artifact classes that produced this defect (husky shims; the
+ worktree `.git` pointer).

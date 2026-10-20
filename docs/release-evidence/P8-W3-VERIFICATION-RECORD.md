@@ -106,16 +106,22 @@ max file 391 lines (the file law, machine-checked).
 
 Tool: `node scripts/release/build-release-manifest.mjs --env
 p8-w3-release-candidate`, run over the lane worktree at commit
-`8420a4d` (the 3/4 code+tooling state; working tree clean of untracked
-files; the documentation authored at 4/4 is excluded — re-run the tool
-at any checkout of `8420a4d` to reproduce):
+`8420a4d` (the 3/4 code+tooling state). **CORRECTED 2026-10-20
+(post-Gate E audit — see RELEASE-READINESS-RECORD §8):** the
+originally-recorded walk (8,481 files / `a45dd3ba…`) counted the lane
+worktree's `.git` pointer FILE — R6 ignores `.git` DIRECTORIES, and a
+linked worktree carries `.git` as a file, so "clean of untracked
+files" was true except for that pointer. The reproducible
+committed-tree values are:
 
-- fileCount: **8,481** (symlinkCount 0; `.git` + `node_modules`
-  ignored per R6)
-- totalDigest: **`a45dd3ba77e0e7717ed482e832e12bea78dd38263872547129d573dd3960127f`**
+- fileCount: **8,480** (symlinkCount 0; `node_modules` ignored per R6)
+- totalDigest: **`fabaa261a7a30970f633da7ec21cc6f861b83d695ed5235a5692b806ca0bdbd9`**
 - identity: commitSha `8420a4d6dec90007e0ecdb4f008312a5a7429393`,
   environment `p8-w3-release-candidate` (the label does not enter the
   totalDigest — it covers the canonical entry stream only)
+
+Re-run the tool at any CLEAN checkout of `8420a4d` (fresh clone or
+`git archive` export — not a linked worktree) to reproduce.
 
 The TL re-runs the tool on the MERGED tree at integration and pins the
 final digest in the release-readiness record.

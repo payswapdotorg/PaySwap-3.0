@@ -39,11 +39,16 @@ frontier empty.**
 
 ## Gate E — release-readiness record
 
-`docs/release-evidence/RELEASE-READINESS-RECORD.md` (completed at `7dfece3`):
+`docs/release-evidence/RELEASE-READINESS-RECORD.md` (completed at `7dfece3`;
+manifest digest corrected 2026-10-20 by the post-closing audit — record §8):
 release identity pinned (commit `b9f9ab7` + build-manifest totalDigest
-`81e51f174c943c56b02b6aa4ccaa1597da175699d48e29257977d962746e84d9` over
-8,515 files, reproducible via `node scripts/release/build-release-manifest.mjs
---verify`); certification receipts cited exactly (P8-W1/W2/W3 evidence
+`33e05966ea14f5bfa46724ff384adfef5967ad81b45c960cf5eacbd3f3b0835a` over
+8,483 files — the committed-tree walk, reproducible via `node
+scripts/release/build-release-manifest.mjs --verify
+docs/release-evidence/release-manifest-b9f9ab7.json` on any clean checkout
+of `b9f9ab7`; the originally-pinned `81e51f17…`/8,515 covered the station's
+mid-census working tree — 32 untracked artifacts — and was not reproducible
+from any checkout); certification receipts cited exactly (P8-W1/W2/W3 evidence
 records + the Gate D live browser record); the full 22-lane CI census
 re-run by the TL on the merged tree — **376 files / 4,092 tests ALL PASS**
 (plus the experience layer 39f/427t → full-tree station battery
