@@ -22,7 +22,7 @@ to EXPLICIT OPERATOR AUTHORIZATION (the standing law; see §6).
 | Base commit (the P8-W1+P8-W2 integration state; 28 work orders) | `b01a0a9` |
 | Release lane branch | `work/p8-w3` — 4 linear commits: `92a6ace` (1/4) → `d234fcc` (2/4) → `8420a4d` (3/4) → 4/4 (this record's commit; see `git log -1`) |
 | Worktree build-manifest digest (tool: `scripts/release/build-release-manifest.mjs`, run at `8420a4d`, the 3/4 code+tooling state; `.git`/`node_modules` ignored per the R6 law) | totalDigest **`a45dd3ba77e0e7717ed482e832e12bea78dd38263872547129d573dd3960127f`** over **8,481 files** (0 symlinks); identity commitSha `8420a4d6dec90007e0ecdb4f008312a5a7429393`, environment label `p8-w3-release-candidate` (labels do not enter the digest) |
-| FINAL merged-tree manifest digest | **FILL-AT-INTEGRATION** — the TL re-runs `node scripts/release/build-release-manifest.mjs --env <label>` on the merged tree after the P8-W3 merge and pins the digest + fileCount here (single-writer law) |
+| FINAL merged-tree manifest digest | **FILLED at Gate E integration (TL, 2026-10-20)** — `node scripts/release/build-release-manifest.mjs --env payswap-3.0-gate-e-final` on the merged tree at commit `b9f9ab7bcaf3e24207f412bc766ab78f95928b07`: totalDigest **`81e51f174c943c56b02b6aa4ccaa1597da175699d48e29257977d962746e84d9`** over **8,515 files** (0 symlinks). Reproducibility law: any checkout of `b9f9ab7` reproduces this digest byte-identically (`--verify` mode). |
 
 The deployment-identity contract this feeds is the four-component
 digest-chained identity (commit SHA + environment record + build
@@ -52,35 +52,41 @@ This lane's receipts (recorded at 4/4, hermetic offline):
 | `node ../../scripts/release/build-release-manifest.mjs --selftest` | exit 0 — ALL CHECKS PASSED |
 
 Full-tree per-package census TEMPLATE (the 21 CI-matrix lanes; the
-test-count cells are FILL-AT-INTEGRATION placeholders the TL completes
-on the merged tree — the operations lane's CI row is added at
-integration with this lane's receipts 18f/134t):
+test-count cells were FILLED by the TL at Gate E integration: all 22 lanes
+re-run by the TL on the merged tree at `b9f9ab7` (2026-10-20, hermetic
+per-package `npm install --no-workspaces` + `vitest run`); the operations
+row carries this lane's receipts 18f/134t):
 
 | # | Package (CI lane) | Test files | Tests | Result (fill at integration) |
 |---|-------------------|-----------:|------:|------------------------------|
-| 1 | trust | _ | _ | _ |
-| 2 | economic | _ | _ | _ |
-| 3 | protocol | _ | _ | _ |
-| 4 | provider-runtime | _ | _ | _ |
-| 5 | surface | _ | _ | _ |
-| 6 | capability | _ | _ | _ |
-| 7 | agents | _ | _ | _ |
-| 8 | command | _ | _ | _ |
-| 9 | execution-graph | _ | _ | _ |
-| 10 | lab | _ | _ | _ |
-| 11 | merchant | _ | _ | _ |
-| 12 | onchain-adapters | _ | _ | _ |
-| 13 | onchain-domain | _ | _ | _ |
-| 14 | onchain-extensions | _ | _ | _ |
-| 15 | onchain-security | _ | _ | _ |
-| 16 | route-compiler | _ | _ | _ |
-| 17 | zcode-bridge | _ | _ | _ |
-| 18 | opportunities | _ | _ | _ |
-| 19 | adversarial | _ | _ | _ |
-| 20 | financial-certification | _ | _ | _ |
-| 21 | client-certification | _ | _ | _ |
+| 1 | trust | 11 | 138 | ALL PASS (station re-run) |
+| 2 | economic | 11 | 105 | ALL PASS (station re-run) |
+| 3 | protocol | 21 | 238 | ALL PASS (station re-run) |
+| 4 | provider-runtime | 13 | 159 | ALL PASS (station re-run) |
+| 5 | surface | 11 | 106 | ALL PASS (station re-run) |
+| 6 | capability | 18 | 230 | ALL PASS (station re-run) |
+| 7 | agents | 18 | 158 | ALL PASS (station re-run) |
+| 8 | command | 19 | 221 | ALL PASS (station re-run) |
+| 9 | execution-graph | 14 | 141 | ALL PASS (station re-run) |
+| 10 | lab | 16 | 147 | ALL PASS (station re-run) |
+| 11 | merchant | 25 | 353 | ALL PASS (station re-run) |
+| 12 | onchain-adapters | 15 | 135 | ALL PASS (station re-run) |
+| 13 | onchain-domain | 14 | 197 | ALL PASS (station re-run) |
+| 14 | onchain-extensions | 16 | 164 | ALL PASS (station re-run) |
+| 15 | onchain-security | 31 | 384 | ALL PASS (station re-run) |
+| 16 | route-compiler | 29 | 353 | ALL PASS (station re-run) |
+| 17 | zcode-bridge | 19 | 181 | ALL PASS (station re-run) |
+| 18 | opportunities | 12 | 181 | ALL PASS (station re-run) |
+| 19 | adversarial | 18 | 146 | ALL PASS (station re-run) |
+| 20 | financial-certification | 16 | 134 | ALL PASS (station re-run) |
+| 21 | client-certification | 11 | 87 | ALL PASS (station re-run) |
 | 22 | operations (added at integration; receipts above) | 18 | 134 | ALL PASS (this lane) |
-| | **TOTAL (fill at integration)** | _ | _ | _ |
+| | **TOTAL (22 CI lanes)** | **376** | **4092** | **ALL PASS** |
+
+Experience-layer station census (outside the CI matrix; pnpm-workspace route,
+station re-run 2026-10-20 @ f9392a3 — unchanged by the P8 wave, zero source
+overlap): ui 15f/226t · web 14f/116t · desktop 10f/85t. Full-tree station
+battery across all 25 battery packages: **415 files / 4519 tests, ALL PASS.**
 
 ## 4. Operational readiness (the contracts that make release supportable)
 
