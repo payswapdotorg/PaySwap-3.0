@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/financial-certification",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Financial invariant/conformance certification for fiat corridors (Work Order P8-W1, lane p8-w1): the operator-authorized certification wave's financial lane. The package owns the CERTIFICATION-GATE and EVIDENCE authority for financial corridors — deterministic, hermetic conformance suites and a uniform gate wall that a corridor/provider/route implementation must pass before promotion: quote expiry/material-change honesty (expired quotes are inert; beneficiary/price/amount/rail change invalidates quote and any command grounded in it), endpoint idempotency (same endpoint + same key replays the recorded outcome, never a second external effect; distinct keys are distinct intents), funding/payout leg separation (separately authorized, observed, reconciled — no fused leg, no cross-leg shortcut, no hidden custody), event-ordering robustness (duplicate and out-of-order provider events resolve deterministically to the same reconciled state, with a total-order proof), ambiguous timeout -> UNKNOWN -> reconciliation (a timeout NEVER resolves to failure or success directly; only external evidence closes ambiguity), late returns/refunds/chargebacks as first-class late events that re-open reconciled state honestly, and versioned, digest-chained certification records that are byte-deterministic functions of their inputs. A FAILED gate halts promotion and CANNOT be downgraded or waived (escalate-only). The suite is hermetic by law: live-corridor certification is credential-gated (the GAP-02 class) and recorded as an explicit limitation — never simulated, no fake success, no mock-as-live. Zero runtime dependencies; devDependencies are exactly the toolchain (typescript + vitest); every cross-lane contract shape is a LOCAL STRUCTURAL PIN (leaf-in-flight law — the TL wires the types at integration).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
