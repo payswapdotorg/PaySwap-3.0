@@ -460,15 +460,18 @@ async function bootstrapWebApp() {
     window.history.replaceState(null, "", surface.target);
   }
 
-  const productPath =
-    surface.kind === "legacy-redirect" ? surface.target : window.location.pathname;
-
   // The PaySwap product (P9-A flip: the DEFAULT experience): the
   // top-level routes render @payswap/app with the web history adapter,
   // the supporting console entry, route-specific document titles and the
   // repository's honest deployment facts as input (nothing configured,
   // no recorded provider evidence).
-  if (isPaySwapProductPath(productPath)) {
+  //
+  // INTEGRATION FIX (J7): the branch keys on the GATE's decision, not a
+  // re-check of isPaySwapProductPath — the gate (post-fix) sends unknown
+  // top-level paths here too, and the product router renders the honest
+  // not-found answer for them (routes.ts law). The console mount below
+  // now owns only /console and /console/*.
+  if (surface.kind === "product" || surface.kind === "legacy-redirect") {
     document.title = "PaySwap";
     root.render(
       <PaySwapApp
@@ -487,7 +490,7 @@ async function bootstrapWebApp() {
     return;
   }
 
-  if (isConversationSharePath(window.location.pathname)) {
+  if (surface.kind === "share" || isConversationSharePath(window.location.pathname)) {
     await renderConversationSharePage();
     return;
   }

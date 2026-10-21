@@ -71,3 +71,19 @@ Until accepted, the violations REMAIN visible in the report: 1 R3
 - **Reclassify provider-runtime to contracts**: rejected — its rails layer is
   deliberate (P2-W2 acceptance integration note) and loosening/renaming layer
   rules to hide an edge is exactly what GOV-W1 must not do.
+
+---
+
+## Update (P9 integration, 2026-10-21)
+
+The pin-mirror suite MOVED with the product in P9-A: the test now
+lives at `packages/payswap-app/test/payswap/pin-mirror.test.ts`
+(`@payswap/app`, platform layer). The violation sites relocated with
+it — the carry set is now `payswap-app -> surface` (R6 ×4 sites) and
+`payswap-app -> provider-runtime` (R6 + R3), replacing the former
+web-keyed entries one-for-one. Same ADR substance: test-only
+source-direct imports that keep the structural pins honest; the
+`@payswap/app` package does not declare the source packages as
+dependencies (same "not executable without inventing a dependency"
+analysis). The web->ui design-stub carry (ADR-0006) is RESOLVED at
+this integration — see its update.

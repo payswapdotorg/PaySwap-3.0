@@ -69,21 +69,27 @@ export function AppOverviewPage({
         </p>
         <ul className="ps-page-grid">
           {navigation.areas.map((area) => (
-            <Card key={area.id} className="ps-area-card">
-              <div className="ps-cap-card-head">
-                <h3 className="ps-cap-name">{area.label}</h3>
-                <StatusPill tone="disabled">empty by design</StatusPill>
-              </div>
-              <p className="ps-cap-summary">{area.purpose}</p>
-              <p className="ps-cap-note">{area.emptyState.reason}</p>
-              <ProductLink
-                to={area.route}
-                navigation={productNavigation}
-                className="ps-area-open"
-              >
-                Open {area.label}
-              </ProductLink>
-            </Card>
+            /* a11y fix (axe "list", found by the journey suite): <ul>
+               children must be <li> — the Card renders a <div>; the
+               wrapper matches CapabilitiesPage's ps-page-grid-item
+               pattern. */
+            <li key={area.id} className="ps-page-grid-item">
+              <Card className="ps-area-card">
+                <div className="ps-cap-card-head">
+                  <h3 className="ps-cap-name">{area.label}</h3>
+                  <StatusPill tone="disabled">empty by design</StatusPill>
+                </div>
+                <p className="ps-cap-summary">{area.purpose}</p>
+                <p className="ps-cap-note">{area.emptyState.reason}</p>
+                <ProductLink
+                  to={area.route}
+                  navigation={productNavigation}
+                  className="ps-area-open"
+                >
+                  Open {area.label}
+                </ProductLink>
+              </Card>
+            </li>
           ))}
         </ul>
       </section>

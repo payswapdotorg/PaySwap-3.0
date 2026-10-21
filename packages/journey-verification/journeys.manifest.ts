@@ -260,17 +260,25 @@ export function isJourneyId(id: string): id is JourneyId {
 }
 
 /**
- * The routes the TIER-1 suite drives at the lane base (the P7-W1 PaySwap
- * surfaces on the @zcode/web substrate). Kept beside the manifest so the
- * specs and the record quote ONE source of truth.
+ * The routes the TIER-1 suite drives (the PaySwap product surfaces).
+ *
+ * INTEGRATION UPDATE (P9, TL): at the lane base these were the P7-W1
+ * `/payswap/*` additive-mount paths; the P9-A merge moved the surfaces
+ * to their canonical top-level homes (PRODUCT-IDENTITY.md §3) and the
+ * legacy paths became permanent redirects (covered by
+ * legacy-redirect.spec.ts via CONTRACT_ROUTES.legacy*). Post-merge,
+ * the "base surface" of every tier-1 journey IS the canonical route —
+ * the tier tag still documents WHAT was verifiable at the lane base;
+ * the href assertions must expect the canonical targets the app now
+ * (correctly) emits.
  */
 export const BASE_ROUTES = {
-  home: "/payswap",
-  capabilities: "/payswap/capabilities",
-  security: "/payswap/security",
-  developers: "/payswap/developers",
-  appEntry: "/payswap/app",
-  notFound: "/payswap/no-such-journey-route",
+  home: "/",
+  capabilities: "/capabilities",
+  security: "/security",
+  developers: "/developers",
+  appEntry: "/app",
+  notFound: "/no-such-journey-route",
 } as const;
 
 /**

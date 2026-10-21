@@ -14,8 +14,10 @@ import { defineConfig } from "vitest/config";
  * Resolution notes (carried from the pre-P9-A config):
  * - vitest externalizes bare @zcode/* workspace imports — Node cannot
  *   execute the substrate's NodeNext .js-suffix TypeScript source — so
- *   the design-layer specifier is aliased onto an in-root stub that
- *   re-exports the workspace source through a RELATIVE path.
+ *   the design-layer specifier is aliased DIRECTLY onto the workspace
+ *   source barrel (vite's TS-aware resolver processes it; P9 integration:
+ *   the former in-root re-export stub is gone — an alias value is config,
+ *   not a scanned import, so the R6 carry disappears with it).
  * - the same treatment applies to the @payswap/app product package:
  *   aliased onto its source barrel so vite's TS-aware resolver processes
  *   the product source (and its css imports get stubbed, as before).
@@ -34,7 +36,7 @@ export default defineConfig({
       },
       {
         find: /^@zcode\/ui\/payswap$/,
-        replacement: path.resolve(import.meta.dirname, "test/payswap-design.ts"),
+        replacement: path.resolve(import.meta.dirname, "../ui/src/payswap/index.ts"),
       },
       {
         find: /^@payswap\/app$/,

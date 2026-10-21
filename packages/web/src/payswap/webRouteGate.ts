@@ -61,7 +61,15 @@ export function resolveWebSurface(params: {
     return { kind: "oauth-callback" };
   }
   if (isPaySwapLegacyPath(pathname)) {
-    return { kind: "legacy-redirect", target: resolvePaySwapLegacyRedirect(pathname) };
+    const target = resolvePaySwapLegacyRedirect(pathname);
+    /*
+     * INTEGRATION FIX (J7, found by the journey suite): the legacy fold
+     * must not strand a console target — "/payswap/console" redirects
+     * to "/console", which the console owns, not the product router.
+     */
+    return isConsoleRoute(target)
+      ? { kind: "console" }
+      : { kind: "legacy-redirect", target };
   }
   if (isPaySwapProductPath(pathname)) {
     return { kind: "product" };
@@ -69,5 +77,25 @@ export function resolveWebSurface(params: {
   if (isConversationShareRoute(pathname)) {
     return { kind: "share" };
   }
-  return { kind: "console" };
+  if (isConsoleRoute(pathname)) {
+    return { kind: "console" };
+  }
+  /*
+   * INTEGRATION FIX (J7, found by the journey suite — the route contract
+   * owns this): an unknown top-level pathname is NOT a console path. The
+   * product owns the top-level namespace now; its router renders the
+   * honest not-found answer (routes.ts: "…which renders the honest
+   * not-found when it is not a real route") — sending unknowns to the
+   * console mount strands the user on a bootstrap error in any
+   * deployment without a live console backend (exactly what the suite
+   * caught: "Web bootstrap failed" instead of the honest answer). The
+   * console remains reachable at /console and /console/* (deep links,
+   * ?remote= entries land there).
+   */
+  return { kind: "product" };
+}
+
+/** The agent-console paths (the supporting surface's own namespace). */
+export function isConsoleRoute(pathname: string): boolean {
+  return pathname === "/console" || pathname.startsWith("/console/");
 }

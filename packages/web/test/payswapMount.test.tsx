@@ -55,10 +55,19 @@ describe("the web route gate (PRODUCT-IDENTITY §3 — which surface owns a path
     }
   });
 
-  it("the agent console owns /console and every other substrate path (the old client root)", () => {
-    for (const pathname of ["/console", "/anything", "/workspace/deep/link"]) {
+  it("the agent console owns /console and /console/* only; unknown top-level paths render the product's honest not-found (J7 integration fix)", () => {
+    for (const pathname of ["/console", "/console/deep/link"]) {
       expect(resolveWebSurface({ pathname, hasState: false, hasCodeOrError: false }), pathname).toEqual({
         kind: "console",
+      });
+    }
+    // The integration fix (found by the journey suite): unknown top-level
+    // paths are PRODUCT surface — its router renders the honest not-found
+    // answer; the old fail-open console default stranded users on a
+    // bootstrap error in deployments without a live console backend.
+    for (const pathname of ["/anything", "/workspace/deep/link"]) {
+      expect(resolveWebSurface({ pathname, hasState: false, hasCodeOrError: false }), pathname).toEqual({
+        kind: "product",
       });
     }
   });

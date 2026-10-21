@@ -90,7 +90,26 @@ export async function expectNoZCodeBranding(
     const texts: string[] = [];
     const body = document.body;
     if (body?.innerText) {
-      texts.push(body.innerText);
+      /*
+       * LEGAL-ATTRIBUTION EXEMPTION (PRODUCT-IDENTITY.md §4, integration
+       * fix): the upstream attribution line ("PaySwap is built on the ZCode
+       * open-source platform…") is REQUIRED content in the footer/legal
+       * surfaces — attribution, never the brand. The exemption is
+       * STRUCTURAL: clone the DOM, strip every element carrying the
+       * attribution hook (.ps-site-footer-attribution — the class A's
+       * SiteChrome renders it with), then scan what remains. Anything
+       * else that says ZCode still fails.
+       */
+      const scanRoot = body.cloneNode(true) as HTMLElement;
+      for (const attributed of Array.from(
+        scanRoot.querySelectorAll(".ps-site-footer-attribution"),
+      )) {
+        attributed.remove();
+      }
+      const scanText = scanRoot.innerText;
+      if (scanText) {
+        texts.push(scanText);
+      }
     }
     for (const image of Array.from(document.querySelectorAll("img[alt], [aria-label]"))) {
       const alt = image.getAttribute("alt");

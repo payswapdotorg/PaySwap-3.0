@@ -59,8 +59,11 @@ jobs:
       - name: Web package suite (@zcode/web — workspace-dependent)
         run: pnpm --filter @zcode/web test
 
-      - name: Desktop package suite (@zcode/desktop — workspace-dependent)
-        run: pnpm --filter @zcode/desktop test
+      - name: Desktop package suite (@payswap/desktop — workspace-dependent; renamed in P9-B)
+        run: pnpm --filter @payswap/desktop test
+
+      - name: Product application suite (@payswap/app — moved with the product in P9-A)
+        run: pnpm --filter @payswap/app test
 
       - name: Install Playwright chromium (scoped to the journey package)
         run: pnpm --filter @payswap/journey-verification exec playwright install chromium --with-deps

@@ -99,6 +99,7 @@ package_layers:
   packages/server: platform
   packages/zcode-server-cli: platform
   packages/ui: platform
+  packages/payswap-app: platform
   packages/web: platform
   packages/desktop: platform
   packages/formal-proof: platform
@@ -167,5 +168,6 @@ package_layers:
   # be downgraded/waived: cannot_downgrade_block semantics; money semantics
   # stay pinned to packages/protocol wires — no parallel financial authority).
   packages/financial-certification: security # spec/financial-certification/FINANCIAL-CERTIFICATION.md (P8-W1: conformance gate wall; GAP-02 live-corridor limitation)
+  packages/journey-verification: security
   packages/client-certification: security # spec/client-certification/CLIENT-CERTIFICATION.md (P8-W2: client-surface honesty gates; secret boundary + dead-action audit)
   packages/operations: platform # spec/operations/OPERATIONS.md (P8-W3: operational-contract authority — deployment identity/reproducible build/observability/rollback/runbook; platform telemetry/operations substrate class; no-deployment-execution law)

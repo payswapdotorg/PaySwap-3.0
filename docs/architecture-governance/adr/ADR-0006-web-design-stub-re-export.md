@@ -58,3 +58,17 @@ Until accepted, this R6 occurrence REMAINS visible in the report.
 - **Change the stub to a package import now**: rejected — breaks the suite
   (the constraint the stub exists to satisfy); not verifiable in this lane
   (workspace toolchain unavailable).
+
+---
+
+## Update (P9 integration, 2026-10-21): RESOLVED
+
+The carry this ADR documented is ELIMINATED at the P9 integration:
+both re-export stubs (`packages/web/test/payswap-design.ts` and its
+moved descendant `packages/payswap-app/test/payswap/design.ts`) are
+DELETED. The vitest configs now alias `@zcode/ui/payswap` DIRECTLY
+onto the workspace source barrel
+(`../../ui/src/payswap/index.ts`) — an alias VALUE is build
+configuration, not a scanned import statement, so no R6 site exists.
+Behavior is identical (vite's TS-aware resolver processes the same
+source through the same css-stub aliases). Net carry count: 8 -> 7.

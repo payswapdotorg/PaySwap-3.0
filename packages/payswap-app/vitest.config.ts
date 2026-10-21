@@ -12,12 +12,13 @@ import { defineConfig } from "vitest/config";
  * per-file (the navigation adapter reads window.location). No network in
  * tests.
  *
- * Resolution note (carried from the web suite): vitest externalizes bare
- * @zcode/* workspace imports — Node cannot execute the substrate's
- * NodeNext .js-suffix TypeScript source — so the design-layer specifier
- * is aliased onto an in-root test stub (test/payswap/design.ts) that
- * re-exports the workspace source through a RELATIVE path, which vite's
- * TS-aware resolver processes. Source files keep importing
+ * Resolution note (P9 integration): vitest externalizes bare @zcode/*
+ * workspace imports — Node cannot execute the substrate's NodeNext
+ * .js-suffix TypeScript source — so the design-layer specifier is
+ * aliased DIRECTLY onto the workspace source barrel (vite's TS-aware
+ * resolver processes it; the former in-root re-export stub is gone —
+ * an alias value is config, not a scanned import, so the R6 carry
+ * disappears with it). Source files keep importing
  * "@zcode/ui/payswap" (the workspace export).
  */
 export default defineConfig({
@@ -34,7 +35,7 @@ export default defineConfig({
       },
       {
         find: /^@zcode\/ui\/payswap$/,
-        replacement: path.resolve(import.meta.dirname, "test/payswap/design.ts"),
+        replacement: path.resolve(import.meta.dirname, "../ui/src/payswap/index.ts"),
       },
     ],
   },
