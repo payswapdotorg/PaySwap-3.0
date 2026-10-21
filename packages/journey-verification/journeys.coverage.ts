@@ -90,6 +90,31 @@ export const SPEC_COVERAGE: readonly SpecCoverage[] = [
     kind: "journey",
   },
   {
+    spec: "console-workspace.spec.ts",
+    journeys: ["J14"],
+    kind: "journey",
+  },
+  {
+    spec: "console-mission-lifecycle.spec.ts",
+    journeys: ["J14"],
+    kind: "journey",
+  },
+  {
+    spec: "console-honest-empties.spec.ts",
+    journeys: ["J14"],
+    kind: "journey",
+  },
+  {
+    spec: "console-advanced.spec.ts",
+    journeys: ["J14"],
+    kind: "journey",
+  },
+  {
+    spec: "console-a11y-responsive.spec.ts",
+    journeys: ["J14"],
+    kind: "journey",
+  },
+  {
     spec: "manifest.spec.ts",
     journeys: [],
     kind: "enforcement",

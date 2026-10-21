@@ -222,11 +222,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     control: "console link from product",
     prerequisite: "auth",
     honestState:
-      "never the default landing; framed as a capability of PaySwap, visually secondary",
+      "never the default landing; the PaySwap Agent Workspace per spec/surface/CONSOLE-WORKSPACE.md — PaySwap chrome, eight sections, honest empties, the §4 ladder; ZCode developer workspace = advanced interface at /console/advanced",
     tier: 2,
     baseSurface: null,
     integrationNote:
-      "at the lane base the console IS the substrate root (the ZCode client at /) — no distinct /console surface exists to test honestly; fully @contract",
+      "at the lane base the console IS the substrate root (the ZCode client at /) — no distinct /console surface exists to test honestly; fully @contract. P10 INTEGRATION UPDATE: on the merged console wave (4137bf6) the /console surface EXISTS as the PaySwap Agent Workspace and JOURNEY-MAP.md §3 flows 15–19 are tier-1-green browser flows (this suite's console-*.spec.ts, P10-D) — the @contract pair in navigation.spec.ts still pins the reachability + never-the-default-landing law",
   },
   {
     id: "J15",
@@ -285,6 +285,12 @@ export const BASE_ROUTES = {
  * The routes of the NEW route contract (PRODUCT-IDENTITY.md §3) the
  * tier-2 @contract tests are authored against. These gate at TL
  * integration on the merged tree (Lane P9-A implements them).
+ *
+ * The console block (P10-D, JOURNEY-MAP.md §3 flows 15–19 — all J14):
+ * the eight-section workspace path space (CONSOLE-WORKSPACE.md §2), the
+ * advanced developer-workspace mount, and the unknown-section probe
+ * the honest-not-found flow drives. The console-* specs import their
+ * routes from HERE (the single canonical route registry).
  */
 export const CONTRACT_ROUTES = {
   home: "/",
@@ -293,6 +299,15 @@ export const CONTRACT_ROUTES = {
   security: "/security",
   developers: "/developers",
   console: "/console",
+  consoleMissions: "/console/missions",
+  consoleAgents: "/console/agents",
+  consoleApprovals: "/console/approvals",
+  consoleConnections: "/console/connections",
+  consoleActivity: "/console/activity",
+  consoleLab: "/console/lab",
+  consoleSettings: "/console/settings",
+  consoleAdvanced: "/console/advanced",
+  consoleUnknownSection: "/console/does-not-exist",
   legacyHome: "/payswap",
   legacyCapabilities: "/payswap/capabilities",
   legacySecurity: "/payswap/security",
