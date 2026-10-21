@@ -367,16 +367,19 @@ async function verifyRelease(args, onWorkdir) {
   if (appImageAsset && !args.skipAppImage) {
     const appImagePath = join(args.workdir, appImageAsset.name);
     await downloadAsset(appImageAsset.browser_download_url, appImagePath);
-    const appImageFindings = collectAppImageFindings({
+    const appImage = collectAppImageFindings({
       path: appImagePath,
       checksums,
       assetName: appImageAsset.name,
       chmodSync,
     });
-    if (appImageFindings.length > 0) {
-      fail(EXIT.APPIMAGE, `AppImage checks failed:\n  - ${appImageFindings.join("\n  - ")}`);
+    if (appImage.findings.length > 0) {
+      fail(EXIT.APPIMAGE, `AppImage checks failed:\n  - ${appImage.findings.join("\n  - ")}`);
     }
-    console.error("[install-verify] AppImage structure + checksum + executable bit ✓");
+    for (const note of appImage.notes) {
+      receipt.assertions.push(`AppImage: ${note}`);
+    }
+    console.error("[install-verify] AppImage structure + checksum ✓");
     receipt.assets.push({
       name: appImageAsset.name,
       size: appImageAsset.size,

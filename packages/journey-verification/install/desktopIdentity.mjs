@@ -76,12 +76,16 @@ export function resolveDesktopEntryExecBinary(entryContent, run) {
 }
 
 /**
- * AppImage structural checks (ELF magic + checksum + executable bit).
- * Returns findings — never exits. The executable-bit repair is performed
- * here and REPORTED as a finding so the receipt records it.
+ * AppImage structural checks (ELF magic + checksum). Returns
+ * { findings, notes } — never exits. The executable bit is NOT a
+ * finding: a plain HTTPS download can never preserve it (GitHub release
+ * downloads arrive 0644 for every AppImage ever published); the
+ * documented user step is `chmod +x` (README), so the probe sets it and
+ * records a note.
  */
 export function collectAppImageFindings({ path, checksums, assetName, chmodSync }) {
   const findings = [];
+  const notes = [];
   const stat = statSync(path);
   if (stat.size < 10 * 1024 * 1024) {
     findings.push(`AppImage is suspiciously small (${stat.size} bytes)`);
@@ -100,10 +104,12 @@ export function collectAppImageFindings({ path, checksums, assetName, chmodSync 
     }
   }
   if ((stat.mode & 0o111) === 0) {
-    chmodSync(path, 0o755);
-    findings.push("AppImage was downloaded without the executable bit (fixed by chmod +x; the publisher should set it)");
+    if (chmodSync) {
+      chmodSync(path, 0o755);
+    }
+    notes.push("AppImage downloaded without the executable bit (expected for any HTTPS download); chmod +x applied — the documented user step");
   }
-  return findings;
+  return { findings, notes };
 }
 
 /**
