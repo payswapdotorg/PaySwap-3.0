@@ -52,7 +52,7 @@ interface AboutSnapshotOptions {
   };
 }
 
-const ABOUT_APPLICATION_NAME = "ZCode Desktop App";
+const ABOUT_APPLICATION_NAME = "PaySwap Desktop";
 // 自定义 About 内容本体是 256x280；原生窗口如果同尺寸会让内容贴满透明窗口边界。
 // 这里给 BrowserWindow 额外留出背景呼吸空间，避免正式 About 看起来比 demo 更局促。
 const ABOUT_WINDOW_WIDTH = 256;
@@ -65,21 +65,24 @@ const ABOUT_MESSAGES: Record<
     okButtonLabel: string;
     optimizedForAppleSilicon: string;
     copyright: (year: number) => string;
+    attribution: string;
   }
 > = {
   "zh-CN": {
-    aboutTitle: "关于 ZCode",
+    aboutTitle: "关于 PaySwap",
     versionLabel: "版本",
     okButtonLabel: "确定",
     optimizedForAppleSilicon: "已针对 Apple Silicon 优化。",
-    copyright: (year) => `版权所有 © ${year} ZCode。`,
+    copyright: (year) => `版权所有 © ${year} PaySwap。`,
+    attribution: "基于 ZCode 开源平台构建（zai-org/ZCode，Apache-2.0）。",
   },
   "en-US": {
-    aboutTitle: "About ZCode",
+    aboutTitle: "About PaySwap",
     versionLabel: "version",
     okButtonLabel: "OK",
     optimizedForAppleSilicon: "Optimized for Apple Silicon.",
-    copyright: (year) => `Copyright © ${year} ZCode.`,
+    copyright: (year) => `Copyright © ${year} PaySwap.`,
+    attribution: "Built on the ZCode open-source platform (zai-org/ZCode, Apache-2.0).",
   },
 };
 
@@ -261,6 +264,9 @@ export async function showAboutDialog(
         optimizationLine: formatAboutOptimizationLine(snapshot, locale),
         versionLabel: aboutMessages.versionLabel,
         okButtonLabel: aboutMessages.okButtonLabel,
+        // PRODUCT-IDENTITY §4: the upstream lineage stays in the About
+        // surface as ATTRIBUTION — preserved legally, never the brand.
+        attribution: aboutMessages.attribution,
       }),
     )}`,
   );

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZCode</title>
+    <title>PaySwap</title>
     <style>
       html,
       body,
@@ -27,6 +27,7 @@
         inset: 0;
         z-index: 2147483647;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         transition: opacity 0.16s ease;
@@ -103,6 +104,20 @@
           animation: none;
         }
       }
+
+      .startup-wordmark {
+        margin: 18px 0 0;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        color: #f4f3f0;
+      }
     </style>
   </head>
   <body>
@@ -112,29 +127,38 @@
       class="[app-region:drag]"
       role="status"
       aria-busy="true"
-      aria-label="Loading..."
+      aria-label="Loading PaySwap"
     >
       <div class="startup-logo-shell">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="118"
-          height="100"
-          fill="none"
-          viewBox="0 0 256 218"
+          width="56"
+          height="56"
+          viewBox="0 0 32 32"
           class="startup-logo"
           aria-hidden="true"
+          focusable="false"
         >
+          <rect width="32" height="32" rx="8" fill="#131211" />
           <path
-            fill="currentColor"
-            d="M134.4 0.130152L116.48 25.6022C113.665 29.5699 109.054 32.0019 104.064 32.0019H6.3999V0C6.3999 0.130149 134.4 0.130152 134.4 0.130152Z"
+            d="M10 12.25h11M18.5 9.25l3 3-3 3"
+            stroke="#10b981"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
           />
-          <path fill="currentColor" d="M256 0.130127L102.401 217.732H0L153.599 0.130127H256Z" />
           <path
-            fill="currentColor"
-            d="M121.601 217.732L139.65 192.134C142.465 188.166 147.076 185.734 152.067 185.734H249.604V217.736H121.601V217.732Z"
+            d="M22 19.75H11M13.5 16.75l-3 3 3 3"
+            stroke="#10b981"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
           />
         </svg>
       </div>
+      <p class="startup-wordmark">PaySwap</p>
     </div>
     <script type="module">
       const startupLogoShell = document.querySelector(".startup-logo-shell");
