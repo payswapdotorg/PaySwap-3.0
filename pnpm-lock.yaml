@@ -951,6 +951,34 @@ importers:
         specifier: ^3.2.7
         version: 3.2.7(@types/debug@4.1.13)(@types/node@25.6.0)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.13.3(@types/node@25.6.0)(typescript@6.0.3))(tsx@4.21.0)(yaml@2.9.0)
 
+  packages/payswap-app:
+    dependencies:
+      '@zcode/ui':
+        specifier: workspace:*
+        version: link:../ui
+      react:
+        specifier: 19.2.7
+        version: 19.2.7
+    devDependencies:
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      jsdom:
+        specifier: ^25.0.1
+        version: 25.0.1
+      react-dom:
+        specifier: 19.2.7
+        version: 19.2.7(react@19.2.7)
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.3
+      vitest:
+        specifier: ^3.2.7
+        version: 3.2.7(@types/debug@4.1.13)(@types/node@25.6.0)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.13.3(@types/node@25.6.0)(typescript@6.0.3))(tsx@4.21.0)(yaml@2.9.0)
+
   packages/protocol:
     devDependencies:
       typescript:
@@ -1451,6 +1479,9 @@ importers:
 
   packages/web:
     dependencies:
+      '@payswap/app':
+        specifier: workspace:*
+        version: link:../payswap-app
       '@zcode/client':
         specifier: workspace:*
         version: link:../client

@@ -178,6 +178,11 @@ export default defineConfig(({ mode }) => {
         // 导致 spinner、alert 等组件里的内部导入在构建时全部失效。
         // 这里在消费端补齐别名，比逐个改组件导入更稳，也能和 web 端保持一致。
         "@": resolve(__dirname, "../ui/src"),
+        // PaySwap 产品包（P9-A）：desktop package.json 归 Lane B 管（打包身份），
+        // renderer 在这里以源码别名直连 workspace 包 —— 与 web 消费的是同一份
+        // @payswap/app 源码，无第二实现。
+        "@payswap/app/routes": resolve(__dirname, "../payswap-app/src/routes.ts"),
+        "@payswap/app": resolve(__dirname, "../payswap-app/src/index.ts"),
         ...desktopRendererDependencyAliases,
         // Recharts 通过 d3-shape 读取 d3-path 的 Path 导出；hoisted node_modules
         // 里可能残留 d3-shape/node_modules/d3-path@1.x，Vite 预构建会优先命中旧包并报 Missing export。
@@ -196,6 +201,11 @@ export default defineConfig(({ mode }) => {
       __ZCODE_PRODUCT_FLAVOR__: JSON.stringify(zcodeProductFlavor),
       __ZCODE_LOCAL_DEVELOPMENT_RUNTIME__: JSON.stringify(mode !== "production"),
       "import.meta.env.VITE_ZCODE_BASE_URL": JSON.stringify(zcodeEndpointOrigin),
+      // PaySwap 产品面的诚实 API runtime（P9-A）：与 web 同名构建期注入；
+      // 未注入时产品开发者面如实显示“未配置”。
+      "import.meta.env.VITE_PAYSWAP_API_URL": JSON.stringify(
+        env.VITE_PAYSWAP_API_URL ?? process.env.VITE_PAYSWAP_API_URL ?? "",
+      ),
       // 兼容旧 renderer 读取名；新代码统一读 VITE_ZCODE_BASE_URL。
       "import.meta.env.VITE_ZCODE_ENDPOINT_ORIGIN": JSON.stringify(zcodeEndpointOrigin),
       "import.meta.env.VITE_CODING_PLAN_WEBVIEW_ORIGIN": JSON.stringify(codingPlanWebviewOrigin),

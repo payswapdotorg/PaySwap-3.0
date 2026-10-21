@@ -109,8 +109,11 @@ function createLinuxDeepLinkDesktopEntry(params: {
   productName?: string;
   iconName?: string;
 }): string {
-  const productName = params.productName ?? "ZCode";
-  const iconName = params.iconName ?? "zcode";
+  // P9-A (PRODUCT-IDENTITY §1): the deep-link desktop entry is a
+  // user-visible menu identity — the fallback defaults are PaySwap too
+  // (the real registration passes app.name, which is PaySwap now).
+  const productName = params.productName ?? "PaySwap";
+  const iconName = params.iconName ?? "payswap";
   const command = {
     executablePath: params.executablePath,
     args: params.args ?? [],

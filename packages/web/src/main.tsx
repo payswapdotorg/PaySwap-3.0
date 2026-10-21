@@ -28,12 +28,23 @@ import {
   isConversationSharePath,
   resolveConversationShareCodeFromPath,
 } from "./share/conversationShareRoute.js";
-// PaySwap web product (P7-W1): the additive product mount. The substrate's
-// own routes (OAuth callback, conversation share, the ZCode client root)
-// are untouched — the PaySwap product renders under /payswap only.
-import { PaySwapWebApp, resolveApiRuntimeInput } from "./payswap/shell/PaySwapWebApp.js";
-import { HONEST_DEPLOYMENT_CONTEXT, NO_EVIDENCE_COVERAGE } from "./payswap/contracts/harness.js";
-import { isPaySwapProductPath } from "./payswap/routes.js";
+// PaySwap web product (P9-A): the product surface lives in the
+// @payswap/app package (consumed by web AND desktop); this mount passes
+// the web platform adapters (history navigation + the vite env API
+// runtime) + the repository's honest deployment facts. The substrate's
+// own routes (OAuth callback, conversation share) are untouched; the
+// agent console moved to /console (PRODUCT-IDENTITY.md §3).
+import {
+  PaySwapApp,
+  HONEST_DEPLOYMENT_CONTEXT,
+  NO_EVIDENCE_COVERAGE,
+  PAYSWAP_CONSOLE_PATH,
+  isPaySwapProductPath,
+  routeDocumentTitle,
+} from "@payswap/app";
+import { resolveApiRuntimeInput } from "./payswap/apiRuntime.js";
+import { createWebNavigation } from "./payswap/webNavigation.js";
+import { resolveWebSurface } from "./payswap/webRouteGate.js";
 import type { IPlatformService, RemoteTarget, ServerRemoteInfo } from "@zcode/shared";
 import { WEB_DEFAULT_THEME, resolveWebInitialTheme } from "./webThemeSeed.js";
 
@@ -93,16 +104,11 @@ interface WebBootstrapResult {
   allowOpenWorkspace?: boolean;
 }
 
-function isWebOAuthCallback(params: URLSearchParams): boolean {
-  return (
-    ["/cn/share/callback", "/share/callback"].includes(window.location.pathname) &&
-    params.has("state") &&
-    (params.has("code") || params.has("error"))
-  );
-}
-
 function renderWebAuthCallbackPage(): void {
-  document.title = "ZCode - Sign In";
+  // The console mount owns the default post-auth landing now (the old
+  // "/" client root moved to /console in the P9-A route flip) — a share
+  // return-to still wins when the state carries one.
+  document.title = "PaySwap — Sign In";
   const callbackState = parseOAuthState(
     new URLSearchParams(window.location.search).get("state") ?? "",
   );
@@ -111,10 +117,10 @@ function renderWebAuthCallbackPage(): void {
     <WebCallbackPage
       authService={webAuthService}
       onSuccess={({ appReturnTo }) => {
-        window.location.replace(appReturnTo ?? "/");
+        window.location.replace(appReturnTo ?? PAYSWAP_CONSOLE_PATH);
       }}
       onRetry={() => {
-        window.location.replace(safeRetryTarget ?? "/");
+        window.location.replace(safeRetryTarget ?? PAYSWAP_CONSOLE_PATH);
       }}
     />,
   );
@@ -422,7 +428,7 @@ function WebBootstrapErrorScreen({ message }: { message: string }) {
 }
 
 function renderWebBootstrapError(error: unknown): void {
-  document.title = "ZCode - Web";
+  document.title = "PaySwap";
   root.render(
     <WebBootstrapErrorScreen message={error instanceof Error ? error.message : String(error)} />,
   );
@@ -430,24 +436,51 @@ function renderWebBootstrapError(error: unknown): void {
 
 async function bootstrapWebApp() {
   const params = new URLSearchParams(window.location.search);
-  if (isWebOAuthCallback(params)) {
+
+  // The P9-A route gate (PRODUCT-IDENTITY.md §3): which surface owns
+  // this pathname — the OAuth callback, the PaySwap product (incl. the
+  // J15 legacy /payswap permanent redirect), the conversation-share
+  // substrate route, or the agent console (the old client root, now the
+  // supporting surface at /console and every other substrate path).
+  const surface = resolveWebSurface({
+    pathname: window.location.pathname,
+    hasState: params.has("state"),
+    hasCodeOrError: params.has("code") || params.has("error"),
+  });
+
+  if (surface.kind === "oauth-callback") {
     renderWebAuthCallbackPage();
     return;
   }
 
-  // PaySwap web product (P7-W1, additive): /payswap* renders the PaySwap
-  // product surface — public site + the honest authenticated entry
-  // boundary — with the repository's honest deployment facts as input
-  // (nothing configured, no recorded provider evidence). The ZCode
-  // substrate below this branch is unchanged.
-  if (isPaySwapProductPath(window.location.pathname)) {
+  if (surface.kind === "legacy-redirect") {
+    // J15 — a permanent CLIENT-SIDE redirect: the URL bar is corrected
+    // with replaceState (no history entry, no reload) and the bootstrap
+    // continues against the target, so recorded URLs keep working.
+    window.history.replaceState(null, "", surface.target);
+  }
+
+  const productPath =
+    surface.kind === "legacy-redirect" ? surface.target : window.location.pathname;
+
+  // The PaySwap product (P9-A flip: the DEFAULT experience): the
+  // top-level routes render @payswap/app with the web history adapter,
+  // the supporting console entry, route-specific document titles and the
+  // repository's honest deployment facts as input (nothing configured,
+  // no recorded provider evidence).
+  if (isPaySwapProductPath(productPath)) {
     document.title = "PaySwap";
     root.render(
-      <PaySwapWebApp
+      <PaySwapApp
         input={{
           deployment: HONEST_DEPLOYMENT_CONTEXT,
           coverage: NO_EVIDENCE_COVERAGE,
           apiRuntime: resolveApiRuntimeInput(),
+        }}
+        navigation={createWebNavigation()}
+        console={{ href: PAYSWAP_CONSOLE_PATH }}
+        onRouteChange={(route) => {
+          document.title = routeDocumentTitle(route);
         }}
       />,
     );
@@ -472,7 +505,11 @@ async function bootstrapWebApp() {
       onClose: () => {},
     });
     const platform = createWebPlatform();
-    document.title = "ZCode - Web + Server";
+    // The agent workspace console — a SUPPORTING capability of PaySwap
+    // (J14): reachable at /console and every other substrate path, never
+    // the default landing. The old "ZCode - Web + Server" title is gone
+    // with the old default landing.
+    document.title = "PaySwap — Agent Console";
 
     root.render(
       <AppErrorBoundary>

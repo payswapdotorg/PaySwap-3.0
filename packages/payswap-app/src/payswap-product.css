@@ -1,0 +1,300 @@
+/*
+ * @payswap/app — the PaySwap web product styles: product root, site
+ * chrome, page scaffold and the coverage explorer.
+ *
+ * NET-NEW (P7-W1, MMP-36): page-level composition over the design-layer
+ * primitives (@zcode/ui/payswap-styles.css supplies the tokens and
+ * component classes). Emerald accent, amber attention/UNKNOWN, red failure
+ * only — NO indigo/blue primary. Split from the original single file to
+ * satisfy the <=400-line file law (the home-page styles live in
+ * payswap-home.css).
+ */
+
+/*
+ * @payswap/app — the PaySwap web product page styles.
+ *
+ * NET-NEW (P7-W1, MMP-36): page-level composition over the design-layer
+ * primitives (@zcode/ui/payswap-styles.css supplies the tokens and
+ * component classes; this file adds only the public-site layout). The
+ * palette is the PaySwap token system — emerald accent, amber for
+ * attention/UNKNOWN, red for failure only; NO indigo/blue primary.
+ */
+
+.ps-product-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ps-bg);
+  color: var(--ps-fg);
+  font-family: var(--ps-font-sans, ui-sans-serif, system-ui, sans-serif);
+}
+
+.ps-product-main {
+  flex: 1 1 auto;
+}
+
+/* ------------------------------ site chrome -------------------------- */
+
+.ps-site-brand {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ps-fg);
+  text-decoration: none;
+}
+
+.ps-site-open {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: var(--ps-accent);
+  color: var(--ps-on-accent);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.ps-site-open:hover {
+  background: var(--ps-accent-emphasis);
+}
+
+.ps-site-nav {
+  display: flex;
+  gap: 4px;
+  padding: 8px 24px;
+  border-bottom: 1px solid var(--ps-border);
+  background: var(--ps-surface);
+  flex-wrap: wrap;
+}
+
+.ps-site-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--ps-fg-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ps-site-nav-link:hover {
+  background: var(--ps-surface-sunken);
+  color: var(--ps-fg);
+}
+
+.ps-site-nav-link.is-active {
+  color: var(--ps-accent);
+}
+
+.ps-site-footer {
+  border-top: 1px solid var(--ps-border);
+  background: var(--ps-surface);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ps-site-footer-line {
+  max-width: 72ch;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ps-fg-muted);
+  margin: 0;
+}
+
+.ps-site-footer-links {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.ps-site-footer-links a {
+  color: var(--ps-accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ------------------------------ page scaffold ------------------------ */
+
+.ps-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+.ps-page-header {
+  margin-bottom: 32px;
+}
+
+.ps-page-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.ps-page-lede {
+  margin: 12px 0 0;
+  max-width: 72ch;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--ps-fg-muted);
+}
+
+.ps-page-section {
+  margin-top: 48px;
+}
+
+.ps-page-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.ps-page-section-note {
+  margin: 8px 0 0;
+  max-width: 80ch;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ps-fg-muted);
+}
+
+.ps-page-grid {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.ps-page-grid-item {
+  display: flex;
+}
+
+.ps-page-grid-item > .ps-card {
+  flex: 1;
+}
+
+.ps-page-list {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ps-page-bullets {
+  margin: 16px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ps-fg-muted);
+}
+
+.ps-page-links {
+  margin-top: 16px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.ps-page-links a {
+  color: var(--ps-accent);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ------------------------------ coverage ----------------------------- */
+
+.ps-cap-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ps-cap-name {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ps-cap-summary {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ps-fg-muted);
+}
+
+.ps-cap-meta {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-cap-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-cap-limitations {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ps-attention);
+}
+
+.ps-cap-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  background: var(--ps-surface);
+}
+
+.ps-cap-reason {
+  font-size: 13px;
+  color: var(--ps-fg-muted);
+  flex: 1 1 240px;
+}
+
+/* ------------------------------ security/dev -------------------------- */
+
+.ps-sec-card {
+  height: 100%;
+}
+
+.ps-sec-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ps-sec-body {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ps-fg-muted);
+}
+
+.ps-dev-card {
+  margin-top: 24px;
+}

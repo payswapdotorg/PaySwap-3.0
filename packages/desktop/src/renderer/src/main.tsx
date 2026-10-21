@@ -39,6 +39,11 @@ import {
   parseRemoteWorkspaceServicePortMessage,
   type RemoteWorkspaceServicePortRegistration,
 } from "./remoteWorkspaceServicePortBridge.js";
+// PaySwap 产品面（P9-A）：主窗口默认打开 PaySwap 产品体验（@payswap/app），
+// agent 控制台（Root）作为支撑面通过 #/console 哈希可达 —— 渲染管线（数据库
+// 准入、服务连接、平台桥）完全不变，只有最终挂载的表面换了默认值。
+import { ProductSurfaceSwitch } from "./ProductSurface.js";
+import { createBrowserHashLocation } from "./payswapDesktop.js";
 
 type DesktopRendererImportMetaEnv = {
   VITE_ZCODE_E2E_STORE_BRIDGE?: string;
@@ -331,20 +336,27 @@ function initializeBusinessRoot(port: MessagePort): void {
         resolveSystemLocale={desktopPlatform.getSystemLocale}
       >
         <StartupReadyNotifier />
-        <Root
-          services={services}
-          platform={desktopPlatform}
-          isDesktop
-          assistantCodeCommentCardsEnabled
-          isMacDesktop={isMacDesktop}
-          isWindowsDesktop={isWindowsDesktop}
-          restoreSession={restoreSession}
-          supportsSettings={supportsSettings}
-          initialWorkspaceAbsPath={initialWorkspaceAbsPath}
-          initialWorkspacePurpose={
-            initialWorkspacePurpose === "conversation" ? "conversation" : "project"
-          }
-          unavailableWorkspacePath={unavailableWorkspacePath}
+        {/* P9-A：默认表面是 PaySwap 产品；控制台（下面的 Root 子树，全部
+            原有 wiring 不变）在 #/console 作为支撑面渲染。 */}
+        <ProductSurfaceSwitch
+          location={createBrowserHashLocation()}
+          renderConsole={() => (
+            <Root
+              services={services}
+              platform={desktopPlatform}
+              isDesktop
+              assistantCodeCommentCardsEnabled
+              isMacDesktop={isMacDesktop}
+              isWindowsDesktop={isWindowsDesktop}
+              restoreSession={restoreSession}
+              supportsSettings={supportsSettings}
+              initialWorkspaceAbsPath={initialWorkspaceAbsPath}
+              initialWorkspacePurpose={
+                initialWorkspacePurpose === "conversation" ? "conversation" : "project"
+              }
+              unavailableWorkspacePath={unavailableWorkspacePath}
+            />
+          )}
         />
       </ZCodeIntlProvider>
     </AppErrorBoundary>,

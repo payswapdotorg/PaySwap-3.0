@@ -1,0 +1,9 @@
+/*
+ * Test-side resolution stub for the design-layer stylesheets (moved from
+ * test/payswap/design-styles.css in P9-A when the product suite moved to
+ * @payswap/app). vitest does not apply CSS in node/jsdom environments
+ * (css processing is off; markup-level honesty assertions never depend on
+ * styling), so the CSS specifiers are aliased onto this in-root stub. The
+ * REAL stylesheets are exercised by the substrate build pipeline
+ * (packages/web/vite.config.ts -> @zcode/ui exports).
+ */

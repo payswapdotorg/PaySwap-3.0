@@ -105,6 +105,19 @@
   }
 }
 
+/* ===================== Focus law (P9-A, WCAG 2.2 AA 2.4.7/2.4.11) =====
+ * Every interactive element of the design system shows visible keyboard
+ * focus — buttons and tab handles joined the inputs/selects that already
+ * carried it. Never remove; never rely on color alone.
+ * ====================================================================== */
+
+.ps-button:focus-visible,
+.ps-tab:focus-visible,
+.ps-chip:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 2px;
+}
+
 /* ============================== Card ============================== */
 
 .ps-card {
