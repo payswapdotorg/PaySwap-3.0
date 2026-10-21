@@ -24,10 +24,7 @@
  */
 
 import { CONSOLE_ADVANCED_ROUTE } from "./console-workspace.ts";
-import {
-  WORKSPACE_STORE_DURABILITY_LABELS,
-  type WorkspaceStoreDurability,
-} from "./console-store.ts";
+import { WORKSPACE_STORE_DURABILITY_LABELS, type WorkspaceStoreDurability } from "./console-store.ts";
 
 /** One entry of a reference vocabulary: a term + its one-line meaning. */
 export interface ConsoleReferenceEntry {
@@ -212,7 +209,7 @@ export function foldWorkspaceSettingsFacts(durability: WorkspaceStoreDurability)
   const durabilityLine =
     durability === "DESKTOP_PROFILE"
       ? "Mission records are stored in the PaySwap desktop app profile (JSON under the PaySwap user-data directory) and survive app restarts."
-      : "Mission records are stored in this browser profile only (browser localStorage under a namespaced key) — clearing this browser's data clears them.";
+      : "Mission records are stored in this browser profile only (under a namespaced key) — clearing this browser's data clears them.";
   return {
     identity: {
       name: "PaySwap",

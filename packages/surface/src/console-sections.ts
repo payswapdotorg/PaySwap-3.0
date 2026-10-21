@@ -26,14 +26,7 @@
  */
 
 import { MISSION_PREREQUISITE_APPROVAL } from "./console-ladder.ts";
-import {
-  InvalidConsoleMissionError,
-  missionSummaryOf,
-  validateMissionRecordShape,
-  type MissionEvent,
-  type MissionRecord,
-  type MissionSummary,
-} from "./console-missions.ts";
+import { InvalidConsoleMissionError, missionSummaryOf, validateMissionRecordShape, type MissionEvent, type MissionRecord, type MissionSummary } from "./console-missions.ts";
 import type { ConsoleSectionId } from "./console-workspace.ts";
 
 /** The recent-events cap on the overview fold (§6). */

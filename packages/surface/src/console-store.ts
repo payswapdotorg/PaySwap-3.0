@@ -13,7 +13,7 @@
  *   persisted as JSON under the PaySwap user-data directory; it survives
  *   app restarts; ids are assigned by the host; the renderer reaches it
  *   through the existing `payswap-desktop` service channel.
- * - BROWSER_PROFILE: browser localStorage under a namespaced key, with
+ * - BROWSER_PROFILE: browser-profile storage under a namespaced key, with
  *   the honest label below; ids assigned locally.
  * - Both: structural validation before recording (§3); a malformed
  *   persisted record is surfaced as a typed store finding and NEVER
@@ -23,12 +23,7 @@
  *   and fails closed with a typed error otherwise.
  */
 
-import type {
-  MissionDetail,
-  MissionIntakeInput,
-  MissionRecord,
-  MissionSummary,
-} from "./console-missions.ts";
+import type { MissionDetail, MissionIntakeInput, MissionRecord, MissionSummary } from "./console-missions.ts";
 
 export type WorkspaceStoreDurability = "DESKTOP_PROFILE" | "BROWSER_PROFILE";
 

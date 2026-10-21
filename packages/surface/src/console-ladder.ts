@@ -19,13 +19,7 @@
  * spec/surface/CONSOLE-WORKSPACE.md and compares byte-for-byte.
  */
 
-import {
-  missionSummaryOf,
-  validateMissionRecordShape,
-  type MissionDetail,
-  type MissionRecord,
-  type MissionRungState,
-} from "./console-missions.ts";
+import { missionSummaryOf, validateMissionRecordShape, type MissionDetail, type MissionRecord, type MissionRungState } from "./console-missions.ts";
 
 /** §4 INTENT (when not reached) — verbatim. */
 export const MISSION_PREREQUISITE_INTENT =
