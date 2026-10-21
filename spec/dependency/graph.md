@@ -58,3 +58,8 @@ Depends on Phase 7.
 
 ## Concurrency law
 Use stable contract boundaries to keep all three lanes productive whenever the frontier permits. Never use duplicate authority, hidden state, mocks or reduced verification merely to increase parallel throughput.
+## Phase 9 - productization (operator handoff: GitHub Issue #1)
+P9-A: PaySwap-native product identity and UX — Worker 1.
+P9-B: downloadable/installable GitHub distribution — Worker 2.
+P9-C: product journeys, tests and install verification — Worker 3.
+All three dispatch in parallel from the same base; write surfaces are pairwise-disjoint (P9-A: packages/web/**, packages/ui/src/payswap/**, packages/payswap-app/** (new), packages/desktop/src/**; P9-B: packages/desktop/{package.json,electron-builder.config.js,build/,scripts/,native/,dev-app-update.yml}, .github/workflows/{ci.yml,release.yml}, README.md, docs/installation/**; P9-C: packages/journey-verification/** (new), .github/workflows/journeys.yml (new), docs/customer-journeys/**). Cross-lane shapes are pinned by spec/productization/PRODUCT-IDENTITY.md + JOURNEY-MAP.md (the TL-authored contracts). Integration order: P9-A, then P9-B, then P9-C's suite green on the integrated tree; TL owns CI matrix, lockfile and MODULE-OWNERSHIP at integration.
