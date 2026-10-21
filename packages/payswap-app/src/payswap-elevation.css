@@ -13,12 +13,30 @@
 
 /* --------------------------- focus law (WCAG 2.4.7 / 2.4.11) ---------- */
 
+/*
+ * CASCADE LAW (fixup, found by Lane C's tier-1 suite): the inherited
+ * substrate stylesheet declares `*:focus, *:focus-visible { outline:
+ * none !important; box-shadow: none !important; }` GLOBALLY
+ * (packages/ui/src/styles.css — the ZCode shell's own ring system).
+ * A normal-specificity outline here is dead CSS against that reset, so
+ * the product focus law MUST carry !important within the product scope
+ * to win the cascade. Scoped to .ps-product-root only — the substrate
+ * shell keeps its own focus system outside the product surface.
+ */
 .ps-product-root a:focus-visible,
 .ps-product-root button:focus-visible,
 .ps-product-root [tabindex]:focus-visible {
-  outline: 2px solid var(--ps-focus);
-  outline-offset: 2px;
+  outline: 2px solid var(--ps-focus) !important;
+  outline-offset: 2px !important;
   border-radius: 6px;
+}
+
+/* The skip link surfaces on :focus (not :focus-visible) — restore it
+   under the same cascade law (its visibility IS the a11y contract). */
+.ps-product-root .ps-skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--ps-focus) !important;
+  outline-offset: 2px !important;
 }
 
 /* --------------------------- site chrome ------------------------------ */

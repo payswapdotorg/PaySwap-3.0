@@ -194,3 +194,22 @@ vite.config.ts, vitest.config.ts}` (wiring for the package seam),
 `packages/desktop/{package.json, electron-builder.config.js, build/,
 scripts/, native/, dev-app-update.yml}`, `.github/`, `README.md`, `docs/`
 (except this record), or `spec/`.
+
+---
+
+## 9. Fixup (TL-authored during acceptance, 2026-10-21)
+
+Lane C's tier-1 suite found a REAL defect in this lane's §5 WCAG
+self-assessment: the substrate stylesheet
+(`packages/ui/src/styles.css:~122`) declares `*:focus, *:focus-visible
+{ outline: none !important; box-shadow: none !important; }` GLOBALLY —
+the inherited ZCode ring system. Against that reset, this lane's
+normal-specificity focus law (`payswap-elevation.css` §focus) was DEAD
+CSS: the computed focus outline on product-surface elements was `none`.
+Fixup commit (on this branch, appended to the 5-commit protocol): the
+product-scope focus law now carries `!important` (scoped to
+`.ps-product-root` only — the substrate shell's own focus system is
+untouched outside the product surface) + the skip link's `:focus`
+restoration (it surfaces on `:focus`, not `:focus-visible`). The §5
+focus-visible rows are conditional on this fixup; Lane C's suite is the
+machine check (green on the merged tree).
