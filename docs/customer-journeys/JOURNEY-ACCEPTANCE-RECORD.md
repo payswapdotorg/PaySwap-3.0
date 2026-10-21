@@ -49,26 +49,38 @@ space; `@contract` tests gate at integration).
 
 | # | Journey | Contract route | Tier | Lane evidence (tier 1 @ e6ed008) | Integration gate (@contract) | VERDICT | Verdict evidence |
 |---|---|---|---|---|---|---|---|
-| J1 | First launch / getting started | `/` | 1 | first-launch.spec.ts (3 tests) | first-launch.spec.ts (2 @contract) | UNTESTED | — |
-| J2 | Overview (authenticated) | `/app` | 1 | journey-entry.spec.ts (3), navigation.spec.ts (1) | journey-entry.spec.ts (2), navigation.spec.ts (1) | UNTESTED | — |
-| J3 | Send / pay / move money | `/app` → payments | 1 | setup-required.spec.ts (3) | setup-required.spec.ts (1) | UNTESTED | — |
-| J4 | Receive money / recipients | `/app` → receive | 1 | setup-required.spec.ts (3) | setup-required.spec.ts (1) | UNTESTED | — |
-| J5 | Convert / compare routes & quotes | `/app` → convert | 1 | setup-required.spec.ts (3) | setup-required.spec.ts (1) | UNTESTED | — |
-| J6 | Merchant checkout / acceptance | `/app` → checkout | 1 | setup-required.spec.ts (3) | setup-required.spec.ts (1) | UNTESTED | — |
-| J7 | Activity / progress / receipts / reconciliation | `/app` → activity | 1 | error-unknown.spec.ts (3) | error-unknown.spec.ts (1) | UNTESTED | — |
-| J8 | Providers / capabilities / permissions | `/app` → connections; `/capabilities` | 1 | navigation.spec.ts (1), branding.spec.ts (2) | branding.spec.ts (1), accessibility.spec.ts (1) | UNTESTED | — |
-| J9 | Opportunities / Lab insights | `/app` → opportunities | 1 | journey-entry.spec.ts (eleven-area map) | (via the /app shell coverage) | UNTESTED | — |
-| J10 | Security / approvals / mandates | `/security`; `/app` → security | 1 | error-unknown.spec.ts (1), branding.spec.ts (2) | branding.spec.ts (1), accessibility.spec.ts (1) | UNTESTED | — |
-| J11 | Reports / history | `/app` → reports | 1 | journey-entry.spec.ts (eleven-area map) | (via the /app shell coverage) | UNTESTED | — |
-| J12 | Developer / API | `/developers` | 1 | navigation.spec.ts (1), branding.spec.ts (2) | branding.spec.ts (1), accessibility.spec.ts (1) | UNTESTED | — |
-| J13 | Settings / support / about | `/app` → settings; about | 1 | settings-about.spec.ts (1), branding.spec.ts (2) | settings-about.spec.ts (1), branding.spec.ts (1) | UNTESTED | — |
+| J1 | First launch / getting started | `/` | 1 | first-launch.spec.ts (3 tests) | first-launch.spec.ts (2 @contract) | PASS | TL run @ 9f09387 (43/1/0 full suite; the VERDICTS section) — first-launch specs: identity, hero, CTA, honest-gate note, zero console errors; re-run @ 4137bf6 (65/1/0) |
+| J2 | Overview (authenticated) | `/app` | 1 | journey-entry.spec.ts (3), navigation.spec.ts (1) | journey-entry.spec.ts (2), navigation.spec.ts (1) | PASS | TL run @ 9f09387 — eleven-area map behind the honest auth gate; designed-empty reasons verified |
+| J3 | Send / pay / move money | `/app` → payments | 1 | setup-required.spec.ts (3) | setup-required.spec.ts (1) | SETUP-REQUIRED | TL run @ 9f09387 — typed prerequisite rendered (economic intake unconfigured); the REQUIRED honest behavior, verified |
+| J4 | Receive money / recipients | `/app` → receive | 1 | setup-required.spec.ts (3) | setup-required.spec.ts (1) | SETUP-REQUIRED | TL run @ 9f09387 — same class, verified |
+| J5 | Convert / compare routes & quotes | `/app` → convert | 1 | setup-required.spec.ts (3) | setup-required.spec.ts (1) | SETUP-REQUIRED | TL run @ 9f09387 — same class, verified |
+| J6 | Merchant checkout / acceptance | `/app` → checkout | 1 | setup-required.spec.ts (3) | setup-required.spec.ts (1) | SETUP-REQUIRED | TL run @ 9f09387 — same class, verified |
+| J7 | Activity / progress / receipts / reconciliation | `/app` → activity | 1 | error-unknown.spec.ts (3) | error-unknown.spec.ts (1) | PASS (surface) / SETUP-REQUIRED (live data) | TL run @ 9f09387 — the not-found fix verified here; UNKNOWN≠FAILED copy present; no fabricated history |
+| J8 | Providers / capabilities / permissions | `/app` → connections; `/capabilities` | 1 | navigation.spec.ts (1), branding.spec.ts (2) | branding.spec.ts (1), accessibility.spec.ts (1) | PASS (coverage surface) / SETUP-REQUIRED (connections) | TL run @ 9f09387 — providers never listed connected without evidence, verified at providerCount 0 |
+| J9 | Opportunities / Lab insights | `/app` → opportunities | 1 | journey-entry.spec.ts (eleven-area map) | (via the /app shell coverage) | SETUP-REQUIRED | TL run @ 9f09387 — advisory-only labeling verified |
+| J10 | Security / approvals / mandates | `/security`; `/app` → security | 1 | error-unknown.spec.ts (1), branding.spec.ts (2) | branding.spec.ts (1), accessibility.spec.ts (1) | PASS | TL run @ 9f09387 — non-custody commitments surface verified |
+| J11 | Reports / history | `/app` → reports | 1 | journey-entry.spec.ts (eleven-area map) | (via the /app shell coverage) | SETUP-REQUIRED | TL run @ 9f09387 — designed-empty verified |
+| J12 | Developer / API | `/developers` | 1 | navigation.spec.ts (1), branding.spec.ts (2) | branding.spec.ts (1), accessibility.spec.ts (1) | PASS | TL run @ 9f09387 — MISSING runtime config displayed, not hidden — verified |
+| J13 | Settings / support / about | `/app` → settings; about | 1 | settings-about.spec.ts (1), branding.spec.ts (2) | settings-about.spec.ts (1), branding.spec.ts (1) | PASS | TL run @ 9f09387 — PaySwap identity + preserved upstream attribution verified (the attribution exemption is structural) |
 | J14 | Agent console (supporting capability) | `/console` | 2 | — (contract-only at base) | navigation.spec.ts (2); console-workspace.spec.ts, console-mission-lifecycle.spec.ts, console-honest-empties.spec.ts, console-advanced.spec.ts, console-a11y-responsive.spec.ts (P10-D lane @ 94f1445, flows 15-19) | PASS | TL run @ 4137bf6→94f1445 (web build, both viewports): 65 passed / 1 skipped / 0 failed incl. all console flows; the twelve evidence screenshots at test-results/evidence/ |
-| J15 | Legacy `/payswap/*` URLs | redirect | 2 | — (contract-only at base) | legacy-redirect.spec.ts (3) | UNTESTED | — |
+| J15 | Legacy `/payswap/*` URLs | redirect | 2 | — (contract-only at base) | legacy-redirect.spec.ts (3) | PASS | TL run @ 9f09387 — permanent redirects verified (all four legacy routes + unknown legacy); re-verified in the P10 run @ 4137bf6 (65/1/0) |
 
 The matrix's machine-checked mirror: `packages/journey-verification/
 journeys.manifest.ts` + `journeys.coverage.ts` + `specs/manifest.spec.ts`
 (the no-orphans cross-check — an orphan journey or an unjourneyed test
 fails the suite in both directions).
+
+**Cell-reconciliation note (TL, 2026-10-21, post-release audit):** the
+J1–J13 and J15 cells above were found still reading the skeleton's
+`UNTESTED` after the TL's runs had filled the VERDICTS section below —
+the stale cells UNDER-reported real verified state (the exact inverse
+of the never-fiati-green law; a stale cell is as dishonest as a fake
+one). Reconciled to the VERDICTS section's own evidence; vocabulary
+maps one-to-one (the section's "COMPLETE" is this legend's "PASS";
+"SETUP-REQUIRED (honest)" is "SETUP-REQUIRED"). The honest totals
+after reconciliation: 9 PASS / 6 SETUP-REQUIRED / 0 FAIL — never wholly
+green, exactly as the record's law requires (the six honest
+unavailables are the typed prerequisites, verified as such).
 
 ---
 
@@ -82,11 +94,11 @@ for the honest state of the suite at the base — they are NOT verdicts
 <!-- P9-C-BATTERY-RECEIPTS: filled by the lane worker at 4/4 — see
      docs/productization-evidence/P9-C-VERIFICATION-RECORD.md -->
 
-- [ ] one-shot web build (`vite build --minify false --sourcemap false`): _FILL_
-- [ ] `playwright test --grep-invert @contract` (tier 1): _FILL — files/tests passed_
-- [ ] `tsc --noEmit` (typecheck): _FILL_
-- [ ] YAML validity of `.github/workflows/journeys.yml`: _FILL_
-- [ ] screenshots sample: `docs/customer-journeys/lane-receipts/` _FILL_
+- [x] one-shot web build (`vite build --minify false --sourcemap false`): exit 0 (webServer one-shot, OOM law)
+- [x] `playwright test --grep-invert @contract` (tier 1): **28 passed / 1 skipped / 0 failed** (41.5s; both projects; the one tier-1 failure found at first run — the global focus-outline cascade defect — was root-caused, fixed in Lane A's surface and honestly retagged `@contract`, §2 of the P9-C record)
+- [x] `tsc --noEmit` (typecheck): exit 0 (after the strict-mode fix)
+- [x] YAML validity of `.github/workflows/journeys.yml`: valid (after the plain-scalar colon fix)
+- [x] screenshots sample: the lane's failure-screenshot config (list+HTML+JSON reporters) captured none in the final green run — the durable screenshot evidence is the TL's evidence sets (`delivery/p9-screenshots/` nine web shots + boot receipt; the P10 twelve at `test-results/evidence/` + six desktop-packaged at `delivery/p10-screenshots/`); the `lane-receipts/` path named by the skeleton checklist was never created — receipts live in `docs/productization-evidence/P9-C-VERIFICATION-RECORD.md` §3 (this fill, 2026-10-21)
 
 ## 4. The tier-2 integration gate (what the TL runs)
 
