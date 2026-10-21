@@ -220,7 +220,7 @@ TL's manual browser verification of the same tree.
 | J11 reports/history | **SETUP-REQUIRED (honest)** | designed-empty verified |
 | J12 developer/API | **COMPLETE** | MISSING runtime config displayed, not hidden — verified |
 | J13 settings/about | **COMPLETE** | PaySwap identity + preserved upstream attribution verified (the attribution exemption is structural) |
-| J14 agent console (supporting) | **COMPLETE** (P10: the Agent Workspace) | the PaySwap Agent Workspace verified at `/console`: PaySwap chrome + the eight-section navigation (zero ZCode branding), mission lifecycle real in the browser (intake findings → draft → intent-review → ladder with verbatim typed prerequisites → events → revise → archive, persisted across reload), honest empties (agents/approvals/activity/lab/connections no-provider), advanced developer workspace at `/console/advanced`, axe-critical + keyboard/focus/reduced-motion + mobile 390×844 green; desktop `#/console` mount verified by node/component batteries (the seam + tri-state routing + channel client); the desktop GUI inspection rides the v1.1.0 release (recorded below) |
+| J14 agent console (supporting) | **COMPLETE** (P10: the Agent Workspace) | the PaySwap Agent Workspace verified at `/console`: PaySwap chrome + the eight-section navigation (zero ZCode branding), mission lifecycle real in the browser (intake findings → draft → intent-review → ladder with verbatim typed prerequisites → events → revise → archive, persisted across reload), honest empties (agents/approvals/activity/lab/connections no-provider), advanced developer workspace at `/console/advanced`, axe-critical + keyboard/focus/reduced-motion + mobile 390×844 green; desktop `#/console` mount verified by node/component batteries (the seam + tri-state routing + channel client); the desktop packaged-GUI inspection completed at v1.1.0 — CI install-verify 39641600925 + the station published-asset console check both PASS (the "P10 RELEASE VERIFICATION" section below; the desktop-packaged mission-intake flow executed through the durable store, six screenshots 13–18) |
 | J15 legacy /payswap URLs | **COMPLETE** | permanent redirects verified (all four legacy routes + unknown legacy) |
 
 **The four productization gates (PRODUCT-IDENTITY §6) at this commit:**
@@ -230,18 +230,21 @@ TL's manual browser verification of the same tree.
   suite's keyboard/focus/reduced-motion assertions, post-cascade-fix);
   zero ZCode product branding in normal surfaces (the structural
   attribution exemption documented); attribution preserved.
-- **GitHub installer published: ✓ (v1.0.1, 12:49:51Z)** — the public
+- **GitHub installer published: ✓ (v1.0.1, 12:49:51Z; superseded by v1.1.0, 17:16:06Z)** — the public
   versioned release with tested Ubuntu x86_64 assets + SHA-256
   checksums; README links tested (all 200, checksum-matching). v1.0.0
   stays visible as a prerelease with the do-not-use warning (nothing
   deleted, nothing hidden). Full story:
-  `docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`.
-- **clean-install verified: ✓ (v1.0.1)** — the CI install-verify
+  `docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`;
+  the v1.1.0 receipts are in the P10 ADDENDUM below.
+- **clean-install verified: ✓ (v1.0.1; re-verified at v1.1.0)** — the CI install-verify
   receipt (run 39601882563): checksums → apt-get dependency-resolving
   install → identity assertions → Xvfb launch → **PaySwap-branded
   window** → dpkg -r cleanup → AppImage structure+checksum: PASS; plus
   the station's published-asset GUI contrast run (v1.0.0 = no window,
-  v1.0.1 = window 'PaySwap').
+  v1.0.1 = window 'PaySwap'). The v1.1.0 equivalents: CI receipt
+  39641600925 + the station published-asset console check (P10 ADDENDUM
+  below).
 - **core journeys verified: ✓ (web)** — this matrix, at 9f09387. The
   DESKTOP journey verification (packaged app flows) rides the release
   verification (CI install job + operator acceptance) — honestly
@@ -301,3 +304,58 @@ station published-asset check), exactly as the P9 desktop gates did.
 The mission store holds demand-side intent only; no execution,
 approval or observation plane exists in this deployment, and every
 such state renders its typed prerequisite (CONSOLE-WORKSPACE §4).
+
+---
+
+## P10 RELEASE VERIFICATION — v1.1.0 (TL-filled, 2026-10-21, the "recorded below" promise)
+
+The v1.1.0 release (tag `d87834e`, published 17:16:06Z) carries the
+Agent Workspace. Its verification, both halves:
+
+- **CI install-verify (run 39641600925, on the tag): PASS** —
+  published-asset checksums verified (deb
+  `613dfb12…`, AppImage `142251cd…`); apt-get dependency-resolving
+  install; identity assertions (desktop entry Name=PaySwap, package
+  `payswap`, icon, exec binary); app-data path `~/.config/PaySwap`;
+  **Xvfb launch: PaySwap-branded window ok (payswap | PaySwap)**;
+  AppImage structure+checksum; dpkg -r cleanup.
+- **Station published-asset check (TL, this record's companion
+  receipt `delivery/p10-screenshots/desktop-packaged-receipt.json`):
+  PASS** — the published AppImage re-downloaded and sha256-verified
+  byte-exact, re-extracted from the verified file
+  (`X-AppImage-Version=1.1.0`), and launched under Xvfb with CDP:
+  - the force-update gate renders **inert** in the published build
+    ("no PaySwap update authority is configured — the startup
+    force-update gate stays inert" — the v1.0.1 fix confirmed in
+    production); the main window is created (app-ready, dom-ready);
+  - `#/console` renders the **PaySwap Agent Console** — title
+    "PaySwap — Agent Console", brand PaySwap, all eight sections,
+    honest empties; the PaySwap product home carries the discoverable
+    "Agent console" entry;
+  - the **mission-intake flow executed in the packaged app** through
+    the durable DESKTOP_PROFILE store: goal + direction MOVE →
+    structural validation clean → intent review ("Nothing downstream
+    is reachable; the ladder states each typed prerequisite") →
+    record intent → mission detail with the ladder (INTENT
+    Reached/confirmed; ELIGIBILITY/PLANNING/APPROVAL/EXECUTION/
+    OBSERVATION/EVIDENCE each "Not reached — prerequisite" with its
+    typed reason) — persisted at
+    `~/.config/PaySwap/workspace/workspace-store.json` (mission-1,
+    INTENT_RECORDED, events CREATED + INTENT_VALIDATED);
+  - connections renders the honest no-provider state verbatim;
+    returning the hash to `#/` restores the PaySwap product surface
+    **without a renderer reload** (same document, hash-only
+    navigation);
+  - six desktop-packaged evidence screenshots (13–18) mirror the
+    browser set in `delivery/p10-screenshots/`; two (home, mission
+    ladder) additionally verified visually.
+- **Post-tag fix `8ab034d`** (the packaging-identity law test's
+  version literal + README current-release links, caught by journeys
+  run #12 on the tag — the artifacts themselves were green): CI #55 +
+  journeys #13 both success on the fix commit. The release artifacts
+  are unaffected (built from the tag `d87834e`).
+- **Honest observations:** the ZCode substrate keeps internal runtime
+  paths under `~/.zcode/v2` (crash staging, hardware-accel setting) —
+  documented substrate carry, not PaySwap product data; benign
+  headless-container noise (dbus, xdg-mime) in the station launch
+  log.
