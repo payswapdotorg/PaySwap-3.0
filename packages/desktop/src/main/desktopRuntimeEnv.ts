@@ -561,6 +561,11 @@ export function buildHostProcessEnv(hostProcessLocalEnv: Record<string, string>)
     [ZCODE_APP_VERSION_ENV]: ZCODE_VERSION,
     ...(dataBaseDir !== homedir() ? { ZCODE_DATA_BASE_DIR: dataBaseDir } : {}),
     ...(windowsAppInstallDir ? { [ZCODE_WINDOWS_APP_INSTALL_DIR_ENV]: windowsAppInstallDir } : {}),
+    // P10-B：PaySwap Agent Console 的 DESKTOP_PROFILE workspace store 快照目录。
+    // Host 进程没有 Electron app 对象，InitLocal 消息的 zod schema 也归 @zcode/shared 管，
+    // 所以路径只能沿既有的 main→host 路径注入模式走 env（同 ZCODE_WINDOWS_APP_INSTALL_DIR）。
+    // Host 侧读取点：src/host/index.ts 的 registerPaySwapDesktopService（P10-B）。
+    PAYSWAP_WORKSPACE_STORE_DIR: join(getElectronAppPath("userData"), "workspace"),
     ...(bundledCuaHelperAppPath
       ? { [ZCODE_CUA_BUNDLED_HELPER_APP_PATH_ENV]: bundledCuaHelperAppPath }
       : {}),

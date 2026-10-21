@@ -31,11 +31,21 @@
  */
 
 /** The pin-set version for the PaySwap Desktop product (bumps on any pin change). */
-export const PAYSWAP_DESKTOP_PIN_SET_VERSION = "1.0.0" as const;
+export const PAYSWAP_DESKTOP_PIN_SET_VERSION = "1.1.0" as const;
 
 /** The PaySwap 3.0 base commit whose accepted contracts this pin set mirrors. */
 export const PAYSWAP_DESKTOP_PIN_SOURCE_COMMIT =
   "2999bbb1658443b72ce9644f32cabbebdbecaa37" as const;
+
+/**
+ * The commit the console workspace contract family (Phase 10,
+ * spec/surface/CONSOLE-WORKSPACE.md §3/§5) was read from: the TL's
+ * cross-lane seam stub registration (packages/payswap-app/src/console/
+ * PaySwapAgentWorkspace.tsx pins the shapes byte-exact; lane P10-A
+ * mirrors the same shapes into @payswap/surface).
+ */
+export const PAYSWAP_CONSOLE_WORKSPACE_PIN_SOURCE_COMMIT =
+  "645a56c2fe8b6580370da4d14ff435f1414a3c82" as const;
 
 /** One structural pin's provenance record. */
 export interface PaySwapContractPin {
@@ -143,13 +153,32 @@ export const PAYSWAP_DESKTOP_PINS: readonly PaySwapContractPin[] = Object.freeze
     mirrors:
       "the execution result envelope (CONFIRMED/UNKNOWN/FAILED with ambiguity reasons), AuthorizedCommand (opaque authorization in) and the SANDBOX/LIVE execution-mode law",
   },
+  {
+    pinId: "surface.console-mission-intake",
+    mirroredPackage: "@payswap/surface",
+    mirroredVersion: "1.0.0",
+    sourceCommit: PAYSWAP_CONSOLE_WORKSPACE_PIN_SOURCE_COMMIT,
+    workOrder: "P10-B",
+    mirrors:
+      "the console workspace mission vocabulary (spec/surface/CONSOLE-WORKSPACE.md §3: MissionIntakeInput/Direction/Status/Event/Record/Summary/Detail shapes, the closed event-kind and lifecycle-rung vocabularies, the intake field bounds, and the §4 typed-prerequisite ladder strings verbatim), as registered by the TL cross-lane seam stub",
+  },
+  {
+    pinId: "surface.console-workspace-store",
+    mirroredPackage: "@payswap/surface",
+    mirroredVersion: "1.0.0",
+    sourceCommit: PAYSWAP_CONSOLE_WORKSPACE_PIN_SOURCE_COMMIT,
+    workOrder: "P10-B",
+    mirrors:
+      "the console workspace store port (spec/surface/CONSOLE-WORKSPACE.md §5: WorkspaceStoreDurability labels and the closed port method set — the only mutation surface for demand-side mission intent; the store holds no financial truth, no authorization, no capability state)",
+  },
 ] as const);
 
 /** The pin-set provenance carried by every desktop product view. */
 export interface DesktopPinProvenance {
   readonly pinSetVersion: typeof PAYSWAP_DESKTOP_PIN_SET_VERSION;
   readonly sourceCommit: typeof PAYSWAP_DESKTOP_PIN_SOURCE_COMMIT;
-  readonly workOrder: "P7-W2";
+  /** The work order that last extended the pin set (older pins keep their own). */
+  readonly workOrder: "P7-W2" | "P10-B";
 }
 
 /** The provenance stamped on every PaySwap Desktop product view. */
