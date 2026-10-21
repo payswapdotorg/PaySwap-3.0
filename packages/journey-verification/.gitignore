@@ -1,0 +1,3 @@
+# test artifacts (screenshots-on-failure + JSON/HTML reports)
+test-results/
+playwright-report/

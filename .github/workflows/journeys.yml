@@ -1,0 +1,79 @@
+# PaySwap 3.0 — journeys (workspace-dependent test coverage)
+#
+# WHY THIS WORKFLOW EXISTS (GitHub Issue #1 directive): the hermetic
+# package matrix in ci.yml covers ONLY self-contained packages — the
+# workspace-dependent test packages (@zcode/ui, @zcode/web,
+# @zcode/desktop) and the browser journey suite are documented there as
+# uncovered ("no fake steps invented for them"). This workflow closes
+# that gap: one job, full workspace install, the three
+# workspace-dependent package suites + the @payswap/journey-verification
+# Playwright acceptance suite (the J1–J15 journey map). It COMPLEMENTS
+# ci.yml — it does not replace any lane of it.
+#
+# The TL owns ci.yml; any matrix change proposed for it goes through the
+# journey acceptance record, never through this file.
+#
+# TIER NOTE: `pnpm --filter @payswap/journey-verification test` runs the
+# FULL suite — tier-1 (base-green /payswap/* flows) AND the tier-2
+# @contract tests authored against the P9-A route contract. The
+# contract tests gate green exactly when the P9-A route space is merged;
+# until then they fail honestly (they are never faked green).
+#
+# LOCKFILE NOTE (single-writer law): the @payswap/journey-verification
+# importer must be present in pnpm-lock.yaml for the frozen install to
+# succeed — the TL adds it at integration (as with every new package).
+
+name: journeys
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: journeys-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  workspace-journeys:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install (full workspace, frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: UI package suite (@zcode/ui — workspace-dependent)
+        run: pnpm --filter @zcode/ui test
+
+      - name: Web package suite (@zcode/web — workspace-dependent)
+        run: pnpm --filter @zcode/web test
+
+      - name: Desktop package suite (@zcode/desktop — workspace-dependent)
+        run: pnpm --filter @zcode/desktop test
+
+      - name: Install Playwright chromium (scoped to the journey package)
+        run: pnpm --filter @payswap/journey-verification exec playwright install chromium --with-deps
+
+      - name: "Journey acceptance suite (@payswap/journey-verification full: tier 1 + @contract tier 2)"
+        run: pnpm --filter @payswap/journey-verification test
+
+      - name: Archive journey evidence (HTML + JSON reports, failure screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: journey-verification-reports
+          path: |
+            packages/journey-verification/playwright-report
+            packages/journey-verification/test-results
+          retention-days: 14
