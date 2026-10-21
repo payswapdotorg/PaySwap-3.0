@@ -42,6 +42,30 @@ export {
   type PaySwapNavigation,
 } from "./shell/navigation.js";
 
+// The PaySwap Agent Workspace (console surface, Phase 10 —
+// spec/surface/CONSOLE-WORKSPACE.md). The component + port types are the
+// cross-lane seam the desktop renderer mount and the web console mount
+// compile against; P10-C owns the implementation under src/console/.
+export {
+  PaySwapAgentWorkspace,
+  type PaySwapAgentWorkspaceProps,
+  type MissionDetail,
+  type MissionDraftStatus,
+  type MissionEvent,
+  type MissionEventKind,
+  type MissionIntakeInput,
+  type MissionIntentDirection,
+  type MissionLifecycleRung,
+  type MissionAmountSpec,
+  type MissionRecord,
+  type MissionRungState,
+  type MissionStructuralValidation,
+  type MissionSummary,
+  type ModelProviderStatus,
+  type WorkspaceStoreDurability,
+  type WorkspaceStorePort,
+} from "./console/PaySwapAgentWorkspace.js";
+
 // The honest harness facts (the deployment truth this repository phase).
 export {
   HONEST_DEPLOYMENT_CONTEXT,

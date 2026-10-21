@@ -21,6 +21,14 @@ cross-lane law); P10-D records the journeys, evidence and
 the J14 acceptance verdict. The TypeScript shapes in §3/§5 are PINNED
 byte-exact — every lane implements to these shapes; drift is a defect.
 
+Cross-lane compile seam: `packages/payswap-app/src/console/`
+`PaySwapAgentWorkspace.tsx` is registered by the TL as a STUB carrying
+the pinned §3/§5 shapes + the component props
+(`navigation` in the "/console/…" path space, `store`, `backToProduct`,
+optional `modelProviders`). P10-C replaces the stub implementation
+keeping the exported names stable; P10-B's mounts import those names —
+every lane branch compiles green in isolation.
+
 ## 1. Position and identity law
 
 The Agent Workspace is the console surface of PaySwap — a SUPPORTING
