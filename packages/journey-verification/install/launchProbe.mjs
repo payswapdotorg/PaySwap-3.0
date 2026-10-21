@@ -4,10 +4,13 @@
  * --launch half of install-verify.mjs; extracted to keep the runner under
  * the repository max-lines lint gate).
  *
- * Launches the installed desktop binary DETACHED (directly under a
- * display, or wrapped in xvfb-run when no display exists — a blocking
- * spawn would kill the app before the window poll could observe it, the
- * second v1.0.1 CI lesson) and asserts, while the app runs:
+ * Starts (or reuses) a display the PROBE owns: when no DISPLAY exists
+ * the probe starts its own Xvfb on a chosen display number and shares it
+ * with BOTH the app and xdotool (the third v1.0.1 CI lesson: xvfb-run -a
+ * allocates a private display the probe's xdotool cannot see — every
+ * poll ran display-less and found nothing). The app is spawned DETACHED
+ * (a blocking spawn would kill it before the window poll could observe
+ * it, the second lesson) and asserts, while the app runs:
  *   - the productName-derived app-data path ~/.config/PaySwap appears;
  *   - a REAL window with a PaySwap WM_CLASS + a PaySwap title exists
  *     (xdotool, polled; matched on BOTH the WM_CLASS class ('PaySwap')
@@ -29,31 +32,59 @@ import os from "node:os";
 const WINDOW_POLL_TIMEOUT_MS = 30_000;
 const WINDOW_POLL_INTERVAL_MS = 1_000;
 
-function probeRun(command, args) {
-  const result = spawnSync(command, args, { encoding: "utf8" });
+function probeRun(command, args, env) {
+  const result = spawnSync(command, args, { encoding: "utf8", ...(env ? { env } : {}) });
   return {
     status: result.status,
     stdout: (result.stdout ?? "").trim(),
   };
 }
 
-export function resolveLaunchWrapper() {
-  if (process.env.DISPLAY || process.env.WAYLAND_DISPLAY) {
-    return { supported: true, wrapper: null };
-  }
-  const xvfb = probeRun("which", ["xvfb-run"]);
-  if (xvfb.status === 0) {
-    return { supported: true, wrapper: xvfb.stdout };
-  }
-  return { supported: false, wrapper: null };
-}
-
 function xdotoolAvailable() {
   return probeRun("which", ["xdotool"]).status === 0;
 }
 
+function xvfbBinaryAvailable() {
+  return probeRun("which", ["Xvfb"]).status === 0;
+}
+
+function sleepSync(seconds) {
+  probeRun("sleep", [`${seconds}`]);
+}
+
+/**
+ * Own the display: reuse the ambient one when present, otherwise start
+ * our own Xvfb on a PID-derived display number and wait for its socket.
+ * Returns { supported, display, xvfbChild } — the app AND xdotool both
+ * run against `display`.
+ */
+function ensureProbeDisplay() {
+  if (process.env.DISPLAY || process.env.WAYLAND_DISPLAY) {
+    return { supported: true, display: process.env.DISPLAY, xvfbChild: null };
+  }
+  if (!xvfbBinaryAvailable()) {
+    return { supported: false, display: null, xvfbChild: null };
+  }
+  const displayNumber = 90 + (process.pid % 9);
+  const display = `:${displayNumber}`;
+  const xvfbChild = spawn(
+    "Xvfb",
+    [display, "-screen", "0", "1280x1024x24"],
+    { detached: true, stdio: "ignore" },
+  );
+  xvfbChild.unref();
+  const socketPath = `/tmp/.X11-unix/X${displayNumber}`;
+  for (let attempt = 0; attempt < 25; attempt += 1) {
+    if (existsSync(socketPath)) {
+      return { supported: true, display, xvfbChild };
+    }
+    sleepSync(0.2);
+  }
+  return { supported: false, display: null, xvfbChild };
+}
+
 /** All window ids whose WM_CLASS matches payswap in either field. */
-function searchPaySwapWindowIds() {
+function searchPaySwapWindowIds(displayEnv) {
   const ids = new Set();
   // WM_CLASS is (instance, class): electron sets instance to the
   // executable name ('payswap') and class to the product name
@@ -64,7 +95,7 @@ function searchPaySwapWindowIds() {
     ["search", "--class", "payswap"],
     ["search", "--class", "Payswap"],
   ]) {
-    const search = probeRun("xdotool", args);
+    const search = probeRun("xdotool", args, displayEnv);
     if (search.status === 0 && search.stdout) {
       for (const id of search.stdout.split(/\s+/).filter(Boolean)) {
         ids.add(id);
@@ -74,10 +105,10 @@ function searchPaySwapWindowIds() {
   return [...ids];
 }
 
-function snapshotPaySwapWindows() {
+function snapshotPaySwapWindows(displayEnv) {
   const windows = [];
-  for (const id of searchPaySwapWindowIds()) {
-    const name = probeRun("xdotool", ["getwindowname", id]);
+  for (const id of searchPaySwapWindowIds(displayEnv)) {
+    const name = probeRun("xdotool", ["getwindowname", id], displayEnv);
     windows.push({ id, name: name.status === 0 ? name.stdout : "(name unavailable)" });
   }
   return windows;
@@ -87,13 +118,11 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function launchDetached(execBinary, extraArgs, wrapper) {
-  const command = wrapper ?? execBinary;
-  const args = wrapper ? ["-a", execBinary, ...extraArgs] : [...extraArgs];
-  const child = spawn(command, args, {
+function launchDetached(execBinary, extraArgs, display) {
+  const child = spawn(execBinary, extraArgs, {
     detached: true,
     stdio: "ignore",
-    env: { ...process.env },
+    env: { ...process.env, DISPLAY: display },
   });
   child.unref();
   return child;
@@ -105,16 +134,16 @@ function launchDetached(execBinary, extraArgs, wrapper) {
  * runner owns the exit protocol.
  */
 export async function collectLaunchFindings({ execBinary, receipt }) {
-  const launchSupport = resolveLaunchWrapper();
-  if (!launchSupport.supported) {
+  const probeDisplay = ensureProbeDisplay();
+  if (!probeDisplay.supported) {
     return {
       unsupported: true,
       findings: [
-        "--launch requested but no display and no xvfb-run are available. Launch verification requires a display environment — run on a desktop host or under xvfb-run.",
+        "--launch requested but no display and no Xvfb are available. Launch verification requires a display environment — run on a desktop host or with Xvfb installed.",
       ],
     };
   }
-  const wrapper = launchSupport.wrapper;
+  const displayEnv = { ...process.env, DISPLAY: probeDisplay.display };
   const home = os.homedir();
   const dataDir = join(home, ".config", "PaySwap");
   const before = existsSync(dataDir);
@@ -122,8 +151,10 @@ export async function collectLaunchFindings({ execBinary, receipt }) {
 
   const findings = [];
   let launchNote = null;
-  let child = launchDetached(execBinary, [], wrapper);
-  console.error(`[install-verify] launching ${execBinary} (wrapper: ${wrapper ?? "direct display"}, pid ${child.pid})…`);
+  let child = launchDetached(execBinary, [], probeDisplay.display);
+  console.error(
+    `[install-verify] launching ${execBinary} (display ${probeDisplay.display}, pid ${child.pid})…`,
+  );
 
   const deadline = Date.now() + WINDOW_POLL_TIMEOUT_MS;
   let sawEarlyExit = false;
@@ -135,7 +166,7 @@ export async function collectLaunchFindings({ execBinary, receipt }) {
     await sleep(WINDOW_POLL_INTERVAL_MS);
     dataDirAppeared = dataDirAppeared || existsSync(dataDir);
     if (hasXdotool) {
-      windows = snapshotPaySwapWindows();
+      windows = snapshotPaySwapWindows(displayEnv);
       if (windows.length > 0) {
         break;
       }
@@ -150,7 +181,7 @@ export async function collectLaunchFindings({ execBinary, receipt }) {
         retried = true;
         launchNote = `first launch exited early (code ${child.exitCode ?? child.signalCode}); retried with --no-sandbox`;
         console.error(`[install-verify] ${launchNote}`);
-        child = launchDetached(execBinary, ["--no-sandbox"], wrapper);
+        child = launchDetached(execBinary, ["--no-sandbox"], probeDisplay.display);
       }
     }
   }
@@ -190,7 +221,7 @@ export async function collectLaunchFindings({ execBinary, receipt }) {
     receipt.assertions.push(`launch: ${launchNote}`);
   }
 
-  // Cleanup: kill the detached process group (xvfb-run + app).
+  // Cleanup: kill the detached app process group, then our Xvfb.
   try {
     if (child.exitCode === null && child.signalCode === null) {
       process.kill(-child.pid, "SIGTERM");
@@ -200,6 +231,17 @@ export async function collectLaunchFindings({ execBinary, receipt }) {
       child.kill("SIGTERM");
     } catch {
       // already gone
+    }
+  }
+  if (probeDisplay.xvfbChild) {
+    try {
+      process.kill(-probeDisplay.xvfbChild.pid, "SIGTERM");
+    } catch {
+      try {
+        probeDisplay.xvfbChild.kill("SIGTERM");
+      } catch {
+        // already gone
+      }
     }
   }
 
