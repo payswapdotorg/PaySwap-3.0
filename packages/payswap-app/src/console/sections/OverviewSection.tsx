@@ -16,9 +16,11 @@ import type { ConsoleSectionRecord } from "../contracts.js";
 import type { PaySwapNavigation } from "../../shell/navigation.js";
 import { ProductLink } from "../../shell/ProductLink.js";
 import {
+  OVERVIEW_ALL_ARCHIVED_STATE,
   OVERVIEW_ATTENTION,
   OVERVIEW_EMPTY_STATE,
 } from "../section-vocabulary.js";
+import type { MissionSummary } from "../contracts.js";
 import type { WorkspaceStoreBinding } from "../useWorkspaceStore.js";
 import {
   ConsoleEmptyStateView,
@@ -29,6 +31,24 @@ import {
 
 /** The §6 overview activity cap. */
 export const OVERVIEW_ACTIVITY_CAP = 20;
+
+/**
+ * In-progress order (the §6 fold law, matching the P10-A
+ * foldWorkspaceOverview): newest-updated first, id ascending as the
+ * deterministic tie-break — never the adapter's incidental order.
+ */
+export function orderInProgressMissions(
+  summaries: readonly MissionSummary[],
+): readonly MissionSummary[] {
+  return summaries
+    .filter((mission) => mission.status !== "ARCHIVED")
+    .slice()
+    .sort(
+      (a, b) =>
+        (a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : 0) ||
+        (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+    );
+}
 
 function MissionStatusPill({ status }: { readonly status: string }) {
   if (status === "INTENT_RECORDED") {
@@ -51,7 +71,13 @@ export function OverviewSection({
 }) {
   const { list, activity } = workspace;
   const inProgress =
-    list.phase === "ready" ? list.summaries.filter((m) => m.status !== "ARCHIVED") : [];
+    list.phase === "ready" ? orderInProgressMissions(list.summaries) : [];
+  // The honest two-reason empty state (§6): zero missions is a different
+  // fact from every-mission-archived — the reason must not lie either way.
+  const emptySpec =
+    list.phase === "ready" && list.summaries.length > 0
+      ? OVERVIEW_ALL_ARCHIVED_STATE
+      : OVERVIEW_EMPTY_STATE;
 
   return (
     <SectionScaffold section={section}>
@@ -82,9 +108,13 @@ export function OverviewSection({
           <ErrorBlock error={list.error} onRetry={() => void workspace.reload()} />
         ) : inProgress.length === 0 ? (
           <ConsoleEmptyStateView
-            spec={OVERVIEW_EMPTY_STATE}
+            spec={emptySpec}
             navigation={navigation}
-            title="No missions yet — the honest state"
+            title={
+              emptySpec === OVERVIEW_ALL_ARCHIVED_STATE
+                ? "No missions in progress — the honest state"
+                : "No missions yet — the honest state"
+            }
           />
         ) : (
           <ul className="ps-console-mission-list">

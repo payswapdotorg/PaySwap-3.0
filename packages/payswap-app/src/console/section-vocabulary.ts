@@ -49,6 +49,23 @@ export const OVERVIEW_EMPTY_STATE: ConsoleEmptyStateSpec = {
   },
 };
 
+/**
+ * overview — the honest reason when missions EXIST but every one is
+ * archived: "no missions exist yet" would be a lie (records exist), so
+ * the typed reason states what is true (nothing in progress). The §6
+ * two-reason reading, matching the P10-A fold (foldWorkspaceOverview
+ * distinguishes records.length === 0 from the all-archived case).
+ */
+export const OVERVIEW_ALL_ARCHIVED_STATE: ConsoleEmptyStateSpec = {
+  reason:
+    "No missions are in progress — every recorded mission is archived. Archived records stay readable in the Missions section; nothing here is invented in their place.",
+  nextAction: {
+    kind: "console-section",
+    target: "missions",
+    label: "Open the missions list",
+  },
+};
+
 /** missions — the empty list state (the intake is on the page). */
 export const MISSIONS_EMPTY_STATE: ConsoleEmptyStateSpec = {
   reason:

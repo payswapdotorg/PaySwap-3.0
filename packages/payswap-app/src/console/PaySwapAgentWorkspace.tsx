@@ -39,6 +39,7 @@ import {
   CONSOLE_ROOT,
   consoleDocumentTitle,
   consoleSection,
+  isConsoleAdvancedPath,
   resolveConsoleSection,
 } from "./contracts.js";
 import {
@@ -91,6 +92,7 @@ export {
   consoleSection,
   consoleSectionPath,
   consoleDocumentTitle,
+  isConsoleAdvancedPath,
   resolveConsoleSection,
 } from "./contracts.js";
 
@@ -221,7 +223,8 @@ export function PaySwapAgentWorkspace({
       <div className="ps-console-shell">
         <ConsoleSidebar activeSectionId={activeSectionId} navigation={navigation} />
         <main id="ps-console-main" tabIndex={-1} className="ps-console-main">
-          {route.kind === "overview" ? (
+          {route.kind === "overview" ||
+          (route.kind === "section" && route.sectionId === "overview") ? (
             <OverviewSection
               section={sectionById("overview")}
               workspace={workspace}
@@ -261,7 +264,11 @@ export function PaySwapAgentWorkspace({
             <LabSection section={sectionById("lab")} />
           ) : null}
           {route.kind === "section" && route.sectionId === "settings" ? (
-            <SettingsSection section={sectionById("settings")} durability={store.durability} />
+            <SettingsSection
+              section={sectionById("settings")}
+              durability={store.durability}
+              navigation={navigation}
+            />
           ) : null}
           {route.kind === "not-found" ? (
             <ConsoleNotFound path={route.path} navigation={navigation} backToProduct={backToProduct} />

@@ -55,6 +55,11 @@ export function SectionScaffold({
  * the vocabulary spec — a console-section route, an in-page anchor, or
  * the product surface via the mount's back affordance. Never a dead
  * button, never a fabricated row.
+ *
+ * In-page actions scroll to the on-page anchor through a BUTTON, never a
+ * `href="#…"` link: on the desktop mount the document hash IS the route
+ * (a plain hash link would corrupt "#/console" into the anchor id and
+ * navigate the renderer away from the workspace — §2's no-reload law).
  */
 export function ConsoleEmptyStateView({
   spec,
@@ -79,10 +84,21 @@ export function ConsoleEmptyStateView({
       </ProductLink>
     );
   } else if (spec.nextAction.kind === "in-page") {
+    const anchor = spec.nextAction.target;
     action = (
-      <a href={`#${spec.nextAction.target}`} className="ps-console-action">
+      <button
+        type="button"
+        className="ps-console-action ps-console-action--primary"
+        onClick={() => {
+          // Scroll, never navigate: the target is on this page. (The
+          // optional call keeps non-visual test environments honest.)
+          if (typeof document !== "undefined") {
+            document.getElementById(anchor)?.scrollIntoView?.({ block: "start" });
+          }
+        }}
+      >
         {spec.nextAction.label}
-      </a>
+      </button>
     );
   } else if (backToProduct !== undefined) {
     action = (

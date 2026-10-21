@@ -6,8 +6,9 @@
  * store durability fact for THIS mount (label per durability — the
  * browser profile is honestly labeled "stored in this browser profile
  * only"); and the advanced developer-workspace entry (clearly labeled,
- * secondary — an anchored reference to /console/advanced, the upstream
- * platform's developer interface the mounts route to).
+ * secondary — routed through the injected navigation adapter so the
+ * platform mount resolves /console/advanced WITHOUT a renderer reload:
+ * desktop hash switch, web history push — §2's navigation law).
  */
 
 import { Card, KeyValue } from "@zcode/ui/payswap";
@@ -18,14 +19,18 @@ import {
   PAYSWAP_IDENTITY,
   storeDurabilityLabel,
 } from "../section-vocabulary.js";
+import type { PaySwapNavigation } from "../../shell/navigation.js";
+import { ProductLink } from "../../shell/ProductLink.js";
 import { SectionScaffold } from "./shared.js";
 
 export function SettingsSection({
   section,
   durability,
+  navigation,
 }: {
   readonly section: ConsoleSectionRecord;
   readonly durability: WorkspaceStoreDurability;
+  readonly navigation: PaySwapNavigation;
 }) {
   const storeLabel = storeDurabilityLabel(durability);
   return (
@@ -69,9 +74,13 @@ export function SettingsSection({
         </h2>
         <Card className="ps-console-card">
           <p className="ps-console-line">
-            <a className="ps-console-action" href={ADVANCED_DEVELOPER_ENTRY.path}>
+            <ProductLink
+              to={ADVANCED_DEVELOPER_ENTRY.path}
+              navigation={navigation}
+              className="ps-console-action"
+            >
               {ADVANCED_DEVELOPER_ENTRY.label}
-            </a>
+            </ProductLink>
           </p>
           <p className="ps-console-line">{ADVANCED_DEVELOPER_ENTRY.description}</p>
         </Card>

@@ -148,9 +148,13 @@ export function MissionsSection({
     if (reviseTarget === null) {
       return;
     }
-    void workspace.reviseDraft(reviseTarget.id, input).then((result) => {
+    const id = reviseTarget.id;
+    void workspace.reviseDraft(id, input).then((result) => {
       if (result.ok) {
         setReviseTarget(null);
+        // Re-open the (now updated) record — the revision is visible,
+        // never silently absorbed.
+        workspace.openDetail(id);
       }
     });
   };
@@ -189,10 +193,14 @@ export function MissionsSection({
             onBack={workspace.closeDetail}
             onRevise={() => {
               if (detail.detail !== undefined) {
+                // The revise form renders in the intake area: close the
+                // detail so the action WORKS (a dead "Revise intake"
+                // would violate §8's zero-dead-actions law).
                 setReviseTarget({
                   id: detail.detail.record.id,
                   intake: detail.detail.record.intake,
                 });
+                workspace.closeDetail();
               }
             }}
             onArchive={handleArchive}

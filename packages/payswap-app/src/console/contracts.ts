@@ -267,6 +267,22 @@ function normalizeConsolePath(path: string): string {
   return path;
 }
 
+/**
+ * The §2 advanced-path law as a total predicate (for the platform
+ * mounts): "/console/advanced" AND every deeper path under it route to
+ * the ZCode developer-workspace mount — NOT a workspace section. The
+ * mounts split these paths BEFORE the workspace renders; if such a path
+ * ever reaches the workspace anyway, it resolves to the honest
+ * not-found (never an invented section, never a crash).
+ */
+export function isConsoleAdvancedPath(path: string): boolean {
+  const normalized = normalizeConsolePath(path);
+  return (
+    normalized === CONSOLE_ADVANCED_PATH ||
+    normalized.startsWith(`${CONSOLE_ADVANCED_PATH}/`)
+  );
+}
+
 export function resolveConsoleSection(path: string): ConsoleRoute {
   const normalized = normalizeConsolePath(path);
   if (normalized === CONSOLE_ROOT) {
