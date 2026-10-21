@@ -1,0 +1,199 @@
+/*
+ * @payswap/app — the console SECTION DETAIL styles (split from
+ * console.css to satisfy the <=400-line file law; the shell/chrome/
+ * scaffold/action laws and the responsive + reduced-motion blocks live
+ * there). Mission rows and the detail ladder, the creation intake +
+ * intent review + validation findings + mission controls, and the
+ * per-section reference rows (model providers, outcome states, the Lab
+ * law, the settings identity).
+ */
+
+/* ---------------------------- mission rows --------------------------- */
+
+.ps-console-mission-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-2);
+}
+
+.ps-console-mission-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-3);
+  padding: var(--ps-space-3) var(--ps-space-4);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-lg);
+  background: var(--ps-surface);
+}
+
+.ps-console-mission-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ps-console-mission-goal {
+  margin: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.ps-console-mission-meta {
+  margin: 2px 0 0;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+}
+
+.ps-console-mission-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ps-space-3);
+  flex-wrap: wrap;
+}
+
+.ps-console-mission-header-main {
+  min-width: 0;
+}
+
+.ps-console-mission-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-5);
+}
+
+.ps-console-backrow {
+  margin: 0;
+}
+
+.ps-console-tablewrap {
+  overflow-x: auto;
+}
+
+.ps-console-archived-note {
+  border-left: 3px solid var(--ps-border);
+}
+
+/* ------------------------------- ladder ------------------------------ */
+
+.ps-console-ladder {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-console-ladder-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-1);
+  padding: var(--ps-space-3) var(--ps-space-4);
+  border-left: 3px solid var(--ps-border);
+}
+
+.ps-console-ladder-item--reached {
+  border-left-color: var(--ps-accent);
+}
+
+.ps-console-ladder-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ps-space-2);
+}
+
+.ps-console-ladder-rung {
+  font-size: var(--ps-text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.ps-console-ladder-prerequisite {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+}
+
+/* --------------------------- intake + review ------------------------- */
+
+.ps-console-intake {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-4);
+  padding: var(--ps-space-5);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-lg);
+  background: var(--ps-surface);
+}
+
+.ps-console-intake-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-1);
+}
+
+.ps-console-intake-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ps-space-3) var(--ps-space-4);
+}
+
+.ps-console-textarea {
+  resize: vertical;
+  min-height: 44px;
+  font-family: inherit;
+}
+
+.ps-console-intake-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-3);
+  flex-wrap: wrap;
+}
+
+.ps-console-findings {
+  padding: var(--ps-space-3) var(--ps-space-4);
+  border: 1px solid var(--ps-danger);
+  border-radius: var(--ps-radius-md);
+  background: var(--ps-danger-tint);
+}
+
+.ps-console-findings-title {
+  margin: 0 0 var(--ps-space-1);
+  font-size: var(--ps-text-sm);
+  font-weight: 600;
+}
+
+.ps-console-findings-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ps-console-finding {
+  font-size: var(--ps-text-sm);
+}
+
+.ps-console-review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-3);
+}
+
+.ps-console-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-3);
+  flex-wrap: wrap;
+}
+
+.ps-console-archive-confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-3);
+  flex-wrap: wrap;
+}
+

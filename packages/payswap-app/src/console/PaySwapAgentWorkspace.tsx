@@ -1,143 +1,98 @@
 /**
  * @payswap/app — the PaySwap Agent Workspace (console surface).
  *
- * TL SEAM STUB (registered with Phase 10, commit-level contract:
- * spec/surface/CONSOLE-WORKSPACE.md). Lane P10-C replaces this
- * implementation with the real workspace views; the EXPORTED NAMES on
- * this module path are the cross-lane seam the desktop renderer mount
- * and the web console mount (Lane P10-B) compile against. The shapes
- * are PINNED byte-exact to CONSOLE-WORKSPACE.md §3/§5 — drift is a
- * defect.
+ * THE CROSS-LANE SEAM (Phase 10): the exported names on this module path
+ * are the compile contract the desktop renderer mount and the web
+ * console mount (Lane P10-B) import — PaySwapAgentWorkspace,
+ * PaySwapAgentWorkspaceProps, the Mission / WorkspaceStore type family
+ * and ModelProviderStatus. The pinned shapes live in ./contracts.ts
+ * (byte-exact to spec/surface/CONSOLE-WORKSPACE.md §3/§5) and are
+ * re-exported here so the module path stays the single import site.
  *
- * Until P10-C lands, this stub renders an honest integration-holding
- * state — never a fabricated workspace.
+ * The real shell (CONSOLE-WORKSPACE.md §1/§2/§8): PaySwap chrome (the
+ * ps- design system + ps-theme-light, the wordmark with "Agent Console"
+ * framing), the eight-section navigation (sidebar at desktop widths,
+ * wrapping nav at mobile), aria-current on the active section, semantic
+ * landmarks, a skip link to the main region, route-specific document
+ * titles via the pure consoleDocumentTitle helper + an effect, and the
+ * honest not-found for unknown section paths — inside the workspace
+ * chrome, never the ZCode shell, never a blank screen. Projections
+ * only: the store port is the single mutation surface; UNKNOWN never
+ * renders as failure or success.
  */
 
+import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { EmptyState, SkipLink, useReducedMotion } from "@zcode/ui/payswap";
+import "@zcode/ui/payswap-styles.css";
+import "../payswap-product.css";
+import "../payswap-elevation.css";
+import "./console.css";
+import "./console-sections.css";
 import type { PaySwapNavigation } from "../shell/navigation.js";
-import type { AmountSpecPin } from "../pins/surface-pins.js";
-
-/** The pinned money wire shape (surface AmountSpec, mirrored). */
-export type MissionAmountSpec = AmountSpecPin;
-
-/* ====================================================================
- * Mission vocabulary (CONSOLE-WORKSPACE.md §3 — pinned)
- * ==================================================================== */
-
-export type MissionIntentDirection = "PAY" | "RECEIVE" | "MOVE" | "CONVERT";
-
-export interface MissionIntakeInput {
-  /** Non-empty after trim, at most 2000 characters. */
-  readonly goalStatement: string;
-  readonly direction: MissionIntentDirection;
-  /** Optional until known; when present it must satisfy the AmountSpec law. */
-  readonly amount?: MissionAmountSpec;
-  /** Optional free-text location hints, at most 200 characters each. */
-  readonly fundingLocationHint?: string;
-  readonly payoutLocationHint?: string;
-  /** Optional note, at most 2000 characters. */
-  readonly note?: string;
-}
-
-export type MissionDraftStatus = "DRAFT" | "INTENT_RECORDED" | "ARCHIVED";
-
-export type MissionLifecycleRung =
-  | "INTENT"
-  | "ELIGIBILITY"
-  | "PLANNING"
-  | "APPROVAL"
-  | "EXECUTION"
-  | "OBSERVATION"
-  | "EVIDENCE";
-
-export type MissionRungState =
-  | { readonly rung: "INTENT"; readonly state: "REACHED" }
-  | {
-      readonly rung: MissionLifecycleRung;
-      readonly state: "NOT_REACHED_PREREQUISITE";
-      /** The typed prerequisite, carried verbatim from §4. */
-      readonly prerequisite: string;
-    };
-
-export type MissionEventKind =
-  | "CREATED"
-  | "REVISED"
-  | "INTENT_VALIDATED"
-  | "ARCHIVED";
-
-export interface MissionEvent {
-  readonly id: string;
-  /** ISO-8601 UTC instant, explicit input — never an ambient clock. */
-  readonly at: string;
-  readonly kind: MissionEventKind;
-  readonly summary: string;
-}
-
-export interface MissionStructuralValidation {
-  readonly ok: boolean;
-  readonly findings: readonly string[];
-}
-
-export interface MissionRecord {
-  readonly id: string;
-  readonly createdAt: string;
-  readonly updatedAt: string;
-  readonly status: MissionDraftStatus;
-  readonly intake: MissionIntakeInput;
-  readonly structuralValidation: MissionStructuralValidation;
-  /** Reverse-chronological (newest first), never rewritten. */
-  readonly events: readonly MissionEvent[];
-}
-
-export interface MissionSummary {
-  readonly id: string;
-  readonly goalStatement: string;
-  readonly direction: MissionIntentDirection;
-  readonly amount?: MissionAmountSpec;
-  readonly status: MissionDraftStatus;
-  readonly updatedAt: string;
-}
-
-export interface MissionDetail {
-  readonly summary: MissionSummary;
-  readonly record: MissionRecord;
-  readonly ladder: readonly MissionRungState[];
-  readonly evidenceNote: string;
-}
+import { ProductLink } from "../shell/ProductLink.js";
+import type {
+  ConsoleSectionRecord,
+  ModelProviderStatus,
+  WorkspaceStorePort,
+} from "./contracts.js";
+import {
+  CONSOLE_ROOT,
+  consoleDocumentTitle,
+  consoleSection,
+  resolveConsoleSection,
+} from "./contracts.js";
+import {
+  ConsoleSidebar,
+  ConsoleSectionNav,
+  ConsoleTopbar,
+  type ConsoleBackToProduct,
+} from "./ConsoleChrome.js";
+import { useWorkspaceStore } from "./useWorkspaceStore.js";
+import { OverviewSection } from "./sections/OverviewSection.js";
+import { MissionsSection } from "./sections/MissionsSection.js";
+import { AgentsSection } from "./sections/AgentsSection.js";
+import { ApprovalsSection } from "./sections/ApprovalsSection.js";
+import { ConnectionsSection } from "./sections/ConnectionsSection.js";
+import { ActivitySection } from "./sections/ActivitySection.js";
+import { LabSection } from "./sections/LabSection.js";
+import { SettingsSection } from "./sections/SettingsSection.js";
 
 /* ====================================================================
- * Workspace store port (CONSOLE-WORKSPACE.md §5 — pinned)
+ * The pinned cross-lane shapes (re-exported from contracts.ts — the
+ * stable seam surface; drift is a defect)
  * ==================================================================== */
 
-export type WorkspaceStoreDurability = "DESKTOP_PROFILE" | "BROWSER_PROFILE";
+export type {
+  ConsoleRoute,
+  ConsoleSectionId,
+  ConsoleSectionRecord,
+  MissionAmountSpec,
+  MissionDetail,
+  MissionDraftStatus,
+  MissionEvent,
+  MissionEventKind,
+  MissionIntakeInput,
+  MissionIntentDirection,
+  MissionLifecycleRung,
+  MissionRecord,
+  MissionRungState,
+  MissionStructuralValidation,
+  MissionSummary,
+  ModelProviderStatus,
+  WorkspaceStoreDurability,
+  WorkspaceStorePort,
+} from "./contracts.js";
 
-export interface WorkspaceStorePort {
-  readonly durability: WorkspaceStoreDurability;
-  listMissions(): Promise<readonly MissionSummary[]>;
-  recordMissionDraft(
-    input: MissionIntakeInput,
-    now: string,
-  ): Promise<MissionRecord>;
-  /** The intent-review step: DRAFT → INTENT_RECORDED. */
-  recordMissionIntent(id: string, now: string): Promise<MissionRecord>;
-  missionDetail(id: string): Promise<MissionDetail | null>;
-  reviseMissionDraft(
-    id: string,
-    input: MissionIntakeInput,
-    now: string,
-  ): Promise<MissionRecord>;
-  archiveMissionDraft(id: string, now: string): Promise<MissionRecord>;
-}
-
-/* ====================================================================
- * The workspace component seam (P10-C implements; P10-B mounts)
- * ==================================================================== */
-
-/** Optional honest projection of real substrate model-provider state. */
-export interface ModelProviderStatus {
-  readonly id: string;
-  readonly label: string;
-  readonly connected: boolean;
-}
+export {
+  CONSOLE_ROOT,
+  CONSOLE_ADVANCED_PATH,
+  CONSOLE_SECTION_IDS,
+  CONSOLE_SECTIONS,
+  consoleSection,
+  consoleSectionPath,
+  consoleDocumentTitle,
+  resolveConsoleSection,
+} from "./contracts.js";
 
 export interface PaySwapAgentWorkspaceProps {
   /**
@@ -154,23 +109,165 @@ export interface PaySwapAgentWorkspaceProps {
   };
   /** Optional real model-provider connection state; absent = honest none. */
   readonly modelProviders?: readonly ModelProviderStatus[];
+  /**
+   * Optional platform clock for store mutations (ISO-8601 UTC instants).
+   * The default reads the ambient UTC instant once per user-initiated
+   * mutation — the pinned port's explicit `now` input (§5), never a
+   * displayed value.
+   */
+  readonly clock?: () => string;
 }
 
-/**
- * The seam stub implementation. P10-C replaces this with the real
- * PaySwap Agent Workspace (eight sections per CONSOLE-WORKSPACE.md §2);
- * the exported name and props are the stable cross-lane contract.
- */
-export function PaySwapAgentWorkspace(_props: PaySwapAgentWorkspaceProps) {
+/** The honest not-found for an unknown console path (inside the chrome). */
+export function ConsoleNotFound({
+  path,
+  navigation,
+  backToProduct,
+}: {
+  readonly path: string;
+  readonly navigation: PaySwapNavigation;
+  readonly backToProduct: ConsoleBackToProduct;
+}) {
   return (
-    <section aria-labelledby="ps-agent-workspace-title" className="ps-console">
-      <h1 id="ps-agent-workspace-title">PaySwap — Agent Console</h1>
-      <p role="status">
-        The Agent Workspace view is being integrated in this build. It never
-        fabricates missions, agents, approvals, connections or activity —
-        the integrated workspace renders real state and honest empty states
-        only.
+    <section aria-labelledby="ps-console-notfound-heading" className="ps-console-section">
+      <header className="ps-console-section-header">
+        <p className="ps-console-eyebrow">PaySwap Agent Console</p>
+        <h1 id="ps-console-notfound-heading" className="ps-console-section-title">
+          Section not found
+        </h1>
+        <p className="ps-console-section-lede">
+          This console address does not name a workspace section. The
+          workspace keeps its chrome and answers honestly — never a blank
+          screen, never an invented section.
+        </p>
+      </header>
+      <EmptyState
+        title="Nothing was found at this console address"
+        description={`No workspace section exists at ${path}. The eight sections are overview, missions, agents, approvals, connections, activity, lab and settings.`}
+        action={
+          <ProductLink
+            to={CONSOLE_ROOT}
+            navigation={navigation}
+            className="ps-console-action ps-console-action--primary"
+          >
+            Go to the workspace overview
+          </ProductLink>
+        }
+        className="ps-console-empty"
+      />
+      <p className="ps-console-line-actions">
+        <button type="button" className="ps-console-link" onClick={backToProduct.onActivate}>
+          {backToProduct.label}
+        </button>
       </p>
     </section>
+  );
+}
+
+/** The real PaySwap Agent Workspace (the seam implementation). */
+export function PaySwapAgentWorkspace({
+  navigation,
+  store,
+  backToProduct,
+  modelProviders,
+  clock,
+}: PaySwapAgentWorkspaceProps) {
+  const subscribe = useCallback((listener: () => void) => navigation.subscribe(listener), [navigation]);
+  const getPath = useCallback(() => navigation.getPath(), [navigation]);
+  const path = useSyncExternalStore(subscribe, getPath, getPath);
+  const route = resolveConsoleSection(path);
+  const workspace = useWorkspaceStore(store, { clock });
+  const reducedMotion = useReducedMotion();
+
+  // Route-specific document titles (§1) — a pure helper + an effect,
+  // applied only where a document exists (platform-agnostic package).
+  const titleKey = route.kind === "section" ? `section:${route.sectionId}` : route.kind;
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.title = consoleDocumentTitle(route);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- titleKey fully identifies the title change.
+  }, [titleKey]);
+
+  const activeSectionId =
+    route.kind === "overview" ? "overview" : route.kind === "section" ? route.sectionId : null;
+
+  const openMissionFromOverview = useCallback(
+    (id: string) => {
+      workspace.openDetail(id);
+      navigation.navigate(`${CONSOLE_ROOT}/missions`);
+    },
+    [navigation, workspace],
+  );
+
+  const sectionById = (id: string): ConsoleSectionRecord => {
+    const record = consoleSection(id);
+    if (record === undefined) {
+      // Fail-closed: the route table never resolves an unknown section,
+      // but a drifted IA mirror must never render a half-invented view.
+      throw new Error(`PaySwapAgentWorkspace: unknown console section ${JSON.stringify(id)}`);
+    }
+    return record;
+  };
+
+  return (
+    <div
+      className="ps-theme-light ps-console-root"
+      data-reduced-motion={reducedMotion ? "true" : undefined}
+    >
+      <SkipLink href="#ps-console-main">Skip to main content</SkipLink>
+      <ConsoleTopbar backToProduct={backToProduct} />
+      <ConsoleSectionNav activeSectionId={activeSectionId} navigation={navigation} />
+      <div className="ps-console-shell">
+        <ConsoleSidebar activeSectionId={activeSectionId} navigation={navigation} />
+        <main id="ps-console-main" tabIndex={-1} className="ps-console-main">
+          {route.kind === "overview" ? (
+            <OverviewSection
+              section={sectionById("overview")}
+              workspace={workspace}
+              navigation={navigation}
+              onOpenMission={openMissionFromOverview}
+            />
+          ) : null}
+          {route.kind === "section" && route.sectionId === "missions" ? (
+            <MissionsSection
+              section={sectionById("missions")}
+              workspace={workspace}
+              navigation={navigation}
+            />
+          ) : null}
+          {route.kind === "section" && route.sectionId === "agents" ? (
+            <AgentsSection section={sectionById("agents")} modelProviders={modelProviders} />
+          ) : null}
+          {route.kind === "section" && route.sectionId === "approvals" ? (
+            <ApprovalsSection section={sectionById("approvals")} />
+          ) : null}
+          {route.kind === "section" && route.sectionId === "connections" ? (
+            <ConnectionsSection
+              section={sectionById("connections")}
+              navigation={navigation}
+              backToProduct={backToProduct}
+              modelProviders={modelProviders}
+            />
+          ) : null}
+          {route.kind === "section" && route.sectionId === "activity" ? (
+            <ActivitySection
+              section={sectionById("activity")}
+              workspace={workspace}
+              navigation={navigation}
+            />
+          ) : null}
+          {route.kind === "section" && route.sectionId === "lab" ? (
+            <LabSection section={sectionById("lab")} />
+          ) : null}
+          {route.kind === "section" && route.sectionId === "settings" ? (
+            <SettingsSection section={sectionById("settings")} durability={store.durability} />
+          ) : null}
+          {route.kind === "not-found" ? (
+            <ConsoleNotFound path={route.path} navigation={navigation} backToProduct={backToProduct} />
+          ) : null}
+        </main>
+      </div>
+    </div>
   );
 }
