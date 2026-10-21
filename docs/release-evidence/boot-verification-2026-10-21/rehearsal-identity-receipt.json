@@ -1,0 +1,46 @@
+{
+  "kind": "station-deployment-identity-rehearsal",
+  "advisory": true,
+  "law": "OPERATIONS.md law 4 + law 9 — advisory rehearsal, contracts+verification only, NOT a deployment",
+  "operatorInstruction": {
+    "text": "go",
+    "received": "2026-10-21",
+    "session": "web-a95c8999-6661-4553-8cd4-51eedc9f4b24",
+    "chat": "31007aa4-a27f-408a-8da2-871cbf878596",
+    "trace": "1a15c1c9c77c8fa1"
+  },
+  "components": {
+    "commitSha": "b9f9ab7bcaf3e24207f412bc766ab78f95928b07",
+    "buildDigest": "016c0748e57eb39fb53a212f20813ff5d02b58d064b57f8345d13c84780618aa",
+    "manifestDigest": "33e05966ea14f5bfa46724ff384adfef5967ad81b45c960cf5eacbd3f3b0835a",
+    "environment": {
+      "tier": "local",
+      "region": "station-sandbox-boot",
+      "executionMode": "SANDBOX",
+      "manifestFingerprint": "fnv1a64:2a01bcf3c843866b",
+      "providerBindingsFingerprint": "fnv1a64:09612b07b5ecb5a5",
+      "planeCount": 2,
+      "providerBindings": "EMPTY (real — providerCount 0 at boot)",
+      "emptyBindingsConfigFingerprint": "fnv1a64:08f44b07b5901a25"
+    }
+  },
+  "results": {
+    "defineEnvironmentRecord": "ok (fail-closed validations passed)",
+    "defineDeploymentIdentity": "ok",
+    "identityDigest": "fnv1a64:be57788d184cca85",
+    "verifyDeploymentIdentity": {
+      "ok": true,
+      "problems": []
+    },
+    "reassemblyByteIdentical": true,
+    "tamperProbe": {
+      "ok": false,
+      "problems": [
+        "identityDigest chain mismatch (record says 'fnv1a64:be57788d184cca85', components digest 'fnv1a64:335d2a212391e4e3') — the identity was altered after assembly"
+      ]
+    },
+    "serializedSha256": "456c2e55e0a72d340517c10f72301298ba2ec5f44c419868397403fb032b68c0",
+    "serializedLengthBytes": 939
+  },
+  "boundary": "Nothing deployed, provisioned or activated. The operator's production deployment remains the operator-side act (environment record + live credentials + DEPLOYMENT-AUTHORIZATION-2026-10-20.md §3). GAP-02 stands."
+}
