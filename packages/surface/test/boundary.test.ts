@@ -149,7 +149,7 @@ describe("boundary law (contracts grade)", () => {
       expect((index as Record<string, unknown>)[anchor], `missing export: ${anchor}`).toBeDefined();
     }
     expect(index.PACKAGE_NAME).toBe("@payswap/surface");
-    expect(index.SURFACE_API_VERSION).toBe("1.0.0");
+    expect(index.SURFACE_API_VERSION).toBe("1.1.0");
   });
 });
 

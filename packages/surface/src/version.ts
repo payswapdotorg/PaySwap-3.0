@@ -25,7 +25,7 @@
  * Every runtime the surface serves records the version it compiled against
  * — drift is detectable at build time, not discovered in production.
  */
-export const SURFACE_API_VERSION = "1.0.0" as const;
+export const SURFACE_API_VERSION = "1.1.0" as const;
 
 /** Which parts of the surface are covered by which stability class. */
 export type SurfaceStability =

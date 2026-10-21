@@ -20,7 +20,7 @@ import { DESKTOP_PIN_PROVENANCE } from "./pin-registry.js";
 // ---------------------------------------------------------------------------
 
 /** Mirrors SURFACE_API_VERSION (@payswap/surface, P2-W3). */
-export const PINNED_SURFACE_API_VERSION = "1.0.0" as const;
+export const PINNED_SURFACE_API_VERSION = "1.1.0" as const;
 
 /** Mirrors SurfaceStability. */
 export type PinnedSurfaceStability = "stable" | "experimental";

@@ -19,7 +19,7 @@
       "R3-not-in-may-depend-on": 5,
       "R6-cross-package-relative": 2
     },
-    "unresolved_external_specifiers": 271
+    "unresolved_external_specifiers": 275
   },
   "packages": [
     {
@@ -586,7 +586,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 1
+          "occurrences": 2
         },
         {
           "source": "packages/server",
@@ -628,15 +628,15 @@
       "dependencies": [
         {
           "target": "packages/client",
-          "occurrences": 1
+          "occurrences": 2
         },
         {
           "target": "packages/payswap-app",
-          "occurrences": 4
+          "occurrences": 6
         },
         {
           "target": "packages/rpc",
-          "occurrences": 15
+          "occurrences": 17
         },
         {
           "target": "packages/server",
@@ -834,21 +834,21 @@
         },
         {
           "target": "packages/surface",
-          "occurrences": 4
+          "occurrences": 9
         },
         {
           "target": "packages/ui",
-          "occurrences": 11
+          "occurrences": 22
         }
       ],
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 4
+          "occurrences": 6
         },
         {
           "source": "packages/web",
-          "occurrences": 5
+          "occurrences": 9
         }
       ],
       "dependency_layers": [
@@ -985,7 +985,7 @@
         },
         {
           "source": "packages/desktop",
-          "occurrences": 15
+          "occurrences": 17
         },
         {
           "source": "packages/server",
@@ -1184,7 +1184,7 @@
       "dependents": [
         {
           "source": "packages/payswap-app",
-          "occurrences": 4
+          "occurrences": 9
         }
       ],
       "dependency_layers": []
@@ -1241,7 +1241,7 @@
         },
         {
           "source": "packages/payswap-app",
-          "occurrences": 11
+          "occurrences": 22
         },
         {
           "source": "packages/web",
@@ -1265,7 +1265,7 @@
         },
         {
           "target": "packages/payswap-app",
-          "occurrences": 5
+          "occurrences": 9
         },
         {
           "target": "packages/shared",
@@ -2085,8 +2085,78 @@
       "severity": "error",
       "sourcePkg": "packages/payswap-app",
       "targetPkg": "packages/surface",
-      "detail": "4 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "9 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/console-workspace.ts",
+          "file": "packages/payswap-app/test/payswap/console-pin-mirror.test.ts",
+          "line": 19,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/console-workspace.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/console-ladder.ts",
+          "file": "packages/payswap-app/test/payswap/console-pin-mirror.test.ts",
+          "line": 29,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/console-ladder.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/console-missions.ts",
+          "file": "packages/payswap-app/test/payswap/console-pin-mirror.test.ts",
+          "line": 30,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/console-missions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/console-store.ts",
+          "file": "packages/payswap-app/test/payswap/console-pin-mirror.test.ts",
+          "line": 55,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/console-store.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/console-missions.ts",
+          "file": "packages/payswap-app/test/payswap/console-pin-mirror.test.ts",
+          "line": 56,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/console-missions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
         {
           "sourcePkg": "packages/payswap-app",
           "targetPkg": "packages/surface",
@@ -2204,9 +2274,14 @@
       "line": 8
     },
     {
+      "file": "packages/desktop/test/payswap/desktop-console-client.test.ts",
+      "specifier": "vitest",
+      "line": 16
+    },
+    {
       "file": "packages/desktop/test/payswap/desktop-product-surface.test.ts",
       "specifier": "vitest",
-      "line": 14
+      "line": 17
     },
     {
       "file": "packages/desktop/test/payswap/honest-states.test.ts",
@@ -2264,6 +2339,11 @@
       "line": 21
     },
     {
+      "file": "packages/desktop/test/payswap/workspace-store.test.ts",
+      "specifier": "vitest",
+      "line": 12
+    },
+    {
       "file": "packages/desktop/vitest.config.ts",
       "specifier": "vitest/config",
       "line": 1
@@ -2282,6 +2362,16 @@
       "file": "packages/onchain-extensions/test/registry.test.ts",
       "specifier": "onchain-pack/dex/uniswap-v2@1.0.0",
       "line": 61
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/console-sections.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 28
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/console-workspace.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 29
     },
     {
       "file": "packages/payswap-app/test/payswap/product-navigation.test.tsx",
@@ -2377,26 +2467,6 @@
       "file": "packages/services/src/bots/providers/telegramProvider.ts",
       "specifier": "#src/bots/providers/providerRequest.js",
       "line": 14
-    },
-    {
-      "file": "packages/services/src/bots/providers/weixinProvider.ts",
-      "specifier": "#src/bots/providers/providerRequest.js",
-      "line": 11
-    },
-    {
-      "file": "packages/services/src/coding-plan-subscription/bigmodelCodingPlanSubscriptionProvider.ts",
-      "specifier": "#src/bigmodel/teamPlanApiKey.js",
-      "line": 80
-    },
-    {
-      "file": "packages/services/src/commands/commandsService.ts",
-      "specifier": "#src/plugins/installedPluginRoots.js",
-      "line": 25
-    },
-    {
-      "file": "packages/services/src/conversation-share/conversationShareArtifactSource.ts",
-      "specifier": "#src/file/file.js",
-      "line": 4
     }
   ],
   "example_hints_without_packages": [

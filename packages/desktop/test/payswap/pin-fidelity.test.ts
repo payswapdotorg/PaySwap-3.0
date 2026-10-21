@@ -113,7 +113,7 @@ describe("pin registry (P7-W2 + P10-B)", () => {
 describe("pin fidelity vs recorded fixtures (surface pins)", () => {
   it("the pinned surface API version equals the recorded contract version", () => {
     expect(PINNED_SURFACE_API_VERSION).toBe(recordedSurface.apiVersion);
-    expect(PINNED_SURFACE_API_VERSION).toBe("1.0.0");
+    expect(PINNED_SURFACE_API_VERSION).toBe("1.1.0");
   });
 
   it("the five pinned outcome actions mirror the recorded registry (ids, labels, dispatch authority, journey ids)", () => {
