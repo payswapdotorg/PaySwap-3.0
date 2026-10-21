@@ -14,8 +14,8 @@
  * network. Money is never a type here; state words are TONES, not outcomes
  * of any authority. The authoritative CONFIRMED/UNKNOWN/FAILED vocabulary
  * lives in @payswap/provider-runtime (packages/provider-runtime/src/
- * result-envelope.ts) and is pinned STRUCTURALLY by the web product
- * (packages/web/src/payswap/pins/) — the design layer only renders the
+ * result-envelope.ts) and is pinned STRUCTURALLY by the product package
+ * (packages/payswap-app/src/pins/) — the design layer only renders the
  * honest-state TONES it is given via props.
  */
 

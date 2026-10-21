@@ -28,12 +28,18 @@ import {
   isConversationSharePath,
   resolveConversationShareCodeFromPath,
 } from "./share/conversationShareRoute.js";
-// PaySwap web product (P7-W1): the additive product mount. The substrate's
-// own routes (OAuth callback, conversation share, the ZCode client root)
-// are untouched — the PaySwap product renders under /payswap only.
-import { PaySwapWebApp, resolveApiRuntimeInput } from "./payswap/shell/PaySwapWebApp.js";
-import { HONEST_DEPLOYMENT_CONTEXT, NO_EVIDENCE_COVERAGE } from "./payswap/contracts/harness.js";
-import { isPaySwapProductPath } from "./payswap/routes.js";
+// PaySwap web product (P9-A): the product surface now lives in the
+// @payswap/app package (consumed by web AND desktop); this mount passes
+// the web platform adapter (vite env) + the repository's honest
+// deployment facts. The substrate's own routes (OAuth callback,
+// conversation share, the agent console) are untouched.
+import {
+  PaySwapWebApp,
+  HONEST_DEPLOYMENT_CONTEXT,
+  NO_EVIDENCE_COVERAGE,
+  isPaySwapProductPath,
+} from "@payswap/app";
+import { resolveApiRuntimeInput } from "./payswap/apiRuntime.js";
 import type { IPlatformService, RemoteTarget, ServerRemoteInfo } from "@zcode/shared";
 import { WEB_DEFAULT_THEME, resolveWebInitialTheme } from "./webThemeSeed.js";
 

@@ -1,0 +1,27 @@
+{
+  "name": "@payswap/app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The PaySwap product application surface (Work Order P9-A): the presentational, platform-agnostic PaySwap product experience — home, app shell over the pinned eleven-area navigation IA, capabilities/coverage, security and developers surfaces — consumed by the web mount (@zcode/web) and the desktop renderer (@zcode/desktop). PRESENTATIONAL with injected platform/data adapters: no fetch, no ambient window/session state; every view is a projection of its explicit inputs (INV-23), honest by construction (UNKNOWN renders as UNKNOWN; unavailable surfaces state their typed prerequisites; nothing fabricates success).",
+  "exports": {
+    ".": "./src/index.ts",
+    "./routes": "./src/routes.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@zcode/ui": "workspace:*",
+    "react": "^19.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^25.0.1",
+    "react-dom": "^19.2.4",
+    "typescript": "^6.0.2",
+    "vitest": "^3.2.7"
+  }
+}
