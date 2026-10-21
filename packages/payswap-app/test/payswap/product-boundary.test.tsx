@@ -16,6 +16,10 @@
  *   full static render of every public page).
  * - P5 determinism: no ambient clock/random in the product's view layer
  *   (the router reads window.location only — an input, not a clock).
+ *   P10-C refinement: the console store binding's DEFAULT mutation clock
+ *   is the one documented exception (see the P5 test body) — it supplies
+ *   the pinned store port's explicit `now` argument for user-initiated
+ *   mutations only, never a displayed value.
  */
 import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
@@ -208,6 +212,19 @@ describe("product law P5: determinism — no ambient clock or randomness in the 
   it("no Date.now / new Date / Math.random in the product sources", () => {
     const offenders: string[] = [];
     for (const { rel, text } of SOURCES) {
+      // P10-C documented refinement (Phase 10 console surface): the ONE
+      // permitted ambient-clock site in the package is the console store
+      // binding's DEFAULT mutation clock (src/console/useWorkspaceStore.ts)
+      // — it exists only to supply the pinned WorkspaceStorePort's
+      // explicit `now` argument at the moment of a user-initiated store
+      // mutation (CONSOLE-WORKSPACE.md §5: "now is an explicit input").
+      // It never feeds a fold, a view model or a displayed value; the
+      // mounts and the tests inject the clock through the same seam. The
+      // console suite pins the site: exactly one occurrence, in the
+      // default-clock initializer, and nowhere else in src/.
+      if (rel === "src/console/useWorkspaceStore.ts") {
+        continue;
+      }
       if (/Date\.now\(|new\s+Date\(|Math\.random\(/.test(text)) {
         offenders.push(rel);
       }

@@ -1,0 +1,355 @@
+/*
+ * @payswap/app — the PaySwap Agent Workspace (console) styles.
+ *
+ * NET-NEW (P10-C): page-level composition over the design-layer
+ * primitives (@zcode/ui/payswap-styles.css supplies the tokens and the
+ * component classes; this file adds only the console layout). The
+ * palette is the PaySwap token system — emerald accent, amber for
+ * attention/UNKNOWN, red for failure only; NO indigo/blue primary.
+ * Split from the original single file to satisfy the <=400-line file
+ * law (the mission/section detail styles live in console-sections.css).
+ *
+ * Accessibility laws carried here (CONSOLE-WORKSPACE.md §8): every
+ * console-specific interactive class shows a visible :focus-visible
+ * ring; the mobile section nav replaces the sidebar below lg (the
+ * design system hides .ps-sidebar--static there); reduced-motion
+ * collapses the few transitions (media query AND the shell's
+ * data-reduced-motion attribute); touch targets stay >= 44px.
+ */
+
+.ps-console-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ps-bg);
+  color: var(--ps-fg);
+  font-family: var(--ps-font-sans);
+}
+
+/* ------------------------------ chrome ------------------------------- */
+
+.ps-console-topbar {
+  border-bottom: 1px solid var(--ps-border);
+}
+
+.ps-console-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-2);
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ps-fg);
+}
+
+.ps-console-brand-name {
+  letter-spacing: 0.02em;
+}
+
+.ps-console-brand-frame {
+  padding: 2px 8px;
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  color: var(--ps-fg-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* The mobile section nav: visible below lg, hidden at lg and up (the
+   static sidebar takes over there — the substrate responsive pattern). */
+.ps-console-sectionnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ps-space-1);
+  padding: var(--ps-space-2) var(--ps-space-4);
+  border-bottom: 1px solid var(--ps-border);
+  background: var(--ps-surface);
+}
+
+.ps-console-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--ps-radius-md);
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+  text-decoration: none;
+}
+
+.ps-console-nav-link.is-active {
+  background: var(--ps-accent-tint);
+  color: var(--ps-fg);
+  font-weight: 600;
+}
+
+.ps-console-nav-item.is-active {
+  color: var(--ps-fg);
+  font-weight: 600;
+}
+
+@media (min-width: 1024px) {
+  .ps-console-sectionnav {
+    display: none;
+  }
+}
+
+/* ------------------------------ shell ------------------------------- */
+
+.ps-console-shell {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.ps-console-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--ps-space-6) var(--ps-space-6) var(--ps-space-8);
+}
+
+/* --------------------------- section scaffold ------------------------ */
+
+.ps-console-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-6);
+  max-width: 880px;
+}
+
+.ps-console-eyebrow {
+  margin: 0 0 var(--ps-space-1);
+  color: var(--ps-fg-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ps-console-section-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.ps-console-section-lede {
+  margin: var(--ps-space-2) 0 0;
+  max-width: 64ch;
+  color: var(--ps-fg-muted);
+}
+
+.ps-console-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-3);
+}
+
+.ps-console-block-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.ps-console-block-note {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+}
+
+.ps-console-line {
+  margin: 0;
+  max-width: 72ch;
+}
+
+.ps-console-line-actions {
+  margin: var(--ps-space-2) 0 0;
+}
+
+/* ------------------------------ cards -------------------------------- */
+
+.ps-console-attention {
+  border-left: 3px solid var(--ps-attention);
+}
+
+.ps-console-attention-head {
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-2);
+}
+
+.ps-console-attention-title {
+  margin: 0;
+  font-size: 15px;
+}
+
+.ps-console-reference,
+.ps-console-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-3);
+}
+
+.ps-console-reference-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ps-space-2);
+  flex-wrap: wrap;
+}
+
+.ps-console-reference-title,
+.ps-console-card-title {
+  margin: 0;
+  font-size: 15px;
+}
+
+.ps-console-reference-note,
+.ps-console-card-note {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+}
+
+.ps-console-reference-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-2);
+}
+
+.ps-console-reference-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) 1fr;
+  gap: var(--ps-space-2) var(--ps-space-4);
+  padding-bottom: var(--ps-space-2);
+  border-bottom: 1px solid var(--ps-border);
+}
+
+.ps-console-reference-term {
+  font-size: var(--ps-text-sm);
+  font-weight: 600;
+}
+
+.ps-console-reference-line {
+  margin: 0;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+}
+
+/* --------------------------- actions + links ------------------------- */
+
+.ps-console-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ps-console-action--primary {
+  border-color: transparent;
+  background: var(--ps-accent);
+  color: var(--ps-on-accent);
+}
+
+.ps-console-action--primary:hover {
+  background: var(--ps-accent-emphasis);
+}
+
+.ps-console-action--danger {
+  border-color: var(--ps-danger);
+  color: var(--ps-danger);
+}
+
+.ps-console-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: var(--ps-accent-emphasis);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* The console focus law (§8 — every interactive element shows focus). */
+.ps-console-nav-link:focus-visible,
+.ps-console-nav-item:focus-visible,
+.ps-console-action:focus-visible,
+.ps-console-link:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 2px;
+}
+
+/* ------------------------------ states ------------------------------- */
+
+.ps-console-empty,
+.ps-console-error {
+  max-width: 640px;
+}
+
+.ps-console-skeleton {
+  max-width: 480px;
+}
+
+/* --------------------------- responsive ------------------------------ */
+
+@media (max-width: 1023px) {
+  .ps-console-main {
+    padding: var(--ps-space-4) var(--ps-space-4) var(--ps-space-6);
+  }
+}
+
+@media (max-width: 560px) {
+  .ps-console-intake-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ps-console-reference-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ps-console-mission-row {
+    flex-wrap: wrap;
+  }
+
+  .ps-console-section-title {
+    font-size: 21px;
+  }
+}
+
+/* --------------------------- reduced motion -------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-console-root *,
+  .ps-console-root *::before,
+  .ps-console-root *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.ps-console-root[data-reduced-motion="true"] *,
+.ps-console-root[data-reduced-motion="true"] *::before,
+.ps-console-root[data-reduced-motion="true"] *::after {
+  transition: none !important;
+  animation: none !important;
+}
