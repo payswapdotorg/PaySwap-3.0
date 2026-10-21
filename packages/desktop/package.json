@@ -1,7 +1,7 @@
 {
   "name": "@payswap/desktop",
   "private": true,
-  "description": "PaySwap Desktop — the non-custodial economic operating system.",
+  "description": "PaySwap Desktop \u2014 the non-custodial economic operating system.",
   "author": "PaySwap",
   "type": "module",
   "main": "out/main/index.js",
@@ -86,6 +86,6 @@
     "typescript": "^6.0.2",
     "vite": "^8.0.2"
   },
-  "version": "1.0.1",
+  "version": "1.1.0",
   "productName": "PaySwap"
 }
