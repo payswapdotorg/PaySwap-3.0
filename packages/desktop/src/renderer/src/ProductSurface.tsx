@@ -1,18 +1,23 @@
 /**
- * @zcode/desktop — the PaySwap PRODUCT surface switch (P9-A).
+ * @zcode/desktop — the PaySwap PRODUCT surface switch (P9-A; extended
+ * P10-B).
  *
  * The desktop main window opens the PaySwap product experience
- * (PRODUCT-IDENTITY.md §3 "Desktop"); the agent workspace console (the
- * ZCode-derived Root mount, with ALL its existing services/platform
- * wiring untouched) renders when the hash opens the supporting console
- * surface (J14). The switch itself is thin glue — every routing decision
- * lives in the pure payswapDesktop.ts seam (node-tested), and the
- * product's own laws are tested in @payswap/app.
+ * (PRODUCT-IDENTITY.md §3 "Desktop"); the agent workspace console
+ * renders when the hash opens the supporting console surface (J14), and
+ * the ZCode-derived developer workspace (the substrate Root mount, with
+ * ALL its existing services/platform wiring untouched) renders as the
+ * ADVANCED TECHNICAL INTERFACE at #/console/advanced. The switch itself
+ * is thin glue — every routing decision lives in the pure
+ * payswapDesktop.ts seam (node-tested), and the product's own laws are
+ * tested in @payswap/app.
  *
- * Document titles follow PRODUCT-IDENTITY §1: the window reads "PaySwap"
- * (the loading title in index.html) and route-specific "… — PaySwap"
- * once the product renders; the console surface reads "PaySwap — Agent
- * Console" — the console is a capability of PaySwap, framed as one.
+ * Document titles follow PRODUCT-IDENTITY §1 + CONSOLE-WORKSPACE §1:
+ * the window reads "PaySwap" (the loading title in index.html) and
+ * route-specific "… — PaySwap" once the product renders; the workspace
+ * console reads "PaySwap — Agent Console"; the advanced developer
+ * workspace is titled as what it honestly is — the developer workspace
+ * of the PaySwap Agent Console.
  */
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
@@ -57,14 +62,21 @@ export function resolveDesktopApiRuntimeInput(): DevelopersPageView["apiRuntime"
 export interface ProductSurfaceSwitchProps {
   /** The injected hash location (browser in production, fake in tests). */
   readonly location: DesktopHashLocation;
-  /** The console subtree — the existing Root mount, wiring untouched. */
+  /** The advanced developer console subtree — the existing Root mount, wiring untouched. */
   readonly renderConsole: () => ReactNode;
+  /**
+   * The PaySwap Agent Workspace subtree (P10-B): the injected component
+   * carries its own PaySwap chrome AND its back-to-product affordance —
+   * the switch adds no floating button on this surface.
+   */
+  readonly renderWorkspace: () => ReactNode;
   readonly apiRuntime?: DevelopersPageView["apiRuntime"];
 }
 
 export function ProductSurfaceSwitch({
   location,
   renderConsole,
+  renderWorkspace,
   apiRuntime = resolveDesktopApiRuntimeInput(),
 }: ProductSurfaceSwitchProps) {
   const [hash, setHash] = useState(() => location.getHash());
@@ -78,23 +90,32 @@ export function ProductSurfaceSwitch({
   const surface = resolveDesktopSurface(hash);
 
   // Document titles are a platform concern (the window title bar):
-  // route-specific "… — PaySwap" on the product; the console is framed
-  // as a capability of PaySwap, never as the product itself.
+  // route-specific "… — PaySwap" on the product; the workspace console
+  // is framed as a capability of PaySwap ("PaySwap — Agent Console");
+  // the advanced surface is titled as the developer workspace it is.
   useEffect(() => {
     document.title =
       surface === "console"
         ? "PaySwap — Agent Console"
-        : routeDocumentTitle(resolvePaySwapRoute(desktopProductPathFromHash(hash)));
+        : surface === "console-advanced"
+          ? "Developer Workspace — PaySwap Agent Console"
+          : routeDocumentTitle(resolvePaySwapRoute(desktopProductPathFromHash(hash)));
   }, [surface, hash]);
 
   if (surface === "console") {
+    // The workspace component carries its own PaySwap chrome + back
+    // affordance — no floating button here (CONSOLE-WORKSPACE §1).
+    return <>{renderWorkspace()}</>;
+  }
+
+  if (surface === "console-advanced") {
     return (
       <>
         {renderConsole()}
-        {/* The supporting-control back to the product. The console's own
-            chrome belongs to the ZCode shell (untouched by P9-A), so the
-            switch renders this small floating affordance instead — honest,
-            discoverable, PaySwap-branded. */}
+        {/* The supporting-control back to the product. The advanced
+            surface's own chrome belongs to the ZCode shell (untouched),
+            so the switch renders this small floating affordance instead —
+            honest, discoverable, PaySwap-branded. */}
         <button
           type="button"
           className="ps-desktop-back-to-product"

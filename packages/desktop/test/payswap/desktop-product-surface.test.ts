@@ -1,9 +1,12 @@
 /**
- * Desktop product-surface laws (P9-A): the hash-routing seam that makes
- * the desktop main window open the PaySwap product experience with the
- * agent console reachable as a supporting surface (PRODUCT-IDENTITY.md
- * §3 "Desktop", JOURNEY-MAP J14), the About-panel identity + upstream
- * attribution (§4), and the renderer identity (title/boot).
+ * Desktop product-surface laws (P9-A + P10-B): the hash-routing seam that
+ * makes the desktop main window open the PaySwap product experience with
+ * the agent console reachable as a supporting surface (PRODUCT-IDENTITY.md
+ * §3 "Desktop", JOURNEY-MAP J14), the P10-B console tri-state (product |
+ * Agent Workspace | advanced developer workspace per CONSOLE-WORKSPACE.md
+ * §2, incl. the /console/<section> pass-through and the advanced-prefix
+ * law), the About-panel identity + upstream attribution (§4), and the
+ * renderer identity (title/boot).
  *
  * Node-environment contract tests over the PURE seam (payswapDesktop.ts)
  * + the importable About dialog template (aboutWindow.ts) + source-scan
@@ -15,7 +18,10 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
+  DESKTOP_CONSOLE_ADVANCED_HASH_PREFIX,
   DESKTOP_CONSOLE_HASH,
+  consoleWorkspacePathFromHash,
+  createConsoleWorkspaceNavigation,
   createDesktopConsoleEntry,
   createDesktopHashNavigation,
   desktopProductPathFromHash,
@@ -66,11 +72,32 @@ describe("the desktop surface switch (hash contract, PRODUCT-IDENTITY §3 Deskto
     expect(resolveDesktopSurface("#/app/payments")).toBe("product");
   });
 
-  it("the console opens ONLY on its dedicated hash — a supporting surface (J14)", () => {
+  it("the console opens ONLY on its dedicated namespace — a supporting surface (J14)", () => {
     expect(DESKTOP_CONSOLE_HASH).toBe(`#${PAYSWAP_CONSOLE_PATH}`);
     expect(resolveDesktopSurface(DESKTOP_CONSOLE_HASH)).toBe("console");
-    // Not a product path shape accident: /console is not a product route.
-    expect(resolveDesktopSurface("#/console/x")).toBe("product");
+    // Not a product path shape accident: a hash that merely STARTS with the
+    // console path (e.g. "/consoleation") is not the console namespace.
+    expect(resolveDesktopSurface("#/consoleation")).toBe("product");
+  });
+
+  it("the §2 routing law as the desktop tri-state table (P10-B)", () => {
+    // console root → the PaySwap Agent Workspace (CONSOLE-WORKSPACE §2).
+    expect(resolveDesktopSurface("#/console")).toBe("console");
+    expect(resolveDesktopSurface("#/console/")).toBe("console");
+    // Every /console/<section> path is the WORKSPACE — known sections and
+    // unknown ones alike (an unknown section path is the workspace's own
+    // honest not-found, INSIDE the workspace chrome, never the product's).
+    expect(resolveDesktopSurface("#/console/missions")).toBe("console");
+    expect(resolveDesktopSurface("#/console/overview")).toBe("console");
+    expect(resolveDesktopSurface("#/console/x")).toBe("console");
+    // The advanced developer workspace: exact or any deeper path under it.
+    expect(resolveDesktopSurface(DESKTOP_CONSOLE_ADVANCED_HASH_PREFIX)).toBe("console-advanced");
+    expect(resolveDesktopSurface("#/console/advanced/deeper")).toBe("console-advanced");
+    expect(resolveDesktopSurface("#/console/advanced/deep/still")).toBe("console-advanced");
+    // The §2 letter: "any deeper path UNDER it" — "/console/advancedfoo"
+    // is an unknown SECTION path (the workspace's not-found), NOT advanced.
+    expect(resolveDesktopSurface("#/console/advancedfoo")).toBe("console");
+    expect(resolveDesktopSurface("#/console/advancedish/x")).toBe("console");
   });
 
   it("hashes map onto the product's top-level route paths", () => {
@@ -80,6 +107,55 @@ describe("the desktop surface switch (hash contract, PRODUCT-IDENTITY §3 Deskto
     expect(desktopProductPathFromHash("#/app")).toBe("/app");
     expect(desktopProductPathFromHash("#/app/payments")).toBe("/app/payments");
     expect(desktopProductPathFromHash("#/capabilities")).toBe("/capabilities");
+  });
+});
+
+describe("the console workspace path space (§2 — section paths pass through)", () => {
+  it("console-namespace hashes keep their body as the workspace path", () => {
+    expect(consoleWorkspacePathFromHash("#/console")).toBe("/console");
+    expect(consoleWorkspacePathFromHash("#/console/")).toBe("/console/");
+    expect(consoleWorkspacePathFromHash("#/console/missions")).toBe("/console/missions");
+    // Unknown sections pass through too — the WORKSPACE resolves its own
+    // honest not-found (the mount never pre-splits, never guesses).
+    expect(consoleWorkspacePathFromHash("#/console/nonsense/deeper")).toBe(
+      "/console/nonsense/deeper",
+    );
+  });
+
+  it("non-console hashes fall back to the workspace root (→ overview)", () => {
+    expect(consoleWorkspacePathFromHash("")).toBe("/console");
+    expect(consoleWorkspacePathFromHash("#/")).toBe("/console");
+    expect(consoleWorkspacePathFromHash("#/app/payments")).toBe("/console");
+  });
+
+  it("the console workspace navigation adapter navigates the /console path space over the hash", () => {
+    const location = fakeLocation("#/console");
+    const navigation = createConsoleWorkspaceNavigation(location);
+    expect(navigation.getPath()).toBe("/console");
+    navigation.navigate("/console/missions");
+    expect(location.hashes).toEqual(["#/console/missions"]);
+    expect(navigation.getPath()).toBe("/console/missions");
+  });
+
+  it("workspace section navigation is reload-free by construction (hash change + subscription)", () => {
+    const location = fakeLocation("#/console");
+    const navigation = createConsoleWorkspaceNavigation(location);
+    let notified = 0;
+    const unsubscribe = navigation.subscribe(() => {
+      notified += 1;
+    });
+    // navigate() sets the hash — the renderer never reloads on hash
+    // changes, and the subscription carries the re-render.
+    navigation.navigate("/console/missions");
+    expect(notified).toBe(1);
+    expect(navigation.getPath()).toBe("/console/missions");
+    // Back to the workspace root without a reload.
+    navigation.navigate("/console");
+    expect(notified).toBe(2);
+    expect(navigation.getPath()).toBe("/console");
+    unsubscribe();
+    navigation.navigate("/console/lab");
+    expect(notified).toBe(2);
   });
 });
 
@@ -184,12 +260,40 @@ describe("the renderer identity (title + boot shell + product mount)", () => {
     expect(source).toContain("supportsSettings={supportsSettings}");
   });
 
-  it("the surface switch sets PaySwap window titles per surface (source-scan)", () => {
+  it("the P10-B wiring: the switch injects the Agent Workspace + the shared hash location (source-scan)", () => {
+    const source = readSource("src/renderer/src/main.tsx");
+    // renderWorkspace injects the console workspace mount over the SAME
+    // hash location instance as the product (no reload on transitions).
+    expect(source).toContain("renderWorkspace={() => (");
+    expect(source).toContain("<DesktopConsoleWorkspace");
+    expect(source).toContain("location={hashLocation}");
+    expect(source).toContain("services={services}");
+    // The services connection is the console-extended channel client.
+    expect(source).toContain("connectDesktopConsoleServices(port)");
+  });
+
+  it("the surface switch titles all three surfaces honestly (source-scan)", () => {
     const source = readSource("src/renderer/src/ProductSurface.tsx");
     expect(source).toContain('"PaySwap — Agent Console"');
+    expect(source).toContain('"Developer Workspace — PaySwap Agent Console"');
     expect(source).toContain("routeDocumentTitle");
     expect(source).toContain("HONEST_DEPLOYMENT_CONTEXT");
     expect(source).toContain("NO_EVIDENCE_COVERAGE");
+  });
+
+  it("the console branch renders the injected workspace with NO floating back button; the advanced branch keeps it (source-scan)", () => {
+    const source = readSource("src/renderer/src/ProductSurface.tsx");
+    // The workspace carries its own PaySwap chrome + back affordance
+    // (CONSOLE-WORKSPACE §1) — the switch adds nothing around it.
+    expect(source).toContain("return <>{renderWorkspace()}</>;");
+    // The floating back affordance exists ONLY on the advanced branch.
+    const advancedBranch = source.slice(source.indexOf('if (surface === "console-advanced")'));
+    expect(advancedBranch).toContain("ps-desktop-back-to-product");
+    const workspaceBranch = source.slice(
+      source.indexOf('if (surface === "console")'),
+      source.indexOf('if (surface === "console-advanced")'),
+    );
+    expect(workspaceBranch).not.toContain("ps-desktop-back-to-product");
   });
 
   it("the renderer build resolves @payswap/app from the workspace (source-scan: vite config)", () => {
