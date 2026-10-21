@@ -152,3 +152,111 @@ describe("boundary law (contracts grade)", () => {
     expect(index.SURFACE_API_VERSION).toBe("1.0.0");
   });
 });
+
+describe("console contract boundary (P10-A — CONSOLE-WORKSPACE.md)", () => {
+  const consoleModules = srcFiles().filter((file) => /console-[^/\\]*\.ts$/.test(file));
+
+  /** Every export declaration name in a source file (runtime AND type exports). */
+  function exportDeclarationNames(file: string): string[] {
+    const text = readFileSync(file, "utf8");
+    const names: string[] = [];
+    for (const line of text.split("\n")) {
+      const trimmed = line.trim();
+      const declared = trimmed.match(
+        /^export\s+(?:declare\s+)?(?:abstract\s+)?(?:async\s+)?(?:function|const|let|var|class|type|interface|enum)\s+([A-Za-z_$][\w$]*)/,
+      );
+      if (declared) {
+        names.push(declared[1] ?? "");
+        continue;
+      }
+      const reExported = trimmed.match(/^export\s*\{([^}]+)\}/);
+      if (reExported) {
+        for (const part of (reExported[1] ?? "").split(",")) {
+          const name = part.trim().split(/\s+as\s+/).pop()?.trim();
+          if (name) names.push(name);
+        }
+      }
+    }
+    return names;
+  }
+
+  it("the console module family is present (six modules, all under packages/surface/src)", () => {
+    expect(consoleModules.length).toBe(6);
+    for (const module of consoleModules) {
+      expect(module.startsWith(join(ROOT, "src"))).toBe(true);
+    }
+  });
+
+  it("advisory-only law extended to the console family: NO export declaration (runtime or type) in any src module carries an authority verb", () => {
+    const AUTHORITY_VERB = /^(authorize|authorise|commit|execute|sign|capture|settle|refund|cancel|approve|dispatch)/i;
+    const allSrc = srcFiles();
+    expect(allSrc.length).toBeGreaterThanOrEqual(15);
+    for (const file of allSrc) {
+      for (const name of exportDeclarationNames(file)) {
+        expect(
+          AUTHORITY_VERB.test(name),
+          `${file}: export '${name}' carries an authority verb — the surface is advisory and can never own authority (INV-23; §7 of the console contract)`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it("the console contract surface is present on the public index (the P10-A deliverables)", () => {
+    const anchors = [
+      "WORKSPACE_SECTIONS",
+      "CONSOLE_SECTION_IDS",
+      "CONSOLE_ROOT_TITLE",
+      "resolveConsoleSection",
+      "consoleDocumentTitle",
+      "consoleSectionById",
+      "validateMissionIntake",
+      "missionSummaryOf",
+      "MISSION_PREREQUISITE_INTENT",
+      "MISSION_PREREQUISITE_ELIGIBILITY",
+      "MISSION_PREREQUISITE_PLANNING",
+      "MISSION_PREREQUISITE_APPROVAL",
+      "MISSION_PREREQUISITE_EXECUTION",
+      "MISSION_PREREQUISITE_OBSERVATION",
+      "MISSION_PREREQUISITE_EVIDENCE",
+      "foldMissionLadder",
+      "foldMissionDetail",
+      "WORKSPACE_STORE_DURABILITY_LABELS",
+      "workspaceStoreDurabilityLabel",
+      "WORKSPACE_STORE_DEMAND_SIDE_LAW",
+      "foldWorkspaceOverview",
+      "WORKSPACE_OVERVIEW_RECENT_EVENTS_CAP",
+      "CONSOLE_SECTION_EMPTY_STATES",
+      "consoleSectionEmptyState",
+      "NO_EVIDENCE_COVERAGE",
+      "AGENT_CONTRACT_VOCABULARY",
+      "APPROVAL_VOCABULARY",
+      "CONNECTION_LIFECYCLE_VOCABULARY",
+      "ACTIVITY_OUTCOME_STATE_REFERENCE",
+      "LAB_REFERENCE_VOCABULARY",
+      "LAB_ADVISORY_LAW",
+      "foldWorkspaceSettingsFacts",
+    ] as const;
+    for (const anchor of anchors) {
+      expect((index as Record<string, unknown>)[anchor], `missing console export: ${anchor}`).toBeDefined();
+    }
+  });
+
+  it("the console modules take explicit inputs only (no ambient clock/locale/registry — SV-9)", () => {
+    const FORBIDDEN: ReadonlyArray<{ readonly pattern: RegExp; readonly label: string }> = [
+      { pattern: /\bIntl\./, label: "ambient Intl" },
+      { pattern: /\bDate\.now\s*\(/, label: "ambient clock (Date.now)" },
+      { pattern: /new\s+Date\s*\(/, label: "ambient clock (new Date)" },
+      { pattern: /\bMath\.random\s*\(/, label: "randomness" },
+      { pattern: /\bprocess\.env\b/, label: "environment read" },
+      { pattern: /\bperformance\.now\s*\(/, label: "ambient clock (performance.now)" },
+      { pattern: /\blocalStorage\b/, label: "browser storage (adapter territory, never the contracts)" },
+      { pattern: /\bfetch\s*\(/, label: "network" },
+    ];
+    for (const file of consoleModules) {
+      const text = readFileSync(file, "utf8");
+      for (const { pattern, label } of FORBIDDEN) {
+        expect(pattern.test(text), `${file}: ${label} — console folds take explicit inputs only`).toBe(false);
+      }
+    }
+  });
+});

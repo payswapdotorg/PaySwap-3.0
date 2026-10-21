@@ -139,3 +139,92 @@ export {
   foldSecurityDecision,
   modeIndicator,
 } from "./security-vocabulary.ts";
+
+export {
+  type ConsoleSectionId,
+  type ConsoleSection,
+  type ConsoleRouteResolution,
+  WORKSPACE_SECTIONS,
+  CONSOLE_SECTION_IDS,
+  CONSOLE_ROOT_TITLE,
+  CONSOLE_TITLE_SUFFIX,
+  CONSOLE_ADVANCED_ROUTE,
+  CONSOLE_ADVANCED_LABEL,
+  consoleSectionById,
+  resolveConsoleSection,
+  consoleDocumentTitle,
+} from "./console-workspace.ts";
+
+export {
+  type MissionIntentDirection,
+  type MissionIntakeInput,
+  type MissionDraftStatus,
+  type MissionLifecycleRung,
+  type MissionRungState,
+  type MissionEventKind,
+  type MissionEvent,
+  type MissionStructuralValidation,
+  type MissionRecord,
+  type MissionSummary,
+  type MissionDetail,
+  MISSION_INTENT_DIRECTIONS,
+  MISSION_DRAFT_STATUSES,
+  MISSION_EVENT_KINDS,
+  MISSION_LIFECYCLE_RUNGS,
+  InvalidConsoleMissionError,
+  validateMissionIntake,
+  validateMissionRecordShape,
+  missionSummaryOf,
+} from "./console-missions.ts";
+
+export {
+  MISSION_PREREQUISITE_INTENT,
+  MISSION_PREREQUISITE_ELIGIBILITY,
+  MISSION_PREREQUISITE_PLANNING,
+  MISSION_PREREQUISITE_APPROVAL,
+  MISSION_PREREQUISITE_EXECUTION,
+  MISSION_PREREQUISITE_OBSERVATION,
+  MISSION_PREREQUISITE_EVIDENCE,
+  foldMissionLadder,
+  foldMissionDetail,
+} from "./console-ladder.ts";
+
+export {
+  type WorkspaceStoreDurability,
+  type WorkspaceStorePort,
+  WORKSPACE_STORE_DURABILITY_LABELS,
+  WORKSPACE_STORE_DEMAND_SIDE_LAW,
+  InvalidWorkspaceStoreError,
+  workspaceStoreDurabilityLabel,
+} from "./console-store.ts";
+
+export {
+  type TaggedMissionEvent,
+  type WorkspaceOverviewAttention,
+  type WorkspaceEmptyState,
+  type WorkspaceOverviewView,
+  type ConsoleSectionEmptyReasonId,
+  type ConsoleSectionEmptyState,
+  type ConsoleConnectionCoverageFact,
+  WORKSPACE_OVERVIEW_RECENT_EVENTS_CAP,
+  InvalidOverviewRecordError,
+  foldWorkspaceOverview,
+  CONSOLE_SECTION_EMPTY_STATES,
+  consoleSectionEmptyState,
+  NO_EVIDENCE_COVERAGE,
+  NO_EVIDENCE_COVERAGE_NOTE,
+} from "./console-sections.ts";
+
+export {
+  type ConsoleReferenceEntry,
+  type ConsoleReferenceVocabulary,
+  type WorkspaceSettingsFacts,
+  LAB_ADVISORY_LAW,
+  AGENT_CONTRACT_VOCABULARY,
+  APPROVAL_VOCABULARY,
+  CONNECTION_LIFECYCLE_VOCABULARY,
+  ACTIVITY_OUTCOME_STATE_REFERENCE,
+  LAB_REFERENCE_VOCABULARY,
+  InvalidWorkspaceSettingsError,
+  foldWorkspaceSettingsFacts,
+} from "./console-vocabularies.ts";
