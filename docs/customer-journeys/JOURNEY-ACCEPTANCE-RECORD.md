@@ -62,7 +62,7 @@ space; `@contract` tests gate at integration).
 | J11 | Reports / history | `/app` → reports | 1 | journey-entry.spec.ts (eleven-area map) | (via the /app shell coverage) | UNTESTED | — |
 | J12 | Developer / API | `/developers` | 1 | navigation.spec.ts (1), branding.spec.ts (2) | branding.spec.ts (1), accessibility.spec.ts (1) | UNTESTED | — |
 | J13 | Settings / support / about | `/app` → settings; about | 1 | settings-about.spec.ts (1), branding.spec.ts (2) | settings-about.spec.ts (1), branding.spec.ts (1) | UNTESTED | — |
-| J14 | Agent console (supporting capability) | `/console` | 2 | — (contract-only at base) | navigation.spec.ts (2) | UNTESTED | — |
+| J14 | Agent console (supporting capability) | `/console` | 2 | — (contract-only at base) | navigation.spec.ts (2); console-workspace.spec.ts, console-mission-lifecycle.spec.ts, console-honest-empties.spec.ts, console-advanced.spec.ts, console-a11y-responsive.spec.ts (P10-D lane @ 94f1445, flows 15-19) | PASS | TL run @ 4137bf6→94f1445 (web build, both viewports): 65 passed / 1 skipped / 0 failed incl. all console flows; the twelve evidence screenshots at test-results/evidence/ |
 | J15 | Legacy `/payswap/*` URLs | redirect | 2 | — (contract-only at base) | legacy-redirect.spec.ts (3) | UNTESTED | — |
 
 The matrix's machine-checked mirror: `packages/journey-verification/
@@ -220,7 +220,7 @@ TL's manual browser verification of the same tree.
 | J11 reports/history | **SETUP-REQUIRED (honest)** | designed-empty verified |
 | J12 developer/API | **COMPLETE** | MISSING runtime config displayed, not hidden — verified |
 | J13 settings/about | **COMPLETE** | PaySwap identity + preserved upstream attribution verified (the attribution exemption is structural) |
-| J14 agent console (supporting) | **COMPLETE** | reachable-but-secondary verified (ghost link, DOM order); the honest no-backend bootstrap report verified |
+| J14 agent console (supporting) | **COMPLETE** (P10: the Agent Workspace) | the PaySwap Agent Workspace verified at `/console`: PaySwap chrome + the eight-section navigation (zero ZCode branding), mission lifecycle real in the browser (intake findings → draft → intent-review → ladder with verbatim typed prerequisites → events → revise → archive, persisted across reload), honest empties (agents/approvals/activity/lab/connections no-provider), advanced developer workspace at `/console/advanced`, axe-critical + keyboard/focus/reduced-motion + mobile 390×844 green; desktop `#/console` mount verified by node/component batteries (the seam + tri-state routing + channel client); the desktop GUI inspection rides the v1.1.0 release (recorded below) |
 | J15 legacy /payswap URLs | **COMPLETE** | permanent redirects verified (all four legacy routes + unknown legacy) |
 
 **The four productization gates (PRODUCT-IDENTITY §6) at this commit:**
@@ -246,3 +246,58 @@ TL's manual browser verification of the same tree.
   DESKTOP journey verification (packaged app flows) rides the release
   verification (CI install job + operator acceptance) — honestly
   marked, never conflated.
+
+---
+
+## P10 ADDENDUM — the console-productization wave (TL-filled, 2026-10-21)
+
+The Phase 10 wave (spec/surface/CONSOLE-WORKSPACE.md; work orders
+P10-A/B/C/D) replaced the `/console` ZCode shell with the PaySwap Agent
+Workspace. Evidence at the exact commits:
+
+- **The wave's cross-lane contract**: `spec/surface/CONSOLE-WORKSPACE.md`
+  (registered 54f7977; the `@payswap/app` compile seam 645a56c).
+- **P10-A** (`work/p10-a` @ 49f5eeb, merged 5309461): the presentation
+  contracts in `@payswap/surface` — 17 files / 195 tests, the §4
+  prerequisites machine-pinned against the contract doc;
+  `SURFACE_API_VERSION` 1.0.0 → 1.1.0 (additive MINOR, TL act at
+  integration 4137bf6).
+- **P10-B** (`work/p10-b` @ ae2aa8f, merged e9577d7): the desktop
+  mission-intake store (DESKTOP_PROFILE, JSON persistence under the
+  PaySwap user-data directory, malformed-record quarantine) + the host
+  service extension + the renderer tri-state mount (`#/console` → the
+  workspace, `#/console/advanced` → the ZCode developer workspace) +
+  the channel client with method-parity drift test; the web mount
+  (gate split + BROWSER_PROFILE localStorage store). 15f/152t desktop,
+  2f/33t web, host+renderer typecheck clean.
+- **P10-C** (`work/p10-c` @ 2e7680a, merged 8e1f86e): the workspace
+  views in `@payswap/app` — the eight sections, the lifecycle ladder,
+  honest empties, WCAG markup assertions; the seam's 17 exported names
+  preserved. 21f/236t (incl. the TL's app↔surface pin-mirror
+  cross-check added at integration).
+- **P10-D** (`work/p10-d` @ 94f1445): the console journey specs
+  (JOURNEY-MAP flows 15-19) + this record's J14 verdict.
+- **The TL integration run** (4137bf6 → 94f1445, this record's
+  verdict basis): surface 17f/195t · app 21f/236t · desktop 15f/152t ·
+  web 2f/33t · ui 15f/226t · **journeys 65 passed / 1 skipped / 0
+  failed** · oxlint 0 errors (3 inherited warnings) · invariants 0
+  failures · ownership report regenerated, zero new violations (the
+  P10 additions live inside the documented carry classes).
+- **Evidence screenshots** (twelve): `packages/journey-verification/
+  test-results/evidence/01…12-*.png` — console overview (empty +
+  in-progress), not-found, intake findings, the intent-review step,
+  mission detail ladder, archived, connections no-provider, activity
+  UNKNOWN-reference, advanced honest state, settings
+  identity/attribution, missions mobile 390×844. Mirrored to the
+  station delivery directory.
+
+**Honest boundaries (never conflated):** the browser flows verify the
+WEB mount of the workspace (the same `@payswap/app` component the
+desktop renders); the DESKTOP `#/console` experience is verified at
+this commit by the node/component batteries (the seam, the tri-state
+routing, the channel client, the store) — its packaged-GUI inspection
+rides the v1.1.0 release verification (the CI install-verify job + the
+station published-asset check), exactly as the P9 desktop gates did.
+The mission store holds demand-side intent only; no execution,
+approval or observation plane exists in this deployment, and every
+such state renders its typed prerequisite (CONSOLE-WORKSPACE §4).
