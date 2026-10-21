@@ -27,7 +27,7 @@ Routes follow PRODUCT-IDENTITY.md §3 (canonical route contract).
 | J11 | Reports / history | `/app` → reports area | reports list | designed-empty with reason | no fabricated history |
 | J12 | Developer / API | `/developers` | developer surface | MISSING runtime config displayed | unconfigured state shown, not hidden |
 | J13 | Settings / support / about | `/app` → settings; about | settings + about | — | PaySwap identity; upstream attribution present (legal/about) |
-| J14 | Agent console (supporting capability) | `/console` (web) / console surface (desktop) | console link from product | auth | never the default landing; framed as a capability of PaySwap |
+| J14 | Agent console (supporting capability) | `/console` (web) / console surface (desktop) | console link from product | auth | never the default landing; the PaySwap Agent Workspace per spec/surface/CONSOLE-WORKSPACE.md (P10); ZCode developer workspace = advanced interface at `/console/advanced` |
 | J15 | Legacy `/payswap/*` URLs | `/payswap`, `/payswap/*` | redirect | — | permanent redirect to the new top-level route |
 
 ## 2. Navigation IA law (Lane A)
@@ -75,6 +75,30 @@ published release):
 12. **appimage-run** (if published): chmod +x → run → same checks.
 13. **upgrade-uninstall**: install over/above, uninstall clean.
 14. **release-page**: README links resolve to the real release assets.
+
+Console flows (Phase 10 — verified against a served production build;
+the desktop store path additionally verified by the station desktop GUI
+inspection per CONSOLE-WORKSPACE.md §9):
+
+15. **console-workspace**: `/console` renders the PaySwap Agent
+   Workspace (PaySwap chrome + the eight-section navigation), zero
+   console errors; returning to the product works without a renderer
+   reload; unknown section paths render the workspace honest not-found.
+16. **console-mission-lifecycle**: mission creation intake → structural
+   validation findings rendered → draft recorded → intent recorded (the
+   review step) → detail ladder (INTENT reached; downstream rungs
+   verbatim typed prerequisites) → real event timeline → revise →
+   archive.
+17. **console-honest-empties**: agents/approvals/activity/lab sections
+   render designed-empty states with typed reasons; no fabricated
+   agents/approvals/activity/experiments; connections shows the honest
+   no-provider state.
+18. **console-advanced**: `/console/advanced` opens the developer
+   workspace, clearly labeled as the upstream platform's developer
+   interface; settings shows PaySwap identity + upstream attribution.
+19. **console-a11y-responsive**: axe-core critical pass on the console
+   sections (desktop 1280×800, mobile 390×844); keyboard traversal,
+   visible focus, landmarks; reduced-motion respected.
 
 ## 4. Evidence obligations
 

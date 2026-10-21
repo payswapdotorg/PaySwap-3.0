@@ -68,13 +68,21 @@ Canonical routes after P9-A (the cross-lane shape C tests against):
 | `/capabilities` | capabilities + live coverage | `/payswap/capabilities` |
 | `/security` | non-custodial security commitments | `/payswap/security` |
 | `/developers` | developer/API authority surface | `/payswap/developers` |
-| `/console` | the agent workspace console (the ZCode-derived client) — a SUPPORTING capability, linked from the product, never the default landing | `/` |
+| `/console` | the PaySwap Agent Workspace (P10) — a SUPPORTING capability per spec/surface/CONSOLE-WORKSPACE.md (overview/missions/agents/approvals/connections/activity/lab/settings); the ZCode-derived developer workspace remains reachable as the advanced technical interface at `/console/advanced`; never the default landing | `/` |
 | `/payswap`, `/payswap/*` | permanent client-side redirects to the new top-level routes (recorded URLs keep working) | — |
 | `/auth/callback`, share routes | unchanged (substrate) | unchanged |
 
 Desktop: the main window opens the PaySwap product experience (home →
-app). The agent console is reachable as a supporting surface. The
-first-run and no-provider states follow the honesty laws (§5).
+app). The agent console (`#/console`) opens the PaySwap Agent Workspace
+(spec/surface/CONSOLE-WORKSPACE.md); the ZCode-derived developer
+workspace is the advanced technical interface at `#/console/advanced`.
+The first-run and no-provider states follow the honesty laws (§5).
+
+Amendment (Phase 10, registered by the resident TL 2026-10-21 per the
+console-productization operator handoff): the console surface is
+PaySwap-native end-to-end — a first-class Agent Workspace, not a
+reskinned coding IDE. The inherited ZCode shell is preserved as the
+advanced developer interface with honest framing, never removed.
 
 ## 4. Upstream attribution (legally preserved)
 
