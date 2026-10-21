@@ -1,0 +1,20 @@
+{
+  "name": "@payswap/journey-verification",
+  "private": true,
+  "version": "1.0.0",
+  "description": "PaySwap journey acceptance suite — the JOURNEY-MAP.md J1–J15 matrix made testable (Playwright browser flows, tier-1 base-green + tier-2 @contract integration-gated), plus the install-verification runner for the published GitHub release.",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:tier1": "playwright test --grep-invert @contract",
+    "test:tier2": "playwright test --grep @contract",
+    "typecheck": "tsc --noEmit -p .",
+    "serve": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.10.1",
+    "typescript": "^6.0.2"
+  }
+}
