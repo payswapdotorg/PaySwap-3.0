@@ -12,63 +12,58 @@
  *   3. verify every checksum (SHA256SUMS is authoritative; a missing
  *      entry for a downloaded asset is a FAILURE, not a skip);
  *   4. dpkg -i the .deb;
- *   5. assert the installed product identity:
- *        - /usr/share/applications/*.desktop → Name=PaySwap (exact);
+ *   5. assert the installed product identity (desktopIdentity.mjs):
+ *        - exactly one /usr/share/applications/*.desktop with Name=PaySwap;
  *        - the Icon= target resolves on disk;
  *        - the Exec= binary exists and is executable;
- *        - the package name is `payswap` and its file list carries the
- *          desktop entry + the `payswap` executable (the app-data path
- *          PATTERN: electron's userData default derives from the
- *          productName — ~/.config/PaySwap; asserted statically here,
- *          and at runtime only under --launch);
- *   6. dpkg -r (cleanup — always attempted, even on failure);
- *   7. AppImage (when published): structure (ELF magic) + checksum +
- *      executable-bit checks; run-verification ONLY under --launch
- *      (requires a display or xvfb-run — documented boundary);
- *   8. write a JSON receipt (the evidence the acceptance record cites).
+ *        - dpkg -s payswap reports 'install ok installed';
+ *   6. under --launch (BEFORE cleanup, while the package is installed):
+ *        - launch the desktop-entry Exec binary (directly under a
+ *          DISPLAY, or wrapped in xvfb-run when available);
+ *        - assert ~/.config/PaySwap appears (productName-derived
+ *          app-data path);
+ *        - assert a real window exists with a PaySwap WM_CLASS and a
+ *          PaySwap title (xdotool, when installed — this assertion is
+ *          what would have caught the v1.0.0 force-update block, where
+ *          the app created its data dir but never a main window);
+ *   7. dpkg -r (cleanup — always attempted, even on failure paths,
+ *      unless --keep);
+ *   8. AppImage (when published): ELF magic + checksum + executable bit;
+ *   9. write a JSON receipt (the evidence the acceptance record cites).
  *
  * HONEST FAILURE MODES (every one exits non-zero with an explicit
  * message — this runner never fabricates a pass):
  *   - exit 2  — usage / environment error (bad args, no network config);
- *   - exit 3  — NO RELEASE EXISTS for the tag (the P9-B gate has not
- *               shipped one) — the clean explicit error the work order
- *               mandates: "no release yet → clean explicit error";
+ *   - exit 3  — NO RELEASE EXISTS for the tag;
  *   - exit 4  — release exists but the expected assets are missing;
  *   - exit 5  — checksum verification failed;
- *   - exit 6  — install environment not usable (dpkg unavailable, no
- *               root/sudo) — the runner does NOT silently skip;
+ *   - exit 6  — install environment not usable (no dpkg, no root/sudo);
  *   - exit 7  — an identity assertion failed (desktop entry / icon /
- *               binary / package name);
+ *               binary / package name / launch / window identity);
  *   - exit 8  — AppImage structural checks failed;
- *   - exit 9  — launch verification requested but the environment does
- *               not support it (no display, no xvfb-run).
+ *   - exit 9  — launch requested but the environment cannot support it.
  *
  * Usage:
  *   node install-verify.mjs --repo <owner/name> --tag <tag|latest>
  *     [--workdir <dir>] [--keep] [--skip-appimage] [--launch]
  *
- * Environment: GITHUB_TOKEN (optional, for rate limits/private repos),
- * GITHUB_API_URL (optional, defaults to https://api.github.com).
+ * Environment: GITHUB_TOKEN (optional), GITHUB_API_URL (optional).
  */
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import {
-  chmodSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { chmodSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import os from "node:os";
 
+import { collectAppImageFindings, collectDesktopIdentityFindings } from "./desktopIdentity.mjs";
+
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const DEFAULT_WORKDIR = join(HERE, ".cache-install-verify");
+const LAUNCH_SETTLE_TIMEOUT_MS = 25_000;
+const WINDOW_POLL_TIMEOUT_MS = 20_000;
+const WINDOW_POLL_INTERVAL_MS = 1_000;
 
 const EXIT = {
   USAGE: 2,
@@ -178,10 +173,7 @@ function parseChecksums(text) {
 }
 
 function run(command, args, options = {}) {
-  const result = spawnSync(command, args, {
-    encoding: "utf8",
-    ...options,
-  });
+  const result = spawnSync(command, args, { encoding: "utf8", ...options });
   return {
     status: result.status,
     stdout: (result.stdout ?? "").trim(),
@@ -200,164 +192,7 @@ function installRootPrefix() {
   return null;
 }
 
-function findDesktopEntry() {
-  const applicationsDir = "/usr/share/applications";
-  if (!existsSync(applicationsDir)) {
-    return null;
-  }
-  const candidates = [];
-  for (const name of readdirSync(applicationsDir)) {
-    if (!name.endsWith(".desktop")) {
-      continue;
-    }
-    const path = join(applicationsDir, name);
-    const content = readFileSync(path, "utf8");
-    const nameMatch = /^Name=(.*)$/m.exec(content);
-    if (nameMatch && nameMatch[1].trim() === "PaySwap") {
-      candidates.push({ path, content });
-    }
-  }
-  return candidates.length === 1 ? candidates[0] : candidates.length > 1 ? candidates : null;
-}
-
-function resolveIcon(iconValue) {
-  if (!iconValue) {
-    return null;
-  }
-  if (iconValue.startsWith("/")) {
-    return existsSync(iconValue) ? iconValue : null;
-  }
-  const iconRoots = ["/usr/share/icons/hicolor", "/usr/share/pixmaps", "/usr/share/icons"];
-  const extensions = [".png", ".svg", ".xpm", ""];
-  for (const root of iconRoots) {
-    for (const size of ["", "512x512", "256x256", "128x128", "96x96", "64x64", "48x48", "scalable", "symbolic"]) {
-      for (const extension of extensions) {
-        const candidate = join(root, size, "apps", `${iconValue}${extension}`);
-        if (existsSync(candidate)) {
-          return candidate;
-        }
-      }
-    }
-  }
-  return null;
-}
-
-function assertInstalledIdentity() {
-  const findings = [];
-
-  // The desktop entry: exactly one, Name=PaySwap.
-  const entry = findDesktopEntry();
-  if (!entry) {
-    findings.push("no /usr/share/applications/*.desktop entry with Name=PaySwap was found");
-  } else if (Array.isArray(entry)) {
-    findings.push(`multiple desktop entries claim Name=PaySwap: ${entry.map((item) => item.path).join(", ")}`);
-  } else {
-    console.error(`[install-verify] desktop entry: ${entry.path} (Name=PaySwap ✓)`);
-
-    const iconMatch = /^Icon=(.*)$/m.exec(entry.content);
-    const iconValue = iconMatch?.[1]?.trim();
-    if (!iconValue) {
-      findings.push("the desktop entry has no Icon= line");
-    } else {
-      const resolved = resolveIcon(iconValue);
-      if (!resolved) {
-        findings.push(`Icon=${iconValue} does not resolve to a file on disk`);
-      } else {
-        console.error(`[install-verify] icon resolved: ${resolved} ✓`);
-      }
-    }
-
-    const execMatch = /^Exec=(.*)$/m.exec(entry.content);
-    const execValue = execMatch?.[1]?.trim();
-    if (!execValue) {
-      findings.push("the desktop entry has no Exec= line");
-    } else {
-      const binaryToken = execValue.split(/\s+/)[0];
-      let binaryPath = binaryToken;
-      if (!binaryToken.startsWith("/")) {
-        const which = run("which", [binaryToken]);
-        binaryPath = which.status === 0 ? which.stdout : null;
-      }
-      if (!binaryPath || !existsSync(binaryPath)) {
-        findings.push(`Exec binary ${binaryToken} does not exist on disk`);
-      } else {
-        const mode = statSync(binaryPath).mode;
-        if ((mode & 0o111) === 0) {
-          findings.push(`Exec binary ${binaryPath} is not executable`);
-        } else {
-          console.error(`[install-verify] exec binary: ${binaryPath} (executable) ✓`);
-        }
-      }
-    }
-  }
-
-  // The package name + file list (the app-data path PATTERN's static
-  // half: the shipped executable is `payswap` — electron's userData
-  // default then derives from productName PaySwap → ~/.config/PaySwap).
-  const status = run("dpkg", ["-s", "payswap"]);
-  if (status.status !== 0 || !/^Status:\s*install ok installed$/m.test(status.stdout)) {
-    findings.push("dpkg -s payswap does not report 'install ok installed'");
-  } else {
-    console.error("[install-verify] package payswap: install ok installed ✓");
-  }
-  const files = run("dpkg", ["-L", "payswap"]);
-  if (files.status !== 0) {
-    findings.push("dpkg -L payswap failed");
-  } else {
-    const listed = files.stdout.split(/\r?\n/);
-    const hasDesktop = listed.some((path) => path.startsWith("/usr/share/applications/") && path.endsWith(".desktop"));
-    if (!hasDesktop) {
-      findings.push("the package file list carries no .desktop entry under /usr/share/applications/");
-    } else {
-      console.error("[install-verify] package ships the desktop entry ✓");
-    }
-    const hasPayswapExecutable = listed.some((path) => /\/payswap(\.exe)?$/.test(path) || /\/bin\/payswap$/.test(path));
-    console.error(
-      hasPayswapExecutable
-        ? "[install-verify] package ships a payswap executable ✓ (app-data path pattern: ~/.config/PaySwap — productName-derived; runtime-asserted only under --launch)"
-        : "[install-verify] NOTE: no literal 'payswap' path in the package list (exec binary name asserted via the desktop entry instead)",
-    );
-  }
-
-  if (findings.length > 0) {
-    fail(EXIT.IDENTITY, `installed product identity assertions failed:\n  - ${findings.join("\n  - ")}`);
-  }
-}
-
-function verifyAppImage(path, checksums, assetName) {
-  const findings = [];
-  const stat = statSync(path);
-  if (stat.size < 10 * 1024 * 1024) {
-    findings.push(`AppImage is suspiciously small (${stat.size} bytes)`);
-  }
-  const magic = readFileSync(path).subarray(0, 4);
-  if (!(magic[0] === 0x7f && magic[1] === 0x45 && magic[2] === 0x4c && magic[3] === 0x46)) {
-    findings.push("AppImage does not carry the ELF magic (not a valid AppImage structure)");
-  }
-  const expected = checksums.get(assetName);
-  if (!expected) {
-    findings.push(`SHA256SUMS has no entry for ${assetName}`);
-  } else {
-    const actual = sha256OfBuffer(readFileSync(path));
-    if (actual !== expected) {
-      findings.push(`AppImage checksum mismatch (expected ${expected}, got ${actual})`);
-    } else {
-      console.error(`[install-verify] AppImage checksum verified ✓`);
-    }
-  }
-  if ((stat.mode & 0o111) === 0) {
-    console.error("[install-verify] AppImage executable bit missing — setting it (recorded as a finding)");
-    chmodSync(path, 0o755);
-    findings.push("AppImage was downloaded without the executable bit (fixed by chmod +x; the publisher should set it)");
-  } else {
-    console.error("[install-verify] AppImage executable bit set ✓");
-  }
-  if (findings.length > 0) {
-    fail(EXIT.APPIMAGE, `AppImage checks failed:\n  - ${findings.join("\n  - ")}`);
-  }
-}
-
-function supportsLaunch() {
+function resolveLaunchWrapper() {
   if (process.env.DISPLAY || process.env.WAYLAND_DISPLAY) {
     return { supported: true, wrapper: null };
   }
@@ -366,6 +201,116 @@ function supportsLaunch() {
     return { supported: true, wrapper: xvfb.stdout };
   }
   return { supported: false, wrapper: null };
+}
+
+/** Poll xdotool for a window whose WM_CLASS or title matches PaySwap. */
+function pollForPaySwapWindow() {
+  const xdotool = run("which", ["xdotool"]);
+  if (xdotool.status !== 0) {
+    return {
+      asserted: false,
+      reason: "xdotool unavailable — window identity NOT ASSERTED (recorded, never fabricated)",
+      windows: [],
+    };
+  }
+  const deadline = Date.now() + WINDOW_POLL_TIMEOUT_MS;
+  const windows = [];
+  while (Date.now() < deadline) {
+    const search = run("xdotool", ["search", "--class", "payswap"]);
+    if (search.status === 0 && search.stdout) {
+      for (const id of search.stdout.split(/\s+/).filter(Boolean)) {
+        const name = run("xdotool", ["getwindowname", id]);
+        windows.push({ id, name: name.status === 0 ? name.stdout : "(name unavailable)" });
+      }
+      if (windows.length > 0) {
+        return { asserted: true, reason: null, windows };
+      }
+    }
+    run("sleep", [`${WINDOW_POLL_INTERVAL_MS / 1000}`]);
+  }
+  return {
+    asserted: true,
+    reason: "no window with a PaySwap WM_CLASS appeared within the timeout",
+    windows,
+  };
+}
+
+/** The launch verification battery (runs while the package is installed). */
+function verifyLaunch({ execBinary, receipt }) {
+  const launchSupport = resolveLaunchWrapper();
+  if (!launchSupport.supported) {
+    fail(
+      EXIT.LAUNCH_UNSUPPORTED,
+      "--launch requested but no display and no xvfb-run are available. Launch verification requires a display environment — run on a desktop host or under xvfb-run.",
+    );
+  }
+  const home = os.homedir();
+  const dataDir = join(home, ".config", "PaySwap");
+  const before = existsSync(dataDir);
+  const wrapper = launchSupport.wrapper;
+  console.error(`[install-verify] launching ${execBinary} (wrapper: ${wrapper ?? "direct display"})…`);
+
+  const attempts = [{ args: [], note: null }];
+  let launched = null;
+  let launchNote = null;
+  for (const attempt of attempts) {
+    const result = wrapper
+      ? run(wrapper, ["-a", execBinary, ...attempt.args], { timeout: LAUNCH_SETTLE_TIMEOUT_MS })
+      : run(execBinary, attempt.args, { timeout: LAUNCH_SETTLE_TIMEOUT_MS });
+    if (wrapper) {
+      // xvfb-run stays foreground for the app's lifetime on success; a fast
+      // exit means the app itself died. Record and retry once with
+      // --no-sandbox (chrome-sandbox needs its setuid bit, which
+      // non-install extractions can lose) — the retry is RECORDED, never
+      // silent.
+      launched = result;
+    } else {
+      launched = result;
+    }
+    if (launched.status !== null && launched.status !== 0 && !attempt.args.includes("--no-sandbox")) {
+      attempts.push({ args: ["--no-sandbox"], note: "retried with --no-sandbox (recorded)" });
+      launchNote = "first launch attempt exited non-zero; retried with --no-sandbox";
+      continue;
+    }
+    break;
+  }
+
+  const after = existsSync(dataDir);
+  const findings = [];
+  if (!after) {
+    findings.push(
+      `launch verification failed: ${dataDir} did not appear (app-data path pattern ~/.config/PaySwap, productName-derived)${before ? " (it existed before launch — pre-existing state, inconclusive)" : ""}`,
+    );
+  } else {
+    console.error("[install-verify] app-data path ~/.config/PaySwap present after launch ✓");
+    receipt.assertions.push("launch: app-data path ~/.config/PaySwap ok");
+  }
+
+  const windowResult = pollForPaySwapWindow();
+  receipt.launchWindows = windowResult.windows;
+  if (!windowResult.asserted) {
+    console.error(`[install-verify] ${windowResult.reason}`);
+    receipt.assertions.push(`launch: window identity not asserted (${windowResult.reason})`);
+  } else if (windowResult.reason) {
+    findings.push(`launch verification failed: ${windowResult.reason}`);
+  } else {
+    const titled = windowResult.windows.filter((window) => /payswap/i.test(window.name));
+    if (titled.length === 0) {
+      findings.push(
+        `windows exist but none carries a PaySwap title (observed: ${JSON.stringify(windowResult.windows)})`,
+      );
+    } else {
+      console.error(`[install-verify] PaySwap window present: ${titled.map((w) => JSON.stringify(w.name)).join(", ")} ✓`);
+      receipt.assertions.push(`launch: PaySwap-branded window ok (${titled.map((w) => w.name).join(" | ")})`);
+    }
+  }
+
+  if (launchNote) {
+    receipt.assertions.push(`launch: ${launchNote}`);
+  }
+  if (findings.length > 0) {
+    fail(EXIT.IDENTITY, `launch verification failed:\n  - ${findings.join("\n  - ")}`);
+  }
 }
 
 /** The single receipt object — written on BOTH pass and fail paths. */
@@ -404,9 +349,7 @@ async function main() {
     writeReceipt(activeWorkdir, "PASS");
     console.error("[install-verify] PASS");
   } catch (error) {
-    const detail = typeof error?.message === "string" && error.message.startsWith("__exit_")
-      ? null
-      : String(error);
+    const detail = typeof error?.message === "string" && error.message.startsWith("__exit_") ? null : String(error);
     writeReceipt(activeWorkdir, "FAIL", detail);
     throw error;
   }
@@ -422,8 +365,7 @@ async function verifyRelease(args, onWorkdir) {
   const assets = Array.isArray(release.assets) ? release.assets : [];
   const debAsset = assets.find((asset) => asset.name.endsWith(".deb")) ?? null;
   const appImageAsset = assets.find((asset) => asset.name.endsWith(".AppImage")) ?? null;
-  const checksumsAsset =
-    assets.find((asset) => /^SHA256SUMS(\.txt)?$/i.test(asset.name)) ?? null;
+  const checksumsAsset = assets.find((asset) => /^SHA256SUMS(\.txt)?$/i.test(asset.name)) ?? null;
 
   if (!debAsset) {
     fail(
@@ -442,7 +384,6 @@ async function verifyRelease(args, onWorkdir) {
   mkdirSync(args.workdir, { recursive: true });
   onWorkdir(args.workdir);
 
-  // Download + verify checksums.
   const checksumsBuffer = await downloadAsset(checksumsAsset.browser_download_url, join(args.workdir, checksumsAsset.name));
   const checksums = parseChecksums(checksumsBuffer.toString("utf8"));
   const debBuffer = await downloadAsset(debAsset.browser_download_url, join(args.workdir, debAsset.name));
@@ -458,7 +399,6 @@ async function verifyRelease(args, onWorkdir) {
   console.error(`[install-verify] ${debAsset.name} checksum verified ✓`);
   receipt.assets.push({ name: debAsset.name, size: debAsset.size, sha256: debActual, checksumVerified: true });
 
-  // Install environment.
   const dpkg = installRootPrefix();
   if (!dpkg) {
     fail(
@@ -469,7 +409,6 @@ async function verifyRelease(args, onWorkdir) {
   const dpkgCommand = dpkg.command === "dpkg" ? "dpkg" : "sudo";
   const dpkgArgs = dpkg.command === "dpkg" ? [] : ["-n", "dpkg"];
 
-  // dpkg -i.
   const installResult = run(dpkgCommand, [...dpkgArgs, "-i", join(args.workdir, debAsset.name)]);
   if (installResult.status !== 0) {
     console.error(installResult.stdout);
@@ -479,9 +418,25 @@ async function verifyRelease(args, onWorkdir) {
   console.error("[install-verify] dpkg -i payswap ✓");
   receipt.assertions.push("dpkg -i ok");
 
+  // Identity assertions + launch BOTH run while the package is installed;
+  // cleanup runs afterwards on every path (the v1.0.1 restructuring: the
+  // original order launched AFTER dpkg -r, which could never work).
   try {
-    assertInstalledIdentity();
+    const identity = collectDesktopIdentityFindings({ run });
+    for (const line of identity.logLines) {
+      console.error(line);
+    }
+    if (identity.findings.length > 0) {
+      fail(EXIT.IDENTITY, `installed product identity assertions failed:\n  - ${identity.findings.join("\n  - ")}`);
+    }
     receipt.assertions.push("desktop entry Name=PaySwap ok", "icon ok", "exec binary ok", "package payswap ok");
+
+    if (args.launch) {
+      if (!identity.execBinary) {
+        fail(EXIT.IDENTITY, "--launch requested but the desktop entry Exec= binary did not resolve");
+      }
+      verifyLaunch({ execBinary: identity.execBinary, receipt });
+    }
   } finally {
     if (!args.keep) {
       const removeResult = run(dpkgCommand, [...dpkgArgs, "-r", "payswap"]);
@@ -492,50 +447,25 @@ async function verifyRelease(args, onWorkdir) {
     }
   }
 
-  // Optional launch verification (display-gated).
-  if (args.launch) {
-    const launchSupport = supportsLaunch();
-    if (!launchSupport.supported) {
-      fail(
-        EXIT.LAUNCH_UNSUPPORTED,
-        "--launch requested but no display and no xvfb-run are available. Launch verification (the ~/.config/PaySwap app-data path + PaySwap-branded window) requires a display environment — run on a desktop host or under xvfb-run.",
-      );
-    }
-    const home = os.homedir();
-    const dataDir = join(home, ".config", "PaySwap");
-    const before = existsSync(dataDir);
-    console.error(`[install-verify] launching (wrapper: ${launchSupport.wrapper ?? "direct display"})…`);
-    const launchCommand = launchSupport.wrapper ?? "payswap";
-    const launchArgs = launchSupport.wrapper ? ["-a", "payswap"] : [];
-    const launched = run(launchCommand, launchArgs, { timeout: 20_000 });
-    void launched;
-    const after = existsSync(dataDir);
-    if (!after) {
-      fail(
-        EXIT.IDENTITY,
-        `launch verification failed: ${dataDir} did not appear (app-data path pattern ~/.config/PaySwap, productName-derived)${before ? " (it existed before launch — pre-existing state, inconclusive)" : ""}`,
-      );
-    }
-    console.error("[install-verify] app-data path ~/.config/PaySwap present after launch ✓");
-    receipt.assertions.push("launch: app-data path ~/.config/PaySwap ok");
-  }
-
-  // AppImage (optional asset).
   if (appImageAsset && !args.skipAppImage) {
     const appImagePath = join(args.workdir, appImageAsset.name);
     await downloadAsset(appImageAsset.browser_download_url, appImagePath);
-    verifyAppImage(appImagePath, checksums, appImageAsset.name);
+    const appImageFindings = collectAppImageFindings({
+      path: appImagePath,
+      checksums,
+      assetName: appImageAsset.name,
+      chmodSync,
+    });
+    if (appImageFindings.length > 0) {
+      fail(EXIT.APPIMAGE, `AppImage checks failed:\n  - ${appImageFindings.join("\n  - ")}`);
+    }
+    console.error("[install-verify] AppImage structure + checksum + executable bit ✓");
     receipt.assets.push({
       name: appImageAsset.name,
       size: appImageAsset.size,
       checksumVerified: true,
       structureChecked: true,
     });
-    if (args.launch) {
-      console.error(
-        "[install-verify] AppImage run-verification: only performed where the environment supports GUI launches (see install/README.md)",
-      );
-    }
   }
 
   receipt.finishedAt = new Date().toISOString();

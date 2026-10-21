@@ -136,3 +136,45 @@ jobs:
             - Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             - Built from a clean checkout with the frozen lockfile (`pnpm install --frozen-lockfile`), the full desktop production build (`pnpm --filter @payswap/desktop build`), and `electron-builder --linux deb appimage --publish never`.
             - Signing: Linux installers are not signed (no Linux signing requirement). macOS/Windows builds and their signing/notarization remain out of scope for this release channel.
+
+  # The clean-install verification (PRODUCT-IDENTITY §6 gate 3): downloads
+  # the PUBLISHED release assets (checksum-verified against the attached
+  # SHA256SUMS), dpkg-installs the .deb on a clean ubuntu-latest runner,
+  # asserts the installed product identity (Name=PaySwap desktop entry,
+  # icon, exec binary, package), LAUNCHES the app under Xvfb and asserts a
+  # PaySwap-branded window exists, then removes the package. The receipt is
+  # uploaded as the evidence artifact. This job exists because the v1.0.0
+  # release shipped a launch-blocking force-update defect that only a real
+  # GUI launch could catch — packaging tests alone proved nothing.
+  install-verify:
+    needs: desktop-linux
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (the install-verify runner)
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install launch-verification tooling (Xvfb + xdotool)
+        run: sudo apt-get update && sudo apt-get install -y xvfb xdotool
+
+      - name: Run the install-verification runner against the published release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node packages/journey-verification/install/install-verify.mjs \
+            --repo "${GITHUB_REPOSITORY}" \
+            --tag "${GITHUB_REF_NAME}" \
+            --launch
+
+      - name: Upload the install-verify receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-verify-receipt
+          path: packages/journey-verification/install/.cache-install-verify/install-verify-receipt.json
+          if-no-files-found: warn

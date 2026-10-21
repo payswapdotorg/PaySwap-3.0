@@ -29,7 +29,8 @@ never a pass):
 4. **Install** — `dpkg -i` (as root, or via passwordless `sudo -n`;
    neither available → explicit environment failure, never a silent
    skip).
-5. **Identity assertions** (PRODUCT-IDENTITY.md §1 owned by Lane P9-B):
+5. **Identity assertions** (PRODUCT-IDENTITY.md §1 owned by Lane P9-B;
+   implemented in `desktopIdentity.mjs`):
    - exactly one `/usr/share/applications/*.desktop` with `Name=PaySwap`;
    - the `Icon=` target resolves on disk;
    - the `Exec=` binary exists and is executable;
@@ -37,15 +38,25 @@ never a pass):
    - the package file list ships the desktop entry;
    - the app-data path PATTERN: the shipped executable is `payswap`, so
      electron's productName-derived userData default is
-     `~/.config/PaySwap` — asserted at runtime only under `--launch`.
-6. **Cleanup** — `dpkg -r payswap` (always attempted, including on
+     `~/.config/PaySwap` — asserted at runtime under `--launch`.
+6. **Launch verification** (`--launch` only; runs BEFORE cleanup, while
+   the package is installed): launches the desktop-entry `Exec=` binary
+   (directly under a display, or wrapped in `xvfb-run` when available),
+   asserts `~/.config/PaySwap` appears, and asserts a real PaySwap
+   window exists — `xdotool` polls for a window with a PaySwap WM_CLASS
+   and a PaySwap title. This window assertion is the v1.0.0 lesson: the
+   broken release created its app-data dir but never a main window
+   (the force-update block), so a data-dir check alone proved nothing.
+   Without `xdotool` the window identity is recorded as NOT ASSERTED —
+   never fabricated.
+7. **Cleanup** — `dpkg -r payswap` (always attempted, including on
    failure paths, unless `--keep`).
-7. **AppImage** (when published): ELF magic (structure), SHA-256
+8. **AppImage** (when published): ELF magic (structure), SHA-256
    (checksum), executable bit (set + recorded as a finding when the
-   publisher shipped it without). Run-verification only under `--launch`.
-8. **Receipt** — `install-verify-receipt.json` in the workdir with the
-   release identity, per-asset checksums, the assertion list and the
-   verdict (`PASS` / `FAIL`). This is the evidence
+   publisher shipped it without).
+9. **Receipt** — `install-verify-receipt.json` in the workdir with the
+   release identity, per-asset checksums, the assertion list, observed
+   windows and the verdict (`PASS` / `FAIL`). This is the evidence
    `docs/customer-journeys/JOURNEY-ACCEPTANCE-RECORD.md` cites for the
    clean-install gate.
 
@@ -93,11 +104,18 @@ browser tier of this suite once the desktop renderer ships the same
 surfaces — the browser evidence stands in for the visual half on
 headless hosts.
 
-## Current status at the P9-C lane base
+## Current status
 
-**No release exists yet** (verified at the lane base `e6ed008`: zero
-GitHub releases — the TL's Phase 9 register findings). Running the
-runner against any tag therefore exits 3 with the clean explicit error
-— which is exactly the honest state: the clean-install gate
-(PRODUCT-IDENTITY §6, "clean-install verified") is one of the four
-SEPARATE gates and closes only on its own evidence at release time.
+**v1.0.0 is published** (the P9-B gate's first release; 2026-10-21). The
+station's own run of this runner against it verified the checksums and
+then found the **v1.0.0 launch-blocking defect** (the upstream ZCode
+force-update floor gating PaySwap 1.0.0 — see
+`docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`): the
+GUI-launch half of this runner and the CI `install-verify` job in
+`release.yml` were added as the direct response, so no future release can
+ship without a real install + launch + window-identity receipt.
+
+Historical note (kept for the record): at the P9-C lane base `e6ed008`
+no release existed and the runner honestly exited 3 — the no-release
+failure mode is still the documented behavior for any tag without a
+published release.

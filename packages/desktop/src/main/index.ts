@@ -133,6 +133,10 @@ import { resolveWindowsAppUserModelIdForFlavor } from "../../scripts/desktop-pro
 import type { DesktopWindowSize } from "./desktopWindowSize.js";
 import { maybeWarnArchitectureMismatch } from "./desktopArchitectureGuard.js";
 import { maybeBlockStartupForForceUpdate } from "./forceUpdateGuard.js";
+import {
+  shouldEnablePaySwapDesktopAutoUpdate,
+  shouldRunStartupForceUpdateGate,
+} from "./payswapUpdateAuthority.js";
 import { createWindowsDesktopTray, updateWindowsDesktopTrayMenu } from "./desktopTray.js";
 import { createWindowsCuaOperationIndicator } from "./windowsCuaOperationIndicator.js";
 import {
@@ -2012,8 +2016,13 @@ app.whenReady().then(async () => {
   // 启动自动更新检查（后台执行，不阻塞主界面）
   // Preview 身份无论连接哪个后端都不自动更新：stable feed 上只分发正式 ZCode 安装包，
   // 不向 Preview 渠道提供更新。
+  // PaySwap update-authority law (payswapUpdateAuthority.ts): no PaySwap
+  // update feed exists yet — the auto-updater stays inert (it must never
+  // poll the upstream ZCode manifest provider and offer a ZCode build to
+  // PaySwap users). initAutoUpdater({ enabled: false }) is the designed
+  // inert path: polling cleared, electron-updater left unconfigured.
   void initAutoUpdater({
-    enabled: ZCODE_PRODUCT_FLAVOR === "production",
+    enabled: ZCODE_PRODUCT_FLAVOR === "production" && shouldEnablePaySwapDesktopAutoUpdate(),
     onBeforeQuitAndInstall: async () => {
       notifyStabilityLifecycle("update_install");
       await prepareAppQuit("auto-update quitAndInstall", "update-install");
@@ -2255,8 +2264,16 @@ app.whenReady().then(async () => {
   // 是面向打包发布客户端的安全门，对未打包 dev 运行时无意义。打包版 app.isPackaged === true，
   // gate 照常生效，对真实用户零影响。
   const skipForceUpdateForLocalDevRuntime = !app.isPackaged;
+  // PaySwap update-authority law (payswapUpdateAuthority.ts): the upstream
+  // ZCode service's minimalVersion floor (ZCode version space, 3.x) is NOT a
+  // PaySwap authority — the v1.0.0 packaged app compared PaySwap 1.0.0 against
+  // the live floor 3.5.3 and blocked main-window creation for every online
+  // user. The gate stays inert until a PaySwap release channel exists.
+  const paySwapUpdateAuthorityConfigured = shouldRunStartupForceUpdateGate();
   const forceUpdateGuardResult =
-    ZCODE_PRODUCT_FLAVOR === "production" && !skipForceUpdateForLocalDevRuntime
+    ZCODE_PRODUCT_FLAVOR === "production" &&
+    !skipForceUpdateForLocalDevRuntime &&
+    paySwapUpdateAuthorityConfigured
       ? await maybeBlockStartupForForceUpdate({
           locale: currentApplicationLocale,
           logger,
@@ -2270,6 +2287,10 @@ app.whenReady().then(async () => {
     logger.info("[force-update] Preview 跳过远端强制升级检查");
   } else if (skipForceUpdateForLocalDevRuntime) {
     logger.info("[force-update] 本地 dev 构建（未打包）跳过远端强制升级检查");
+  } else if (!paySwapUpdateAuthorityConfigured) {
+    logger.info(
+      "[force-update] PaySwap: no PaySwap update authority is configured — the startup force-update gate stays inert (the upstream ZCode service floor never gates the PaySwap product; see payswapUpdateAuthority.ts)",
+    );
   }
   if (forceUpdateGuardResult.blocked) {
     return;
