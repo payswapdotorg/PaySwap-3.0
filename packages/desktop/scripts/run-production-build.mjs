@@ -43,6 +43,19 @@ export function createDesktopProductionBuildPlan({ cwd, baseEnv = process.env })
     NODE_ENV: "production",
   };
 
+  // P9-B station adaptation (4GB RAM lanes): two env-gated escape hatches that never
+  // change CI behavior (GitHub runners keep the defaults).
+  //   ZCODE_DESKTOP_SERIAL_BUILD=1  - run tsup and vite sequentially instead of in
+  //                                  parallel (both bundlers in memory at once OOMs
+  //                                  a 4GB box during vite's chunk rendering).
+  //   ZCODE_DESKTOP_VITE_NO_MINIFY=1 - append --minify false --sourcemap false to the
+  //                                  renderer vite build (the same mitigation the
+  //                                  station used for the web production build).
+  const viteArgs = ["exec", "vite", "build"];
+  if (env.ZCODE_DESKTOP_VITE_NO_MINIFY === "1") {
+    viteArgs.push("--minify", "false", "--sourcemap", "false");
+  }
+
   return [
     {
       label: "desktop production bundles",
@@ -55,7 +68,7 @@ export function createDesktopProductionBuildPlan({ cwd, baseEnv = process.env })
         },
         {
           command: "pnpm",
-          args: ["exec", "vite", "build"],
+          args: viteArgs,
           cwd,
           env,
         },
@@ -92,6 +105,13 @@ export async function runDesktopProductionBuild({ cwd = resolveDesktopBuildCwd()
     if (step.parallel) {
       // 之前串行跑 tsup 和 vite，但两者分别写 main/preload/host 与 renderer 目录。
       // 这里并行执行平台无关构建，缩短 CI 关键路径，同时保持各自 cwd/env 一致以兼容 macOS/Windows/Linux runner。
+      // ZCODE_DESKTOP_SERIAL_BUILD=1（4GB station）保留同一 plan 但逐步串行执行，避免双打包器同时驻留内存。
+      if (process.env.ZCODE_DESKTOP_SERIAL_BUILD === "1") {
+        for (const serialStep of step.parallel) {
+          await runCommandAsync(serialStep);
+        }
+        continue;
+      }
       await Promise.all(step.parallel.map(runCommandAsync));
       continue;
     }

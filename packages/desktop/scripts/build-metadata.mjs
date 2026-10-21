@@ -35,7 +35,7 @@ function findPackageDir(packageName, startDirs) {
   throw new Error(`Unable to find package directory for ${packageName}`);
 }
 
-const desktopDir = findPackageDir("@zcode/desktop", [
+const desktopDir = findPackageDir("@payswap/desktop", [
   moduleDir,
   resolve(moduleDir, ".."),
   process.cwd(),
@@ -80,11 +80,13 @@ function resolveCommitId() {
 }
 
 export function collectBuildMetadata() {
-  const rootPackageJson = readJson(resolve(workspaceDir, "package.json"));
+  // 产品版本住在桌面包自身（spec/productization/PRODUCT-IDENTITY.md §1：PaySwap 自有
+  // semver，从 1.0.0 起）；根 package.json 的 3.14.3 是上游 ZCode 基线钉子，不是产品版本，
+  // 安装包文件名/About 面板不得再从根包取版本号（P9-B）。
   const desktopPackageJson = readJson(resolve(desktopDir, "package.json"));
 
   return {
-    appVersion: normalizeVersion(rootPackageJson.version),
+    appVersion: normalizeVersion(desktopPackageJson.version),
     buildCommitId: resolveCommitId(),
     buildTime: new Date().toISOString(),
     electronBuilderVersion: resolveInstalledPackageVersion(
