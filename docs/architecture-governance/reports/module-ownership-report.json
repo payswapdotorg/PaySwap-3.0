@@ -19,7 +19,7 @@
       "R3-not-in-may-depend-on": 5,
       "R6-cross-package-relative": 2
     },
-    "unresolved_external_specifiers": 270
+    "unresolved_external_specifiers": 271
   },
   "packages": [
     {
@@ -648,7 +648,7 @@
         },
         {
           "target": "packages/shared",
-          "occurrences": 201
+          "occurrences": 202
         },
         {
           "target": "packages/ui",
@@ -1140,7 +1140,7 @@
         },
         {
           "source": "packages/desktop",
-          "occurrences": 201
+          "occurrences": 202
         },
         {
           "source": "packages/provider",
@@ -2259,6 +2259,11 @@
       "line": 9
     },
     {
+      "file": "packages/desktop/test/payswap/update-authority.test.ts",
+      "specifier": "vitest",
+      "line": 21
+    },
+    {
       "file": "packages/desktop/vitest.config.ts",
       "specifier": "vitest/config",
       "line": 1
@@ -2392,11 +2397,6 @@
       "file": "packages/services/src/conversation-share/conversationShareArtifactSource.ts",
       "specifier": "#src/file/file.js",
       "line": 4
-    },
-    {
-      "file": "packages/services/src/conversation-share/conversationShareService.ts",
-      "specifier": "#src/zcode-session/zcodeSession.js",
-      "line": 35
     }
   ],
   "example_hints_without_packages": [
