@@ -23,15 +23,20 @@ import {
 import type { ReactNode } from "react";
 import type { HomePageView } from "../contracts/view-models.js";
 import { formatUtcTimestamp, providerLabel } from "../lib/coverage.js";
+import { outcomeAreaAlias } from "../lib/outcome-area-aliases.js";
+import type { PaySwapNavigation } from "../shell/navigation.js";
+import { ProductLink } from "../shell/ProductLink.js";
 
 function productLink(
   href: string,
   children: ReactNode,
   variant: "primary" | "secondary" = "secondary",
+  navigation?: PaySwapNavigation,
 ): ReactNode {
   return (
-    <a
-      href={href}
+    <ProductLink
+      to={href}
+      navigation={navigation}
       className={
         variant === "primary"
           ? "ps-home-cta ps-home-cta--primary"
@@ -39,11 +44,17 @@ function productLink(
       }
     >
       {children}
-    </a>
+    </ProductLink>
   );
 }
 
-export function HomePage({ view }: { readonly view: HomePageView }) {
+export function HomePage({
+  view,
+  navigation,
+}: {
+  readonly view: HomePageView;
+  readonly navigation?: PaySwapNavigation;
+}) {
   const { positioning, outcomeBoard, coverageSummary, commitments } = view;
   const connectedNames = coverageSummary.connected.map((entry) =>
     providerLabel(entry.providerName),
@@ -61,8 +72,8 @@ export function HomePage({ view }: { readonly view: HomePageView }) {
           </h1>
           <p className="ps-home-lede">{positioning.subheadline}</p>
           <div className="ps-home-cta-row">
-            {productLink("/payswap/app", "Open the product", "primary")}
-            {productLink("/payswap/capabilities", "See live coverage")}
+            {productLink("/app", "Open the product", "primary", navigation)}
+            {productLink("/capabilities", "See live coverage", "secondary", navigation)}
           </div>
           <p className="ps-home-gate-note">
             The product requires authentication and is not yet available in
@@ -91,25 +102,38 @@ export function HomePage({ view }: { readonly view: HomePageView }) {
             />
           ) : null}
           <ul className="ps-home-grid">
-            {outcomeBoard.rows.map((row) => (
-              <li key={row.actionId} className="ps-home-card">
-                <div className="ps-home-card-head">
-                  <h3 className="ps-home-card-title">{row.label}</h3>
-                  <StatusPill
-                    tone={row.capability.dispatchable ? "ok" : "attention"}
-                  >
-                    {row.capability.dispatchable ? "Dispatchable" : "Not yet dispatchable"}
-                  </StatusPill>
-                </div>
-                <p className="ps-home-card-body">{row.outcomeLine}</p>
-                {!row.capability.dispatchable &&
-                row.capability.missingPrerequisite ? (
-                  <p className="ps-home-card-note">
-                    {row.capability.missingPrerequisite}
-                  </p>
-                ) : null}
-              </li>
-            ))}
+            {outcomeBoard.rows.map((row) => {
+              const alias = outcomeAreaAlias(row.actionId);
+              return (
+                <li key={row.actionId} className="ps-home-card">
+                  <div className="ps-home-card-head">
+                    <h3 className="ps-home-card-title">{row.label}</h3>
+                    <StatusPill
+                      tone={row.capability.dispatchable ? "ok" : "attention"}
+                    >
+                      {row.capability.dispatchable ? "Dispatchable" : "Not yet dispatchable"}
+                    </StatusPill>
+                  </div>
+                  <p className="ps-home-card-body">{row.outcomeLine}</p>
+                  {!row.capability.dispatchable &&
+                  row.capability.missingPrerequisite ? (
+                    <p className="ps-home-card-note">
+                      {row.capability.missingPrerequisite}
+                    </p>
+                  ) : null}
+                  {alias.navAreas.length > 0 ? (
+                    <p className="ps-area-learn">
+                      <ProductLink
+                        to={`/app/${alias.navAreas[0]}`}
+                        navigation={navigation}
+                      >
+                        Open {alias.navAreas.join(" + ")}
+                      </ProductLink>
+                    </p>
+                  ) : null}
+                </li>
+              );
+            })}
           </ul>
           <p className="ps-home-unknown-note">
             When a provider answer is ambiguous, the product renders UNKNOWN
@@ -182,7 +206,7 @@ export function HomePage({ view }: { readonly view: HomePageView }) {
               </dl>
             </>
           )}
-          {productLink("/payswap/capabilities", "Full coverage explorer")}
+          {productLink("/capabilities", "Full coverage explorer", "secondary", navigation)}
         </div>
       </section>
 
@@ -210,7 +234,7 @@ export function HomePage({ view }: { readonly view: HomePageView }) {
               </Card>
             ))}
           </div>
-          {productLink("/payswap/security", "Read the security & non-custody commitments →")}
+          {productLink("/security", "Read the security & non-custody commitments →", "secondary", navigation)}
         </div>
       </section>
 
@@ -226,9 +250,13 @@ export function HomePage({ view }: { readonly view: HomePageView }) {
             programmatic clients. Financial truth is protocol-owned; the
             interface only ever projects it.
           </p>
-          <a className="ps-home-cta ps-home-cta--on-dark" href="/payswap/developers">
+          <ProductLink
+            to="/developers"
+            navigation={navigation}
+            className="ps-home-cta ps-home-cta--on-dark"
+          >
             Start with the API
-          </a>
+          </ProductLink>
         </div>
       </section>
     </>

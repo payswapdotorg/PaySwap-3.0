@@ -105,7 +105,7 @@ describe("home page", () => {
 
   it("links to the product entry with the honest gate expectation set", () => {
     const html = renderHome();
-    expect(html).toContain('href="/payswap/app"');
+    expect(html).toContain('href="/app"');
     expect(html).toContain("Open the product");
     expect(html).toContain("requires authentication");
     expect(html).toContain("not yet available in this deployment phase");
@@ -115,9 +115,9 @@ describe("home page", () => {
 
   it("links to the public surfaces", () => {
     const html = renderHome();
-    expect(html).toContain('href="/payswap/capabilities"');
-    expect(html).toContain('href="/payswap/security"');
-    expect(html).toContain('href="/payswap/developers"');
+    expect(html).toContain('href="/capabilities"');
+    expect(html).toContain('href="/security"');
+    expect(html).toContain('href="/developers"');
   });
 
   it("carries the non-custody commitments", () => {

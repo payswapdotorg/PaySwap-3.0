@@ -1,18 +1,18 @@
 /**
- * @payswap/app — the honest authenticated entry boundary.
+ * @payswap/app — the app OVERVIEW: the honest authenticated entry boundary.
  *
  * ADAPT of payswap.org@8a735bf packages/web the honest /app gate (MMP-36
- * content/IA evidence: "the honest authenticated entry boundary"; the old
- * app gate + onboarding pages' honesty law): the product entry states
- * exactly what is unavailable and why, with zero credential capture and
- * zero fabricated data. It renders the eleven-area navigation IA with
+ * content/IA evidence) — P9-A: elevated from a gated dead-end into the
+ * app OVERVIEW (J2): the honest gate statement + the eleven-area map with
  * every area's HONEST empty-state contract (the canonical surface IA —
- * pinned) and the five outcome actions' honest dispatchability board, so
- * the map of the product is truthful even while the surface itself is
- * gated.
+ * pinned) + the five outcome actions' honest dispatchability board, each
+ * linked to its REAL area route (lib/outcome-area-aliases.ts — the
+ * surface reconciliation). The map of the product is truthful even while
+ * the surface itself is gated: zero credential capture, zero fabricated
+ * data, zero dead ends.
  *
- * On the ZCode web substrate the session plane is substrate territory
- * (platform permission, not financial authorization); wiring real session
+ * On the substrate the session plane is platform territory (web: the
+ * server session; desktop: the host attachment); wiring real session
  * authority is TL accept-time integration — this boundary renders the
  * honest pre-integration truth.
  */
@@ -24,13 +24,18 @@ import {
   StatusPill,
 } from "@zcode/ui/payswap";
 import type { NavigationAreaView, OutcomeBoardView } from "../contracts/view-models.js";
+import { outcomeAreaAlias } from "../lib/outcome-area-aliases.js";
+import type { PaySwapNavigation } from "../shell/navigation.js";
+import { ProductLink } from "../shell/ProductLink.js";
 
-export function AppEntryPage({
+export function AppOverviewPage({
   navigation,
   outcomeBoard,
+  productNavigation,
 }: {
   readonly navigation: NavigationAreaView;
   readonly outcomeBoard: OutcomeBoardView;
+  readonly productNavigation?: PaySwapNavigation;
 }) {
   return (
     <article className="ps-page">
@@ -41,6 +46,7 @@ export function AppEntryPage({
           The authenticated product surface — payments, accounts, activity,
           connections and the rest of the eleven areas — requires
           authentication and is not yet available in this deployment phase.
+          The map below is the honest truth of what exists and what does not.
         </p>
       </header>
 
@@ -56,9 +62,10 @@ export function AppEntryPage({
         </h2>
         <p className="ps-page-section-note">
           These are the eleven operational areas of the PaySwap product.
-          Each one renders the honest truth of THIS deployment: its designed
-          empty state — why it is empty and what the real next action is.
-          Nothing here is populated by guesswork.
+          Each one opens its own surface and renders the honest truth of
+          THIS deployment: its designed empty state — why it is empty and
+          what the real next action is. Nothing here is populated by
+          guesswork.
         </p>
         <ul className="ps-page-grid">
           {navigation.areas.map((area) => (
@@ -69,6 +76,13 @@ export function AppEntryPage({
               </div>
               <p className="ps-cap-summary">{area.purpose}</p>
               <p className="ps-cap-note">{area.emptyState.reason}</p>
+              <ProductLink
+                to={area.route}
+                navigation={productNavigation}
+                className="ps-area-open"
+              >
+                Open {area.label}
+              </ProductLink>
             </Card>
           ))}
         </ul>
@@ -81,19 +95,36 @@ export function AppEntryPage({
         <p className="ps-page-section-note">
           Every outcome action states whether it can dispatch in this
           deployment — and when it cannot, the typed reason renders
-          verbatim. Never a dead button, never a fabricated success.
+          verbatim with the area where its journey lives. Never a dead
+          button, never a fabricated success.
         </p>
         <ul className="ps-page-list">
-          {outcomeBoard.rows.map((row) => (
-            <li key={row.actionId} className="ps-cap-row">
-              <span className="ps-cap-name">{row.label}</span>
-              <StatusPill tone={row.capability.dispatchable ? "ok" : "attention"}>
-                {row.capability.dispatchable
-                  ? "Dispatchable"
-                  : "Not dispatchable in this deployment"}
-              </StatusPill>
-            </li>
-          ))}
+          {outcomeBoard.rows.map((row) => {
+            const alias = outcomeAreaAlias(row.actionId);
+            return (
+              <li key={row.actionId} className="ps-cap-row">
+                <span className="ps-cap-name">{row.label}</span>
+                <span className="ps-cap-anchor">
+                  {alias.navAreas.length > 0 ? (
+                    <>
+                      {"in "}
+                      <ProductLink
+                        to={`/app/${alias.navAreas[0]}`}
+                        navigation={productNavigation}
+                      >
+                        {alias.navAreas.join(" + ")}
+                      </ProductLink>
+                    </>
+                  ) : null}
+                </span>
+                <StatusPill tone={row.capability.dispatchable ? "ok" : "attention"}>
+                  {row.capability.dispatchable
+                    ? "Dispatchable"
+                    : "Not dispatchable in this deployment"}
+                </StatusPill>
+              </li>
+            );
+          })}
         </ul>
         {outcomeBoard.nothingDispatchable ? (
           <p className="ps-page-section-note">

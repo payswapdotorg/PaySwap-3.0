@@ -24,7 +24,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { HomePage } from "../../src/pages/HomePage.js";
 import { CapabilitiesPage } from "../../src/pages/CapabilitiesPage.js";
 import { SecurityPage } from "../../src/pages/SecurityPage.js";
-import { AppEntryPage } from "../../src/pages/AppEntryPage.js";
+import { AppOverviewPage } from "../../src/pages/AppOverviewPage.js";
+import { AreaPage } from "../../src/pages/AreaPage.js";
 import { foldCoverage } from "../../src/lib/coverage.js";
 import { foldNavigation } from "../../src/lib/navigation.js";
 import { foldOutcomeBoard } from "../../src/lib/outcome-board.js";
@@ -134,7 +135,7 @@ describe("product law P3: non-custody messaging — the product never claims cus
       <CapabilitiesPage view={foldCoverage(NO_EVIDENCE_COVERAGE)} />,
     );
     const appEntryHtml = renderToStaticMarkup(
-      <AppEntryPage
+      <AppOverviewPage
         navigation={foldNavigation()}
         outcomeBoard={foldOutcomeBoard(HONEST_DEPLOYMENT_CONTEXT)}
       />,
@@ -173,9 +174,9 @@ describe("product law P4: honest UNKNOWN — never collapsed into failure or suc
     expect(new Set(tones).size).toBe(3);
   });
 
-  it("the app entry gate renders an honest auth boundary — no credential capture", () => {
+  it("the app overview gate renders an honest auth boundary — no credential capture", () => {
     const html = renderToStaticMarkup(
-      <AppEntryPage
+      <AppOverviewPage
         navigation={foldNavigation()}
         outcomeBoard={foldOutcomeBoard(HONEST_DEPLOYMENT_CONTEXT)}
       />,
@@ -184,6 +185,22 @@ describe("product law P4: honest UNKNOWN — never collapsed into failure or suc
     expect(html).toContain("no pretend login");
     // No credential inputs on the gate.
     expect(html).not.toMatch(/<input[^>]*type=["'](password|text)["']/);
+  });
+
+  it("every area surface renders its pinned designed-empty reason — never a spinner, never rows", () => {
+    // react-dom/server escapes apostrophes as &#x27; — decode before
+    // comparing against the pinned contract literals.
+    const decode = (markup: string) => markup.replace(/&#x27;/g, "'");
+    for (const area of foldNavigation().areas) {
+      const html = renderToStaticMarkup(
+        <AreaPage
+          areaId={area.id}
+          navigation={foldNavigation()}
+          outcomeBoard={foldOutcomeBoard(HONEST_DEPLOYMENT_CONTEXT)}
+        />,
+      );
+      expect(decode(html), area.id).toContain(area.emptyState.reason);
+    }
   });
 });
 

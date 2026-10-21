@@ -10,23 +10,37 @@
  *
  * Consumers bring:
  * - the design layer: @zcode/ui/payswap (tokens + primitives);
- * - the platform mount: the honest deployment facts for the runtime.
+ * - the platform mount: a navigation adapter (web: history; desktop:
+ *   hash) + the honest deployment facts for the runtime.
  */
 
-// Route table.
+// Route table (PRODUCT-IDENTITY.md §3 — the canonical route contract).
 export {
-  PAYSWAP_PRODUCT_PREFIX,
+  PAYSWAP_CONSOLE_PATH,
+  PAYSWAP_LEGACY_PREFIX,
+  isPaySwapLegacyPath,
   isPaySwapProductPath,
+  resolvePaySwapLegacyRedirect,
   resolvePaySwapRoute,
+  routeDocumentTitle,
   type PaySwapRoute,
 } from "./routes.js";
 
 // The product shell + its input contract.
+export { PaySwapApp, type PaySwapAppProps, type PaySwapProductInput } from "./shell/PaySwapApp.js";
 export {
-  PaySwapWebApp,
-  type PaySwapProductInput,
-} from "./shell/PaySwapWebApp.js";
-export { SiteFooter, SiteHeader, SiteNav } from "./shell/SiteChrome.js";
+  AppAreaNav,
+  ConsoleLink,
+  SiteFooter,
+  SiteHeader,
+  SiteNav,
+  type PaySwapConsoleEntry,
+} from "./shell/SiteChrome.js";
+export { ProductLink, type ProductLinkProps } from "./shell/ProductLink.js";
+export {
+  createStaticNavigation,
+  type PaySwapNavigation,
+} from "./shell/navigation.js";
 
 // The honest harness facts (the deployment truth this repository phase).
 export {

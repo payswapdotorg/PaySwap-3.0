@@ -19,7 +19,7 @@ export function NotFoundPage({ path }: { readonly path: string }) {
         title="Nothing was found at this address"
         description={`The path ${path} does not exist in the PaySwap product surface. This is the honest answer — the product does not invent a page where there is none.`}
         action={
-          <a className="ps-home-cta ps-home-cta--primary" href="/payswap">
+          <a className="ps-home-cta ps-home-cta--primary" href="/">
             Back to the PaySwap home page
           </a>
         }

@@ -1,0 +1,216 @@
+/*
+ * @payswap/app — the P9-A design elevation: chrome, focus, motion,
+ * responsive.
+ *
+ * The design-system elevation layer for the product surface (Work Order
+ * P9-A §4): the new top-level chrome (actions row, supporting console
+ * link, brand mark, eleven-area nav), the WCAG 2.2 AA keyboard-focus
+ * law for EVERY interactive element (visible focus, never removed), the
+ * reduced-motion law, and the responsive rhythm (390px → 1440px). The
+ * token system (@zcode/ui/payswap tokens.css) stays the single source of
+ * visual truth — this file only composes tokens, never redefines them.
+ */
+
+/* --------------------------- focus law (WCAG 2.4.7 / 2.4.11) ---------- */
+
+.ps-product-root a:focus-visible,
+.ps-product-root button:focus-visible,
+.ps-product-root [tabindex]:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* --------------------------- site chrome ------------------------------ */
+
+.ps-site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ps-site-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  overflow: hidden;
+  flex: none;
+}
+
+.ps-site-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/*
+ * The console link is deliberately QUIETER than the product CTA: the
+ * agent console is a supporting capability (J14) — reachable, never the
+ * hero action. Ghost treatment, muted color, no fill.
+ */
+.ps-site-console {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ps-fg-muted);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ps-site-console:hover {
+  background: var(--ps-surface-sunken);
+  color: var(--ps-fg);
+}
+
+/* --------------------------- area navigation (J2–J13) ----------------- */
+
+.ps-area-nav {
+  display: flex;
+  gap: 4px;
+  padding: 8px 24px;
+  border-bottom: 1px solid var(--ps-border);
+  background: var(--ps-surface-sunken);
+  flex-wrap: wrap;
+}
+
+.ps-area-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--ps-fg-muted);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ps-area-nav-link:hover {
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+}
+
+.ps-area-nav-link.is-active {
+  background: var(--ps-surface);
+  color: var(--ps-accent);
+  font-weight: 600;
+}
+
+/* --------------------------- area surfaces ----------------------------- */
+
+.ps-area-open {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  margin-top: 12px;
+  padding: 0 14px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 8px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ps-area-open:hover {
+  background: var(--ps-surface-sunken);
+}
+
+.ps-area-learn {
+  margin: 10px 0 0;
+  font-size: 12px;
+}
+
+.ps-area-learn a {
+  color: var(--ps-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ps-area-learn a:hover {
+  text-decoration: underline;
+}
+
+/* --------------------------- footer attribution ------------------------ */
+
+.ps-site-footer-attribution {
+  margin: 4px 0 0;
+  max-width: 72ch;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ps-fg-subtle);
+}
+
+/* --------------------------- reduced motion --------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-product-root *,
+  .ps-product-root *::before,
+  .ps-product-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --------------------------- responsive (390px → 1440px) -------------- */
+
+@media (max-width: 640px) {
+  .ps-home-container {
+    padding: 48px 16px;
+  }
+
+  .ps-home-h1 {
+    font-size: 30px;
+  }
+
+  .ps-home-h2 {
+    font-size: 22px;
+  }
+
+  .ps-home-stat-value {
+    font-size: 28px;
+  }
+
+  .ps-page {
+    padding: 24px 16px 48px;
+  }
+
+  .ps-page-title {
+    font-size: 26px;
+  }
+
+  .ps-site-nav,
+  .ps-area-nav {
+    padding: 8px 16px;
+  }
+
+  .ps-site-footer {
+    padding: 24px 16px;
+  }
+
+  .ps-home-grid,
+  .ps-page-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1440px) {
+  .ps-home-container,
+  .ps-page {
+    max-width: 1200px;
+  }
+}

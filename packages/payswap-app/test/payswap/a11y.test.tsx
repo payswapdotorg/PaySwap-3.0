@@ -1,13 +1,13 @@
 /**
  * @payswap/app — aria + deep-link contracts (ADAPT of
  * payswap.org@8a735bf packages/web/test/a11y-aria.test.tsx +
- * a11y-deep-links.test.tsx, MMP-36 behavioral oracle).
+ * a11y-deep-links.test.tsx, MMP-36 behavioral oracle; P9-A route flip).
  *
  * The old suite's laws, kept over the new product surface: every
  * interactive element is named; the active nav entry is carried by
  * aria-current (never color alone); landmarks are present; UNKNOWN
  * states announce as status (never alert); and every internal href
- * rendered anywhere in the public surface resolves to a REAL route of
+ * rendered anywhere in the product surface resolves to a REAL route of
  * this product (no dead buttons, no broken deep links — the route
  * inventory is checked against the route table so the two cannot drift).
  */
@@ -18,21 +18,26 @@ import { HomePage } from "../../src/pages/HomePage.js";
 import { CapabilitiesPage } from "../../src/pages/CapabilitiesPage.js";
 import { SecurityPage } from "../../src/pages/SecurityPage.js";
 import { DevelopersPage } from "../../src/pages/DevelopersPage.js";
-import { AppEntryPage } from "../../src/pages/AppEntryPage.js";
+import { AppOverviewPage } from "../../src/pages/AppOverviewPage.js";
+import { AreaPage } from "../../src/pages/AreaPage.js";
 import { NotFoundPage } from "../../src/pages/NotFoundPage.js";
-import { SiteFooter, SiteHeader, SiteNav } from "../../src/shell/SiteChrome.js";
+import { SiteFooter, SiteHeader, SiteNav, AppAreaNav } from "../../src/shell/SiteChrome.js";
 import { foldOutcomeBoard } from "../../src/lib/outcome-board.js";
 import { foldCoverage } from "../../src/lib/coverage.js";
 import { foldNavigation } from "../../src/lib/navigation.js";
 import { resolveApiRuntimeInputForTests } from "./fixtures-view.js";
 import { HONEST_DEPLOYMENT_CONTEXT } from "../../src/contracts/harness.js";
 import { RECORDED_COVERAGE_FIXTURE } from "./fixtures.js";
+import { UNIVERSAL_AREAS_MIRROR } from "../../src/lib/areas.js";
+import { createStaticNavigation } from "../../src/shell/navigation.js";
 
 function doc(markup: string): Document {
   return new JSDOM(`<!doctype html><html><body>${markup}</body></html>`, {
     url: "https://payswap.test/",
   }).window.document;
 }
+
+const navigation = createStaticNavigation("/");
 
 const homeMarkup = renderToStaticMarkup(
   <HomePage
@@ -49,6 +54,7 @@ const homeMarkup = renderToStaticMarkup(
         "Every action carries evidence",
       ],
     }}
+    navigation={navigation}
   />,
 );
 const capabilitiesMarkup = renderToStaticMarkup(
@@ -63,30 +69,56 @@ const developersMarkup = renderToStaticMarkup(
     }}
   />,
 );
-const appEntryMarkup = renderToStaticMarkup(
-  <AppEntryPage
+const appOverviewMarkup = renderToStaticMarkup(
+  <AppOverviewPage
     navigation={foldNavigation()}
     outcomeBoard={foldOutcomeBoard(HONEST_DEPLOYMENT_CONTEXT)}
+    productNavigation={navigation}
   />,
 );
-const notFoundMarkup = renderToStaticMarkup(<NotFoundPage path="/payswap/nowhere" />);
-const headerMarkup = renderToStaticMarkup(<SiteHeader currentPath="/payswap" />);
-const navMarkup = renderToStaticMarkup(<SiteNav currentPath="/payswap" />);
-const footerMarkup = renderToStaticMarkup(<SiteFooter />);
+const paymentsAreaMarkup = renderToStaticMarkup(
+  <AreaPage
+    areaId="payments"
+    navigation={foldNavigation()}
+    outcomeBoard={foldOutcomeBoard(HONEST_DEPLOYMENT_CONTEXT)}
+    productNavigation={navigation}
+  />,
+);
+const notFoundMarkup = renderToStaticMarkup(<NotFoundPage path="/nowhere" />);
+const headerMarkup = renderToStaticMarkup(
+  <SiteHeader navigation={navigation} console={{ href: "/console" }} />,
+);
+const navMarkup = renderToStaticMarkup(
+  <SiteNav currentPath="/capabilities" navigation={navigation} />,
+);
+const areaNavMarkup = renderToStaticMarkup(
+  <AppAreaNav
+    currentPath="/app/payments"
+    navigation={navigation}
+    areas={UNIVERSAL_AREAS_MIRROR.map((area) => ({
+      id: area.id,
+      label: area.label,
+      route: area.route,
+    }))}
+  />,
+);
+const footerMarkup = renderToStaticMarkup(<SiteFooter navigation={navigation} />);
 
 const ALL_MARKUPS: ReadonlyArray<[string, string]> = [
   ["home", homeMarkup],
   ["capabilities", capabilitiesMarkup],
   ["security", securityMarkup],
   ["developers", developersMarkup],
-  ["app-entry", appEntryMarkup],
+  ["app-overview", appOverviewMarkup],
+  ["app-area-payments", paymentsAreaMarkup],
   ["not-found", notFoundMarkup],
   ["site-header", headerMarkup],
   ["site-nav", navMarkup],
+  ["app-area-nav", areaNavMarkup],
   ["site-footer", footerMarkup],
 ];
 
-describe("aria contracts across the public surface", () => {
+describe("aria contracts across the product surface", () => {
   it("every link and button is accessible-named (no anonymous interactive elements)", () => {
     for (const [name, markup] of ALL_MARKUPS) {
       const document = doc(markup);
@@ -109,6 +141,14 @@ describe("aria contracts across the public surface", () => {
     expect(active[0]?.getAttribute("aria-current")).toBe("page");
   });
 
+  it("the active AREA nav entry is carried by aria-current=page (never color alone)", () => {
+    const document = doc(areaNavMarkup);
+    const active = document.querySelectorAll(".ps-area-nav-link.is-active");
+    expect(active).toHaveLength(1);
+    expect(active[0]?.getAttribute("aria-current")).toBe("page");
+    expect(active[0]?.textContent).toContain("Payments");
+  });
+
   it("every image/icon decoration is hidden from AT (aria-hidden on decorative nodes)", () => {
     for (const [name, markup] of ALL_MARKUPS) {
       const document = doc(markup);
@@ -127,7 +167,8 @@ describe("aria contracts across the public surface", () => {
       ["capabilities", capabilitiesMarkup],
       ["security", securityMarkup],
       ["developers", developersMarkup],
-      ["app-entry", appEntryMarkup],
+      ["app-overview", appOverviewMarkup],
+      ["app-area-payments", paymentsAreaMarkup],
       ["not-found", notFoundMarkup],
     ];
     for (const [name, markup] of PAGES) {
@@ -140,30 +181,42 @@ describe("aria contracts across the public surface", () => {
       ["capabilities", capabilitiesMarkup],
       ["security", securityMarkup],
       ["developers", developersMarkup],
-      ["app-entry", appEntryMarkup],
+      ["app-overview", appOverviewMarkup],
+      ["app-area-payments", paymentsAreaMarkup],
     ] as const) {
       const document = doc(markup);
       expect(document.querySelectorAll("h1"), `${name} h1 count`).toHaveLength(1);
       expect(document.querySelectorAll("h2").length).toBeGreaterThan(0);
     }
   });
+
+  it("the site header renders the PaySwap mark + wordmark and the console entry (J14)", () => {
+    expect(headerMarkup).toContain("PaySwap");
+    expect(headerMarkup).toContain('href="/console"');
+    expect(headerMarkup).toContain("Agent console");
+    // The brand link is a product link to the home route.
+    expect(headerMarkup).toContain('href="/"');
+  });
 });
 
 describe("deep-link contracts: no dead buttons, no broken deep links", () => {
-  it("every internal href resolves to a REAL product route", () => {
-    const ROUTES = new Set([
-      "/payswap",
-      "/payswap/capabilities",
-      "/payswap/security",
-      "/payswap/developers",
-      "/payswap/app",
+  it("every internal href resolves to a REAL product route (or the console)", () => {
+    const ROUTES = new Set<string>([
+      "/",
+      "/capabilities",
+      "/security",
+      "/developers",
+      "/app",
+      ...UNIVERSAL_AREAS_MIRROR.map((area) => area.route),
+      // The supporting console is a real mount of the platform (J14).
+      "/console",
     ]);
     const broken: string[] = [];
     for (const [name, markup] of ALL_MARKUPS) {
       const document = doc(markup);
       for (const anchor of document.querySelectorAll<HTMLAnchorElement>("a[href]")) {
         const href = anchor.getAttribute("href") ?? "";
-        if (href.startsWith("/payswap") && !ROUTES.has(href)) {
+        if (href.startsWith("/") && !ROUTES.has(href)) {
           broken.push(`${name}: ${href}`);
         }
       }
@@ -171,10 +224,16 @@ describe("deep-link contracts: no dead buttons, no broken deep links", () => {
     expect(broken).toEqual([]);
   });
 
+  it("no legacy /payswap href survives in the product surface (the prefix is dead)", () => {
+    for (const [name, markup] of ALL_MARKUPS) {
+      expect(markup, `${name} legacy href`).not.toMatch(/href="\/payswap/);
+    }
+  });
+
   it("the not-found page names the honest truth and offers the real home route", () => {
     const document = doc(notFoundMarkup);
     expect(document.body.textContent).toContain("Nothing was found at this address");
-    expect(document.body.textContent).toContain("/payswap/nowhere");
-    expect(notFoundMarkup).toContain('href="/payswap"');
+    expect(document.body.textContent).toContain("/nowhere");
+    expect(notFoundMarkup).toContain('href="/"');
   });
 });

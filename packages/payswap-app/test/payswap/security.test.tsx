@@ -80,7 +80,7 @@ describe("security page", () => {
     expect(html).toContain("not yet available in this deployment phase");
     expect(html).toContain("honest authentication gate");
     expect(html).toContain("not a demo with fake balances or a pretend login");
-    expect(html).toContain('href="/payswap/capabilities"');
-    expect(html).toContain('href="/payswap/developers"');
+    expect(html).toContain('href="/capabilities"');
+    expect(html).toContain('href="/developers"');
   });
 });

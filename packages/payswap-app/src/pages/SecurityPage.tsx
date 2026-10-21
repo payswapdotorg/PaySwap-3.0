@@ -129,8 +129,8 @@ export function SecurityPage() {
           this phase.
         </p>
         <nav aria-label="Security page onward links" className="ps-page-links">
-          <a href="/payswap/capabilities">See the honest coverage explorer</a>
-          <a href="/payswap/developers">Read the developer entry</a>
+          <a href="/capabilities">See the honest coverage explorer</a>
+          <a href="/developers">Read the developer entry</a>
         </nav>
       </section>
     </article>
