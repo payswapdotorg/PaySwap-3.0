@@ -104,11 +104,21 @@ describe("delegated money movement laws (P7-W2)", () => {
     const methodNames = Object.keys(service).filter((key) => key !== "session");
     expect(methodNames.sort()).toEqual([
       "delegateMoneyMovement",
+      "deploymentFacts",
       "journeyState",
       "missionBoard",
       "progressTimeline",
       "quoteDisclosure",
       "securityDecision",
+      // P10-B console workspace members: demand-side mission intent +
+      // host-computed deployment facts ONLY (never money movement).
+      "workspaceArchiveMissionDraft",
+      "workspaceListMissions",
+      "workspaceMissionDetail",
+      "workspaceRecordMissionDraft",
+      "workspaceRecordMissionIntent",
+      "workspaceReviseMissionDraft",
+      "workspaceStoreHealth",
     ]);
     for (const name of ["execute", "retry", "cancel", "confirm", "settle", "payout"] as const) {
       expect(methodNames).not.toContain(name);

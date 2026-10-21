@@ -34,17 +34,16 @@ import {
 // runtime) + the repository's honest deployment facts. The substrate's
 // own routes (OAuth callback, conversation share) are untouched; the
 // agent console moved to /console (PRODUCT-IDENTITY.md §3).
+// P10-B: /console is the PaySwap Agent Workspace (rendered by the same
+// PaySwapSurfaces tree as the product — history-push transitions, no
+// reloads); the ZCode-derived developer workspace stays at
+// /console/advanced (CONSOLE-WORKSPACE.md §1/§2).
 import {
-  PaySwapApp,
-  HONEST_DEPLOYMENT_CONTEXT,
-  NO_EVIDENCE_COVERAGE,
   PAYSWAP_CONSOLE_PATH,
-  isPaySwapProductPath,
-  routeDocumentTitle,
 } from "@payswap/app";
 import { resolveApiRuntimeInput } from "./payswap/apiRuntime.js";
-import { createWebNavigation } from "./payswap/webNavigation.js";
 import { resolveWebSurface } from "./payswap/webRouteGate.js";
+import { PaySwapSurfaces } from "./payswap/webSurfaces.js";
 import type { IPlatformService, RemoteTarget, ServerRemoteInfo } from "@zcode/shared";
 import { WEB_DEFAULT_THEME, resolveWebInitialTheme } from "./webThemeSeed.js";
 
@@ -460,32 +459,26 @@ async function bootstrapWebApp() {
     window.history.replaceState(null, "", surface.target);
   }
 
-  // The PaySwap product (P9-A flip: the DEFAULT experience): the
-  // top-level routes render @payswap/app with the web history adapter,
-  // the supporting console entry, route-specific document titles and the
-  // repository's honest deployment facts as input (nothing configured,
-  // no recorded provider evidence).
+  // The PaySwap product + the Agent Workspace (P9-A flip + P10-B): the
+  // top-level product routes AND the /console workspace render ONE
+  // PaySwapSurfaces tree over the shared history adapter — every product
+  // ↔ workspace transition is a pushState (CONSOLE-WORKSPACE §2: never a
+  // reload), the console entry is an in-tree push (J14), and the
+  // workspace back affordance returns the same way. The repository's
+  // honest deployment facts are the input (nothing configured, no
+  // recorded provider evidence).
   //
   // INTEGRATION FIX (J7): the branch keys on the GATE's decision, not a
   // re-check of isPaySwapProductPath — the gate (post-fix) sends unknown
   // top-level paths here too, and the product router renders the honest
-  // not-found answer for them (routes.ts law). The console mount below
-  // now owns only /console and /console/*.
-  if (surface.kind === "product" || surface.kind === "legacy-redirect") {
-    document.title = "PaySwap";
+  // not-found answer for them (routes.ts law). The advanced developer
+  // workspace mount below owns only /console/advanced (+ deeper).
+  if (surface.kind === "product" || surface.kind === "legacy-redirect" || surface.kind === "console") {
+    document.title = surface.kind === "console" ? "PaySwap — Agent Console" : "PaySwap";
     root.render(
-      <PaySwapApp
-        input={{
-          deployment: HONEST_DEPLOYMENT_CONTEXT,
-          coverage: NO_EVIDENCE_COVERAGE,
-          apiRuntime: resolveApiRuntimeInput(),
-        }}
-        navigation={createWebNavigation()}
-        console={{ href: PAYSWAP_CONSOLE_PATH }}
-        onRouteChange={(route) => {
-          document.title = routeDocumentTitle(route);
-        }}
-      />,
+      <AppErrorBoundary>
+        <PaySwapSurfaces apiRuntime={resolveApiRuntimeInput()} />
+      </AppErrorBoundary>,
     );
     return;
   }
@@ -508,11 +501,13 @@ async function bootstrapWebApp() {
       onClose: () => {},
     });
     const platform = createWebPlatform();
-    // The agent workspace console — a SUPPORTING capability of PaySwap
-    // (J14): reachable at /console and every other substrate path, never
-    // the default landing. The old "ZCode - Web + Server" title is gone
-    // with the old default landing.
-    document.title = "PaySwap — Agent Console";
+    // The ADVANCED developer workspace (P10-B split): the ZCode-derived
+    // substrate client at /console/advanced — the advanced TECHNICAL
+    // interface, clearly labeled, never the default console experience,
+    // never removed (CONSOLE-WORKSPACE §1). The workspace store does NOT
+    // live here (the BROWSER_PROFILE store serves the /console workspace
+    // mount above); this mount is the substrate Root exactly as in P9-A.
+    document.title = "Developer Workspace — PaySwap Agent Console";
 
     root.render(
       <AppErrorBoundary>

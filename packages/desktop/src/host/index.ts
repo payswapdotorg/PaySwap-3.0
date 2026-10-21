@@ -2902,11 +2902,19 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
         // exposure path (Logging + NetworkTelemetry middleware) as every
         // other host-owned service. Money movement is delegated via typed
         // references only; no engine lives here.
+        // P10-B: the seam carries the console workspace store directory —
+        // main injects it via the host process env (PAYSWAP_WORKSPACE_
+        // STORE_DIR, set in desktopRuntimeEnv.buildHostProcessEnv under
+        // app.getPath("userData")/"workspace"; the InitLocal zod schema
+        // lives in @zcode/shared so the message path is not lane-editable).
+        // The composition edge injects the node:fs binding; an absent
+        // directory fails closed with a typed error on first use.
         registerPaySwapDesktopService(services, {
           scope: { kind: "local" },
           log: (level, message, ...args) => {
             writeHostLog(level, message, ...args);
           },
+          storeDirectory: process.env.PAYSWAP_WORKSPACE_STORE_DIR?.trim() || undefined,
         });
         hasDisposedHostResources = false;
         disposeHostResourcesInFlight = null;

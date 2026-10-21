@@ -10,12 +10,52 @@
 export {
   PAYSWAP_DESKTOP_PIN_SET_VERSION,
   PAYSWAP_DESKTOP_PIN_SOURCE_COMMIT,
+  PAYSWAP_CONSOLE_WORKSPACE_PIN_SOURCE_COMMIT,
   PAYSWAP_DESKTOP_PINS,
   DESKTOP_PIN_PROVENANCE,
   pinById,
   pinsForPackage,
 } from "./pin-registry.js";
 export type { PaySwapContractPin, DesktopPinProvenance } from "./pin-registry.js";
+
+export {
+  CONSOLE_WORKSPACE_PIN_STAMP,
+  PINNED_MISSION_INTENT_DIRECTIONS,
+  PINNED_MISSION_INTAKE_BOUNDS,
+  PINNED_MISSION_DRAFT_STATUSES,
+  PINNED_MISSION_LIFECYCLE_RUNGS,
+  PINNED_MISSION_EVENT_KINDS,
+  PINNED_LADDER_INTENT_PREREQUISITE,
+  PINNED_LADDER_ELIGIBILITY_PREREQUISITE,
+  PINNED_LADDER_PLANNING_PREREQUISITE,
+  PINNED_LADDER_APPROVAL_PREREQUISITE,
+  PINNED_LADDER_EXECUTION_PREREQUISITE,
+  PINNED_LADDER_OBSERVATION_PREREQUISITE,
+  PINNED_LADDER_EVIDENCE_PREREQUISITE,
+  PINNED_LADDER_PREREQUISITES,
+  PINNED_WORKSPACE_STORE_DURABILITY,
+  PINNED_WORKSPACE_STORE_PORT_METHODS,
+  isPinnedMissionIntentDirection,
+  isPinnedMissionDraftStatus,
+  isPinnedMissionEventKind,
+  isPinnedMissionLifecycleRung,
+} from "./mission-intake-pins.js";
+export type {
+  ConsoleWorkspacePinStamp,
+  PinnedMissionIntentDirection,
+  PinnedMissionIntakeInput,
+  PinnedMissionDraftStatus,
+  PinnedMissionLifecycleRung,
+  PinnedMissionRungState,
+  PinnedMissionEventKind,
+  PinnedMissionEvent,
+  PinnedMissionStructuralValidation,
+  PinnedMissionRecord,
+  PinnedMissionSummary,
+  PinnedMissionDetail,
+  PinnedWorkspaceStoreDurability,
+  PinnedWorkspaceStorePortMethod,
+} from "./mission-intake-pins.js";
 
 export {
   PINNED_SURFACE_API_VERSION,

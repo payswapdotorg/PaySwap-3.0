@@ -10,6 +10,7 @@ import { describe, expect, it } from "vitest";
 import {
   PAYSWAP_DESKTOP_PIN_SET_VERSION,
   PAYSWAP_DESKTOP_PIN_SOURCE_COMMIT,
+  PAYSWAP_CONSOLE_WORKSPACE_PIN_SOURCE_COMMIT,
   PAYSWAP_DESKTOP_PINS,
   pinById,
   pinsForPackage,
@@ -27,6 +28,15 @@ import {
   PINNED_EXTERNAL_EFFECT_OUTCOMES,
   PINNED_AMBIGUITY_REASONS,
   PINNED_EXECUTION_MODES,
+  PINNED_MISSION_INTENT_DIRECTIONS,
+  PINNED_MISSION_DRAFT_STATUSES,
+  PINNED_MISSION_LIFECYCLE_RUNGS,
+  PINNED_MISSION_EVENT_KINDS,
+  PINNED_MISSION_INTAKE_BOUNDS,
+  PINNED_LADDER_PREREQUISITES,
+  PINNED_WORKSPACE_STORE_DURABILITY,
+  PINNED_WORKSPACE_STORE_PORT_METHODS,
+  CONSOLE_WORKSPACE_PIN_STAMP,
 } from "../../src/host/payswap/index.js";
 import {
   recordedBaseCommit,
@@ -39,6 +49,22 @@ import {
   recordedEvidenceNodeKinds,
   recordedExecutionModes,
 } from "../fixtures/recorded-contract-vocabulary.js";
+import {
+  recordedConsoleWorkspaceSourceCommit,
+  recordedMissionIntentDirections,
+  recordedMissionDraftStatuses,
+  recordedMissionLifecycleRungs,
+  recordedMissionEventKinds,
+  recordedMissionIntakeBounds,
+  recordedLadderPrerequisites,
+  recordedWorkspaceStoreDurability,
+  recordedWorkspaceStorePortMethods,
+} from "../fixtures/recorded-console-workspace-vocabulary.js";
+// The P10-B console-workspace recording lives in its own fixture file
+// (see that file's header: the P10-A @payswap/surface console modules are
+// not on this branch — parallel lane; the TL upgrades this check to a
+// direct relative import of packages/surface/src/console-*.ts when they
+// land).
 import { PINNED_DELIVERY_ESTIMATE_KINDS } from "../../src/host/payswap/pins/quote-terms-pins.js";
 import type { PinnedQuoteFeeBasis } from "../../src/host/payswap/pins/quote-terms-pins.js";
 
@@ -49,26 +75,36 @@ const FEE_BASES: readonly PinnedQuoteFeeBasis[] = [
   "PROVIDER_DISCLOSED",
 ];
 
-describe("pin registry (P7-W2)", () => {
-  it("the pin set is versioned and mirrors the exact base commit of this lane", () => {
-    expect(PAYSWAP_DESKTOP_PIN_SET_VERSION).toBe("1.0.0");
+describe("pin registry (P7-W2 + P10-B)", () => {
+  it("the pin set is versioned and mirrors the exact base commits of its lanes", () => {
+    // Bumped 1.0.0 → 1.1.0 by P10-B (pin law: any pin change bumps the set).
+    expect(PAYSWAP_DESKTOP_PIN_SET_VERSION).toBe("1.1.0");
     expect(PAYSWAP_DESKTOP_PIN_SOURCE_COMMIT).toBe(recordedBaseCommit);
     expect(recordedBaseCommit).toBe("2999bbb1658443b72ce9644f32cabbebdbecaa37");
+    expect(PAYSWAP_CONSOLE_WORKSPACE_PIN_SOURCE_COMMIT).toBe(
+      recordedConsoleWorkspaceSourceCommit,
+    );
   });
 
   it("every pin records mirrored package, version, source commit and work order (canonical)", () => {
-    expect(PAYSWAP_DESKTOP_PINS.length).toBe(10);
+    expect(PAYSWAP_DESKTOP_PINS.length).toBe(12);
     for (const pin of PAYSWAP_DESKTOP_PINS) {
       expect(pin.mirroredPackage).toMatch(/^@payswap\//);
-      expect(pin.sourceCommit).toBe(recordedBaseCommit);
-      expect(pin.workOrder).toMatch(/^P\d+-W\d+$/);
+      // Pins registered through P7-W2 record the Phase-2 base; the P10-B
+      // console-workspace pins record the TL's console-contract commit.
+      expect(pin.sourceCommit).toBe(
+        pin.workOrder === "P10-B"
+          ? PAYSWAP_CONSOLE_WORKSPACE_PIN_SOURCE_COMMIT
+          : PAYSWAP_DESKTOP_PIN_SOURCE_COMMIT,
+      );
+      expect(pin.workOrder).toMatch(/^P\d+-[A-Z0-9]+$/);
       expect(pin.mirrors.length).toBeGreaterThan(20);
     }
   });
 
   it("pin lookup is fail-closed on unknown ids (the pin set is closed)", () => {
     expect(() => pinById("surface.nonexistent")).toThrow(/unknown pin id/);
-    expect(pinsForPackage("@payswap/surface").length).toBe(8);
+    expect(pinsForPackage("@payswap/surface").length).toBe(10);
     expect(pinsForPackage("@payswap/protocol").length).toBe(1);
     expect(pinsForPackage("@payswap/provider-runtime").length).toBe(1);
   });
@@ -143,5 +179,40 @@ describe("pin fidelity vs recorded fixtures (protocol + provider-runtime pins)",
     expect([...PINNED_EXTERNAL_EFFECT_OUTCOMES]).toEqual(recordedProviderRuntime.externalEffectOutcomes);
     expect([...PINNED_AMBIGUITY_REASONS]).toEqual(recordedProviderRuntime.ambiguityReasons);
     expect([...PINNED_EXECUTION_MODES]).toEqual([...recordedExecutionModes]);
+  });
+});
+
+describe("pin fidelity vs recorded fixtures (console workspace mission-intake pins, P10-B)", () => {
+  it("the pinned mission vocabularies mirror the recorded console contract (directions, statuses, rungs, event kinds)", () => {
+    expect([...PINNED_MISSION_INTENT_DIRECTIONS]).toEqual([...recordedMissionIntentDirections]);
+    expect([...PINNED_MISSION_DRAFT_STATUSES]).toEqual([...recordedMissionDraftStatuses]);
+    expect([...PINNED_MISSION_LIFECYCLE_RUNGS]).toEqual([...recordedMissionLifecycleRungs]);
+    expect([...PINNED_MISSION_EVENT_KINDS]).toEqual([...recordedMissionEventKinds]);
+  });
+
+  it("the pinned intake bounds mirror the recorded §3 field-length law", () => {
+    expect(PINNED_MISSION_INTAKE_BOUNDS).toEqual(recordedMissionIntakeBounds);
+  });
+
+  it("the pinned §4 ladder prerequisites mirror the recording CHARACTER-EXACT (the typed honesty law)", () => {
+    for (const [rung, prerequisite] of Object.entries(PINNED_LADDER_PREREQUISITES)) {
+      expect(prerequisite).toBe(recordedLadderPrerequisites[rung]);
+    }
+    expect(Object.keys(PINNED_LADDER_PREREQUISITES)).toHaveLength(7);
+  });
+
+  it("the pinned store durability labels + port method set mirror the §5 recording (the only mutation surface)", () => {
+    expect([...PINNED_WORKSPACE_STORE_DURABILITY]).toEqual([...recordedWorkspaceStoreDurability]);
+    expect([...PINNED_WORKSPACE_STORE_PORT_METHODS]).toEqual([
+      ...recordedWorkspaceStorePortMethods,
+    ]);
+  });
+
+  it("the console pin stamp carries the pin-set version + the console contract commit", () => {
+    expect(CONSOLE_WORKSPACE_PIN_STAMP.pinSetVersion).toBe(PAYSWAP_DESKTOP_PIN_SET_VERSION);
+    expect(CONSOLE_WORKSPACE_PIN_STAMP.consoleContractCommit).toBe(
+      recordedConsoleWorkspaceSourceCommit,
+    );
+    expect(CONSOLE_WORKSPACE_PIN_STAMP.workOrder).toBe("P10-B");
   });
 });

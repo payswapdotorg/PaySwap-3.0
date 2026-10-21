@@ -34,6 +34,13 @@ import type {
   DesktopSecurityGateView,
   PaySwapDesktopDeploymentFacts,
 } from "../product/contracts.js";
+import type {
+  PinnedMissionDetail,
+  PinnedMissionIntakeInput,
+  PinnedMissionRecord,
+  PinnedMissionSummary,
+} from "../pins/index.js";
+import type { WorkspaceStoreHealthReport } from "../product/workspace-store-persistence.js";
 
 // ---------------------------------------------------------------------------
 // Channel identity (substrate ServiceChannels convention: kebab-case)
@@ -125,7 +132,11 @@ export interface PaySwapDesktopTransportSeam {
  * over the substrate's service port. Every method is a pure projection or
  * a typed-reference delegation: there is NO method that executes money
  * movement, mints authorization, or writes financial truth (the
- * no-parallel-engine law, enforced structurally).
+ * no-parallel-engine law, enforced structurally). The Phase-10 console
+ * workspace members (deploymentFacts + the workspace store surface) carry
+ * the same law: the workspace store holds DEMAND-SIDE MISSION INTENT
+ * ONLY (§5 of spec/surface/CONSOLE-WORKSPACE.md) — never financial
+ * truth, never authorization, never capability state.
  */
 export interface IPaySwapDesktopService {
   /** The session this service instance serves (window/session seam). */
@@ -156,6 +167,50 @@ export interface IPaySwapDesktopService {
   delegateMoneyMovement(
     movement: DesktopDelegatedMovementRef,
   ): Promise<DesktopDelegationReceipt>;
+
+  // -------------------------------------------------------------------------
+  // Console workspace (P10-B) — host-computed facts + the §5 store surface
+  // -------------------------------------------------------------------------
+
+  /**
+   * The host-computed honest deployment facts for the console workspace
+   * (DESKTOP_PROFILE). These are FACTS ABOUT CONFIGURED PLANES computed
+   * in the host — never renderer-invented, never UI state. The current
+   * derivation: no economic intake plane, no capability observations, no
+   * merchant checkout binding, no provider observations and no reachable
+   * delegation plane EXIST in this deployment, so every fact is false —
+   * the all-unconfigured truth, mirrored from the repository's honest
+   * deployment context (the same inputs the mission board folds).
+   */
+  deploymentFacts(): PaySwapDesktopDeploymentFacts;
+
+  /** The §5 store surface: list mission summaries (newest-updated-first). */
+  workspaceListMissions(): Promise<readonly PinnedMissionSummary[]>;
+
+  /** Record a mission draft (structural validation embedded, fail-closed). */
+  workspaceRecordMissionDraft(
+    input: PinnedMissionIntakeInput,
+    now: string,
+  ): Promise<PinnedMissionRecord>;
+
+  /** The intent-review step: DRAFT → INTENT_RECORDED exactly when valid. */
+  workspaceRecordMissionIntent(id: string, now: string): Promise<PinnedMissionRecord>;
+
+  /** Mission detail (§4 ladder + evidence note) or null when unknown. */
+  workspaceMissionDetail(id: string): Promise<PinnedMissionDetail | null>;
+
+  /** Re-validate + revise a mission draft (the REVISE law, §5). */
+  workspaceReviseMissionDraft(
+    id: string,
+    input: PinnedMissionIntakeInput,
+    now: string,
+  ): Promise<PinnedMissionRecord>;
+
+  /** Archive a mission (terminal; preserves the rungs reached at archive). */
+  workspaceArchiveMissionDraft(id: string, now: string): Promise<PinnedMissionRecord>;
+
+  /** The typed store health report (quarantine surfaced, never dropped). */
+  workspaceStoreHealth(): Promise<WorkspaceStoreHealthReport>;
 }
 
 // ---------------------------------------------------------------------------
@@ -175,6 +230,16 @@ export interface PaySwapDesktopHostSeam {
    * — the product never bypasses it with console calls.
    */
   readonly log: (level: "info" | "warn" | "error", message: string, ...args: unknown[]) => void;
+  /**
+   * (P10-B, optional) The directory the DESKTOP_PROFILE workspace store
+   * persists its JSON snapshot under (the PaySwap user-data "workspace"
+   * directory, resolved by the MAIN process — the host process has no
+   * Electron app object). When ABSENT, the workspace-store service
+   * members fail closed with a typed STORE_NOT_CONFIGURED error on first
+   * use — never a silent no-op, never an in-memory-only store pretending
+   * to be persistent.
+   */
+  readonly storeDirectory?: string;
 }
 
 /** Composition diagnostics returned by the host registration helper. */
