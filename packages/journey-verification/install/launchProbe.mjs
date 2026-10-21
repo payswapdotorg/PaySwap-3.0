@@ -4,34 +4,36 @@
  * --launch half of install-verify.mjs; extracted to keep the runner under
  * the repository max-lines lint gate).
  *
- * Launches the installed desktop binary (directly under a display, or
- * wrapped in xvfb-run when no display exists) and asserts:
+ * Launches the installed desktop binary DETACHED (directly under a
+ * display, or wrapped in xvfb-run when no display exists — a blocking
+ * spawn would kill the app before the window poll could observe it, the
+ * second v1.0.1 CI lesson) and asserts, while the app runs:
  *   - the productName-derived app-data path ~/.config/PaySwap appears;
  *   - a REAL window with a PaySwap WM_CLASS + a PaySwap title exists
- *     (xdotool, polled). This window assertion is the v1.0.0 lesson: the
- *     broken release created its app-data dir but never a main window
- *     (the force-update block), so a data-dir check alone proved nothing.
+ *     (xdotool, polled; matched on BOTH the WM_CLASS class ('PaySwap')
+ *     and instance ('payswap') strings — case matters). This window
+ *     assertion is the v1.0.0 lesson: the broken release created its
+ *     app-data dir but never a main window (the force-update block), so
+ *     a data-dir check alone proved nothing.
  *
  * Honest boundary: without xdotool the window identity is returned as
  * NOT ASSERTED — never fabricated. A failed first launch retries once
  * with --no-sandbox and the retry is REPORTED.
  */
 
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import os from "node:os";
 
-const LAUNCH_SETTLE_TIMEOUT_MS = 25_000;
-const WINDOW_POLL_TIMEOUT_MS = 20_000;
+const WINDOW_POLL_TIMEOUT_MS = 30_000;
 const WINDOW_POLL_INTERVAL_MS = 1_000;
 
-function run(command, args, options = {}) {
-  const result = spawnSync(command, args, { encoding: "utf8", ...options });
+function probeRun(command, args) {
+  const result = spawnSync(command, args, { encoding: "utf8" });
   return {
     status: result.status,
     stdout: (result.stdout ?? "").trim(),
-    stderr: (result.stderr ?? "").trim(),
   };
 }
 
@@ -39,50 +41,70 @@ export function resolveLaunchWrapper() {
   if (process.env.DISPLAY || process.env.WAYLAND_DISPLAY) {
     return { supported: true, wrapper: null };
   }
-  const xvfb = run("which", ["xvfb-run"]);
+  const xvfb = probeRun("which", ["xvfb-run"]);
   if (xvfb.status === 0) {
     return { supported: true, wrapper: xvfb.stdout };
   }
   return { supported: false, wrapper: null };
 }
 
-/** Poll xdotool for a window whose WM_CLASS matches payswap. */
-function pollForPaySwapWindow() {
-  const xdotool = run("which", ["xdotool"]);
-  if (xdotool.status !== 0) {
-    return {
-      asserted: false,
-      reason: "xdotool unavailable — window identity NOT ASSERTED (recorded, never fabricated)",
-      windows: [],
-    };
-  }
-  const deadline = Date.now() + WINDOW_POLL_TIMEOUT_MS;
-  const windows = [];
-  while (Date.now() < deadline) {
-    const search = run("xdotool", ["search", "--class", "payswap"]);
+function xdotoolAvailable() {
+  return probeRun("which", ["xdotool"]).status === 0;
+}
+
+/** All window ids whose WM_CLASS matches payswap in either field. */
+function searchPaySwapWindowIds() {
+  const ids = new Set();
+  // WM_CLASS is (instance, class): electron sets instance to the
+  // executable name ('payswap') and class to the product name
+  // ('PaySwap') — match both, case-sensitively explicit.
+  for (const args of [
+    ["search", "--class", "PaySwap"],
+    ["search", "--classname", "payswap"],
+    ["search", "--class", "payswap"],
+    ["search", "--class", "Payswap"],
+  ]) {
+    const search = probeRun("xdotool", args);
     if (search.status === 0 && search.stdout) {
       for (const id of search.stdout.split(/\s+/).filter(Boolean)) {
-        const name = run("xdotool", ["getwindowname", id]);
-        windows.push({ id, name: name.status === 0 ? name.stdout : "(name unavailable)" });
-      }
-      if (windows.length > 0) {
-        return { asserted: true, reason: null, windows };
+        ids.add(id);
       }
     }
-    run("sleep", [`${WINDOW_POLL_INTERVAL_MS / 1000}`]);
   }
-  return {
-    asserted: true,
-    reason: "no window with a PaySwap WM_CLASS appeared within the timeout",
-    windows,
-  };
+  return [...ids];
+}
+
+function snapshotPaySwapWindows() {
+  const windows = [];
+  for (const id of searchPaySwapWindowIds()) {
+    const name = probeRun("xdotool", ["getwindowname", id]);
+    windows.push({ id, name: name.status === 0 ? name.stdout : "(name unavailable)" });
+  }
+  return windows;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function launchDetached(execBinary, extraArgs, wrapper) {
+  const command = wrapper ?? execBinary;
+  const args = wrapper ? ["-a", execBinary, ...extraArgs] : [...extraArgs];
+  const child = spawn(command, args, {
+    detached: true,
+    stdio: "ignore",
+    env: { ...process.env },
+  });
+  child.unref();
+  return child;
 }
 
 /**
  * The launch verification battery (runs while the package is installed).
- * Returns findings — the runner owns the exit protocol.
+ * Async: polls while the detached app runs. Returns findings — the
+ * runner owns the exit protocol.
  */
-export function collectLaunchFindings({ execBinary, receipt }) {
+export async function collectLaunchFindings({ execBinary, receipt }) {
   const launchSupport = resolveLaunchWrapper();
   if (!launchSupport.supported) {
     return {
@@ -92,29 +114,50 @@ export function collectLaunchFindings({ execBinary, receipt }) {
       ],
     };
   }
+  const wrapper = launchSupport.wrapper;
   const home = os.homedir();
   const dataDir = join(home, ".config", "PaySwap");
   const before = existsSync(dataDir);
-  const wrapper = launchSupport.wrapper;
-  console.error(`[install-verify] launching ${execBinary} (wrapper: ${wrapper ?? "direct display"})…`);
-
-  let launchNote = null;
-  let result = wrapper
-    ? run(wrapper, ["-a", execBinary], { timeout: LAUNCH_SETTLE_TIMEOUT_MS })
-    : run(execBinary, [], { timeout: LAUNCH_SETTLE_TIMEOUT_MS });
-  if (result.status !== null && result.status !== 0) {
-    // One recorded retry: chrome-sandbox needs its setuid bit, which
-    // non-install extractions can lose. The retry is REPORTED, never
-    // silent.
-    launchNote = `first launch attempt exited ${result.status}; retried with --no-sandbox`;
-    result = wrapper
-      ? run(wrapper, ["-a", execBinary, "--no-sandbox"], { timeout: LAUNCH_SETTLE_TIMEOUT_MS })
-      : run(execBinary, ["--no-sandbox"], { timeout: LAUNCH_SETTLE_TIMEOUT_MS });
-  }
+  const hasXdotool = xdotoolAvailable();
 
   const findings = [];
-  const after = existsSync(dataDir);
-  if (!after) {
+  let launchNote = null;
+  let child = launchDetached(execBinary, [], wrapper);
+  console.error(`[install-verify] launching ${execBinary} (wrapper: ${wrapper ?? "direct display"}, pid ${child.pid})…`);
+
+  const deadline = Date.now() + WINDOW_POLL_TIMEOUT_MS;
+  let sawEarlyExit = false;
+  let retried = false;
+  let windows = [];
+  let dataDirAppeared = existsSync(dataDir);
+
+  while (Date.now() < deadline) {
+    await sleep(WINDOW_POLL_INTERVAL_MS);
+    dataDirAppeared = dataDirAppeared || existsSync(dataDir);
+    if (hasXdotool) {
+      windows = snapshotPaySwapWindows();
+      if (windows.length > 0) {
+        break;
+      }
+    }
+    const exited = child.exitCode !== null || child.signalCode !== null;
+    if (exited) {
+      sawEarlyExit = true;
+      // One recorded retry: chrome-sandbox needs its setuid bit, which
+      // non-install extractions can lose. The retry is REPORTED, never
+      // silent.
+      if (!retried) {
+        retried = true;
+        launchNote = `first launch exited early (code ${child.exitCode ?? child.signalCode}); retried with --no-sandbox`;
+        console.error(`[install-verify] ${launchNote}`);
+        child = launchDetached(execBinary, ["--no-sandbox"], wrapper);
+      }
+    }
+  }
+
+  receipt.launchWindows = windows;
+
+  if (!dataDirAppeared) {
     findings.push(
       `launch verification failed: ${dataDir} did not appear (app-data path pattern ~/.config/PaySwap, productName-derived)${before ? " (it existed before launch — pre-existing state, inconclusive)" : ""}`,
     );
@@ -123,18 +166,19 @@ export function collectLaunchFindings({ execBinary, receipt }) {
     receipt.assertions.push("launch: app-data path ~/.config/PaySwap ok");
   }
 
-  const windowResult = pollForPaySwapWindow();
-  receipt.launchWindows = windowResult.windows;
-  if (!windowResult.asserted) {
-    console.error(`[install-verify] ${windowResult.reason}`);
-    receipt.assertions.push(`launch: window identity not asserted (${windowResult.reason})`);
-  } else if (windowResult.reason) {
-    findings.push(`launch verification failed: ${windowResult.reason}`);
+  if (!hasXdotool) {
+    const reason = "xdotool unavailable — window identity NOT ASSERTED (recorded, never fabricated)";
+    console.error(`[install-verify] ${reason}`);
+    receipt.assertions.push(`launch: window identity not asserted (${reason})`);
+  } else if (windows.length === 0) {
+    findings.push(
+      `no window with a PaySwap WM_CLASS appeared within ${WINDOW_POLL_TIMEOUT_MS / 1000}s${sawEarlyExit ? " (the app exited early)" : ""}`,
+    );
   } else {
-    const titled = windowResult.windows.filter((window) => /payswap/i.test(window.name));
+    const titled = windows.filter((window) => /payswap/i.test(window.name));
     if (titled.length === 0) {
       findings.push(
-        `windows exist but none carries a PaySwap title (observed: ${JSON.stringify(windowResult.windows)})`,
+        `windows exist but none carries a PaySwap title (observed: ${JSON.stringify(windows)})`,
       );
     } else {
       console.error(`[install-verify] PaySwap window present: ${titled.map((w) => JSON.stringify(w.name)).join(", ")} ✓`);
@@ -145,5 +189,19 @@ export function collectLaunchFindings({ execBinary, receipt }) {
   if (launchNote) {
     receipt.assertions.push(`launch: ${launchNote}`);
   }
+
+  // Cleanup: kill the detached process group (xvfb-run + app).
+  try {
+    if (child.exitCode === null && child.signalCode === null) {
+      process.kill(-child.pid, "SIGTERM");
+    }
+  } catch {
+    try {
+      child.kill("SIGTERM");
+    } catch {
+      // already gone
+    }
+  }
+
   return { unsupported: false, findings };
 }

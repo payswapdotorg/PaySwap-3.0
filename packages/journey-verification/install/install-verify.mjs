@@ -346,7 +346,7 @@ async function verifyRelease(args, onWorkdir) {
       if (!identity.execBinary) {
         fail(EXIT.IDENTITY, "--launch requested but the desktop entry Exec= binary did not resolve");
       }
-      const launch = collectLaunchFindings({ execBinary: identity.execBinary, receipt });
+      const launch = await collectLaunchFindings({ execBinary: identity.execBinary, receipt });
       if (launch.unsupported) {
         fail(EXIT.LAUNCH_UNSUPPORTED, launch.findings[0]);
       }
