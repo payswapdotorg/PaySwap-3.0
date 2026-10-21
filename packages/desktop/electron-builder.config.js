@@ -156,16 +156,8 @@ const REQUIRED_ASAR_RUNTIME_MODULES = [
 // pacman 依赖必须使用 Arch 官方仓库中的包名。electron-builder 的历史默认集合包含
 // 已移除的 libappindicator-gtk3/http-parser，且缺少 Electron 实际需要的运行库；显式
 // 维护最小运行时闭包，避免 pacman -U 无法解析依赖或启动时才暴露缺库。
-const PACMAN_RUNTIME_DEPENDENCIES = [
-  "gtk3",
-  "nss",
-  "libxss",
-  "libxtst",
-  "libnotify",
-  "alsa-lib",
-  "mesa",
-  "xdg-utils",
-];
+// （P9-B：PaySwap 发行面收敛为 deb + AppImage；pacman/rpm 目标连同此集合一起移除，
+// 待需要时再按同样纪律重新引入。）
 
 const WINDOWS_INSTALL_MANIFEST_NAME = ".zcode-install-manifest";
 
@@ -235,6 +227,20 @@ const PACKAGING_PRUNE_PATTERNS = [
   "!**/CODE_OF_CONDUCT*",
   "!**/SECURITY*",
 ];
+
+/*
+ * P9-B note on hoisted runtime modules: electron-builder's pnpm collector can
+ * miss pure-JS transitive deps under some dedup/hoisting layouts (measured here:
+ * 24 modules — the OTLP exporter closure plus ssh2/yazl/yauzl children). The
+ * designed mechanism is the afterPack app.asar rewrite below (extract to a
+ * tmpdir staging, copy the missing closure, repack). A `files`-based
+ * pre-include was tried and does NOT work: node_modules patterns cannot add
+ * modules outside electron-builder's computed dependency graph. On RAM/disk
+ * constrained builders, point TMPDIR at a tmpfs so the staging copy never
+ * lands on the output filesystem (the pack itself still writes
+ * app.asar.next + .next.unpacked next to the old archive — budget ~1× asar
+ * of extra headroom there).
+ */
 
 function buildDesktopArtifactName(platformName, extension = "${ext}") {
   // 测试环境产物必须和正式安装包文件名区分，避免上传、下载或人工验收时混用。
@@ -456,13 +462,15 @@ export default {
   appId: desktopProductIdentity.appId,
   // Linux deb 打包（fpm）会校验 package metadata 中的 homepage、author.email、maintainer。
   // CI 环境下若这些字段缺失会在产物阶段直接失败。这里统一在构建配置补齐，避免依赖外部注入。
+  // P9-B：homepage/author 指向 PaySwap 的 GitHub 仓库（唯一真实发布源）；maintainer 邮箱
+  // 使用 GitHub 组织 noreply 约定，操作方提供真实联系邮箱后再替换。
   extraMetadata: {
     version: buildMetadata.appVersion,
     zcodeProductFlavor: desktopProductIdentity.flavor,
-    homepage: "https://zcode.z.ai",
+    homepage: "https://github.com/payswapdotorg/PaySwap-3.0",
     author: {
-      name: "ZCode",
-      email: "dev@zcode.z.ai",
+      name: "PaySwap",
+      email: "payswapdotorg@users.noreply.github.com",
     },
   },
   // macOS 签名阶段会对 Electron Framework 下每个语言包逐个 codesign。
@@ -493,7 +501,11 @@ export default {
     // 默认也会原样进入安装包。这里统一在主包层做一次裁剪，只移除非运行时文件，LICENSE 继续保留。
     ...PACKAGING_PRUNE_PATTERNS,
     ...createDesktopNativePackagePrunePatterns(targetPlatform.key),
+    // P9-B：@payswap/app（lane A 的产品界面包）在桌面侧只作为构建期依赖（tsconfig paths
+    // + vite alias 内联进 renderer 产物），运行时同样不需要整包源码进 app.asar；
+    // 与 @zcode workspace 包同一裁剪纪律，避免合并后 asar 重复携带源码。
     "!node_modules/@zcode/**",
+    "!node_modules/@payswap/**",
     "!node_modules/react/**",
     "!node_modules/react-dom/**",
   ],
@@ -695,39 +707,32 @@ export default {
     artifactName: buildDesktopArtifactName("win"),
   },
   linux: {
-    target: ["AppImage", "deb", "rpm", "pacman"],
-    artifactName: buildDesktopArtifactName("linux"),
-    // desktop 包名是 scoped package（@zcode/desktop），electron-builder 默认会把
-    // Linux executable/Icon 推成 @zcodedesktop。部分桌面环境无法按这个 icon name 命中
-    // hicolor 图标，最终回退成系统齿轮。这里固定成稳定的小写名称，让 Icon=zcode
-    // 与 /usr/share/icons/hicolor/*/apps/zcode.png 保持一致。
+    // P9-B：PaySwap 的 Linux 发行面是 deb（优先，Ubuntu 官方安装路径）+ AppImage
+    // （免安装路径）。rpm/pacman 目标已移除——没有对应验收证据的目标不留在配置里冒充能力。
+    target: ["deb", "AppImage"],
+    // desktop 包名是 scoped package（@payswap/desktop），electron-builder 默认会把
+    // Linux executable/Icon 推成 @payswapdesktop。部分桌面环境无法按这个 icon name 命中
+    // hicolor 图标，最终回退成系统齿轮。这里固定成稳定的小写名称，让 Icon=payswap
+    // 与 /usr/share/icons/hicolor/*/apps/payswap.png 保持一致。
     executableName: desktopProductIdentity.linuxExecutableName,
-    category: "Development",
-    maintainer: "ZCode <dev@zcode.z.ai>",
+    // 桌面条目归类：办公/金融（PRODUCT-IDENTITY §1）。electron-builder 26 把 linux.category
+    // 直接拼成 Categories=<category>; ——复合值 "Office;Finance" 产出 "Office;Finance;"。
+    // 注意：linux.desktop 只接受 desktopActions/entry，不能用它写 Categories（且会在
+    // category 推导之后被覆盖）。桌面条目 Name/Icon 由 eb 从 productName/executableName
+    // 推导为 PaySwap/payswap，与 hicolor 图标名一致。
+    category: "Office;Finance",
+    maintainer: "PaySwap <payswapdotorg@users.noreply.github.com>",
   },
   deb: {
     // 生产版与 Preview 必须是两个 dpkg package；只改可执行名仍会让安装器把另一版本当成升级替换。
     packageName: desktopProductIdentity.linuxPackageName,
+    // Debian 惯例产物名（name_version_arch.deb）：PaySwap_1.0.0_amd64.deb。
+    // ${arch} 在 deb 目标下解析为 Debian 架构名（amd64），与 GitHub Release 资产名一致。
+    artifactName: `\${productName}_\${version}_\${arch}${desktopArtifactEnvSuffix}.\${ext}`,
   },
-  pacman: {
-    // 与 deb/rpm 保持相同的 flavor 隔离，避免 Preview/Production 被 pacman 当作同一包覆盖。
-    packageName: desktopProductIdentity.linuxPackageName,
-    // 显式列出 Arch 官方仓库可解析的 Electron 运行时依赖，替换 electron-builder
-    // 陈旧默认集合，避免安装阶段因已移除包名直接失败。
-    depends: PACMAN_RUNTIME_DEPENDENCIES,
-    // Electron Builder 默认把 pacman target 命名为 .pacman；Arch 原生包的标准扩展名是 .pkg.tar.zst。
-    artifactName: buildDesktopArtifactName("linux", "pkg.tar.zst"),
-  },
-  rpm: {
-    // 与 deb 同一约束：生产版与 Preview 必须是两个独立 rpm 包，否则 dnf 会把另一 flavor 当成升级替换。
-    // rpm 面向 RHEL 8+（glibc 2.28）分发；整包 glibc 下限由 node-pty prebuild 与 bfs/ugrep 抬到 2.28，
-    // Electron 41 主二进制只引用到 2.25，不会更高。fpm 产 rpm 需要构建机提供 rpmbuild 与 xz。
-    packageName: desktopProductIdentity.linuxPackageName,
-    // electron-builder 的 rpm 默认 Requires（gtk3/nss/libXtst 等）不包含 Electron ELF 实际
-    // DT_NEEDED 的 mesa-libgbm 与 alsa-lib；rockylinux:8 最小化容器实测装完后启动报
-    // libgbm.so.1 缺失。这里用 fpm 追加 -d（在默认 Requires 之后累积），不能用 depends——
-    // depends 会整组替换默认 Requires 集。
-    fpm: ["-d", "mesa-libgbm", "-d", "alsa-lib"],
+  appImage: {
+    // AppImage 惯例产物名：PaySwap-1.0.0.AppImage（与 GitHub Release 资产名一致）。
+    artifactName: `\${productName}-\${version}${desktopArtifactEnvSuffix}.\${ext}`,
   },
   dmg: {
     // 当前安装包携带的运行时资源（尤其 agent node_modules）体积已超过默认 DMG 估算值。
