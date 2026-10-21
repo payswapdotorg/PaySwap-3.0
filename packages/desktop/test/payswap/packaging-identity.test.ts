@@ -47,7 +47,7 @@ describe("packaging identity law: canonical §1 values are the law (P9-B)", () =
   it("the desktop package manifest carries the canonical packaging identity", () => {
     expect(desktopManifest.name).toBe("@payswap/desktop");
     expect(desktopManifest.productName).toBe("PaySwap");
-    expect(desktopManifest.version).toBe("1.0.1");
+    expect(desktopManifest.version).toBe("1.1.0");
     expect(desktopManifest.description).toBe(
       "PaySwap Desktop — the non-custodial economic operating system.",
     );

@@ -8,13 +8,13 @@ PaySwap Desktop ships as a Debian package (`.deb`, the recommended install) and 
 
 **→ <https://github.com/payswapdotorg/PaySwap-3.0/releases>**
 
-> **Current release: [`v1.0.1`](https://github.com/payswapdotorg/PaySwap-3.0/releases/tag/v1.0.1)** (tested: checksum-verified, apt-installed, launched and window-verified on a clean Ubuntu CI runner — [the verification receipt](https://github.com/payswapdotorg/PaySwap-3.0/actions/runs/39601882563)). Every tagged release ships with that CI install + launch + window-identity receipt. `v1.0.0` is marked pre-release: it carried a launch-blocking defect (found by GUI verification of the published artifacts, fixed by the PaySwap update-authority law — see [`docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`](docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md)). Direct asset links for the current release:
+> **Current release: [`v1.1.0`](https://github.com/payswapdotorg/PaySwap-3.0/releases/tag/v1.1.0)** — the Agent Workspace release: the console is now the PaySwap Agent Workspace (missions with a real intake lifecycle, agents, approvals, connections, activity, lab, settings; the ZCode developer workspace remains at `/console/advanced`). Tested: checksum-verified, apt-installed, launched and window-verified on a clean Ubuntu CI runner — [the verification receipt](https://github.com/payswapdotorg/PaySwap-3.0/actions/runs/39641600925). Every tagged release ships with that CI install + launch + window-identity receipt. `v1.0.0` is marked pre-release: it carried a launch-blocking defect (found by GUI verification of the published artifacts, fixed by the PaySwap update-authority law — see [`docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`](docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md)). Direct asset links for the current release:
 
 
 ```
-https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.1/PaySwap_1.0.1_amd64.deb
-https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.1/PaySwap-1.0.1.AppImage
-https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.1/SHA256SUMS.txt
+https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.1.0/PaySwap_1.1.0_amd64.deb
+https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.1.0/PaySwap-1.1.0.AppImage
+https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.1.0/SHA256SUMS.txt
 ```
 
 (Verified reachable and checksum-matching at publication; newer releases follow the same `v<version>` URL pattern.)
@@ -24,7 +24,7 @@ https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.1/SHA256SUMS
 Download `PaySwap_<version>_amd64.deb` from the release, then:
 
 ```bash
-sudo apt install ./PaySwap_1.0.1_amd64.deb
+sudo apt install ./PaySwap_1.1.0_amd64.deb
 ```
 
 `apt` resolves the runtime dependencies (GTK3, NSS, X11 libs, …) from your system repositories. After install, PaySwap appears in your application menu as **PaySwap** (menu category: Office/Finance) and can also be launched from the terminal with `payswap`.
@@ -32,11 +32,11 @@ sudo apt install ./PaySwap_1.0.1_amd64.deb
 ### Install the AppImage (portable, no install)
 
 ```bash
-chmod +x PaySwap-1.0.1.AppImage
-./PaySwap-1.0.1.AppImage
+chmod +x PaySwap-1.1.0.AppImage
+./PaySwap-1.1.0.AppImage
 ```
 
-On Ubuntu 24.04+ the AppImage needs the FUSE 2 compatibility package: `sudo apt install libfuse2t64` (Ubuntu 22.04: `sudo apt install libfuse2`). Without FUSE you can still run it extracted: `./PaySwap-1.0.1.AppImage --appimage-extract-and-run`.
+On Ubuntu 24.04+ the AppImage needs the FUSE 2 compatibility package: `sudo apt install libfuse2t64` (Ubuntu 22.04: `sudo apt install libfuse2`). Without FUSE you can still run it extracted: `./PaySwap-1.1.0.AppImage --appimage-extract-and-run`.
 
 ### Verify the download
 
@@ -49,7 +49,7 @@ sha256sum -c SHA256SUMS.txt
 ### Launch, upgrade, uninstall
 
 - **Launch:** from the application menu, or run `payswap`.
-- **Upgrade:** install the new `.deb` over the old one (`sudo apt install ./PaySwap_1.0.1_amd64.deb`); your data under `~/.config/PaySwap` is preserved. For the AppImage, replace the file.
+- **Upgrade:** install the new `.deb` over the old one (`sudo apt install ./PaySwap_1.1.0_amd64.deb`); your data under `~/.config/PaySwap` is preserved. For the AppImage, replace the file.
 - **Uninstall:** `sudo apt remove payswap` (add `--purge` to also remove system packaging state; your `~/.config/PaySwap` data is never touched by the package). For the AppImage, delete the file.
 
 ### Troubleshooting
@@ -61,7 +61,7 @@ sha256sum -c SHA256SUMS.txt
 
 ### Minimum requirements
 
-Ubuntu 20.04 or newer (or Debian 11+, glibc ≥ 2.28) on x86_64 (amd64), 8 GB RAM recommended, ~2 GB free disk for the installed app. The `.deb` is built on ubuntu-latest (GitHub Actions) and was install + launch verified on a clean Ubuntu runner at v1.0.1.
+Ubuntu 20.04 or newer (or Debian 11+, glibc ≥ 2.28) on x86_64 (amd64), 8 GB RAM recommended, ~2 GB free disk for the installed app. The `.deb` is built on ubuntu-latest (GitHub Actions) and was install + launch verified on a clean Ubuntu runner at v1.0.1 and v1.1.0.
 
 ## Repository authority
 
