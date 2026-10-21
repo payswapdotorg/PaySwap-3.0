@@ -26,9 +26,13 @@ never a pass):
    SHA-256 against `SHA256SUMS`. A missing `SHA256SUMS` entry for a
    downloaded asset is a FAILURE (flow 11: "checksum verify" is
    mandatory).
-4. **Install** — `dpkg -i` (as root, or via passwordless `sudo -n`;
-   neither available → explicit environment failure, never a silent
-   skip).
+4. **Install** — the README-documented user path: `apt-get install -y
+   <deb>` (as root, or via passwordless `sudo -n`), which RESOLVES the
+   runtime dependencies (libgtk-3-0, libnotify4, libsecret-1-0, …) that
+   a bare `dpkg -i` cannot — the first v1.0.1 CI run failed exactly
+   there. Falls back to `dpkg -i` only when apt-get is unavailable
+   (recorded in the receipt); neither root nor sudo available → explicit
+   environment failure, never a silent skip.
 5. **Identity assertions** (PRODUCT-IDENTITY.md §1 owned by Lane P9-B;
    implemented in `desktopIdentity.mjs`):
    - exactly one `/usr/share/applications/*.desktop` with `Name=PaySwap`;

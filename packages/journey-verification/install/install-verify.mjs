@@ -52,18 +52,15 @@
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { chmodSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import os from "node:os";
 
 import { collectAppImageFindings, collectDesktopIdentityFindings } from "./desktopIdentity.mjs";
+import { collectLaunchFindings } from "./launchProbe.mjs";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const DEFAULT_WORKDIR = join(HERE, ".cache-install-verify");
-const LAUNCH_SETTLE_TIMEOUT_MS = 25_000;
-const WINDOW_POLL_TIMEOUT_MS = 20_000;
-const WINDOW_POLL_INTERVAL_MS = 1_000;
 
 const EXIT = {
   USAGE: 2,
@@ -192,125 +189,46 @@ function installRootPrefix() {
   return null;
 }
 
-function resolveLaunchWrapper() {
-  if (process.env.DISPLAY || process.env.WAYLAND_DISPLAY) {
-    return { supported: true, wrapper: null };
-  }
-  const xvfb = run("which", ["xvfb-run"]);
-  if (xvfb.status === 0) {
-    return { supported: true, wrapper: xvfb.stdout };
-  }
-  return { supported: false, wrapper: null };
-}
+/**
+ * The README-documented user install path: `apt install ./<file>.deb` —
+ * apt RESOLVES the runtime dependencies (libgtk-3-0, libnotify4,
+ * libsecret-1-0, …) that a bare `dpkg -i` cannot (the v1.0.1 first CI
+ * run failed exactly there: ubuntu-latest ships without libnotify4 /
+ * libsecret-1-0, so dpkg -i left the package unconfigured). Falls back
+ * to `dpkg -i` only when apt-get is unavailable, and the receipt records
+ * which path ran.
+ */
+function installDebPackage(debPath, prefix, receipt) {
+  const rootCommand = prefix.command === "dpkg" ? null : "sudo";
+  const withRoot = (command, args) =>
+    rootCommand === null
+      ? run(command, args)
+      : run(rootCommand, ["-n", command, ...args]);
 
-/** Poll xdotool for a window whose WM_CLASS or title matches PaySwap. */
-function pollForPaySwapWindow() {
-  const xdotool = run("which", ["xdotool"]);
-  if (xdotool.status !== 0) {
-    return {
-      asserted: false,
-      reason: "xdotool unavailable — window identity NOT ASSERTED (recorded, never fabricated)",
-      windows: [],
-    };
-  }
-  const deadline = Date.now() + WINDOW_POLL_TIMEOUT_MS;
-  const windows = [];
-  while (Date.now() < deadline) {
-    const search = run("xdotool", ["search", "--class", "payswap"]);
-    if (search.status === 0 && search.stdout) {
-      for (const id of search.stdout.split(/\s+/).filter(Boolean)) {
-        const name = run("xdotool", ["getwindowname", id]);
-        windows.push({ id, name: name.status === 0 ? name.stdout : "(name unavailable)" });
-      }
-      if (windows.length > 0) {
-        return { asserted: true, reason: null, windows };
-      }
+  const aptGetAvailable = rootCommand === null
+    ? run("which", ["apt-get"]).status === 0
+    : run("sudo", ["-n", "which", "apt-get"]).status === 0;
+
+  if (aptGetAvailable) {
+    const result = withRoot("apt-get", ["install", "-y", debPath]);
+    if (result.status === 0) {
+      console.error("[install-verify] apt-get install payswap ✓ (dependency-resolving path, as documented in the README)");
+      receipt.assertions.push("apt-get install ok (dependency-resolving)");
+      return;
     }
-    run("sleep", [`${WINDOW_POLL_INTERVAL_MS / 1000}`]);
-  }
-  return {
-    asserted: true,
-    reason: "no window with a PaySwap WM_CLASS appeared within the timeout",
-    windows,
-  };
-}
-
-/** The launch verification battery (runs while the package is installed). */
-function verifyLaunch({ execBinary, receipt }) {
-  const launchSupport = resolveLaunchWrapper();
-  if (!launchSupport.supported) {
-    fail(
-      EXIT.LAUNCH_UNSUPPORTED,
-      "--launch requested but no display and no xvfb-run are available. Launch verification requires a display environment — run on a desktop host or under xvfb-run.",
-    );
-  }
-  const home = os.homedir();
-  const dataDir = join(home, ".config", "PaySwap");
-  const before = existsSync(dataDir);
-  const wrapper = launchSupport.wrapper;
-  console.error(`[install-verify] launching ${execBinary} (wrapper: ${wrapper ?? "direct display"})…`);
-
-  const attempts = [{ args: [], note: null }];
-  let launched = null;
-  let launchNote = null;
-  for (const attempt of attempts) {
-    const result = wrapper
-      ? run(wrapper, ["-a", execBinary, ...attempt.args], { timeout: LAUNCH_SETTLE_TIMEOUT_MS })
-      : run(execBinary, attempt.args, { timeout: LAUNCH_SETTLE_TIMEOUT_MS });
-    if (wrapper) {
-      // xvfb-run stays foreground for the app's lifetime on success; a fast
-      // exit means the app itself died. Record and retry once with
-      // --no-sandbox (chrome-sandbox needs its setuid bit, which
-      // non-install extractions can lose) — the retry is RECORDED, never
-      // silent.
-      launched = result;
-    } else {
-      launched = result;
-    }
-    if (launched.status !== null && launched.status !== 0 && !attempt.args.includes("--no-sandbox")) {
-      attempts.push({ args: ["--no-sandbox"], note: "retried with --no-sandbox (recorded)" });
-      launchNote = "first launch attempt exited non-zero; retried with --no-sandbox";
-      continue;
-    }
-    break;
+    console.error(result.stdout);
+    console.error(result.stderr);
+    fail(EXIT.ENVIRONMENT, `apt-get install failed (exit ${result.status})`);
   }
 
-  const after = existsSync(dataDir);
-  const findings = [];
-  if (!after) {
-    findings.push(
-      `launch verification failed: ${dataDir} did not appear (app-data path pattern ~/.config/PaySwap, productName-derived)${before ? " (it existed before launch — pre-existing state, inconclusive)" : ""}`,
-    );
-  } else {
-    console.error("[install-verify] app-data path ~/.config/PaySwap present after launch ✓");
-    receipt.assertions.push("launch: app-data path ~/.config/PaySwap ok");
+  const result = withRoot("dpkg", ["-i", debPath]);
+  if (result.status !== 0) {
+    console.error(result.stdout);
+    console.error(result.stderr);
+    fail(EXIT.ENVIRONMENT, `dpkg -i failed (exit ${result.status})`);
   }
-
-  const windowResult = pollForPaySwapWindow();
-  receipt.launchWindows = windowResult.windows;
-  if (!windowResult.asserted) {
-    console.error(`[install-verify] ${windowResult.reason}`);
-    receipt.assertions.push(`launch: window identity not asserted (${windowResult.reason})`);
-  } else if (windowResult.reason) {
-    findings.push(`launch verification failed: ${windowResult.reason}`);
-  } else {
-    const titled = windowResult.windows.filter((window) => /payswap/i.test(window.name));
-    if (titled.length === 0) {
-      findings.push(
-        `windows exist but none carries a PaySwap title (observed: ${JSON.stringify(windowResult.windows)})`,
-      );
-    } else {
-      console.error(`[install-verify] PaySwap window present: ${titled.map((w) => JSON.stringify(w.name)).join(", ")} ✓`);
-      receipt.assertions.push(`launch: PaySwap-branded window ok (${titled.map((w) => w.name).join(" | ")})`);
-    }
-  }
-
-  if (launchNote) {
-    receipt.assertions.push(`launch: ${launchNote}`);
-  }
-  if (findings.length > 0) {
-    fail(EXIT.IDENTITY, `launch verification failed:\n  - ${findings.join("\n  - ")}`);
-  }
+  console.error("[install-verify] dpkg -i payswap ✓ (apt-get unavailable — dependency resolution skipped, recorded)");
+  receipt.assertions.push("dpkg -i ok (no apt-get on this environment — dependencies not resolved)");
 }
 
 /** The single receipt object — written on BOTH pass and fail paths. */
@@ -409,14 +327,7 @@ async function verifyRelease(args, onWorkdir) {
   const dpkgCommand = dpkg.command === "dpkg" ? "dpkg" : "sudo";
   const dpkgArgs = dpkg.command === "dpkg" ? [] : ["-n", "dpkg"];
 
-  const installResult = run(dpkgCommand, [...dpkgArgs, "-i", join(args.workdir, debAsset.name)]);
-  if (installResult.status !== 0) {
-    console.error(installResult.stdout);
-    console.error(installResult.stderr);
-    fail(EXIT.ENVIRONMENT, `dpkg -i failed (exit ${installResult.status})`);
-  }
-  console.error("[install-verify] dpkg -i payswap ✓");
-  receipt.assertions.push("dpkg -i ok");
+  installDebPackage(join(args.workdir, debAsset.name), dpkg, receipt);
 
   // Identity assertions + launch BOTH run while the package is installed;
   // cleanup runs afterwards on every path (the v1.0.1 restructuring: the
@@ -435,7 +346,13 @@ async function verifyRelease(args, onWorkdir) {
       if (!identity.execBinary) {
         fail(EXIT.IDENTITY, "--launch requested but the desktop entry Exec= binary did not resolve");
       }
-      verifyLaunch({ execBinary: identity.execBinary, receipt });
+      const launch = collectLaunchFindings({ execBinary: identity.execBinary, receipt });
+      if (launch.unsupported) {
+        fail(EXIT.LAUNCH_UNSUPPORTED, launch.findings[0]);
+      }
+      if (launch.findings.length > 0) {
+        fail(EXIT.IDENTITY, `launch verification failed:\n  - ${launch.findings.join("\n  - ")}`);
+      }
     }
   } finally {
     if (!args.keep) {
