@@ -32,7 +32,6 @@ import {
 import "./productSurface.css";
 import {
   createDesktopConsoleEntry,
-  createDesktopHashNavigation,
   desktopProductPathFromHash,
   resolveDesktopSurface,
   type DesktopHashLocation,

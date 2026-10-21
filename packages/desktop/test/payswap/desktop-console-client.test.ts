@@ -51,7 +51,7 @@ function fakeChannelService(): IPaySwapDesktopClientService & {
       record("workspaceRecordMissionDraft", Promise.resolve({ id: "mission-1", intake: input, now })),
     workspaceRecordMissionIntent: (id, now) =>
       record("workspaceRecordMissionIntent", Promise.resolve({ id, now })),
-    workspaceMissionDetail: (id) => record("workspaceMissionDetail", Promise.resolve(null)),
+    workspaceMissionDetail: (_id) => record("workspaceMissionDetail", Promise.resolve(null)),
     workspaceReviseMissionDraft: (id, input, now) =>
       record("workspaceReviseMissionDraft", Promise.resolve({ id, intake: input, now })),
     workspaceArchiveMissionDraft: (id, now) =>
