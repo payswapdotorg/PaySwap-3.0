@@ -1,8 +1,8 @@
 # P9 Release Closure — the v1.0.0 defect, the fix, and the v1.0.1 release
 
-Status: IN FLIGHT (authored at the fix commit; the v1.0.1 sections
-finalize when its verification lands). TL-authored; the station's own
-runs are the evidence base. All timestamps UTC, 2026-10-21.
+Status: CLOSED 2026-10-21T13:0xZ — v1.0.1 published and verified (CI
+receipt PASS + station published-asset GUI run). TL-authored; the
+station's own runs are the evidence base. All timestamps UTC, 2026-10-21.
 
 Authorities: `spec/productization/PRODUCT-IDENTITY.md` (§5 honesty laws,
 §6 the four separate gates), `spec/productization/JOURNEY-MAP.md` §3
@@ -137,18 +137,41 @@ first).
   (`PAYSWAP_DESKTOP_PIN_SET_VERSION`) and surface-API versions are
   independent version spaces and are intentionally unchanged (no pin
   changed).
-- Released from the fixed commit through the SAME workflow + the NEW
-  install-verify job: the CI receipt (checksums → dpkg install →
-  identity → Xvfb launch → PaySwap window assertion → uninstall) is the
-  machine evidence for the clean-install gate.
-- Station-side: the published v1.0.1 AppImage is downloaded, checksum-
-  verified, extracted and GUI-launched under Xvfb with the X11 window
-  probe — the main window must EXIST and be PaySwap-branded this time.
-  Receipts + screenshots land in the acceptance record when verified.
-- The v1.0.0 release page is marked prerelease with a prominent warning
-  pointing at v1.0.1 AFTER v1.0.1 is verified (no window of time
-  without a working download). The v1.0.0 tag and its workflow run
-  remain as history — nothing deleted, nothing hidden.
+- Released from commit `456c2b5` (tag `v1.0.1`, published 12:49:51Z)
+  through the SAME workflow + the NEW install-verify job. **CI receipt
+  (run 39601882563): verdict PASS** — deb sha256
+  `9c4fcb8c76d900a2245e7bb54bf700478d439f1abd38265a4867b1e6b2020573`,
+  AppImage sha256
+  `cb8a604a1479f3c913f9fbb31c34a5f48048b5a950a732eb73b1f6fa956d8248`;
+  apt-get dependency-resolving install; every identity assertion; the
+  Xvfb launch with **"PaySwap window present: \"payswap\", \"PaySwap\" ✓"**;
+  dpkg -r cleanup; AppImage structure + checksum.
+- Station-side published-asset contrast run: the downloaded v1.0.1
+  AppImage (checksum-matching) launches, creates ~/.config/PaySwap,
+  logs the inert-gate line + "创建主窗口", and shows the main window
+  (_NET_WM_NAME 'PaySwap', WM_CLASS ('payswap','PaySwap')) — while
+  v1.0.0 under the same probe shows the force-update block and NO
+  window. Screenshots: v1.0.1-published-appimage-launch-xvfb.png
+  (78KB rendered) vs the v1.0.0 blank.
+- The v1.0.0 release page is marked prerelease with the do-not-use
+  warning pointing at v1.0.1. The v1.0.0 tag, its workflow run and its
+  assets remain as history — nothing deleted, nothing hidden.
+- **The four v1.0.1 attempts** (the verification tooling hardening
+  itself into existence, all withdrawals at ZERO downloads):
+  1. run 39594665320 — install-verify failed: bare `dpkg -i` cannot
+     resolve deps on ubuntu-latest → the apt-get dependency-resolving
+     path.
+  2. run 39596405715 — failed: the blocking spawn killed the app
+     before the window poll + case-mismatched `--class` patterns →
+     the detached launch + both-field matching.
+  3. run 39598661891 — failed: xvfb-run -a's private display was
+     invisible to the probe's display-less xdotool → the probe-owned
+     Xvfb shared by app and xdotool (locally proven end-to-end before
+     re-cutting, via a python-xlib xdotool-semantics shim).
+  4. run 39600330280 — failed only on the exec-bit policy (an HTTPS
+     download can never preserve it; chmod +x is the documented user
+     step) → a recorded note, not a failure.
+  5. run 39601882563 — **PASS**.
 
 ## 6. Gate states (the four separate gates, honestly)
 
@@ -156,10 +179,10 @@ first).
   (9f09387); re-evidenced live at `5fbf0c7` by the web boot lane
   (10 routes, zero console errors, honest setup-required states,
   screenshots in the station delivery set).
-- **GitHub installer published: ✓ (v1.0.1)** — v1.0.0 was published but
-  defective; the gate closes on the corrected, launch-verified v1.0.1.
-- **clean-install verified: PENDING v1.0.1** — closes on the CI
-  install-verify receipt + the station GUI verification (§5).
+- **GitHub installer published: ✓ (v1.0.1)** — public, versioned,
+  checksummed, README-linked and tested.
+- **clean-install verified: ✓ (v1.0.1)** — CI receipt PASS (run
+  39601882563) + the station published-asset GUI contrast run.
 - **core journeys verified: ✓ (web)** — the J1–J15 matrix at 9f09387 +
   the live web boot lane; desktop packaged-app journeys ride §5.
 

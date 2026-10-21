@@ -135,20 +135,39 @@ PaySwap update-authority law (commit `e9eef37`) + the install-verify CI
 job with real window assertions. v1.0.0 is marked broken (prerelease
 warning) once v1.0.1 is verified.
 
-### v1.0.1 — THE CORRECTED RELEASE (this section finalizes on its receipts)
+### v1.0.1 — THE CORRECTED RELEASE (VERIFIED, 2026-10-21)
 
 ```
-Release:            v1.0.1 (payswapdotorg/PaySwap-3.0)
-Verified commit:    <fill: the v1.0.1 tag commit>
+Release:            v1.0.1 (payswapdotorg/PaySwap-3.0) — published 12:49:51Z
+Verified commit:    456c2b5854f8bd1fe4f3bdc4d9574636235bc13a (tag v1.0.1)
 Runner:             packages/journey-verification/install/install-verify.mjs
-Runner receipt:      <fill: CI install-verify job receipt + station GUI run>
-Environment:        clean ubuntu-latest (CI, root tier) + station Xvfb GUI
-deb:                <fill>
-AppImage:           <fill>
-Launch verification: <fill — window identity assertions now mandatory>
-Evidence links:     <fill: workflow run URL + station screenshots>
-Date + verifier:    <fill>
+Runner receipt:      CI verdict PASS (run 39601882563, job install-verify;
+                    receipt artifact install-verify-receipt) + station runs
+Environment:        clean ubuntu-latest (CI, root tier: apt-get install,
+                    Xvfb launch, window identity) + Debian 13 station
+                    (no-root tier: checksums triple-source, structure,
+                    published-AppImage GUI launch)
+deb:                PASS — sha256 9c4fcb8c76d900a2245e7bb54bf700478d439f1abd38265a4867b1e6b2020573
+                    (SHA256SUMS == station download == GitHub API digest);
+                    apt-get dependency-resolving install ok; desktop entry
+                    Name=PaySwap; icon; /opt/PaySwap/payswap ELF; package
+                    payswap installed; dpkg -r cleanup ok
+AppImage:           PASS — sha256 cb8a604a1479f3c913f9fbb31c34a5f48048b5a950a732eb73b1f6fa956d8248;
+                    ELF structure + checksum verified; exec bit = the
+                    documented chmod +x user step (recorded note)
+Launch verification: PASS (CI + station) — ~/.config/PaySwap appears AND
+                    the main window EXISTS: _NET_WM_NAME 'PaySwap',
+                    WM_CLASS ('payswap','PaySwap') — the assertion that
+                    v1.0.0 could never satisfy
+Evidence links:     run https://github.com/payswapdotorg/PaySwap-3.0/actions/runs/39601882563;
+                    docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md
+Date + verifier:    2026-10-21, resident TL (CI receipt + station runs)
 ```
+
+The four release attempts (all zero-download withdrawals before this
+one: dpkg-vs-apt, the blocking spawn, the display-less xdotool, the
+exec-bit policy) are recorded in the closure doc §5 — each an iteration
+of the verification tooling, never of the product artifacts.
 
 Honest failure modes are the runner's exit codes (see
 `packages/journey-verification/install/README.md`); exit 3 (no release
@@ -211,18 +230,18 @@ TL's manual browser verification of the same tree.
   suite's keyboard/focus/reduced-motion assertions, post-cascade-fix);
   zero ZCode product branding in normal surfaces (the structural
   attribution exemption documented); attribution preserved.
-- **GitHub installer published: IN FLIGHT → v1.0.1** — v1.0.0 was
-  published 06:26Z but carried the launch-blocking 2026-10-21
-  force-update defect (§5 below); this gate closes only when the
-  corrected v1.0.1 (built from the fixed commit by the same workflow +
-  the new install-verify CI job) is published AND verified. Full story:
+- **GitHub installer published: ✓ (v1.0.1, 12:49:51Z)** — the public
+  versioned release with tested Ubuntu x86_64 assets + SHA-256
+  checksums; README links tested (all 200, checksum-matching). v1.0.0
+  stays visible as a prerelease with the do-not-use warning (nothing
+  deleted, nothing hidden). Full story:
   `docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`.
-- **clean-install verified: PENDING v1.0.1** — closes on the CI
-  install-verify receipt (checksums → dpkg → identity → Xvfb launch →
-  PaySwap window assertion → uninstall) + the station GUI contrast run
-  at the same tag. The station's v1.0.0 run verified checksums
-  (triple-source) + structure and FOUND the defect — the honest
-  outcome of a real verification.
+- **clean-install verified: ✓ (v1.0.1)** — the CI install-verify
+  receipt (run 39601882563): checksums → apt-get dependency-resolving
+  install → identity assertions → Xvfb launch → **PaySwap-branded
+  window** → dpkg -r cleanup → AppImage structure+checksum: PASS; plus
+  the station's published-asset GUI contrast run (v1.0.0 = no window,
+  v1.0.1 = window 'PaySwap').
 - **core journeys verified: ✓ (web)** — this matrix, at 9f09387. The
   DESKTOP journey verification (packaged app flows) rides the release
   verification (CI install job + operator acceptance) — honestly

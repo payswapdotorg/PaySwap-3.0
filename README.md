@@ -8,22 +8,23 @@ PaySwap Desktop ships as a Debian package (`.deb`, the recommended install) and 
 
 **→ <https://github.com/payswapdotorg/PaySwap-3.0/releases>**
 
-> **Status (honest note): `v1.0.0` is published but carries a launch-blocking defect** (the startup force-update gate compared PaySwap `1.0.0` against the upstream ZCode service's version floor and refused to open a window; found by GUI launch verification of the published artifacts, fixed by the PaySwap update-authority law — see [`docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`](docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md)). **Use the latest release from the Releases page above** — the corrected `v1.0.1` is being published from the fixed commit and every tagged release now ships with a CI install + launch + window-identity verification receipt before it is recommended here. This README links only release-asset URL patterns, never a dead download.
+> **Current release: [`v1.0.1`](https://github.com/payswapdotorg/PaySwap-3.0/releases/tag/v1.0.1)** (tested: checksum-verified, apt-installed, launched and window-verified on a clean Ubuntu CI runner — [the verification receipt](https://github.com/payswapdotorg/PaySwap-3.0/actions/runs/39601882563)). Every tagged release ships with that CI install + launch + window-identity receipt. `v1.0.0` is marked pre-release: it carried a launch-blocking defect (found by GUI verification of the published artifacts, fixed by the PaySwap update-authority law — see [`docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`](docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md)). Direct asset links for the current release:
 
-Per-release assets (replace `1.0.0` with the released version):
 
 ```
-https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.0/PaySwap_1.0.0_amd64.deb
-https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.0/PaySwap-1.0.0.AppImage
-https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.0/SHA256SUMS.txt
+https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.1/PaySwap_1.0.1_amd64.deb
+https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.1/PaySwap-1.0.1.AppImage
+https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.0.1/SHA256SUMS.txt
 ```
+
+(Verified reachable and checksum-matching at publication; newer releases follow the same `v<version>` URL pattern.)
 
 ### Install the .deb (recommended)
 
 Download `PaySwap_<version>_amd64.deb` from the release, then:
 
 ```bash
-sudo apt install ./PaySwap_1.0.0_amd64.deb
+sudo apt install ./PaySwap_1.0.1_amd64.deb
 ```
 
 `apt` resolves the runtime dependencies (GTK3, NSS, X11 libs, …) from your system repositories. After install, PaySwap appears in your application menu as **PaySwap** (menu category: Office/Finance) and can also be launched from the terminal with `payswap`.
@@ -31,11 +32,11 @@ sudo apt install ./PaySwap_1.0.0_amd64.deb
 ### Install the AppImage (portable, no install)
 
 ```bash
-chmod +x PaySwap-1.0.0.AppImage
-./PaySwap-1.0.0.AppImage
+chmod +x PaySwap-1.0.1.AppImage
+./PaySwap-1.0.1.AppImage
 ```
 
-On Ubuntu 24.04+ the AppImage needs the FUSE 2 compatibility package: `sudo apt install libfuse2t64` (Ubuntu 22.04: `sudo apt install libfuse2`). Without FUSE you can still run it extracted: `./PaySwap-1.0.0.AppImage --appimage-extract-and-run`.
+On Ubuntu 24.04+ the AppImage needs the FUSE 2 compatibility package: `sudo apt install libfuse2t64` (Ubuntu 22.04: `sudo apt install libfuse2`). Without FUSE you can still run it extracted: `./PaySwap-1.0.1.AppImage --appimage-extract-and-run`.
 
 ### Verify the download
 
@@ -60,7 +61,7 @@ sha256sum -c SHA256SUMS.txt
 
 ### Minimum requirements
 
-Ubuntu 20.04 or newer (or Debian 11+, glibc ≥ 2.28) on x86_64 (amd64), 8 GB RAM recommended, ~2 GB free disk for the installed app. The `v1.0.0` `.deb` was built and install-verified on Debian 13 x86_64.
+Ubuntu 20.04 or newer (or Debian 11+, glibc ≥ 2.28) on x86_64 (amd64), 8 GB RAM recommended, ~2 GB free disk for the installed app. The `.deb` is built on ubuntu-latest (GitHub Actions) and was install + launch verified on a clean Ubuntu runner at v1.0.1.
 
 ## Repository authority
 
