@@ -111,23 +111,49 @@ runs this same full suite on every push/PR to main + manual dispatch.
 For the "clean-install verified" gate (PRODUCT-IDENTITY §6) — one block
 per verified release:
 
+### v1.0.0 — PUBLISHED BUT DEFECTIVE (station run, 2026-10-21)
+
 ```
-Release:            <tag> (<repo>)
-Verified commit:    <sha>
+Release:            v1.0.0 (payswapdotorg/PaySwap-3.0)
+Verified commit:    5fbf0c716c87a4b0ee7f2ea747a63ac9009af920
 Runner:             packages/journey-verification/install/install-verify.mjs
-Runner receipt:      <path to install-verify-receipt.json>
-Environment:        <clean Ubuntu <version> x86_64 — host/CI + method>
-deb:                PASS/FAIL — checksums, desktop entry Name=PaySwap, icon, binary, dpkg -r
-AppImage (if any):  PASS/FAIL/NONE — structure, checksum, exec bit
-Launch verification: PASS/FAIL/NOT-RUN — display availability, ~/.config/PaySwap
-Evidence links:     <CI run URL / screenshots / logs>
-Date + verifier:    <date> <who>
+Runner receipt:      station run — checksum tier PASS (deb 3fa235160d796b2ab…),
+                    then honest exit 6 (no root on station; root tier = CI)
+Environment:        Debian 13 x86_64 station (no-root tier) + Xvfb GUI launch
+deb:                checksums PASS · structure PASS (Name=PaySwap / Icon / ELF)
+AppImage:           checksum PASS (24afe2e2d66eb4ae…) · structure PASS
+Launch verification: FAIL — the force-update block (see below)
+Evidence links:     docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md
+Date + verifier:    2026-10-21, resident TL
+```
+
+**The finding**: the packaged app consulted the upstream ZCode service's
+force-update floor (`3.5.3`, ZCode version space) against PaySwap
+`1.0.0` and blocked main-window creation for every online user — the
+app-data dir appears but no product window ever does. Fixed by the
+PaySwap update-authority law (commit `e9eef37`) + the install-verify CI
+job with real window assertions. v1.0.0 is marked broken (prerelease
+warning) once v1.0.1 is verified.
+
+### v1.0.1 — THE CORRECTED RELEASE (this section finalizes on its receipts)
+
+```
+Release:            v1.0.1 (payswapdotorg/PaySwap-3.0)
+Verified commit:    <fill: the v1.0.1 tag commit>
+Runner:             packages/journey-verification/install/install-verify.mjs
+Runner receipt:      <fill: CI install-verify job receipt + station GUI run>
+Environment:        clean ubuntu-latest (CI, root tier) + station Xvfb GUI
+deb:                <fill>
+AppImage:           <fill>
+Launch verification: <fill — window identity assertions now mandatory>
+Evidence links:     <fill: workflow run URL + station screenshots>
+Date + verifier:    <fill>
 ```
 
 Honest failure modes are the runner's exit codes (see
 `packages/journey-verification/install/README.md`); exit 3 (no release
-exists) is the expected state until the P9-B gate ships the first
-release — recorded as such, never worked around.
+exists) remains the documented behavior for any tag without a published
+release.
 
 ## 6. Truth laws restated (the tested set)
 
@@ -185,14 +211,18 @@ TL's manual browser verification of the same tree.
   suite's keyboard/focus/reduced-motion assertions, post-cascade-fix);
   zero ZCode product branding in normal surfaces (the structural
   attribution exemption documented); attribution preserved.
-- **GitHub installer published: PENDING THE TAG** — the workflow, the
-  identity and the verified build pipeline are in-tree; publication =
-  the `v1.0.0` tag push + the CI release run (this record updates with
-  the release URL + checksums when it lands).
-- **clean-install verified: PENDING THE RELEASE** — the lane's no-root
-  dpkg-deb verification passed (Package payswap / Name=PaySwap / icons
-  / ELF); the root-tier `apt install` + GUI launch run in CI against
-  the published artifacts (the install-verify runner).
+- **GitHub installer published: IN FLIGHT → v1.0.1** — v1.0.0 was
+  published 06:26Z but carried the launch-blocking 2026-10-21
+  force-update defect (§5 below); this gate closes only when the
+  corrected v1.0.1 (built from the fixed commit by the same workflow +
+  the new install-verify CI job) is published AND verified. Full story:
+  `docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`.
+- **clean-install verified: PENDING v1.0.1** — closes on the CI
+  install-verify receipt (checksums → dpkg → identity → Xvfb launch →
+  PaySwap window assertion → uninstall) + the station GUI contrast run
+  at the same tag. The station's v1.0.0 run verified checksums
+  (triple-source) + structure and FOUND the defect — the honest
+  outcome of a real verification.
 - **core journeys verified: ✓ (web)** — this matrix, at 9f09387. The
   DESKTOP journey verification (packaged app flows) rides the release
   verification (CI install job + operator acceptance) — honestly

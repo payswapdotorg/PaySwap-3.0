@@ -8,7 +8,7 @@ PaySwap Desktop ships as a Debian package (`.deb`, the recommended install) and 
 
 **→ <https://github.com/payswapdotorg/PaySwap-3.0/releases>**
 
-> **Status (honest note): the first PaySwap release (`v1.0.0`) is in preparation.** The Releases page above is the canonical download location; the per-release asset links below show the exact URL pattern each release uses. This README deliberately does not link a specific asset file until that release exists — there is no dead download link here.
+> **Status (honest note): `v1.0.0` is published but carries a launch-blocking defect** (the startup force-update gate compared PaySwap `1.0.0` against the upstream ZCode service's version floor and refused to open a window; found by GUI launch verification of the published artifacts, fixed by the PaySwap update-authority law — see [`docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`](docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md)). **Use the latest release from the Releases page above** — the corrected `v1.0.1` is being published from the fixed commit and every tagged release now ships with a CI install + launch + window-identity verification receipt before it is recommended here. This README links only release-asset URL patterns, never a dead download.
 
 Per-release assets (replace `1.0.0` with the released version):
 
