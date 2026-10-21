@@ -16,11 +16,7 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [
-    "P9-A",
-    "P9-B",
-    "P9-C"
-  ],
+  "frontier": [],
   "active_work_orders": [],
   "completed_work_orders": [
     {
@@ -596,6 +592,42 @@
       ],
       "findings_queued": [],
       "completed_at": "2026-10-20T15:20:00Z"
+    },
+    {
+      "id": "P9-A",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "p9 local lane (agent-infrastructure deaths; A delivered via lane protocol, B/C TL salvage-completed per the packet protocols)",
+      "chat_id": null,
+      "worker_branch": "work/p9-a",
+      "worker_head_sha": "0867652",
+      "base_sha": "e6ed008",
+      "accepted_via_merge": "merge --no-ff ba1db78",
+      "note": "PaySwap-native product identity and UX (GitHub Issue #1 Lane A) \u2014 MERGED ba1db78: @payswap/app shared product package; the \u00a73 route contract live (/ = PaySwap, /app + areas, /console supporting, /payswap/* redirects); identity flip complete with preserved attribution; design elevation + WCAG; lane head 0867652 (5 commits + the TL-accepted focus-cascade fixup)"
+    },
+    {
+      "id": "P9-B",
+      "owner": "tl-salvage",
+      "status": "COMPLETE",
+      "session": "p9 local lane (agent-infrastructure deaths; A delivered via lane protocol, B/C TL salvage-completed per the packet protocols)",
+      "chat_id": null,
+      "worker_branch": "work/p9-b",
+      "worker_head_sha": "12c8fbe",
+      "base_sha": "e6ed008",
+      "accepted_via_merge": "merge --no-ff 159d872",
+      "note": "downloadable/installable GitHub distribution (Issue #1 Lane B) \u2014 MERGED 159d872: @payswap/desktop identity (productName PaySwap, appId org.payswap.PaySwap, v1.0.0); REAL artifacts built+verified in-lane (PaySwap_1.0.0_amd64.deb 8cd92ba1\u2026, PaySwap-1.0.0.AppImage 35a98c3f\u2026); tag-triggered release workflow; README+docs/installation; lane head 12c8fbe (TL salvage-completed after agent-infrastructure deaths, the P6-W1 precedent)"
+    },
+    {
+      "id": "P9-C",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "p9 local lane (agent-infrastructure deaths; A delivered via lane protocol, B/C TL salvage-completed per the packet protocols)",
+      "chat_id": null,
+      "worker_branch": "work/p9-c",
+      "worker_head_sha": "7a7fcd1",
+      "base_sha": "e6ed008",
+      "accepted_via_merge": "merge --no-ff 92900db",
+      "note": "product journeys, tests and install verification (Issue #1 Lane C) \u2014 MERGED 92900db: @payswap/journey-verification (42 tests, the J1-J15 manifest + no-orphans law); journeys.yml workspace CI; install-verify runner; lane head 7a7fcd1 (TL salvage-completed)"
     }
   ],
   "policies": {
@@ -639,7 +671,7 @@
     "note": "Used only as verified historical/reference implementation; PaySwap 3.0 architecture and source win."
   },
   "repository_setup_verified_at": "2026-10-08",
-  "notes": "PHASE 2 COMPLETE: trust 138 + economic 105 + protocol 238 + provider-runtime 159 + surface 106 + capability 230 = 976 tests across 6 domain packages. Frontier recomputed: P3 wave (agents / execution-graph / zcode-bridge) per work-orders.md; composition notes pre-staged (P3-COMPOSITION-NOTES.md) \u2014 base SHAs to re-verify at dispatch. | 2026-10-19 final-handoff: R3 wave 3/3 COMPLETE (route-compiler c5a4dc7, onchain-extensions e80c932, merchant bbc9a93 \u2014 station-verified). Audit + queue: spec/development-state/TL-AUDIT-2026-10-19.md. P3/P4 records + CI matrix + MODULE-OWNERSHIP reconciliation = GOV-W1 (in flight). P6 dispatching; P7 e2e + P8 certification queued. | 2026-10-19T19:40Z TL: P6-W1 (@payswap/lab) accepted via merge 2251932 \u2014 salvage acceptance (worker chat recycled after 3/4; LAW-2 bundle salvage captured commits 1-3 verbatim; 4/4 TL-authored from station receipts: tsc 0, 16f/147t, exports 101, census exact). GOV-W1: two worker attempts lost to chat recycling \u2014 redispatch with hardened packet pending. P6-W2/P6-W3 queued on new base. | 2026-10-19 GOV-W1 (records reconciliation): completed_work_orders now covers EVERY accepted merge on main \u2014 added R1 trio (0d0e906, c5c5a23, 6999888), R2 trio (6402fa9, 95c8d8f, a86147a), P7 trio (fb074b4, 2c10a0e, 22b0534) beside the existing P0\u2013P2 waves, R3 trio, P6-W1 and P7-E2E records; frontier drops GOV-W1 (this lane complete). Derivation + receipts: docs/governance-evidence/GOV-W1-VERIFICATION-RECORD.md. | 2026-10-20T18:00Z TL (post-closing audit, operator continuation session): Gate E manifest-digest defect found + corrected \u2014 the pinned 81e51f17/8,515 was computed mid-census over the station working tree (32 untracked artifacts: 17 husky shims + 15 census npm lockfiles; forensic reconstruction byte-exact) and was NOT reproducible from any checkout; corrected release identity = 33e05966.../8,483 @ b9f9ab7 (committed-tree walk; --verify artifact committed at docs/release-evidence/release-manifest-b9f9ab7.json, verify PASS on a clean clone); P8-W3 worktree digest likewise corrected (a45dd3ba/8,481 counted the worktree .git pointer file; committed-tree = fabaa261.../8,480); release-candidate build digest computed on the clean export (016c0748... via computeDeterministicSourceSha256); docs/state correction only, zero code change. | 2026-10-20T18:10Z TL: operator production-deployment authorization captured (\"go\", chat web-a95c8999, trace 1a15a572c639b141) \u2014 docs/release-evidence/DEPLOYMENT-AUTHORIZATION-2026-10-20.md: four-component release identity assembled (commit b9f9ab7 + manifest 33e05966.../8,483 + build 016c0748...; environment record = operator input, never fabricated); execution path = operator-side per the runbook/rollout/activation contracts; no-deployment-execution law held \u2014 nothing deployed from this station; governance re-run clean (invariants 29/0 failures, ownership 54/54 + exactly the 8 documented carries). 2026-10-21 RELEASE-IDENTITY BOOT VERIFICATION (operator \"go\", docs-only evidence commit): the b9f9ab7 release-candidate tree BOOTED at station (server static-root serving, providerCount 0, zero-error logs) and the public surface browser-verified zero-error (unauthenticated scope, honestly stated); advisory deployment-identity rehearsal over the 4 real components \u2014 verifyDeploymentIdentity ok, byte-deterministic, tamper probe fails closed (receipt: docs/release-evidence/boot-verification-2026-10-21/). Nothing deployed \u2014 the boundary stands. | 2026-10-21T04:20Z TL: operator implementation handoff received (GitHub Issue #1 \"Productize PaySwap 3.0\" \u2014 native UX, GitHub installers, verified journeys). Findings verified at e4f8506 (0 releases; root zcode@3.14.3; desktop productName ZCode; ZCode root page; providerCount 0 fail-closed boot confirmed). Phase 9 REGISTERED: P9-A/P9-B/P9-C with TL-authored cross-lane contracts (spec/productization/PRODUCT-IDENTITY.md + JOURNEY-MAP.md \u2014 canonical identity values, route contract, journey map, four separate verification gates). Dispatch follows the P8 local-lane pattern (worktrees + packets + 4-commit protocol); integration order A->B->C.",
+  "notes": "PHASE 2 COMPLETE: trust 138 + economic 105 + protocol 238 + provider-runtime 159 + surface 106 + capability 230 = 976 tests across 6 domain packages. Frontier recomputed: P3 wave (agents / execution-graph / zcode-bridge) per work-orders.md; composition notes pre-staged (P3-COMPOSITION-NOTES.md) \u2014 base SHAs to re-verify at dispatch. | 2026-10-19 final-handoff: R3 wave 3/3 COMPLETE (route-compiler c5a4dc7, onchain-extensions e80c932, merchant bbc9a93 \u2014 station-verified). Audit + queue: spec/development-state/TL-AUDIT-2026-10-19.md. P3/P4 records + CI matrix + MODULE-OWNERSHIP reconciliation = GOV-W1 (in flight). P6 dispatching; P7 e2e + P8 certification queued. | 2026-10-19T19:40Z TL: P6-W1 (@payswap/lab) accepted via merge 2251932 \u2014 salvage acceptance (worker chat recycled after 3/4; LAW-2 bundle salvage captured commits 1-3 verbatim; 4/4 TL-authored from station receipts: tsc 0, 16f/147t, exports 101, census exact). GOV-W1: two worker attempts lost to chat recycling \u2014 redispatch with hardened packet pending. P6-W2/P6-W3 queued on new base. | 2026-10-19 GOV-W1 (records reconciliation): completed_work_orders now covers EVERY accepted merge on main \u2014 added R1 trio (0d0e906, c5c5a23, 6999888), R2 trio (6402fa9, 95c8d8f, a86147a), P7 trio (fb074b4, 2c10a0e, 22b0534) beside the existing P0\u2013P2 waves, R3 trio, P6-W1 and P7-E2E records; frontier drops GOV-W1 (this lane complete). Derivation + receipts: docs/governance-evidence/GOV-W1-VERIFICATION-RECORD.md. | 2026-10-20T18:00Z TL (post-closing audit, operator continuation session): Gate E manifest-digest defect found + corrected \u2014 the pinned 81e51f17/8,515 was computed mid-census over the station working tree (32 untracked artifacts: 17 husky shims + 15 census npm lockfiles; forensic reconstruction byte-exact) and was NOT reproducible from any checkout; corrected release identity = 33e05966.../8,483 @ b9f9ab7 (committed-tree walk; --verify artifact committed at docs/release-evidence/release-manifest-b9f9ab7.json, verify PASS on a clean clone); P8-W3 worktree digest likewise corrected (a45dd3ba/8,481 counted the worktree .git pointer file; committed-tree = fabaa261.../8,480); release-candidate build digest computed on the clean export (016c0748... via computeDeterministicSourceSha256); docs/state correction only, zero code change. | 2026-10-20T18:10Z TL: operator production-deployment authorization captured (\"go\", chat web-a95c8999, trace 1a15a572c639b141) \u2014 docs/release-evidence/DEPLOYMENT-AUTHORIZATION-2026-10-20.md: four-component release identity assembled (commit b9f9ab7 + manifest 33e05966.../8,483 + build 016c0748...; environment record = operator input, never fabricated); execution path = operator-side per the runbook/rollout/activation contracts; no-deployment-execution law held \u2014 nothing deployed from this station; governance re-run clean (invariants 29/0 failures, ownership 54/54 + exactly the 8 documented carries). 2026-10-21 RELEASE-IDENTITY BOOT VERIFICATION (operator \"go\", docs-only evidence commit): the b9f9ab7 release-candidate tree BOOTED at station (server static-root serving, providerCount 0, zero-error logs) and the public surface browser-verified zero-error (unauthenticated scope, honestly stated); advisory deployment-identity rehearsal over the 4 real components \u2014 verifyDeploymentIdentity ok, byte-deterministic, tamper probe fails closed (receipt: docs/release-evidence/boot-verification-2026-10-21/). Nothing deployed \u2014 the boundary stands. | 2026-10-21T04:20Z TL: operator implementation handoff received (GitHub Issue #1 \"Productize PaySwap 3.0\" \u2014 native UX, GitHub installers, verified journeys). Findings verified at e4f8506 (0 releases; root zcode@3.14.3; desktop productName ZCode; ZCode root page; providerCount 0 fail-closed boot confirmed). Phase 9 REGISTERED: P9-A/P9-B/P9-C with TL-authored cross-lane contracts (spec/productization/PRODUCT-IDENTITY.md + JOURNEY-MAP.md \u2014 canonical identity values, route contract, journey map, four separate verification gates). Dispatch follows the P8 local-lane pattern (worktrees + packets + 4-commit protocol); integration order A->B->C. | 2026-10-21T07:30Z TL INTEGRATION P9 (9f09387): the journey suite caught FOUR real defects on the merged tree and all were fixed at integration (the dead-CTA pushState/notify bug; the J7 not-found route-gate hole; the axe list violation; the focus-outline cascade kill) \u2014 the lanes worked as designed. GATE: journey suite FULL 43 passed/0 failed (tier 1 + all 15 @contract) + ui 226t / web 10t / desktop 109t / payswap-app 154t / typecheck green / ownership 56/56 mapped (violations 8->7, ADR-0006 resolved via direct aliases, ADR-0005 relocated) / invariants clean. Next: the v1.0.0 release (tag push -> the release workflow builds from clean source -> the install-verify runner against the published release).",
   "dispatch_log": [
     {
       "ts": "2026-10-10T05:44:00Z",
@@ -845,7 +877,14 @@
       "action": "register",
       "id": "P9-A,P9-B,P9-C",
       "note": "operator handoff GitHub Issue #1; contracts at spec/productization/; lanes dispatched from base e4f8506"
+    },
+    {
+      "ts": "2026-10-21T07:30:00Z",
+      "action": "accept",
+      "id": "P9-A,P9-B,P9-C",
+      "merge": "ba1db78+159d872+92900db+9f09387",
+      "note": "Phase 9 productization integrated; journey gate green 43/0; see docs/productization-evidence/"
     }
   ],
-  "last_tl_action_at": "2026-10-21T04:20:00Z"
+  "last_tl_action_at": "2026-10-21T07:30:00Z"
 }

@@ -149,3 +149,51 @@ From PRODUCT-IDENTITY.md §5, as enforced by this suite:
 6. WCAG 2.2 AA for the core experience (accessibility.spec.ts — axe
    critical rules + reduced motion; responsive.spec.ts — the three
    viewports).
+
+
+---
+
+## VERDICTS (TL-filled, 2026-10-21 — the integration run at commit `9f09387`)
+
+Evidence: `@payswap/journey-verification` FULL suite — **43 passed / 1
+skipped / 0 failed** (tier 1 + all 15 `@contract` tier-2; both
+projects; the served production build of the tested commit), plus the
+TL's manual browser verification of the same tree.
+
+| Journey | Verdict | Evidence |
+|---|---|---|
+| J1 first launch / getting started | **COMPLETE** | first-launch specs (identity, hero, CTA, honest-gate note, zero console errors; `/` PaySwap-branded; boot title+favicon) |
+| J2 overview (authenticated) | **COMPLETE** | eleven-area map behind the honest auth gate; designed-empty reasons verified |
+| J3 send/pay/move | **SETUP-REQUIRED (honest)** | typed prerequisite rendered (economic intake unconfigured) — the REQUIRED behavior, verified |
+| J4 receive/recipients | **SETUP-REQUIRED (honest)** | same class, verified |
+| J5 convert/compare | **SETUP-REQUIRED (honest)** | same class, verified |
+| J6 merchant checkout | **SETUP-REQUIRED (honest)** | same class, verified |
+| J7 activity/receipts/reconciliation | **COMPLETE** (surface) / **SETUP-REQUIRED** (live data) | the not-found fix verified here; UNKNOWN≠FAILED copy present; no fabricated history |
+| J8 providers/capabilities/permissions | **COMPLETE** (coverage surface) / **SETUP-REQUIRED** (connections) | providers never listed connected without evidence — verified at providerCount 0 |
+| J9 opportunities/Lab | **SETUP-REQUIRED (honest)** | advisory-only labeling verified |
+| J10 security/mandates | **COMPLETE** | non-custody commitments surface verified |
+| J11 reports/history | **SETUP-REQUIRED (honest)** | designed-empty verified |
+| J12 developer/API | **COMPLETE** | MISSING runtime config displayed, not hidden — verified |
+| J13 settings/about | **COMPLETE** | PaySwap identity + preserved upstream attribution verified (the attribution exemption is structural) |
+| J14 agent console (supporting) | **COMPLETE** | reachable-but-secondary verified (ghost link, DOM order); the honest no-backend bootstrap report verified |
+| J15 legacy /payswap URLs | **COMPLETE** | permanent redirects verified (all four legacy routes + unknown legacy) |
+
+**The four productization gates (PRODUCT-IDENTITY §6) at this commit:**
+
+- **brand/UX implemented: ✓** — identity contract satisfied across web
+  (+desktop renderer source); WCAG critical rules green (axe + the
+  suite's keyboard/focus/reduced-motion assertions, post-cascade-fix);
+  zero ZCode product branding in normal surfaces (the structural
+  attribution exemption documented); attribution preserved.
+- **GitHub installer published: PENDING THE TAG** — the workflow, the
+  identity and the verified build pipeline are in-tree; publication =
+  the `v1.0.0` tag push + the CI release run (this record updates with
+  the release URL + checksums when it lands).
+- **clean-install verified: PENDING THE RELEASE** — the lane's no-root
+  dpkg-deb verification passed (Package payswap / Name=PaySwap / icons
+  / ELF); the root-tier `apt install` + GUI launch run in CI against
+  the published artifacts (the install-verify runner).
+- **core journeys verified: ✓ (web)** — this matrix, at 9f09387. The
+  DESKTOP journey verification (packaged app flows) rides the release
+  verification (CI install job + operator acceptance) — honestly
+  marked, never conflated.
