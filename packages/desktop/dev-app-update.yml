@@ -1,6 +1,10 @@
-# 修复原因：显式开启开发态自动更新时 electron-updater 会读取 dev-app-update.yml 初始化下载缓存。
-# 服务端 manifest provider 仍负责返回真实安装包 URL；这里的 generic url 只作为本地配置占位。
+# PaySwap 开发态自动更新占位（P9-B 重定向）。
+#
+# 诚实边界：PaySwap 目前没有配置任何生产更新源。electron-updater 在开发态显式开启
+# 时会读取 dev-app-update.yml 初始化下载缓存；这里的 generic url 只是本地占位，
+# 不指向任何真实 PaySwap feed——操作方在配置真实更新源之前，自动更新链路不可用，
+# 也不应该在文档里宣称可用。生产更新走服务端 manifest provider（由操作方部署）。
 provider: generic
 url: http://localhost:8081
 useMultipleRangeRequest: false
-updaterCacheDirName: zcode-dev-updater
+updaterCacheDirName: payswap-dev-updater

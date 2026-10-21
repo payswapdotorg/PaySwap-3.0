@@ -1,8 +1,8 @@
 {
-  "name": "@zcode/desktop",
+  "name": "@payswap/desktop",
   "private": true,
-  "description": "ZCode Desktop App",
-  "author": "ZCode",
+  "description": "PaySwap Desktop — the non-custodial economic operating system.",
+  "author": "PaySwap",
   "type": "module",
   "main": "out/main/index.js",
   "scripts": {
@@ -18,6 +18,8 @@
     "prepare:native-search": "node ../../scripts/prepare-native-search-tools.mjs",
     "prepare:browser-import-helper": "node scripts/build-windows-browser-import-helper.mjs",
     "prepare:macos-window-bounds": "node scripts/build-macos-window-bounds.mjs",
+    "icons": "node scripts/generate-payswap-icons.mjs",
+    "pack:linux": "electron-builder --config electron-builder.config.js --linux deb appimage --publish never",
     "build:no-runtime-assets": "pnpm prepare:build-meta && node scripts/run-production-build.mjs",
     "build": "pnpm prepare:runtime-assets && pnpm run build:no-runtime-assets",
     "bundle": "node scripts/bundle.mjs",
@@ -84,5 +86,6 @@
     "typescript": "^6.0.2",
     "vite": "^8.0.2"
   },
-  "productName": "ZCode"
+  "version": "1.0.0",
+  "productName": "PaySwap"
 }
