@@ -1,0 +1,86 @@
+{
+  "harness": "p13-u1-real-flow-e2e",
+  "ranAt": "2026-10-22T22:33:25.864Z",
+  "gates": {
+    "N1-never-active-before-probe": {
+      "held": true,
+      "detail": "seeded state PROPOSED (PROPOSED expected, never ACTIVE)"
+    },
+    "seal": {
+      "held": true,
+      "detail": "sealed 1 secret(s); state PENDING_VERIFICATION; handle opaque"
+    },
+    "N1-never-active-after-seal": {
+      "held": true,
+      "detail": "sealed ≠ verified: the connection is PENDING_VERIFICATION, never ACTIVE"
+    },
+    "N2-inv25-live-key-refused": {
+      "held": true,
+      "detail": "refused: The supplied key is not a Stripe test-mode restricted key (expected rk_test_… or sk_test_…). LIVE keys are refused: this deployment is SANDB"
+    },
+    "N3-seal-escape-scan": {
+      "held": true,
+      "detail": "threw as designed: a sealed secret string leaked through the consumer result (context: n3-escape-scan-control) — the result is refused, never sanitized"
+    },
+    "probe": {
+      "held": true,
+      "detail": "CONFIRMED — account acct_1FPs7UAkPdhgtN6I, provider live-mode null"
+    },
+    "N4-convergence-resume": {
+      "held": true,
+      "detail": "re-seed → RESUMED conn:3a4bac48-edd2-4626-8edc-cea750b42746 (same id expected)"
+    },
+    "active-on-real-evidence": {
+      "held": true,
+      "detail": "final state ACTIVE"
+    },
+    "N5-restart-record-stability": {
+      "held": true,
+      "detail": "fresh authority over the same dir → ACTIVE with 3 transitions"
+    }
+  },
+  "probe": {
+    "outcome": "CONFIRMED",
+    "accountRef": "acct_1FPs7UAkPdhgtN6I",
+    "providerLiveMode": null,
+    "transportClass": "PRODUCTION_HTTP",
+    "transportId": "stripe-https",
+    "providerReferences": [
+      "acct_1FPs7UAkPdhgtN6I",
+      "balance"
+    ],
+    "dispatchedAt": "2026-10-22T22:33:25.870Z",
+    "completedAt": "2026-10-22T22:33:26.679Z",
+    "latencyMs": 809
+  },
+  "connection": {
+    "connectionId": "conn:3a4bac48-edd2-4626-8edc-cea750b42746",
+    "finalState": "ACTIVE",
+    "transitions": [
+      {
+        "at": "2026-10-22T22:33:25.866Z",
+        "from": "PROPOSED",
+        "to": "PROPOSED",
+        "cause": "SETUP_SEEDED"
+      },
+      {
+        "at": "2026-10-22T22:33:25.869Z",
+        "from": "PROPOSED",
+        "to": "PENDING_VERIFICATION",
+        "cause": "CREDENTIAL_SEALED"
+      },
+      {
+        "at": "2026-10-22T22:33:26.679Z",
+        "from": "PENDING_VERIFICATION",
+        "to": "ACTIVE",
+        "cause": "PROBE_CONFIRMED"
+      }
+    ]
+  },
+  "honestNotes": [
+    "credential source: the station secret store (STRIPE_SECRET_KEY env); never chat, never committed, never echoed",
+    "credential service: harness-local AES-256-GCM (node:crypto) standing in for the substrate safeStorage-backed service — real authenticated encryption, documented boundary",
+    "broker storage-key law held: payswap.connection.conn:3a4bac48-edd2-4626-8edc-cea750b42746.credential (payswap.connection.<connectionId>.credential)",
+    "N5 boundary: the RECORD store persists across restart; unsealing the credential blob across restarts is the substrate safeStorage migration path (out of the P13-B slice) — the harness master key is per-run"
+  ]
+}

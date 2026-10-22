@@ -25,7 +25,7 @@
     {
       "id": "P13-A",
       "owner": "worker-1",
-      "status": "QUEUED",
+      "status": "COMPLETE",
       "depends_on": [
         "P13-0"
       ],
@@ -33,12 +33,14 @@
       "unlocks": [
         "P13-D"
       ],
-      "acceptance": "Connections CTA and natural-language/voice connector intent use same durable task; Pay action and Pay intent share intake; routes, draft/history, keyboard/accessibility tested."
+      "acceptance": "Connections CTA and natural-language/voice connector intent use same durable task; Pay action and Pay intent share intake; routes, draft/history, keyboard/accessibility tested.",
+      "completed_at": "2026-10-22T18:30:00Z",
+      "completed_via": "main@7c58351 (work/p13-a@57ca4d2, merge f2c1e17) \u2014 app 31f/338t green at integration"
     },
     {
       "id": "P13-B",
       "owner": "worker-2",
-      "status": "QUEUED",
+      "status": "COMPLETE",
       "depends_on": [
         "P13-0"
       ],
@@ -46,12 +48,14 @@
       "unlocks": [
         "P13-D"
       ],
-      "acceptance": "Actual Stripe sandbox flow for the selected setup type verifies persisted connection/scopes with no secret leak; if required live setup absent, blockers are exact and status remains unverified."
+      "acceptance": "Actual Stripe sandbox flow for the selected setup type verifies persisted connection/scopes with no secret leak; if required live setup absent, blockers are exact and status remains unverified.",
+      "completed_at": "2026-10-22T18:33:00Z",
+      "completed_via": "main@7c58351 (work/p13-b@cedf3d4, merge d9d5d35) \u2014 provider-runtime 18f/236t, desktop 19f/199t green at integration"
     },
     {
       "id": "P13-C",
       "owner": "worker-3",
-      "status": "QUEUED",
+      "status": "COMPLETE",
       "depends_on": [
         "P13-0"
       ],
@@ -59,12 +63,14 @@
       "unlocks": [
         "P13-D"
       ],
-      "acceptance": "Text/button/voice intake converges; preview + explicit scoped approval required; task resumes; UNKNOWN outcome reconciles before retry."
+      "acceptance": "Text/button/voice intake converges; preview + explicit scoped approval required; task resumes; UNKNOWN outcome reconciles before retry.",
+      "completed_at": "2026-10-22T18:36:00Z",
+      "completed_via": "main@7c58351 (work/p13-c@1913653, merge 7c58351) \u2014 desktop 20f/200t green at integration"
     },
     {
       "id": "P13-D",
       "owner": "TL",
-      "status": "BLOCKED",
+      "status": "COMPLETE",
       "depends_on": [
         "P13-A",
         "P13-B",
@@ -72,7 +78,9 @@
       ],
       "lane_scope": "Cross-lane integration, route/feature/journey mirrors, test matrix, packaged Ubuntu acceptance and release evidence.",
       "unlocks": [],
-      "acceptance": "Exact commit has passing E2E/packaged-app evidence at prescribed sizes; offline/contract/sandbox/live claims separated; P13 acceptance record and canonical state agree."
+      "acceptance": "Exact commit has passing E2E/packaged-app evidence at prescribed sizes; offline/contract/sandbox/live claims separated; P13 acceptance record and canonical state agree.",
+      "completed_at": "2026-10-22T19:50:00Z",
+      "completed_via": "main@28a5ece \u2014 TL integration: 4 batteries 1013t green, browser 87/1/0 (J20-J23), packaged-Ubuntu three-size verification; P13 held open ONLY on the credentials law (closed by the 2026-10-22 credential drop: P13-CLOSURE-RECORD-2026-10-22.md, U1 receipt green)"
     }
   ]
 }
