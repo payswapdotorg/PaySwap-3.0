@@ -34,6 +34,7 @@ import {
 } from "../section-vocabulary.js";
 import type { WorkspaceStoreBinding } from "../useWorkspaceStore.js";
 import { ErrorBlock, LoadingBlock, SectionScaffold } from "./shared.js";
+import { AgentComposer } from "../../agent/AgentComposer.js";
 
 /** The §6 overview activity cap. */
 export const OVERVIEW_ACTIVITY_CAP = 20;
@@ -290,6 +291,22 @@ export function OverviewSection({
           </ul>
         </section>
       ) : null}
+
+      <section aria-labelledby="ps-console-overview-agent" className="ps-console-block">
+        <h3 id="ps-console-overview-agent" className="ps-console-block-title">
+          The shared PaySwap agent composer
+        </h3>
+        <p className="ps-console-workspace-note">
+          The same composer that lives on the product areas (Connections,
+          Payments, Accounts) is exposed here in the Agent Workspace: type
+          a request in plain words and it becomes the SAME resumable task
+          a card click creates — one task list, one history. The composer
+          records requests and progress only; it holds zero financial
+          authority, and voice input is not supported in this deployment —
+          stated, never simulated.
+        </p>
+        <AgentComposer area="console-overview" />
+      </section>
 
       <section aria-labelledby="ps-console-overview-activity" className="ps-console-block">
         <h2 id="ps-console-overview-activity" className="ps-console-block-title">

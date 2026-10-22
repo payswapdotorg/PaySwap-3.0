@@ -32,6 +32,18 @@ export type WorkspaceStoreOperation =
   | "revise"
   | "archive";
 
+/**
+ * The ONE ambient-clock read in this package (the P5 pinned site): the
+ * shared DEFAULT mutation clock for every store/port binding at this app
+ * boundary — the console workspace store AND the agent composer
+ * controller (P13-A). Read once per user-initiated mutation to supply a
+ * port's explicit `now` argument (§5: "now is an explicit input"); never
+ * a fold input, never a view-model value, never displayed. Every binding
+ * and every test injects its clock through the same seam; this default
+ * exists only so the standalone browser profile works.
+ */
+export const ambientMutationClock = () => new Date().toISOString();
+
 /** The typed store error (fail-closed; rejections are never swallowed). */
 export interface WorkspaceStoreError {
   readonly kind: "store-error";
@@ -100,12 +112,12 @@ export function useWorkspaceStore(
   options?: UseWorkspaceStoreOptions,
 ) {
   // The clock seam: the mount (and every test) may inject the clock; the
-  // DEFAULT reads the ambient UTC instant — the ONE ambient read in this
-  // package, created lazily here and called only at the moment of a
-  // user-initiated mutation to supply the pinned port's explicit `now`
-  // argument (§5). It never feeds a fold, a view model or a displayed
-  // value (the P5 product law + the console suite pin this site).
-  const clockRef = useRef<() => string>(() => new Date().toISOString());
+  // DEFAULT is the package's ONE ambient read (ambientMutationClock above,
+  // shared with the agent composer controller — P13-A), called only at the
+  // moment of a user-initiated mutation to supply the pinned port's
+  // explicit `now` argument (§5). It never feeds a fold, a view model or a
+  // displayed value (the P5 product law + the console suite pin the site).
+  const clockRef = useRef(ambientMutationClock);
   if (options?.clock !== undefined) {
     clockRef.current = options.clock;
   }

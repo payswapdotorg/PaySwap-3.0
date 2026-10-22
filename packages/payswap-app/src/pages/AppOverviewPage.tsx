@@ -27,6 +27,7 @@ import type { NavigationAreaView, OutcomeBoardView } from "../contracts/view-mod
 import { outcomeAreaAlias } from "../lib/outcome-area-aliases.js";
 import type { PaySwapNavigation } from "../shell/navigation.js";
 import { ProductLink } from "../shell/ProductLink.js";
+import { AgentComposer } from "../agent/AgentComposer.js";
 
 export function AppOverviewPage({
   navigation,
@@ -138,6 +139,24 @@ export function AppOverviewPage({
             of this deployment phase, recorded here instead of hidden.
           </p>
         ) : null}
+      </section>
+
+      <section aria-labelledby="app-overview-agent-heading" className="ps-page-section">
+        <h2 id="app-overview-agent-heading" className="ps-page-section-title">
+          The PaySwap agent — one composer, every surface
+        </h2>
+        <p className="ps-page-section-note">
+          The shared agent composer also lives on this overview: ask for a
+          payment or a connection in plain words, or open the areas above
+          and use their agent-led sections. Every entrypoint — a card
+          click, a typed request, an area action — reaches the SAME
+          resumable task: one task list, one history, never a duplicate.
+          The composer works standalone in this browser profile (honestly
+          labeled): it records requests and progress; it holds zero
+          financial authority, and voice input is not supported in this
+          deployment — stated, never simulated.
+        </p>
+        <AgentComposer area="app-overview" />
       </section>
     </article>
   );

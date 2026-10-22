@@ -15,14 +15,32 @@
 import { Card, StatusPill } from "@zcode/ui/payswap";
 import type { PaySwapNavigation } from "../../shell/navigation.js";
 import { ProductLink } from "../../shell/ProductLink.js";
+import { agentPaymentDirectionEntries } from "../../lib/agent-payment-entries.js";
+import { sharedAgentComposerController } from "../../agent/agentComposerController.js";
+import { AgentComposer } from "../../agent/AgentComposer.js";
 
 export function AccountsAreaSurface({
   productNavigation,
 }: {
   readonly productNavigation?: PaySwapNavigation;
 }) {
+  const agentEntries = agentPaymentDirectionEntries("accounts");
+
+  const seedPaymentDirection = (entry: (typeof agentEntries)[number]): void => {
+    void sharedAgentComposerController().seedFromSurface({
+      intent: {
+        kind: "PAYMENT_MISSION",
+        direction: entry.direction,
+        goalStatement: entry.goalStatement,
+      },
+      originNote: entry.cardActionLabel,
+      area: "accounts",
+    });
+  };
+
   return (
-    <section aria-labelledby="accounts-observations-heading" className="ps-page-section">
+    <>
+      <section aria-labelledby="accounts-observations-heading" className="ps-page-section">
       <h2 id="accounts-observations-heading" className="ps-page-section-title">
         Balances as observations — none observed
       </h2>
@@ -53,6 +71,43 @@ export function AccountsAreaSurface({
           </ProductLink>
         </p>
       </Card>
-    </section>
+      </section>
+
+      <section aria-labelledby="accounts-agent-heading" className="ps-page-section">
+        <h2 id="accounts-agent-heading" className="ps-page-section-title">
+          Agent-led conversions — click a direction or just ask
+        </h2>
+        <p className="ps-page-section-note">
+          The shared PaySwap agent composer lives on this surface too.
+          Convert (and Move, cross-anchored here from Payments) seed the
+          SAME resumable payment-intake tasks as typing “convert my USDC"
+          or “move funds” into the composer — one task, one history, never
+          a duplicate. Starting a task moves nothing: a conversion exists
+          only after guided intake, validation against observed balances,
+          a structured preview and your explicit authorization.
+        </p>
+        <ul className="ps-page-grid">
+          {agentEntries.map((entry) => (
+            <li key={entry.actionId} className="ps-page-grid-item">
+              <Card className="ps-area-card">
+                <div className="ps-cap-card-head">
+                  <h3 className="ps-cap-name">{entry.cardTitle}</h3>
+                  <StatusPill tone="disabled">Intake task — never a dispatch</StatusPill>
+                </div>
+                <p className="ps-cap-summary">{entry.cardLine}</p>
+                <button
+                  type="button"
+                  className="ps-agent-entry-action"
+                  onClick={() => seedPaymentDirection(entry)}
+                >
+                  {entry.cardActionLabel}
+                </button>
+              </Card>
+            </li>
+          ))}
+        </ul>
+        <AgentComposer area="accounts" />
+      </section>
+    </>
   );
 }

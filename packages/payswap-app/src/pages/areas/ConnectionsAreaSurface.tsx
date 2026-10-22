@@ -26,9 +26,12 @@
 import { Card, StatusPill } from "@zcode/ui/payswap";
 import { foldConnectionsSetup } from "../../lib/connections-catalogue.js";
 import { foldOnchainRail } from "../../lib/onchain-rail.js";
+import { agentProviderSetupCards } from "../../lib/agent-provider-entries.js";
 import type { PaySwapNavigation } from "../../shell/navigation.js";
 import { ProductLink } from "../../shell/ProductLink.js";
 import type { OnchainCapabilityRow } from "../../lib/onchain-rail.js";
+import { sharedAgentComposerController } from "../../agent/agentComposerController.js";
+import { AgentComposer } from "../../agent/AgentComposer.js";
 
 const CAPABILITY_STATE_PILL: Readonly<
   Record<OnchainCapabilityRow["state"], { readonly tone: "disabled" | "attention" | "unknown"; readonly label: string }>
@@ -53,6 +56,20 @@ export function ConnectionsAreaSurface({
 }) {
   const setup = foldConnectionsSetup();
   const onchain = foldOnchainRail();
+  const setupCards = agentProviderSetupCards();
+
+  const seedProviderSetup = (card: (typeof setupCards)[number]): void => {
+    void sharedAgentComposerController().seedFromSurface({
+      intent: {
+        kind: "CONNECTION_SETUP",
+        providerId: card.providerId,
+        form: card.form,
+        useCaseRef: card.useCaseRef,
+      },
+      originNote: card.cardActionLabel,
+      area: "connections",
+    });
+  };
 
   return (
     <>
@@ -84,6 +101,49 @@ export function ConnectionsAreaSurface({
             );
           })}
         </ol>
+      </section>
+
+      <section aria-labelledby="connections-agent-heading" className="ps-page-section">
+        <h2 id="connections-agent-heading" className="ps-page-section-title">
+          Agent-led setup — click a card or just ask
+        </h2>
+        <p className="ps-page-section-note">
+          The shared PaySwap agent composer lives on this surface (and on
+          Pay, Receive, Move, Convert and the Agent Workspace). Clicking a
+          connect card below and typing “connect Stripe” into the composer
+          reach the SAME resumable setup task — one task, one history,
+          never a duplicate. Seeding a task connects nothing: a connection
+          exists only when the connection plane records real provider
+          evidence, and every card states its typed prerequisite verbatim.
+        </p>
+        <ul className="ps-page-grid">
+          {setupCards.map((card) => (
+            <li key={`${card.providerId}:${card.form}`} className="ps-page-grid-item">
+              <Card className="ps-area-card">
+                <div className="ps-cap-card-head">
+                  <h3 className="ps-cap-name">{card.cardTitle}</h3>
+                  <StatusPill tone="disabled">Declared — never a connection</StatusPill>
+                </div>
+                <p className="ps-cap-summary">{card.cardLine}</p>
+                <button
+                  type="button"
+                  className="ps-agent-entry-action"
+                  onClick={() => seedProviderSetup(card)}
+                >
+                  {card.cardActionLabel}
+                </button>
+              </Card>
+            </li>
+          ))}
+        </ul>
+        <p className="ps-page-section-note">
+          Stripe is the one provider declared in this deployment — no
+          other provider is named anywhere, so no other provider is ever
+          offered. Voice input is not supported in this deployment and is
+          never simulated; the composer states it where voice would be
+          offered.
+        </p>
+        <AgentComposer area="connections" />
       </section>
 
       <section aria-labelledby="connections-forms-heading" className="ps-page-section">
