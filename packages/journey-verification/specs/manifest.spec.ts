@@ -76,12 +76,13 @@ function parseSpecTests(spec: string): ParsedTest[] {
 test("no-orphans law: the manifest, the registry and the spec files agree in both directions", async ({ page }) => {
   expect(page).toBeDefined();
 
-  // The map itself is the canonical J1–J19 (19 unique, ordered — the
-  // P12 Lane C wave added J16-J19, JOURNEY-MAP.md §5).
+  // The map itself is the canonical J1–J23 (23 unique, ordered — the
+  // P12 Lane C wave added J16–J19, JOURNEY-MAP.md §5; the P13 wave added
+  // J20–J23, JOURNEY-MAP.md §6).
   expect(JOURNEY_IDS).toEqual(
-    Array.from({ length: 19 }, (_, index) => `J${index + 1}` as JourneyId),
+    Array.from({ length: 23 }, (_, index) => `J${index + 1}` as JourneyId),
   );
-  expect(new Set(JOURNEY_IDS).size).toBe(19);
+  expect(new Set(JOURNEY_IDS).size).toBe(23);
 
   const onDisk = readdirSync(SPECS_DIR)
     .filter((name) => name.endsWith(".spec.ts"))
@@ -183,7 +184,11 @@ test("no-orphans law: the manifest, the registry and the spec files agree in bot
     }
   }
   const tier2Only = JOURNEYS.filter((row) => journeyTier(row.id) === 2);
-  expect(tier2Only.map((row) => row.id)).toEqual(["J14", "J15", "J16", "J17", "J18", "J19"]);
+  expect(tier2Only.map((row) => row.id)).toEqual([
+    "J14", "J15", "J16", "J17", "J18", "J19",
+    // The P13 composer journeys (JOURNEY-MAP.md §6).
+    "J20", "J21", "J22", "J23",
+  ]);
   for (const row of tier2Only) {
     expect(
       contractCoverage.has(row.id),

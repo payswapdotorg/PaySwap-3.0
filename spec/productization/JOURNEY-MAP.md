@@ -33,6 +33,10 @@ Routes follow PRODUCT-IDENTITY.md §3 (canonical route contract).
 | J17 | Onchain discovery | `/app/connections` → the onchain rail; `/app/accounts` (observation anchor) | the onchain rail block | no wallet / transport / signer wired | UNAVAILABLE rows with typed reasons; REFERENCE rows for declared contracts (fee provenance, simulation, state vocabulary incl. reorg + UNKNOWN); NO_OBSERVATIONS rows (balances, history); declared chain catalogue; synthetic venue packs labeled AS synthetic; nothing fabricated |
 | J18 | PSP connection setup | `/app/connections` | the PSP setup steps + forms catalogue | provider connection plane not wired (providerCount 0) | a catalogue entry is never a connection; connect states its typed prerequisite (never a dead button / fabricated login); scopes + sandbox/live structural; health honest empty; lifecycle lawful |
 | J19 | Advanced developer workspace access | `/developers` → `/console/advanced` | the advanced developer workspace entry | entry public; workspace is a live-backend surface | honestly labeled as the advanced developer workspace OF the PaySwap Agent Console; SPA routing (no renderer reload / durable-state loss); the Agent Workspace stays primary |
+| J20 | Shared agent entrypoints — one composer, every surface | `/` → `/app` → `/app/payments` → `/app/connections` → `/app/accounts` → `/console` | the persistent, toggleable PaySwap agent composer (dock + panel) | none (standalone browser-profile mode, honestly labeled) | every entrypoint drives the ONE shared controller; zero-authority + no-tools + declared-unsupported VOICE notes verbatim; never a mic control; secrets refused before recording |
+| J21 | Connections → Stripe and chat → "connect Stripe" converge on ONE setup task | `/app/connections` (agent-led setup section) | the Stripe connect cards + the composer text path | no provider connection exists (the honest empty) | card click + typed text → the SAME resumable CONNECTION_SETUP task (RESUMED, never duplicated); seeding connects nothing; Stripe is the one declared provider; U2/U3 state their exact missing operator configuration |
+| J22 | Pay by button and text — the same payment-intake task; voice honestly unsupported | `/app/payments` (agent-led payments section) | the Pay/Receive/Move direction cards + the composer text path | no payment can dispatch (preview → authorization → execution is host-side) | Pay-card + "pay the supplier" seed the SAME PAYMENT_MISSION task; checkout has NO card (no direction in the mission vocabulary); starting a task pays nothing; voice never simulated |
+| J23 | Composer durability — minimize/reopen and reload never lose context | any integrated surface | the dock/panel toggle + the browser-profile task store | the standalone persistence (honestly labeled: not synced, cleared with site data) | minimize returns focus to the dock keeping draft + transcript + tasks; reopen restores; a full reload preserves the task list (restart resume, browser-profile tier) |
 
 ## 2. Navigation IA law (Lane A)
 
@@ -145,3 +149,54 @@ machine-checkable mirror, no-orphans enforced by specs/manifest.spec.ts):
 - FEATURE-MAP.md (P12, NEW) is the capability survey that drove these
   surfaces: every capability family mapped to its real
   route/component/service with honest operational states.
+
+
+## 6. P13 reconciliation (Issue #3 — the agent-led payment UX wave)
+
+The P13 lanes (A: composer + routing; B: connection plane; C: payment
+mission runtime) are integrated at the TL station. The map gains
+J20–J23 (the composer journeys — all tier-2 @contract, gated on the
+merged tree at TL integration, exactly as J16–J19 were in P12):
+
+- J20 shared agent entrypoints: the composer on home/app-overview/
+  payments/connections/accounts + the Agent Workspace
+  (specs/agent-composer-surfaces.spec.ts).
+- J21 connection convergence: the Connections Stripe card and the typed
+  "connect Stripe" reach ONE resumable setup task
+  (specs/agent-composer-convergence.spec.ts).
+- J22 payment-intake convergence + honest checkout exclusion
+  (same spec).
+- J23 composer durability: minimize/reopen + reload resume
+  (same spec).
+
+The DEEPER connection and payment flows (key seal → verification probe
+→ ACTIVE; the D3 provider-return discipline; the preview → explicit
+scoped authorization → dispatch → UNKNOWN-reconciles path) run in the
+DESKTOP HOST process — they are evidenced by the CONTRACT-tier
+batteries, not by web journeys (the web renderer honestly runs the
+composer's browser-profile store only):
+
+- `packages/desktop/test/payswap/connections-plane.test.ts` (20 tests:
+  the never-ACTIVE law, the credential seal, the D3 single-use
+  10-minute monotonic state bindings, expiry/revocation, restart
+  stability — Lane P13-B).
+- `packages/desktop/test/payswap/payments-mission-runtime.test.ts`
+  (16 tests: the full consequential path — preview → explicit
+  PREVIEW_UI_ACT authorization → UNKNOWN → reconcile → CONFIRMED →
+  COMPLETED; pause/resume/cancel/expire; restart + the recovery sweep
+  — Lane P13-C).
+- `packages/desktop/test/payswap/payments-contract-mirrors.test.ts`
+  (the by-value pins vs the REAL @payswap/surface + @payswap/economic
+  sources).
+- `packages/provider-runtime/test/adapters/*.test.ts` (46 tests: the
+  Stripe adapter contracts, the read-only verification probe, the
+  secret-leak assertions — Lane P13-B).
+
+EVIDENCE SEPARATION (the P13-D work-order law): the web journeys above
+are BROWSER-tier evidence for the composer UX; the desktop unit
+batteries are CONTRACT-tier evidence for the host planes; the packaged
+Ubuntu app run (P13-RELEASE) is the SHIPPED-APP tier. NO LIVE-TIER
+evidence exists in this wave: no Stripe credentials exist in this
+station, so the U1 real-flow E2E gate stays operator-gated (ADR-0007
+D1/D8) and P13 stays OPEN at close (the work-order law) — the sandbox
+gate is NOT marked passed.

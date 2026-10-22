@@ -1,5 +1,5 @@
 /**
- * @payswap/journey-verification — the J1–J15 journey manifest.
+ * @payswap/journey-verification — the J1–J23 journey manifest.
  *
  * Authority: spec/productization/JOURNEY-MAP.md §1 (the primary journey
  * map, REGISTERED by the TL) + PRODUCT-IDENTITY.md §3 (the route contract
@@ -29,7 +29,7 @@
  * suite; an unjourneyed test fails it too.
  */
 
-/** A journey id from the J1–J19 map (JOURNEY-MAP.md §1). */
+/** A journey id from the J1–J23 map (JOURNEY-MAP.md §1). */
 export type JourneyId = `J${number}`;
 
 /** Where a journey's acceptance can run green. */
@@ -292,9 +292,61 @@ export const JOURNEYS: readonly JourneyRow[] = [
     integrationNote:
       "the in-IA advanced entry (DevelopersPage + section-vocabulary, Lane P12-C) — @contract, gates at TL integration (specs/advanced-workspace-access.spec.ts)",
   },
+  {
+    id: "J20",
+    title: "Shared agent entrypoints — one composer, every surface",
+    route: "/ → /app → /app/payments → /app/connections → /app/accounts → /console",
+    control: "the persistent, toggleable PaySwap agent composer (dock + panel)",
+    prerequisite: "none (the composer works standalone in the browser profile, honestly labeled)",
+    honestState:
+      "the composer mounts on the home, app overview, payments, connections and accounts surfaces AND the Agent Workspace — every entrypoint drives the ONE shared controller (one task list, one history); the panel renders the zero-authority note, the no-tools note and the declared-unsupported VOICE statement verbatim; never a microphone control; secrets never enter chat (secret-shaped text is refused before it is recorded)",
+    tier: 2,
+    baseSurface: null,
+    integrationNote:
+      "the composer plane (packages/payswap-app/src/agent/, Lane P13-A) — @contract, gates at TL integration on the merged tree (specs/agent-composer-surfaces.spec.ts)",
+  },
+  {
+    id: "J21",
+    title: "Connections → Stripe and chat → “connect Stripe” converge on ONE setup task",
+    route: "/app/connections (agent-led setup section)",
+    control: "the Stripe connect cards + the composer text path",
+    prerequisite: "no provider connection exists (the honest empty; a catalogue entry is never a connection)",
+    honestState:
+      "a card click and a typed “connect Stripe” reach the SAME resumable CONNECTION_SETUP task inside the window — CREATED then RESUMED, never a duplicate; the task record states nothing is connected (a connection exists only when the connection plane records real provider evidence); Stripe is the one declared provider and no other is ever offered; the U2/U3 forms state their exact missing operator configuration (never simulated OAuth)",
+    tier: 2,
+    baseSurface: null,
+    integrationNote:
+      "the convergence law (agent-task seedOrResume + the Connections integration, Lane P13-A; the connection plane machinery, Lane P13-B) — @contract, gates at TL integration (specs/agent-composer-convergence.spec.ts)",
+  },
+  {
+    id: "J22",
+    title: "Pay by button and text — the same payment-intake task; voice honestly unsupported",
+    route: "/app/payments (agent-led payments section)",
+    control: "the Pay/Receive/Move direction cards + the composer text path",
+    prerequisite: "no payment can dispatch (the preview→authorization→execution path is host-side; the composer holds zero financial authority)",
+    honestState:
+      "a Pay-card click and a typed “pay the supplier” seed the SAME resumable PAYMENT_MISSION task; checkout has NO card (no direction exists in the mission vocabulary — never a guessed seed); the card copy states starting a task pays nothing; voice input is not supported in this deployment and is never simulated",
+    tier: 2,
+    baseSurface: null,
+    integrationNote:
+      "the payment-intake seeding (agent-payment-entries + the Payments integration, Lane P13-A; the mission runtime, Lane P13-C) — @contract, gates at TL integration (specs/agent-composer-convergence.spec.ts)",
+  },
+  {
+    id: "J23",
+    title: "Composer durability — minimize/reopen and reload never lose context",
+    route: "/app/payments (any integrated surface)",
+    control: "the composer dock/panel toggle + the browser-profile task store",
+    prerequisite: "the standalone browser-profile persistence (honestly labeled: not synced anywhere, clearing site data removes it)",
+    honestState:
+      "minimize returns focus to the dock and keeps the draft + transcript + tasks; reopen restores them; a full page reload preserves the task list and history (restart resume at the browser-profile tier); Escape minimizes; the transcript is a polite live region",
+    tier: 2,
+    baseSurface: null,
+    integrationNote:
+      "the composer UI-state + task-store persistence (Lane P13-A) — @contract, gates at TL integration (specs/agent-composer-convergence.spec.ts)",
+  },
 ] as const;
 
-/** The ordered id list J1..J19 (the map is total; the cross-check pins it). */
+/** The ordered id list J1..J23 (the map is total; the cross-check pins it). */
 export const JOURNEY_IDS: readonly JourneyId[] = JOURNEYS.map((row) => row.id);
 
 /** Tier lookup for the cross-check (tier-1 journeys need non-@contract tests). */

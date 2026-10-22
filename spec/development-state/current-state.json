@@ -16,9 +16,7 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [
-    "P13-D"
-  ],
+  "frontier": [],
   "active_work_orders": [],
   "completed_work_orders": [
     {
@@ -807,6 +805,31 @@
       "gates_closed": [],
       "findings_queued": [],
       "completed_at": "2026-10-22T19:10:00Z"
+    },
+    {
+      "id": "P13-D",
+      "owner": "resident-tl",
+      "status": "COMPLETE",
+      "session": "payswap3-p13-dispatch",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "worker_branch": "main",
+      "worker_head_sha": "PENDING",
+      "base_sha": "7c58351",
+      "accepted_via_merge": "TL-owned integration: J20-J23 journey reconciliation (manifest + coverage + no-orphans + specs: 87/1/0 browser receipt), FEATURE-MAP + JOURNEY-MAP \u00a76 reconciliation, the packaged-Ubuntu verification at 1280x720/1024x768/800x600 (production deb of the integrated tree; identity/scroll-round-trip/keyboard-nav/restart receipts), the acceptance record",
+      "evidence": [
+        "docs/productization-evidence/P13-D-ACCEPTANCE-RECORD-2026-10-22.md",
+        "spec/productization/JOURNEY-MAP.md#6-p13-reconciliation-issue-3--the-agent-led-payment-ux-wave",
+        "packages/journey-verification/specs/agent-composer-surfaces.spec.ts",
+        "packages/journey-verification/specs/agent-composer-convergence.spec.ts"
+      ],
+      "tl_battery": "browser tier 87 passed/1 skip/0 failed (desktop+mobile, receipt report.json expected 87 unexpected 0 flaky 0); contract tier surface 219 + provider-runtime 236 + desktop 220 + app 338 all green; tsc host/pr/app 0; oxlint 0/0; architecture:check 0; packaged tier: three sizes with byte-identical scroll round-trips + window identity + WM_DELETE graceful quit + restart durable state (delivery/p13-rc-verification/VERIFICATION-RECORD.md)",
+      "gates_closed": [],
+      "findings_queued": [
+        "the U1 real-flow E2E gate stays operator-gated (no Stripe credentials in this station \u2014 ADR D1/D8)",
+        "the payment execution authority port defaults to UNWIRED (kernel composition is the next wave)",
+        "XTEST synthetic button activation inert under the minimal WM (anchors OK) \u2014 recorded in the P13-D verification record"
+      ],
+      "completed_at": "2026-10-22T20:00:00Z"
     }
   ],
   "policies": {
