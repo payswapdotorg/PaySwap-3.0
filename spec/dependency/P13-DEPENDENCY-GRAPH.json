@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "wave": "P13",
+  "title": "Agent-led connector onboarding and durable payment tasks",
+  "issue": "https://github.com/payswapdotorg/PaySwap-3.0/issues/3",
+  "ux_reference": "docs/productization-evidence/P13-AGENT-LED-UX-REFERENCE-2026-10-22.md",
+  "registration_commit_base": "148f7f83dcf8179a477a8212c80f2167012c0966",
+  "policy": "Register only. No implementation or acceptance is claimed by the work-order graph. Update statuses only at the exact accepted commit with evidence.",
+  "work_orders": [
+    {
+      "id": "P13-0",
+      "owner": "TL",
+      "status": "QUEUED",
+      "depends_on": [],
+      "lane_scope": "Source-backed gap audit and architecture decision: Stripe account use case/auth method, browser/session boundary, secret broker, task identity and authority seams.",
+      "unlocks": [
+        "P13-A",
+        "P13-B",
+        "P13-C"
+      ],
+      "acceptance": "ADR/current-gap matrix committed; shared typed intent/task contract and disjoint ownership agreed; implementation dispatch begins."
+    },
+    {
+      "id": "P13-A",
+      "owner": "worker-1",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P13-0"
+      ],
+      "lane_scope": "PaySwap UI shared composer, entrypoint convergence, typed intent routing and session UI; no provider adapter or financial execution files.",
+      "unlocks": [
+        "P13-D"
+      ],
+      "acceptance": "Connections CTA and natural-language/voice connector intent use same durable task; Pay action and Pay intent share intake; routes, draft/history, keyboard/accessibility tested."
+    },
+    {
+      "id": "P13-B",
+      "owner": "worker-2",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P13-0"
+      ],
+      "lane_scope": "Provider session authority/registry, secure host-side credential broker, Stripe adapter and test-mode provider verification; no P13-A UI files.",
+      "unlocks": [
+        "P13-D"
+      ],
+      "acceptance": "Actual Stripe sandbox flow for the selected setup type verifies persisted connection/scopes with no secret leak; if required live setup absent, blockers are exact and status remains unverified."
+    },
+    {
+      "id": "P13-C",
+      "owner": "worker-3",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P13-0"
+      ],
+      "lane_scope": "Typed Pay intake validation, payment mission/task lifecycle, authorized execution gate, durable progress/idempotency/reconciliation; no P13-A composer files or P13-B connector implementation files.",
+      "unlocks": [
+        "P13-D"
+      ],
+      "acceptance": "Text/button/voice intake converges; preview + explicit scoped approval required; task resumes; UNKNOWN outcome reconciles before retry."
+    },
+    {
+      "id": "P13-D",
+      "owner": "TL",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P13-A",
+        "P13-B",
+        "P13-C"
+      ],
+      "lane_scope": "Cross-lane integration, route/feature/journey mirrors, test matrix, packaged Ubuntu acceptance and release evidence.",
+      "unlocks": [],
+      "acceptance": "Exact commit has passing E2E/packaged-app evidence at prescribed sizes; offline/contract/sandbox/live claims separated; P13 acceptance record and canonical state agree."
+    }
+  ]
+}
