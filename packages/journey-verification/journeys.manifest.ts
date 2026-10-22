@@ -29,7 +29,7 @@
  * suite; an unjourneyed test fails it too.
  */
 
-/** A journey id from the J1–J15 map (JOURNEY-MAP.md §1). */
+/** A journey id from the J1–J19 map (JOURNEY-MAP.md §1). */
 export type JourneyId = `J${number}`;
 
 /** Where a journey's acceptance can run green. */
@@ -240,9 +240,61 @@ export const JOURNEYS: readonly JourneyRow[] = [
     integrationNote:
       "at the lane base /payswap/* ARE the real product routes (no redirect exists); the redirect contract only exists post-P9-A — fully @contract",
   },
+  {
+    id: "J16",
+    title: "Primary payment discovery (the payments action set)",
+    route: "/app/payments",
+    control: "the typed action set (Pay / Receive / Move / Checkout, anchored by the pinned alias table)",
+    prerequisite: "economic intake plane unconfigured / no merchant plane → typed prerequisite per action",
+    honestState:
+      "every anchored action states dispatchability with its typed prerequisite verbatim + the two real routes forward (configure connections / learn the contract); recipients honestly UNAVAILABLE, approvals → Agent Workspace, activity → ledger, convert → accounts cross-anchor; never a dead button, never a fabricated success",
+    tier: 2,
+    baseSurface: null,
+    integrationNote:
+      "the typed payments landing (PaymentsAreaSurface, Lane P12-C) — @contract, gates at TL integration on the merged tree (specs/payments-discovery.spec.ts)",
+  },
+  {
+    id: "J17",
+    title: "Onchain discovery (the onchain rail)",
+    route: "/app/connections → the onchain rail block; /app/accounts (observation anchor)",
+    control: "the onchain rail block on the connections area",
+    prerequisite: "no wallet / transport / signer wired in this deployment",
+    honestState:
+      "UNAVAILABLE rows with typed reasons (wallet connection, live network context, transaction preview, scoped signing); REFERENCE rows for declared contracts (fee provenance, simulation & security, the state vocabulary incl. reorg + UNKNOWN); NO_OBSERVATIONS rows (balances, history); the declared chain catalogue; synthetic venue packs labeled AS synthetic; balances are observations and zero are observed",
+    tier: 2,
+    baseSurface: null,
+    integrationNote:
+      "the onchain rail surface (foldOnchainRail + ConnectionsAreaSurface + AccountsAreaSurface, Lane P12-C) — @contract, gates at TL integration (specs/onchain-discovery.spec.ts)",
+  },
+  {
+    id: "J18",
+    title: "PSP connection setup flow",
+    route: "/app/connections",
+    control: "the PSP setup steps + the connection forms catalogue",
+    prerequisite: "provider connection plane not wired (providerCount 0)",
+    honestState:
+      "a catalogue entry is never a connection; the connect step states its typed prerequisite (never a dead button, never a fabricated login); scopes/effect classes declared; sandbox/live structurally distinct; health honest empty at zero connections; lifecycle transitions lawful",
+    tier: 2,
+    baseSurface: null,
+    integrationNote:
+      "the PSP setup surface (foldConnectionsSetup + ConnectionsAreaSurface, Lane P12-C) — @contract, gates at TL integration (specs/psp-connection.spec.ts)",
+  },
+  {
+    id: "J19",
+    title: "Advanced developer workspace access (ZCode-derived, integrated)",
+    route: "/developers → /console/advanced",
+    control: "the advanced developer workspace entry on the developers surface",
+    prerequisite: "entry public; the workspace is a live-backend surface (its honest no-backend state is the truthful render)",
+    honestState:
+      "the entry is honestly labeled as the advanced developer workspace of the PaySwap Agent Console; routing is SPA (no renderer reload / no durable-state loss — window-marker verified); the Agent Workspace stays primary (/console keeps .ps-console-root)",
+    tier: 2,
+    baseSurface: null,
+    integrationNote:
+      "the in-IA advanced entry (DevelopersPage + section-vocabulary, Lane P12-C) — @contract, gates at TL integration (specs/advanced-workspace-access.spec.ts)",
+  },
 ] as const;
 
-/** The ordered id list J1..J15 (the map is total; the cross-check pins it). */
+/** The ordered id list J1..J19 (the map is total; the cross-check pins it). */
 export const JOURNEY_IDS: readonly JourneyId[] = JOURNEYS.map((row) => row.id);
 
 /** Tier lookup for the cross-check (tier-1 journeys need non-@contract tests). */
@@ -314,4 +366,10 @@ export const CONTRACT_ROUTES = {
   legacyDevelopers: "/payswap/developers",
   legacyApp: "/payswap/app",
   unknown: "/no-such-contract-route",
+  // The P12 Lane C area surfaces (J16–J19 drive these; the pinned
+  // eleven-area IA — INV-22 — owns the literals).
+  appPayments: "/app/payments",
+  appAccounts: "/app/accounts",
+  appActivity: "/app/activity",
+  appConnections: "/app/connections",
 } as const;
