@@ -182,7 +182,7 @@ export function AreaPage({
                 Never a dead button, never a fabricated success.
               </p>
               <ul className="ps-page-grid">
-                {anchoredActions.map(({ alias, row }) =>
+                {anchoredActions.map(({ row }) =>
                   row === undefined ? null : (
                     <li key={row.actionId} className="ps-home-card">
                       <div className="ps-home-card-head">

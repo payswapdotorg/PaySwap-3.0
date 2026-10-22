@@ -105,7 +105,7 @@ export function foldConnectionsSetup(input?: {
         id: "scopes",
         title: "Review scopes & permissions",
         state: "READY_DECLARED",
-        line: "Connection scopes are declared up front: execution is admitted only by ACTIVE (or read-scoped DEGRADED) connections, and a degraded connection never carries new consequential effects.",
+        line: "Connection scopes are declared up front — read provider state, observe external funds, create or cancel external effects, manage the connection. Only live connections admit operations; a degraded connection never carries new consequential effects, and every effect class (observation-only vs state-changing) is explicit.",
       },
       {
         id: "validate",

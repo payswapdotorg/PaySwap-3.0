@@ -95,9 +95,10 @@ export const CONNECTION_FORM_CATALOGUE_PIN: readonly ConnectionFormProfilePin[] 
 
 /** The operation classes a connection scope can admit — same literals, same order. */
 export const OPERATION_CLASSES_PIN = [
-  "EXECUTION",
   "READ_PROVIDER_STATE",
   "OBSERVE_EXTERNAL_FUNDS",
+  "CREATE_EXTERNAL_EFFECT",
+  "CANCEL_OR_REVERSE_EFFECT",
   "MANAGE_CONNECTION",
 ] as const;
 

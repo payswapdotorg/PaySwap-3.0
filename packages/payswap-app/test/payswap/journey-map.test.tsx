@@ -122,7 +122,7 @@ describe("J3–J6 — the four money journeys land on real area surfaces with ty
   });
 
   it("every money journey lands on its REAL area route with the typed prerequisite + dispatchability verdict", () => {
-    for (const { journey, areaId, control, prerequisite } of CASES) {
+    for (const { journey, areaId, prerequisite } of CASES) {
       const area = UNIVERSAL_AREAS_MIRROR.find((entry) => entry.id === areaId);
       expect(area, journey).toBeDefined();
       const html = shell(area!.route);

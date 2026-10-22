@@ -63,7 +63,6 @@ const PAYMENTS_ADJACENT_SURFACES: readonly {
 ];
 
 export function PaymentsAreaSurface({
-  navigation,
   outcomeBoard,
   productNavigation,
 }: {
