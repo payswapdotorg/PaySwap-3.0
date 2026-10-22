@@ -228,3 +228,42 @@ export {
   InvalidWorkspaceSettingsError,
   foldWorkspaceSettingsFacts,
 } from "./console-vocabularies.ts";
+
+export {
+  AGENT_TASK_KINDS,
+  AGENT_TASK_ORIGINS,
+  SUPPORTED_AGENT_TASK_ORIGINS,
+  AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT,
+  AGENT_TASK_STATUSES,
+  TERMINAL_AGENT_TASK_STATUSES,
+  isTerminalAgentTaskStatus,
+  isResumableAgentTaskStatus,
+  AGENT_TASK_EVENT_KINDS,
+  AGENT_TASK_CONNECTION_FORMS,
+  AGENT_TASK_RESUME_WINDOW_SECONDS,
+  AGENT_TASK_STATE_LIFETIME_SECONDS,
+  agentTaskResumeKey,
+  AGENT_TASKS_PROVENANCE,
+  type AgentTaskKind,
+  type AgentTaskOrigin,
+  type AgentTaskStatus,
+  type AgentTaskEventKind,
+  type AgentTaskConnectionForm,
+  type ConnectionSetupIntent,
+  type PaymentMissionIntent,
+  type AgentTaskIntent,
+  type AgentTaskId,
+  type AgentTaskEvent,
+  type AgentTask,
+  type AgentTaskStateBinding,
+} from "./agent-tasks.ts";
+
+export {
+  InvalidAgentTaskError,
+  validateConnectionSetupIntent,
+  validatePaymentMissionIntent,
+  validateAgentTaskIntent,
+  validateAgentTask,
+  resolveAgentTaskSeed,
+  type AgentTaskSeedDecision,
+} from "./agent-task-validation.ts";
