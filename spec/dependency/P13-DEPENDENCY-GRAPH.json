@@ -10,7 +10,7 @@
     {
       "id": "P13-0",
       "owner": "TL",
-      "status": "QUEUED",
+      "status": "COMPLETE",
       "depends_on": [],
       "lane_scope": "Source-backed gap audit and architecture decision: Stripe account use case/auth method, browser/session boundary, secret broker, task identity and authority seams.",
       "unlocks": [
@@ -18,12 +18,14 @@
         "P13-B",
         "P13-C"
       ],
-      "acceptance": "ADR/current-gap matrix committed; shared typed intent/task contract and disjoint ownership agreed; implementation dispatch begins."
+      "acceptance": "ADR/current-gap matrix committed; shared typed intent/task contract and disjoint ownership agreed; implementation dispatch begins.",
+      "completed_at": "2026-10-22T17:10:00Z",
+      "completed_via": "main@0372cf2 (work/p13-0@54a1193)"
     },
     {
       "id": "P13-A",
       "owner": "worker-1",
-      "status": "BLOCKED",
+      "status": "QUEUED",
       "depends_on": [
         "P13-0"
       ],
@@ -36,7 +38,7 @@
     {
       "id": "P13-B",
       "owner": "worker-2",
-      "status": "BLOCKED",
+      "status": "QUEUED",
       "depends_on": [
         "P13-0"
       ],
@@ -49,7 +51,7 @@
     {
       "id": "P13-C",
       "owner": "worker-3",
-      "status": "BLOCKED",
+      "status": "QUEUED",
       "depends_on": [
         "P13-0"
       ],
