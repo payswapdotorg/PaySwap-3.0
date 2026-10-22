@@ -314,7 +314,12 @@ describe("the settings section (§6 — identity, attribution, durability, advan
     const { navigation } = mountSection("/console/settings");
     const entry = screen.getByText(SETTINGS_FIXTURE.advancedEntry.label);
     expect(entry.getAttribute("href")).toBe(SETTINGS_FIXTURE.advancedEntry.path);
-    expect(screen.getByText(/developer workspace of the upstream ZCode platform/)).toBeDefined();
+    // P12 (C5): the entry frames the surface as the advanced developer
+    // workspace OF the PaySwap Agent Console (with the upstream-platform
+    // attribution kept inside the block).
+    expect(
+      screen.getByText(/advanced developer workspace of the PaySwap Agent Console/),
+    ).toBeDefined();
     await act(async () => {
       fireEvent.click(entry);
     });

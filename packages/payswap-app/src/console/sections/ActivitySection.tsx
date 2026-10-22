@@ -100,6 +100,19 @@ export function ActivitySection({
             execution plane, so no live outcome states can be shown here.
           </p>
         </Card>
+        <Card className="ps-console-card">
+          <div className="ps-console-reference-head">
+            <h3 className="ps-console-card-title">Development artifacts</h3>
+            <StatusPill tone="disabled">Advanced workspace</StatusPill>
+          </div>
+          <p className="ps-console-card-note">
+            Files, session artifacts and workflow outputs from development
+            work live in the advanced developer workspace of the PaySwap
+            Agent Console — they are not duplicated into this mission
+            activity ledger. This section records mission events only,
+            from the real store.
+          </p>
+        </Card>
       </ReferenceCard>
     </SectionScaffold>
   );

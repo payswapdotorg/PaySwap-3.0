@@ -21,6 +21,7 @@ import "@zcode/ui/payswap-styles.css";
 import "../payswap-product.css";
 import "../payswap-home.css";
 import "../payswap-elevation.css";
+import "../p12-lane-c.css";
 import type { CoverageSource, DevelopersPageView } from "../contracts/view-models.js";
 import type { OutcomeDeploymentContextPin } from "../pins/surface-pins.js";
 import { foldCoverage } from "../lib/coverage.js";
@@ -132,16 +133,22 @@ export function PaySwapApp({ input, navigation, console: consoleEntry, onRouteCh
               apiRuntime: input.apiRuntime,
               consumableContracts: DEVELOPER_CONTRACTS,
             }}
+            productNavigation={navigation}
           />
         ) : null}
         {route.kind === "app-overview" ? (
-          <AppOverviewPage navigation={navigationView} outcomeBoard={outcomeBoard} />
+          <AppOverviewPage
+            navigation={navigationView}
+            outcomeBoard={outcomeBoard}
+            productNavigation={navigation}
+          />
         ) : null}
         {route.kind === "app-area" ? (
           <AreaPage
             areaId={route.areaId}
             navigation={navigationView}
             outcomeBoard={outcomeBoard}
+            productNavigation={navigation}
           />
         ) : null}
         {route.kind === "not-found" ? <NotFoundPage path={route.path} /> : null}

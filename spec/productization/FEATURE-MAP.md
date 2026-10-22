@@ -1,0 +1,148 @@
+# PaySwap Feature Map (P12 Lane C) — the capability survey of what is REAL
+
+Status: REGISTERED 2026-10-22 by the P12 Lane C worker (Issue #2, Task 97-C).
+This document is the C1 forcing function for the P12 desktop-first UX wave:
+a survey of EVERY capability in the payments / activity / onchain / PSP /
+Agent Workspace / ZCode-derived families, each mapped to the REAL route,
+component and service that implements it (or marked UNAVAILABLE with the
+reason — never a stub that pretends). It is written from actual code reads;
+every row cites file paths that exist at the surveyed commit (181d670).
+
+Legend (the `State` column):
+
+- `WIRED` — the capability is reachable on a real route and does real work
+  through wired machinery in this deployment.
+- `PROJECTION` — the capability renders as an honest PROJECTION of explicit
+  inputs (view-model folds, pinned vocabularies); the heavy machinery exists
+  as accepted domain packages but the execution plane is not wired in this
+  deployment, so the surface renders its typed prerequisite / designed-empty
+  truth (INV-24 posture — this is the intended honest state, not a gap that
+  hides).
+- `REFERENCE` — the surface renders the capability's contract vocabulary as
+  clearly-labeled reference (the vocabulary is real and machine-checked; no
+  live instance exists).
+- `UNAVAILABLE` — no implementation exists anywhere in the repository; the
+  surface says so with the typed reason. NEVER fabricated.
+
+The route contract is PRODUCT-IDENTITY.md §3; the area set is the pinned
+eleven-area IA (INV-22 — unchanged by this wave). Machine-checkable companion:
+`packages/payswap-app/test/payswap/feature-map.test.ts` parses this file and
+asserts every wired row's route resolves and every cited component exists.
+
+## 1. Payments family
+
+| Capability | Route / Component / Service | Entry point | Prerequisites | State | Test |
+|---|---|---|---|---|---|
+| Pay (money out) | `/` board + `/app` board + `/app/payments` action set — `packages/payswap-app/src/pages/HomePage.tsx`, `AppOverviewPage.tsx`, `pages/areas/PaymentsAreaSurface.tsx`; registry `src/lib/outcome-registry.ts` (mirror of `packages/surface/src/outcomes.ts`); dispatch authority = economic-intent-plane (`packages/economic/src/payment-intent.ts`, `intent.ts` — advisory contracts, validated, no execution plane) | "Pay" action card on the payments landing + the home/app outcome boards | `economicIntakeConfigured` (false in `src/contracts/harness.ts` HONEST_DEPLOYMENT_CONTEXT) → typed prerequisite renders verbatim | PROJECTION | `test/payswap/journey-map.test.tsx` (J3), journey-verification `specs/setup-required.spec.ts`, `test/payswap/payments-area.test.tsx` (P12) |
+| Receive (collect request) | same surfaces, outcome id `receive`; journey `collect` | "Receive" action card | same as Pay | PROJECTION | same battery (J4) |
+| Move (payout to registered settlement destination) | same surfaces + `/app/accounts` cross-anchor; alias `src/lib/outcome-area-aliases.ts` (`payments` + `accounts`) | "Move" action card | same as Pay | PROJECTION | same battery (J3) |
+| Convert (quotes before movement) | `/app/accounts` + `/app/capabilities` anchors; dispatch authority = quote-projection-plane | "Convert" action card | `capabilityObservationsAvailable` (false) → "Quote projection requires fresh capability observations…" | PROJECTION | same battery (J5) |
+| Checkout (merchant acceptance) | payments landing Checkout card; contracts `packages/merchant/src/checkout.ts`, `checkout-support.ts`, `quotes.ts`, `settlement-routes.ts` (deterministic contract package; no UI plane) | "Checkout" action card | `merchantCheckoutContextBound` (false) → "No merchant checkout plane exists in this deployment…" | PROJECTION | same battery (J6) |
+| Recipients (address book / management) | NONE — no recipients registry, view or service exists in any package (surveyed `packages/payswap-app/src/**`, `packages/economic/src/**`, `packages/merchant/src/**`) | payments landing states it honestly | would require a recipients registry surface + session plane | UNAVAILABLE — "No recipients surface exists in this deployment; a collect request names its payer, and no recipient registry is wired." Rendered as typed copy on `/app/payments` — never an invented list | `test/payswap/payments-area.test.tsx` (P12: the unavailable row renders verbatim, no fabricated rows) |
+| Approvals (mandates / authority scope) | `/console/approvals` — `packages/payswap-app/src/console/sections/ApprovalsSection.tsx` (reference vocabulary + honest empty "No approval plane is configured"); gate vocabulary pins `src/pins/surface-pins.ts` (GateBlockReasonPin et al.) | Agent Workspace → Approvals section; the payments landing links it | approval plane (not configured) | REFERENCE | journey-verification `specs/console-honest-empties.spec.ts` (J14) |
+| Payment-object spine / progress | 16-stage progress vocabulary pinned `src/pins/surface-pins.ts` SURFACE_PROGRESS_STAGES_PIN (mirror of `packages/surface/src/progress-states.ts`) | rendered with activity/receipts surfaces (reference) | executed records (none) | REFERENCE | `test/payswap/pin-mirror.test.ts` |
+
+## 2. Activity / receipts / reconciliation
+
+| Capability | Route / Component / Service | Entry point | Prerequisites | State | Test |
+|---|---|---|---|---|---|
+| Activity ledger (app area) | `/app/activity` — `packages/payswap-app/src/pages/AreaPage.tsx` + `pages/areas/*` (P12); pinned empty-state contract `src/lib/areas.ts` ("No recorded activity yet — activity rows come from authoritative records, never from the UI.") | primary area nav (eleven-area `src/shell/SiteChrome.tsx` AppAreaNav) | authoritative records (none) | PROJECTION | `test/payswap/journey-map.test.tsx` (J7) |
+| Activity (mission events, real) | `/console/activity` — `src/console/sections/ActivitySection.tsx` over the real workspace store port (`src/console/useWorkspaceStore.ts`, `contracts.ts` WorkspaceStorePort; desktop profile / browser profile stores) | Agent Workspace → Activity | a recorded mission (real: create one in Missions) | WIRED | journey-verification `specs/console-mission-lifecycle.spec.ts`, `test/payswap/console-sections.test.tsx` |
+| Receipts | NONE as a distinct surface — no receipts view/service exists (surveyed all packages; evidence lineage is a contract vocabulary: INV-5 evidence refs, `packages/financial-certification/src/records.ts`) | `/app/activity` states the honest boundary: receipts/evidence links render inside activity rows when executed records exist | executed effects (none) | UNAVAILABLE as a surface; the evidence-linkage LAW is wired into the activity contract | `test/payswap/journey-map.test.tsx` (J7 designed-empty), `test/payswap/areas-connection.test.tsx` (P12) |
+| Reconciliation (UNKNOWN ≠ FAILED) | vocabulary: `src/pins/provider-runtime-pins.ts` (CONFIRMED/UNKNOWN/FAILED + AMBIGUITY_REASONS, mirror of `packages/provider-runtime/src/result-envelope.ts`); `packages/financial-certification/src/ambiguous-outcome.ts`, `late-events.ts`; console reference `src/console/section-vocabulary.ts` ACTIVITY_OUTCOME_REFERENCE (Unknown announces role=status, never alert) | `/app/activity` purpose + reference; `/console/activity` outcome-state reference | executed/ambiguous records (none) | REFERENCE | `test/payswap/honest-states.test.ts`, journey-verification `specs/console-honest-empties.spec.ts` |
+| Reports / history | `/app/reports` — AreaPage with pinned empty state ("No reportable records yet…") | primary area nav | reportable records (none) | PROJECTION | journey-map J11 |
+
+## 3. Onchain family (packages/onchain-domain, onchain-adapters, onchain-security, onchain-extensions)
+
+The honest home chosen by this survey: the CONNECTIONS area (`/app/connections`)
+owns rail setup — wallet/account connection is a connected-instance concern —
+with the onchain observation vocabulary cross-anchored on `/app/accounts`
+(externally-observed balances) and the capability flavors on
+`/app/capabilities`. Primary navigation reaches it via the pinned area nav.
+
+| Capability | Route / Component / Service | Entry point | Prerequisites | State | Test |
+|---|---|---|---|---|---|
+| Onchain rail surface (the hub) | `/app/connections` onchain block — `packages/payswap-app/src/pages/areas/ConnectionsAreaSurface.tsx` + vocabulary `src/lib/onchain-rail.ts` (pins `src/pins/onchain-pins.ts`) | primary area nav → Connections | — | PROJECTION/REFERENCE (below) | `test/payswap/areas-connection.test.tsx` (P12) |
+| Wallet/account connection | vocabulary: `packages/onchain-domain/src/wallet.ts` (WALLET_CUSTODY_MODELS, opaque SignerHandle with permission envelope; non-custody law INV-8/19); connection machinery `packages/provider-runtime/src/connection-lifecycle.ts` (connected instances) | onchain block on `/app/connections` | a wallet connection surface + session plane — NONE is wired in the app or the desktop renderer (surveyed `packages/payswap-app/src/**`, `packages/desktop/src/renderer/**`) | UNAVAILABLE — "No wallet connection surface exists in this deployment. The wallet/signer/smart-account capability vocabulary is real; no wallet is connected, and none is invented." | `test/payswap/areas-connection.test.tsx` (P12: honest UNAVAILABLE row, no connected-wallet claim) |
+| Network context (chains + environments) | `packages/onchain-adapters/src/environment.ts` CHAIN_ENVIRONMENT_REGISTRY (ethereum mainnet/sepolia/holesky, solana mainnet-beta/devnet/testnet, bitcoin mainnet/testnet/signet/regtest; PRODUCTION/TESTNET/REGTEST/SIMULATION classes, fail-closed classification); families `packages/onchain-domain/src/family.ts` (EVM, SOLANA, UTXO, MOVE, COSMOS, SUBSTRATE, OTHER + address/finality/reorg models) — pinned `src/pins/onchain-pins.ts` | onchain block on `/app/connections` | none (descriptive catalogue) | REFERENCE — the chain catalogue renders as declared data; live network context (RPC transports) is UNAVAILABLE: transports are contracts only (`packages/onchain-adapters/src/transport.ts` — "Concrete transport wiring is composition-root work", none wired) | `test/payswap/onchain-pins-mirror.test.ts` (P12), `areas-connection.test.tsx` |
+| Externally-observed balances | vocabulary `packages/onchain-domain/src/asset-observation.ts` (AssetObservation: observer identity, freshness asOf/maxAge, provenance; structurally NOT a balance — INV-7); rendered block on `/app/accounts` | `/app/accounts` observations block | fresh asset observations from a connected observer (none) | UNAVAILABLE observationally — honest empty: no observations exist; the surface never renders a balance | `test/payswap/areas-connection.test.tsx` (P12) |
+| Transaction preview | `packages/onchain-security/src/write-intent.ts` (PreparedWrite), `simulation.ts` (expected-state diff: SimulatedBalanceDelta, ObservedApprovalState) | onchain block reference | a prepared write + simulation observation (none — no execution plane) | UNAVAILABLE — vocabulary reference only | `areas-connection.test.tsx` |
+| Fee provenance | `packages/onchain-adapters/src/semantics.ts` (per-family fee models: EVM GAS_AUCTION EIP-1559 baseFee+priority; SOLANA SIGNATURE_FEE; UTXO SATOSHI_PER_VBYTE; `SemanticNotExpressibleError` fail-closed) | onchain block reference | fee observations from a rail (none) | REFERENCE for the vocabulary; live fee quotes UNAVAILABLE | `test/payswap/onchain-pins-mirror.test.ts` (P12) |
+| Scoped signing authorization | `packages/onchain-security/src/authorization.ts` (OnchainAuthorizationRequest/Artifact), `signers.ts` (SigningRequest from RECHECKED only; SignerAdapter port; THE KERNEL NEVER BROADCASTS), `pipeline.ts` (deterministic pipeline machine) | onchain block reference | an authorized write + signer adapter (none wired) | UNAVAILABLE operationally — the scoped-signing LAW is reference | `areas-connection.test.tsx` |
+| Simulation / security checks | `packages/onchain-security/src/simulation.ts` (SUCCEEDED/REVERTED/FAILED/OUTCOME_UNKNOWN — UNKNOWN never silently BLOCK/ALLOW), `gates.ts` (decision lattice BLOCK > UNKNOWN > ALLOW; every guard dimension one GuardCheck) | onchain block reference | simulation + policy state (none) | REFERENCE | `areas-connection.test.tsx` |
+| State vocabulary (pending/confirmed/failed/reorg/unknown) | `packages/onchain-domain/src/execution-observation.ts` (BROADCAST/CONFIRMED/FAILED/OUTCOME_UNKNOWN; OnchainFinalityCandidate with candidateOnly + reorgDetected + confirmationDepth; failure classes; retry guidance; coupling rules validated) | onchain block reference | — | REFERENCE (the full vocabulary is pinned and mirror-tested; UNKNOWN never becomes FAILED or success) | `test/payswap/onchain-pins-mirror.test.ts` (P12) |
+| History / evidence | `packages/onchain-adapters/src/lifecycle/evidence-log.ts` + mandatory evidenceRefs on every observation (INV-5) | onchain block honest empty | recorded observations (none) | UNAVAILABLE observationally — honest empty | `areas-connection.test.tsx` |
+| DEX / bridge / cross-chain | `packages/onchain-extensions/src/packs/*` — uniswap-v2.ts, zeroswap-aggregator.ts (DEX/aggregator), solverbatch-intents.ts (intent), lockport-bridge.ts (bridge, LOCK_AND_MINT), coinramp-offramp.ts (off-ramp), meridian-lending.ts, tidalpools-liquidity.ts — ALL declared SYNTHETIC MODEL DEPLOYMENTS (venue-STYLE shapes, "no claim about any specific real venue"); capability flavors `packages/onchain-domain/src/onchain-capabilities.ts` (DexCapability, BridgeCapability with custodialTransit declaration, IntentExecutionCapability) | onchain block venue catalogue | a connected onchain venue (none; the packs are synthetic declarations) | REFERENCE — the synthetic packs render AS synthetic model deployments, clearly labeled; never as live venues | `test/payswap/onchain-pins-mirror.test.ts` (P12), `areas-connection.test.tsx` |
+| Onchain operations vocabulary | `packages/onchain-domain/src/operations.ts` (onchain.transfer/approval/contract_call/swap/bridge/intent; consequentialWrite literal true; INV-18/20) | onchain block reference | — | REFERENCE | `test/payswap/onchain-pins-mirror.test.ts` (P12) |
+
+## 4. PSP connection family (packages/provider-runtime, provider, provider-node, capability)
+
+| Capability | Route / Component / Service | Entry point | Prerequisites | State | Test |
+|---|---|---|---|---|---|
+| PSP setup flow (the hub) | `/app/connections` — `packages/payswap-app/src/pages/areas/ConnectionsAreaSurface.tsx` + vocabulary `src/lib/connections-catalogue.ts` (pins of the provider-runtime vocabulary) | primary area nav → Connections | — | PROJECTION/REFERENCE (below) | `test/payswap/areas-connection.test.tsx` (P12) |
+| Capability catalogue | `packages/capability/src/registry.ts`, `canonical.ts`, `capability-definition.ts` (the fabric); the app renders the COVERAGE projection `src/lib/coverage.ts` over recorded evidence (`src/contracts/harness.ts` NO_EVIDENCE_COVERAGE: connected=[], providerCount honestly 0) | `/app/connections` catalogue block + `/capabilities` explorer | recorded probe evidence (none recorded in this repository phase) | PROJECTION — honest no-evidence state; catalogue entries are NOT connections | `test/payswap/coverage.test.ts`, journey-verification `specs/branding.spec.ts` (J8 "provider lists are empty-truthful at providerCount 0") |
+| Supported connection forms (rails) | `packages/provider-runtime/src/connection-forms.ts` (DELEGATED_OAUTH, CONNECTED_ACCOUNT, SCOPED_API_CREDENTIAL, ISOLATED_INTERACTIVE_BROWSER_SESSION, PROVIDERLESS_RAIL + credential kinds + browser-isolation law) — pinned `src/pins/provider-runtime-pins.ts` + `src/lib/connections-catalogue.ts` | catalogue block | none (declared vocabulary) | REFERENCE | `test/payswap/areas-connection.test.tsx` (P12) |
+| Corridors (rails/corridors eligibility) | `packages/capability/src/corridor.ts` projectCorridor (deterministic eligibility; exclusion reasons surfaced; a corridor is never authority) | catalogue block corridor note | route observations + query (none) | UNAVAILABLE observationally — no corridor observations exist; the corridor law renders as reference | `areas-connection.test.tsx` |
+| Connect / authenticate | lifecycle machinery `packages/provider-runtime/src/connection-lifecycle.ts` (PROPOSED → PENDING_VERIFICATION → ACTIVE ⇄ DEGRADED; terminal EXPIRED/REVOKED/DISCONNECTED monotonic) + `credential-isolation.ts` (broker-owned handles, INV-19) | the connect step on `/app/connections` | the connect flow plane: session authority + provider registry wiring by the platform mount — NOT wired in this deployment (the app is presentational; no connect service exists in `packages/payswap-app/src/**` or the desktop renderer) | UNAVAILABLE — the connect control explains the typed prerequisite instead of pretending: "Connect requires the provider connection plane (session authority + provider registry) — not wired in this deployment." Never a dead button: it links what exists (the lifecycle contract + the developers surface) | `test/payswap/areas-connection.test.tsx` (P12: zero connected, the honest gate) |
+| Scopes / permissions | `packages/provider-runtime/src/connection-scope.ts` (operation classes READ_PROVIDER_STATE / OBSERVE_EXTERNAL_FUNDS / CREATE_EXTERNAL_EFFECT / CANCEL_OR_REVERSE_EFFECT / MANAGE_CONNECTION; effect classes NONE/OBSERVATION_ONLY/STATE_CHANGING; scopeAdmits — DEGRADED never carries new consequential effects) | scopes block on `/app/connections` | none (declared vocabulary) | REFERENCE | `areas-connection.test.tsx` |
+| Config validation | developer surface `/developers` renders the honest API runtime state (`src/pages/DevelopersPage.tsx`: VITE_PAYSWAP_API_URL named, "Not configured — and shown as such"); provider config codecs exist at `packages/provider-node/src/provider-config-file-codec.ts`, `provider-config-runtime.ts` (substrate-side) | `/developers` + the connections setup note | runtime config (absent → shown) | PROJECTION | `test/payswap/developers.test.tsx`, journey-map J12 |
+| Health + observations | `packages/provider-runtime/src/events.ts`, `event-extractor.ts`, `attempts.ts` (observation vocabulary); coverage probe evidence contract (`src/contracts/view-models.ts` ConnectedProviderRecord.probeEvidence) | health block on `/app/connections` | a connected instance (zero) | UNAVAILABLE observationally — honest empty ("No connection health to observe — nothing is connected") | `areas-connection.test.tsx` |
+| Sandbox / live distinction | `packages/provider-runtime/src/execution-mode.ts` (INV-25: ExecutionMode = 'SANDBOX' | 'LIVE', mechanically distinct; `errors.ts` SandboxLiveBoundaryError) | environment banner + the sandbox/live block | none (law is structural) | REFERENCE — the EnvironmentBanner ("test") + the sandbox/live law render; a sandbox pass is never live proof | `areas-connection.test.tsx` |
+| Reconnect / disable / disconnect | lifecycle transition table + causes (`connection-lifecycle.ts`: PRINCIPAL_REQUEST, VERIFICATION_SUCCEEDED/FAILED, PROVIDER_SIGNAL, POLICY_DECISION, CREDENTIAL_EXPIRY, OPERATOR_ACTION; append-only transition history) | lifecycle reference on `/app/connections` | an existing connection (zero — nothing to reconnect/disable/disconnect) | REFERENCE | `areas-connection.test.tsx` |
+| Model-provider connections (substrate) | `/console/connections` ModelProvidersCard (`src/console/sections/ConnectionsSection.tsx`, mount-injected ModelProviderStatus) | Agent Workspace → Connections | mount-supplied substrate provider state (honest none when absent) | WIRED (projection of real mount state) | `test/payswap/console-sections.test.tsx` |
+
+## 5. Agent Workspace family (packages/payswap-app/src/console)
+
+| Capability | Route / Component / Service | Entry point | Prerequisites | State | Test |
+|---|---|---|---|---|---|
+| Workspace shell (eight sections) | `/console` — `src/console/PaySwapAgentWorkspace.tsx` + `ConsoleChrome.tsx`; contracts pinned to spec/surface/CONSOLE-WORKSPACE.md (`src/console/contracts.ts`) | product header "Agent console" (web `/console`; desktop hash `#/console` — `packages/desktop/src/renderer/src/payswapDesktop.ts`) | none | WIRED | journey-verification `specs/console-workspace.spec.ts` (J14) |
+| Missions (intake → validation → record) | `/console/missions` — `sections/MissionsSection.tsx` + `MissionIntakeForm.tsx`, `mission-validation.ts` (structural validation, findings verbatim) | Missions section | none (records in the store) | WIRED | `specs/console-mission-lifecycle.spec.ts` |
+| Mission lifecycle ladder | `src/console/mission-ladder.ts` (INTENT/ELIGIBILITY/PLANNING/APPROVAL/EXECUTION/OBSERVATION/EVIDENCE; downstream rungs verbatim typed prerequisites) + `MissionDetailView.tsx` | mission detail | INTENT reached by recording intent; downstream rungs state their prerequisites | WIRED | `specs/console-mission-lifecycle.spec.ts` (flow 16) |
+| Mission events / revise / archive | store port `src/console/useWorkspaceStore.ts` over WorkspaceStorePort (DESKTOP_PROFILE survives restarts; BROWSER_PROFILE honest browser-local labeling) | mission detail + activity section | none | WIRED | `specs/console-mission-lifecycle.spec.ts` |
+| Agents / approvals / lab sections | `sections/AgentsSection.tsx`, `ApprovalsSection.tsx`, `LabSection.tsx` — honest empties with typed reasons (`section-vocabulary.ts`) | workspace nav | registries (none — honest) | PROJECTION (honest empty) | `specs/console-honest-empties.spec.ts` |
+| Overview intake entry (prefill) | `sections/OverviewSection.tsx` → missions intake prefilled (P11) | overview "New mission" | none | WIRED | `specs/console-mission-lifecycle.spec.ts` (P11 flow) |
+
+## 6. ZCode-derived family (the advanced developer workspace at /console/advanced)
+
+The substrate Root mount (ALL its services wired) — `packages/desktop/src/renderer/src/ProductSurface.tsx` renders it at `#/console/advanced`; web serves it at `/console/advanced`. In the journey environment (no backend) it renders its TRUTHFUL no-backend bootstrap-failure state (Web bootstrap failed + Retry) — that is the honest behavior, never a fabricated workspace.
+
+| Capability | Route / Component / Service | Entry point | Prerequisites | State | Test |
+|---|---|---|---|---|---|
+| Advanced developer workspace mount | `/console/advanced` — the ZCode-derived substrate client (desktop: `packages/desktop/src/renderer/src/ProductSurface.tsx` renderConsole; web mount) | Agent Workspace → Settings → "Advanced developer workspace"; P12: also surfaced from the PaySwap IA at `/app/developers` (advanced tooling block) | the console backend (honest bootstrap-failure state without it) | WIRED (mount) | journey-verification `specs/console-advanced.spec.ts` (J14, P12-updated copy) |
+| Model/provider selection | `packages/services/src/model-provider/*`, `packages/provider-node/src/provider-registry-runtime.ts` — full stack in the advanced workspace; the Agent Workspace surfaces the honest model-provider CONNECTION STATE via ModelProvidersCard (no duplication) | advanced workspace (full); workspace agents/connections (state) | provider configuration | WIRED (advanced); PROJECTION (workspace state) | `specs/console-advanced.spec.ts`, `test/payswap/console-sections.test.tsx` |
+| Projects / workspaces | advanced workspace project machinery (substrate services `packages/services/src/*` — fs, git, fileWatcher) | advanced workspace only | console backend | WIRED (advanced only) — surfaced from the PaySwap IA as a catalogued pointer (`/app/developers`), never duplicated | `specs/console-advanced.spec.ts` |
+| Tasks / sessions / history | `packages/services/src/zcode-session`, `zcode-agent` | advanced workspace only | console backend | WIRED (advanced only) | `specs/console-advanced.spec.ts` |
+| Agents / subagents | `packages/services/src/subagents`, `bots` | advanced workspace only | console backend | WIRED (advanced only) | `specs/console-advanced.spec.ts` |
+| Terminal | `packages/services/src/terminal` | advanced workspace only | console backend | WIRED (advanced only) | `specs/console-advanced.spec.ts` |
+| Command palette | substrate command center (`apps/zcode-cli/packages/cli/src/command-center`, renderer palette) | advanced workspace only | console backend | WIRED (advanced only) | `specs/console-advanced.spec.ts` |
+| Artifacts / files | `packages/services/src/file`, `media-preview`; workflow artifacts in the substrate UI | advanced workspace only; the console ACTIVITY section carries an honest pointer (P12) that development artifacts live in the advanced workspace — no duplicated artifact service | console backend | WIRED (advanced only) + honest pointer (P12) | `specs/console-advanced.spec.ts`, `test/payswap/console-sections.test.tsx` |
+| Browser tooling | `packages/zcode-cua`, `packages/services/src/cua-permission-broker` | advanced workspace only | console backend | WIRED (advanced only) | `specs/console-advanced.spec.ts` |
+| Tools / MCP | `packages/services/src/mcp-sync`, `official-mcp`, `plugins` | advanced workspace only | console backend | WIRED (advanced only) | `specs/console-advanced.spec.ts` |
+| Extensions | `packages/services/src/plugins`, `plugin-sync` | advanced workspace only | console backend | WIRED (advanced only) | `specs/console-advanced.spec.ts` |
+| Automations | substrate hooks/commands (`packages/services/src/hooks`, `commands`) | advanced workspace only | console backend | WIRED (advanced only) | `specs/console-advanced.spec.ts` |
+
+## 7. Headline findings (the survey's summary)
+
+1. The product's PAYMENTS ACTION VOCABULARY is real and machine-checked (five
+   outcome actions, typed prerequisites, mirror tests) — but every money
+   action is a PROJECTION: the economic/merchant kernels are advisory
+   contract packages with no execution plane wired, so the honest state is
+   the typed prerequisite (this is INV-24 working as designed).
+2. RECIPIENTS and RECEIPTS are genuinely UNAVAILABLE as surfaces (no
+   implementation anywhere) — P12 renders them as typed unavailable rows,
+   never as invented lists.
+3. The ONCHAIN stack is deep (domain vocabulary, EVM/Solana/UTXO adapter
+   contracts, the security kernel, synthetic venue packs) but ZERO of it is
+   operationally wired to any UI: wallet connection, live network context,
+   balances, tx preview, signing, DEX/bridge execution are all UNAVAILABLE
+   operationally; their vocabularies/laws are real and now surfaced as
+   clearly-labeled reference on `/app/connections` (+ the accounts
+   observation block).
+4. The PSP connection machinery (forms, scopes, lifecycle, sandbox/live law)
+   is real as contracts with an honest providerCount 0; the connect flow
+   plane is NOT wired (no session authority) — `/app/connections` now states
+   that as the typed prerequisite instead of a dead connect button.
+5. The Agent Workspace is fully WIRED (missions, ladder, events, stores).
+6. The ZCode-derived capabilities are fully WIRED in the advanced workspace
+   only; P12 surfaces them from the PaySwap IA as honest catalogued pointers
+   (developers area + console activity) without duplicating any service.

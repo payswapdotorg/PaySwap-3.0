@@ -296,7 +296,7 @@ export const CONSOLE_UPSTREAM_ATTRIBUTION =
 export const ADVANCED_DEVELOPER_ENTRY = {
   label: "Advanced developer workspace",
   description:
-    "The developer workspace of the upstream ZCode platform — an advanced technical interface for development work, not part of the PaySwap Agent Workspace.",
+    "The advanced developer workspace of the PaySwap Agent Console — built on the upstream ZCode platform. An advanced technical interface for development work (model/provider selection, projects, sessions, terminal, artifacts, tools/MCP, extensions): distinct from the Agent Workspace, which stays the primary PaySwap work surface.",
   path: "/console/advanced",
 } as const;
 

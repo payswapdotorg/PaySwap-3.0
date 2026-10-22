@@ -2,7 +2,7 @@
  * @payswap/journey-verification — the spec ↔ journey COVERAGE REGISTRY.
  *
  * The no-orphans law, both directions (the operations package's pattern,
- * applied to the journey map): every journey J1–J15 must be covered by at
+ * applied to the journey map): every journey J1–J19 must be covered by at
  * least one test in the suite, and every test must declare the journey
  * id(s) it covers. This registry is the file-level half; the test-level
  * half is the `[Jn]` title convention (every `test(...)` title carries at
@@ -112,6 +112,26 @@ export const SPEC_COVERAGE: readonly SpecCoverage[] = [
   {
     spec: "console-a11y-responsive.spec.ts",
     journeys: ["J14"],
+    kind: "journey",
+  },
+  {
+    spec: "payments-discovery.spec.ts",
+    journeys: ["J16"],
+    kind: "journey",
+  },
+  {
+    spec: "onchain-discovery.spec.ts",
+    journeys: ["J17"],
+    kind: "journey",
+  },
+  {
+    spec: "psp-connection.spec.ts",
+    journeys: ["J18"],
+    kind: "journey",
+  },
+  {
+    spec: "advanced-workspace-access.spec.ts",
+    journeys: ["J19"],
     kind: "journey",
   },
   {

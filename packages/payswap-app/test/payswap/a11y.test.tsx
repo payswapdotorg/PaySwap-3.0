@@ -208,8 +208,21 @@ describe("deep-link contracts: no dead buttons, no broken deep links", () => {
       "/developers",
       "/app",
       ...UNIVERSAL_AREAS_MIRROR.map((area) => area.route),
-      // The supporting console is a real mount of the platform (J14).
+      // The supporting console is a real mount of the platform (J14) —
+      // including its SECTION routes (P12: the payments area deep-links
+      // the approvals gate) and the advanced developer-workspace mount
+      // (P12: the developers surface catalogues it — CONSOLE-WORKSPACE
+      // §2 routing law).
       "/console",
+      "/console/overview",
+      "/console/missions",
+      "/console/agents",
+      "/console/approvals",
+      "/console/connections",
+      "/console/activity",
+      "/console/lab",
+      "/console/settings",
+      "/console/advanced",
     ]);
     const broken: string[] = [];
     for (const [name, markup] of ALL_MARKUPS) {

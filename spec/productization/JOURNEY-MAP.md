@@ -29,6 +29,10 @@ Routes follow PRODUCT-IDENTITY.md §3 (canonical route contract).
 | J13 | Settings / support / about | `/app` → settings; about | settings + about | — | PaySwap identity; upstream attribution present (legal/about) |
 | J14 | Agent console (supporting capability) | `/console` (web) / console surface (desktop) | console link from product | auth | never the default landing; the PaySwap Agent Workspace per spec/surface/CONSOLE-WORKSPACE.md (P10); ZCode developer workspace = advanced interface at `/console/advanced` |
 | J15 | Legacy `/payswap/*` URLs | `/payswap`, `/payswap/*` | redirect | — | permanent redirect to the new top-level route |
+| J16 | Primary payment discovery | `/app/payments` | the typed action set (Pay / Receive / Move / Checkout — pinned alias anchors) | economic intake / merchant plane unconfigured → typed prerequisite per action | every action states dispatchability with its verbatim prerequisite + configure/learn routes; recipients honestly UNAVAILABLE; approvals → Agent Workspace; activity → ledger; convert → accounts cross-anchor; never a dead button |
+| J17 | Onchain discovery | `/app/connections` → the onchain rail; `/app/accounts` (observation anchor) | the onchain rail block | no wallet / transport / signer wired | UNAVAILABLE rows with typed reasons; REFERENCE rows for declared contracts (fee provenance, simulation, state vocabulary incl. reorg + UNKNOWN); NO_OBSERVATIONS rows (balances, history); declared chain catalogue; synthetic venue packs labeled AS synthetic; nothing fabricated |
+| J18 | PSP connection setup | `/app/connections` | the PSP setup steps + forms catalogue | provider connection plane not wired (providerCount 0) | a catalogue entry is never a connection; connect states its typed prerequisite (never a dead button / fabricated login); scopes + sandbox/live structural; health honest empty; lifecycle lawful |
+| J19 | Advanced developer workspace access | `/developers` → `/console/advanced` | the advanced developer workspace entry | entry public; workspace is a live-backend surface | honestly labeled as the advanced developer workspace OF the PaySwap Agent Console; SPA routing (no renderer reload / durable-state loss); the Agent Workspace stays primary |
 
 ## 2. Navigation IA law (Lane A)
 
@@ -110,3 +114,34 @@ inspection per CONSOLE-WORKSPACE.md §9):
   the acceptance record; journeys not executable end-to-end are labeled
   unavailable/setup-required — the map is never marked wholly complete
   by a partial pass.
+
+## 5. P12 reconciliation (Issue #2 — the desktop wave)
+
+The P12 Lane C reconciliation of the map with the ACTUAL desktop routes
+(every journey's steps name real routes/components — the manifest rows
+in packages/journey-verification/journeys.manifest.ts are the
+machine-checkable mirror, no-orphans enforced by specs/manifest.spec.ts):
+
+- J1–J13, J15: unchanged — the P9 route contract holds on the desktop
+  build (the desktop renderer loads the same @payswap/app surfaces;
+  verified in the P11 packaged-app run).
+- J14 + mission lifecycle: unchanged — the console mount stays the
+  PaySwap Agent Workspace (ConsoleChrome + PaySwapAgentWorkspace + the
+  mission ladder); the mission lifecycle flows remain the P10 set
+  (console-mission-lifecycle.spec.ts).
+- J16–J19 are the P12 journeys (all tier-2 @contract — the surfaces are
+  Lane P12-C work, gated at TL integration on the merged tree):
+  - J16 payments discovery: the typed action set on /app/payments
+    (PaymentsAreaSurface; anchored pay/receive/move/checkout by the
+    pinned alias table; recipients/approvals/activity/convert rows).
+  - J17 onchain discovery: the onchain rail on /app/connections
+    (foldOnchainRail + ConnectionsAreaSurface; the accounts observation
+    anchor on /app/accounts — AccountsAreaSurface).
+  - J18 PSP connection setup: foldConnectionsSetup + the forms
+    catalogue on /app/connections (provider-runtime vocabulary pinned,
+    mirror-tested against the sources).
+  - J19 advanced workspace access: the /developers entry to
+    /console/advanced (DevelopersPage), honestly labeled, SPA-verified.
+- FEATURE-MAP.md (P12, NEW) is the capability survey that drove these
+  surfaces: every capability family mapped to its real
+  route/component/service with honest operational states.
