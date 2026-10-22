@@ -371,3 +371,53 @@ Agent Workspace. Its verification, both halves:
   documented substrate carry, not PaySwap product data; benign
   headless-container noise (dbus, xdg-mime) in the station launch
   log.
+
+## P11 RELEASE VERIFICATION — v1.2.0 (TL-filled, 2026-10-22, the workspace-design port)
+
+The operator design directive ("move the current app from current to
+target" — the current.png/target.png pair) became the P11 wave: the
+target design ported into the shipped console per the AMENDED
+spec/surface/CONSOLE-WORKSPACE.md (presentation-contract amendment
+only — §2 IA/routing, §3/§4/§5 pinned shapes, §7, §9 and
+`foldWorkspaceOverview` unchanged; Task 99 had realized the same
+design at the :3000 preview and the operator confirmed the wave).
+
+- **Integration commit `b4890f0`**: the §1 framing rename (Agent
+  Console → Agent Workspace, pinned title literals + chrome +
+  mounts), the §6 outcome-first overview home (question, intake-entry
+  card, PAY/RECEIVE/MOVE/CONVERT shortcuts, workspace note; attention
+  line + in-progress + activity folds retained), the §8 chrome
+  (iconed sidebar with Settings pinned, mobile scroll nav, the
+  honest workspace footer) + the prefill mechanism + pin-law version
+  bumps to 1.2.0. Batteries: payswap-app 239/239, surface 195/195,
+  web 33/33, desktop 152/152, journeys **66 passed / 1 skipped /
+  0 failed** including the NEW P11 golden path (type a goal →
+  "New mission" → the missions intake PREFILLED; outcome shortcut →
+  direction-prefilled intake; in-tree, store untouched by the entry),
+  typecheck zero new diagnostics, oxlint 0 errors, governance
+  invariants 0 failures + ownership exactly the 8 documented carries.
+  CI run 39704625757 + journeys run 39704625759 both **success**.
+- **Release `v1.2.0`** (tag at `b4890f0`, run 39705000283): both
+  jobs success; the CI install-verify receipt **PASS** (artifact
+  12394402984: published-asset checksums verified; apt dependency-
+  resolving install; identity assertions; `~/.config/PaySwap`
+  app-data path; Xvfb launch with the PaySwap-branded window;
+  AppImage structure; dpkg cleanup).
+- **Station published-asset console check — 39/39 PASS** over the
+  sha256-verified published AppImage (`d61de54b…` byte-exact vs the
+  published SHA256SUMS): the P11 chrome (title "PaySwap — Agent
+  Workspace", iconed sidebar in the pinned order with Settings after
+  the divider, mobile nav icons), the outcome-first home, the
+  PREFILL golden path, and the full mission-intake flow through the
+  durable DESKTOP_PROFILE store — with the store CARRIED from the
+  v1.1.0 verification (mission-1 visible in the retained in-progress
+  fold; the honest footer count 3→4 across the run) — a real
+  durability-across-release demonstration. Connections no-provider
+  verbatim; return to `#/` without a renderer reload. Evidence:
+  `delivery/p11-screenshots/` (receipts + screenshots 21–26); two
+  key shots VLM-verified (the home per the target design; the ladder
+  with its typed prerequisites).
+- J14 stands COMPLETE with its evidence now including the v1.2.0
+  receipts; the four productization gates on Issue #1 remain closed
+  on the new release (brand/UX, installer publication, clean-install
+  verification, core journeys).
