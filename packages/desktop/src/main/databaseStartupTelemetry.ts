@@ -32,6 +32,15 @@ function send(
           status: state.phase,
           stage: state.failedPhase ?? state.phase,
           error_code: state.errorCode ?? "none",
+          // P12-A: the sanitized cause taxonomy — the generic transport_closed
+          // never again hides whether this was a spawn failure, a load
+          // failure, an early exit (with code), a protocol violation, an
+          // abort, a timeout or a classified database failure.
+          failure_category: state.startupFailure?.category ?? "unclassified",
+          worker_exit_code: state.startupFailure?.workerExitCode ?? "none",
+          failure_system_code:
+            state.startupFailure?.systemCode ?? state.systemCode ?? "none",
+          migration_preserved: state.startupFailure?.migrationPreserved === true,
           ...properties,
         },
       },
@@ -124,6 +133,14 @@ export function reportDatabaseStartupState(state: DatabaseStartupState): void {
     status: state.phase,
     durationMs: state.updatedAt - state.startedAt,
     errorCode: state.errorCode,
+    startupFailure: state.startupFailure
+      ? {
+          category: state.startupFailure.category,
+          workerExitCode: state.startupFailure.workerExitCode ?? null,
+          systemCode: state.startupFailure.systemCode ?? null,
+          migrationPreserved: state.startupFailure.migrationPreserved === true,
+        }
+      : undefined,
     disk: state.disk,
   });
 }

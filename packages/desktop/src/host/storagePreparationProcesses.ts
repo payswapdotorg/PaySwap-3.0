@@ -7,13 +7,74 @@ import {
   databaseStartupErrorCodeSchema,
   databaseMigrationFactsSchema,
   type DatabaseMigrationFacts,
+  type DatabaseStartupFailure,
+  type DatabaseStartupState,
   databaseStartupErrorDetailsSchema,
   zcodeStoragePreparationFrameSchema,
-  type DatabaseStartupState,
 } from "@zcode/shared";
 import { resolveDefaultZCodeAgentCommand } from "@zcode/services/storage-startup";
 
 type Phase = NonNullable<DatabaseStartupState["databasePhase"]>;
+
+/**
+ * P12-A (Issue #2 Lane A): every distinct transport failure mode now carries
+ * a sanitized cause instead of collapsing onto the generic
+ * `transport_closed`:
+ *
+ *   worker_spawn_failed        — the Worker could not even be constructed
+ *   worker_load_failed         — the worker errored before completing
+ *                                (module load, runtime bootstrap), with its
+ *                                short system code (ERR_MODULE_NOT_FOUND …)
+ *   worker_early_exit          — the worker exited without the expected
+ *                                frames/exit code (carries the exit code)
+ *   worker_protocol_violation  — malformed / duplicate / oversize frames
+ *   aborted                    — the caller's AbortSignal fired (shutdown)
+ *   first_state_timeout        — 30s without a first progress frame
+ *   database_failed            — the worker itself reported a classified
+ *                                database failure (sqlite/OS codes preserved)
+ *
+ * `errorCode` keeps its v1.2.0 values (transport_closed etc.) so existing
+ * consumers/telemetry stay coherent; the cause disambiguates.
+ */
+type FailureCause = Omit<DatabaseStartupFailure, "migrationPreserved">;
+
+function sanitizeSystemCode(code: unknown): string | undefined {
+  return typeof code === "string" && /^[A-Z_0-9]{1,64}$/.test(code) ? code : undefined;
+}
+
+/** Attach the sanitized cause to an error without disturbing its chain. */
+function withFailureCause(error: unknown, cause: FailureCause): unknown {
+  if (error && typeof error === "object") {
+    try {
+      (error as { startupFailure?: unknown }).startupFailure = cause;
+    } catch {
+      /* frozen/exotic error objects keep their original classification */
+    }
+  }
+  return error;
+}
+
+const statusError = (
+  kind: string,
+  details?: {
+    sqliteCode?: number;
+    systemCode?: string;
+    migrationId?: string;
+    migration?: DatabaseMigrationFacts;
+  },
+  databaseId?: string,
+  cause?: FailureCause,
+) =>
+  Object.assign(new Error(`Storage preparation failed: ${kind}`), {
+    kind,
+    errcode: details?.sqliteCode,
+    code: details?.systemCode,
+    migrationId: details?.migrationId,
+    startupFailure: cause,
+    migrationUpdate:
+      databaseId && details?.migration ? { databaseId, migration: details.migration } : undefined,
+  });
+
 const workerMessageSchema = z.discriminatedUnion("type", [
   z
     .object({
@@ -39,50 +100,67 @@ const workerMessageSchema = z.discriminatedUnion("type", [
     })
     .strict(),
 ]);
-const statusError = (
-  kind: string,
-  details?: {
-    sqliteCode?: number;
-    systemCode?: string;
-    migrationId?: string;
-    migration?: DatabaseMigrationFacts;
-  },
-  databaseId?: string,
-) =>
-  Object.assign(new Error(`Storage preparation failed: ${kind}`), {
-    kind,
-    errcode: details?.sqliteCode,
-    code: details?.systemCode,
-    migrationId: details?.migrationId,
-    migrationUpdate:
-      databaseId && details?.migration ? { databaseId, migration: details.migration } : undefined,
-  });
+
+/** The worker-facing surface the transport drives (test seam friendly). */
+interface WorkerTransport extends Worker {
+  /* structural: a real Worker satisfies this trivially */
+}
+
+export interface PrepareHostStorageOptions {
+  /**
+   * Test seam: overrides the tasks-storage worker spawn. Production callers
+   * omit it and get the bundled worker (same URL resolution as v1.2.0).
+   */
+  readonly createWorker?: () => WorkerTransport;
+}
 
 export function prepareHostStorage(
   path: string,
   report: (phase: Phase, migration?: DatabaseMigrationFacts) => void,
   signal: AbortSignal,
+  options?: PrepareHostStorageOptions,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const worker = new Worker(new URL("./tasksStorageWorker.js", import.meta.url), {
-      workerData: { path },
-    });
+    let worker: WorkerTransport;
+    try {
+      worker =
+        options?.createWorker?.() ??
+        new Worker(new URL("./tasksStorageWorker.js", import.meta.url), {
+          workerData: { path },
+        });
+    } catch (error) {
+      // A synchronous construction failure (invalid options, resource
+      // exhaustion) is a SPAWN failure — distinct from anything the worker
+      // itself did.
+      reject(withFailureCause(error, { category: "worker_spawn_failed" }));
+      return;
+    }
+    let settled = false;
     let done = false;
     let failure: unknown;
     let firstState = false;
+    const settle = (outcome: () => void) => {
+      if (settled) return;
+      settled = true;
+      outcome();
+    };
     const firstStateTimer = setTimeout(() => {
-      failure = statusError("startup_status_timeout");
+      failure = statusError("startup_status_timeout", undefined, undefined, {
+        category: "first_state_timeout",
+      });
       void worker.terminate();
     }, 30_000);
     const abort = () => {
-      failure = statusError("transport_closed");
+      failure = statusError("transport_closed", undefined, undefined, { category: "aborted" });
       void worker.terminate();
     };
     signal.addEventListener("abort", abort, { once: true });
     worker.on("message", (raw: unknown) => {
       const result = workerMessageSchema.safeParse(raw);
       if (!result.success) {
-        failure = statusError("transport_closed");
+        failure = statusError("transport_closed", undefined, undefined, {
+          category: "worker_protocol_violation",
+        });
         void worker.terminate();
         return;
       }
@@ -91,16 +169,41 @@ export function prepareHostStorage(
       const message = result.data;
       if (message.type === "progress") report(message.phase, message.migration);
       else if (message.type === "done") done = true;
-      else failure = statusError(message.errorCode, message, "tasks-index");
+      else
+        failure = statusError(message.errorCode, message, "tasks-index", {
+          category: "database_failed",
+          ...(typeof message.systemCode === "string"
+            ? { systemCode: message.systemCode }
+            : {}),
+        });
     });
     worker.once("error", (error) => {
-      failure = error;
+      if (failure === undefined) {
+        failure = withFailureCause(error, {
+          category: "worker_load_failed",
+          ...(sanitizeSystemCode((error as { code?: unknown }).code)
+            ? { systemCode: sanitizeSystemCode((error as { code?: unknown }).code)! }
+            : {}),
+        });
+      }
     });
     worker.once("exit", (code) => {
       clearTimeout(firstStateTimer);
       signal.removeEventListener("abort", abort);
-      if (done && code === 0 && !failure && firstState) resolve();
-      else reject(failure ?? statusError("transport_closed"));
+      if (done && code === 0 && !failure && firstState) {
+        settle(resolve);
+        return;
+      }
+      if (failure === undefined) {
+        // The worker ended without the expected frames and without an error
+        // event — the v1.2.0 blind spot (generic transport_closed with no
+        // exit code). Carry the code.
+        failure = statusError("transport_closed", undefined, undefined, {
+          category: "worker_early_exit",
+          workerExitCode: code,
+        });
+      }
+      settle(() => reject(failure));
     });
     if (signal.aborted) abort();
   });
@@ -117,6 +220,8 @@ export async function prepareSessionStorage(options: {
   ) => void;
   preparedPaths?: Set<string>;
   observePath: (path: string) => Promise<void>;
+  /** Test seam: overrides the CLI-entry worker spawn. */
+  createWorker?: (entry: string) => WorkerTransport;
 }): Promise<void> {
   const command = resolveDefaultZCodeAgentCommand({
     workspacePath: options.cwd,
@@ -127,13 +232,21 @@ export async function prepareSessionStorage(options: {
     throw statusError("unsupported_runtime");
   const entry = command.storagePreparationEntry;
   await new Promise<void>((resolve, reject) => {
-    const child = new Worker(entry, {
-      argv: ["app-server", "--stdio", "--prepare-storage", "--cwd", command.cwd ?? options.cwd],
-      env: { ...process.env, ...options.env, ...command.env },
-      stdin: true,
-      stdout: true,
-      stderr: true,
-    });
+    let child: WorkerTransport;
+    try {
+      child =
+        options.createWorker?.(entry) ??
+        new Worker(entry, {
+          argv: ["app-server", "--stdio", "--prepare-storage", "--cwd", command.cwd ?? options.cwd],
+          env: { ...process.env, ...options.env, ...command.env },
+          stdin: true,
+          stdout: true,
+          stderr: true,
+        });
+    } catch (error) {
+      reject(withFailureCause(error, { category: "worker_spawn_failed" }));
+      return;
+    }
     const input = child.stdin!;
     const lines = createInterface({ input: child.stdout });
     let settled = false;
@@ -141,15 +254,22 @@ export async function prepareSessionStorage(options: {
     let pathReceived = false;
     let preparedPath: string | undefined;
     let failure: unknown;
+    const settle = (outcome: () => void) => {
+      if (settled) return;
+      settled = true;
+      outcome();
+    };
     const terminate = () => {
       void child.terminate();
     };
     const abort = () => {
-      failure ??= statusError("transport_closed");
+      failure ??= statusError("transport_closed", undefined, undefined, { category: "aborted" });
       terminate();
     };
     const firstStateTimer = setTimeout(() => {
-      failure = statusError("startup_status_timeout");
+      failure = statusError("startup_status_timeout", undefined, undefined, {
+        category: "first_state_timeout",
+      });
       terminate();
     }, 30_000);
     options.signal.addEventListener("abort", abort, { once: true });
@@ -161,11 +281,17 @@ export async function prepareSessionStorage(options: {
     });
     lines.on("line", (line) => {
       try {
-        if (line.length > 65536) throw statusError("transport_closed");
+        if (line.length > 65536)
+          throw statusError("transport_closed", undefined, undefined, {
+            category: "worker_protocol_violation",
+          });
         const frame = zcodeStoragePreparationFrameSchema.parse(JSON.parse(line));
         clearTimeout(firstStateTimer);
         if (frame.method === "startup/storagePath") {
-          if (pathReceived) throw statusError("transport_closed");
+          if (pathReceived)
+            throw statusError("transport_closed", undefined, undefined, {
+              category: "worker_protocol_violation",
+            });
           pathReceived = true;
           void (async () => {
             // 仅复用同一次准备中已成功关闭的真实库，不能按不同 cwd 误判为不同数据库。
@@ -192,6 +318,7 @@ export async function prepareSessionStorage(options: {
             frame.params.errorCode ?? "sql_failed",
             frame.params,
             frame.params.databaseId,
+            { category: "database_failed" },
           );
         else
           options.report(frame.params.phase, {
@@ -204,17 +331,29 @@ export async function prepareSessionStorage(options: {
       }
     });
     child.once("error", (error) => {
-      failure ??= error;
+      failure ??= withFailureCause(error, {
+        category: "worker_load_failed",
+        ...(sanitizeSystemCode((error as { code?: unknown }).code)
+          ? { systemCode: sanitizeSystemCode((error as { code?: unknown }).code)! }
+          : {}),
+      });
     });
     child.once("exit", (code) => {
-      settled = true;
       clearTimeout(firstStateTimer);
       options.signal.removeEventListener("abort", abort);
       lines.close();
       if (code === 0 && prepared && !failure) {
         if (preparedPath) options.preparedPaths?.add(preparedPath);
-        resolve();
-      } else reject(failure ?? statusError("transport_closed"));
+        settle(resolve);
+        return;
+      }
+      if (failure === undefined) {
+        failure = statusError("transport_closed", undefined, undefined, {
+          category: "worker_early_exit",
+          workerExitCode: code,
+        });
+      }
+      settle(() => reject(failure));
     });
     if (options.signal.aborted) abort();
   });
