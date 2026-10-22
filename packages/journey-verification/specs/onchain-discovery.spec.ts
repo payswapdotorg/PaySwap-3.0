@@ -71,7 +71,7 @@ test("[J17][@contract] the onchain rail checklist: UNAVAILABLE rows carry typed 
   expect(text).toContain("No onchain history or evidence records exist");
 
   await expectZeroConsoleDefects(record);
-  await evidenceShot(page, "p12-j17-onchain-rail");
+  await evidenceShot(page, "p12-j17-onchain-rail.png");
 });
 
 test("[J17][@contract] the declared chain catalogue renders and the venue packs are labeled synthetic — never live venues", async ({
@@ -103,9 +103,13 @@ test("[J17][@contract] accounts anchors the observation vocabulary: balances are
 
   const text = await visibleText(page);
   // The observation law: a balance is an observation, never custody.
-  expect(text).toContain("observation");
-  // Zero observed — the honest empty, never an invented balance.
-  expect(text).toContain("No asset observations");
+  expect(text).toContain("never PaySwap custody");
+  // Zero observed — the honest empty, never an invented balance (verbatim).
+  expect(text).toContain("Zero asset observations are recorded in this deployment");
+  expect(text).toContain("No observations — honest empty");
+  // The cross-anchor to the onchain rail.
+  const rail = page.getByRole("link", { name: "See the onchain rail and its observation vocabulary (Connections)" });
+  await expect(rail).toHaveAttribute("href", CONTRACT_ROUTES.appConnections);
 
   await expectZeroConsoleDefects(record);
 });

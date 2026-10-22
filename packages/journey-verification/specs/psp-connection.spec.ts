@@ -41,7 +41,7 @@ test("[J18][@contract] the setup flow is honest at zero connections: the count i
   expect(text).toContain("A catalogue entry is never a connection");
 
   await expectZeroConsoleDefects(record);
-  await evidenceShot(page, "p12-j18-psp-setup");
+  await evidenceShot(page, "p12-j18-psp-setup.png");
 });
 
 test("[J18][@contract] the connect step states its typed prerequisite — never a dead button, never a fabricated login", async ({

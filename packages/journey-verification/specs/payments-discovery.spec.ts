@@ -65,7 +65,7 @@ test("[J16][@contract] the payments area renders the typed action set — every 
   }
 
   await expectZeroConsoleDefects(record);
-  await evidenceShot(page, "p12-j16-payments-action-set");
+  await evidenceShot(page, "p12-j16-payments-action-set.png");
 });
 
 test("[J16][@contract] the payments-adjacent surfaces are real-and-linked or honestly unavailable — no dead rows, no invented lists", async ({

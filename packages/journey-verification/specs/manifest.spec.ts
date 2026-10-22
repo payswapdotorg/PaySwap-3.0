@@ -17,7 +17,8 @@
  *      title in that file (a declared-but-untested journey is an
  *      orphan);
  *   7. tier-1 journeys have at least one NON-@contract covering test;
- *      tier-2-only journeys (J14, J15) have at least one @contract test.
+ *      tier-2-only journeys (J14, J15 + the P12 set J16-J19) have at
+ *      least one @contract test.
  *
  * This spec is the single documented exemption from the title
  * convention: it enforces the law, it does not cover a journey
@@ -75,11 +76,12 @@ function parseSpecTests(spec: string): ParsedTest[] {
 test("no-orphans law: the manifest, the registry and the spec files agree in both directions", async ({ page }) => {
   expect(page).toBeDefined();
 
-  // The map itself is the canonical J1–J15 (15 unique, ordered).
+  // The map itself is the canonical J1–J19 (19 unique, ordered — the
+  // P12 Lane C wave added J16-J19, JOURNEY-MAP.md §5).
   expect(JOURNEY_IDS).toEqual(
-    Array.from({ length: 15 }, (_, index) => `J${index + 1}` as JourneyId),
+    Array.from({ length: 19 }, (_, index) => `J${index + 1}` as JourneyId),
   );
-  expect(new Set(JOURNEY_IDS).size).toBe(15);
+  expect(new Set(JOURNEY_IDS).size).toBe(19);
 
   const onDisk = readdirSync(SPECS_DIR)
     .filter((name) => name.endsWith(".spec.ts"))
@@ -181,7 +183,7 @@ test("no-orphans law: the manifest, the registry and the spec files agree in bot
     }
   }
   const tier2Only = JOURNEYS.filter((row) => journeyTier(row.id) === 2);
-  expect(tier2Only.map((row) => row.id)).toEqual(["J14", "J15"]);
+  expect(tier2Only.map((row) => row.id)).toEqual(["J14", "J15", "J16", "J17", "J18", "J19"]);
   for (const row of tier2Only) {
     expect(
       contractCoverage.has(row.id),
