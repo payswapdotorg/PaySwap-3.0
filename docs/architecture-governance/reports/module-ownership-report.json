@@ -8,18 +8,18 @@
     "packages_checked": 56,
     "packages_mapped": 56,
     "packages_unmapped": 0,
-    "import_edges": 87,
+    "import_edges": 90,
     "layer_rules": 10,
-    "violations_total": 7,
+    "violations_total": 13,
     "violations_by_severity": {
-      "error": 7,
+      "error": 13,
       "warn": 0
     },
     "violations_by_rule": {
-      "R3-not-in-may-depend-on": 5,
-      "R6-cross-package-relative": 2
+      "R3-not-in-may-depend-on": 8,
+      "R6-cross-package-relative": 5
     },
-    "unresolved_external_specifiers": 275
+    "unresolved_external_specifiers": 306
   },
   "packages": [
     {
@@ -648,7 +648,7 @@
         },
         {
           "target": "packages/shared",
-          "occurrences": 202
+          "occurrences": 203
         },
         {
           "target": "packages/ui",
@@ -772,27 +772,42 @@
       "dir": "packages/onchain-adapters",
       "name": "@payswap/onchain-adapters",
       "declared_layer": "rails",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/payswap-app",
+          "occurrences": 1
+        }
+      ],
       "dependency_layers": []
     },
     {
       "dir": "packages/onchain-domain",
       "name": "@payswap/onchain-domain",
       "declared_layer": "rails",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/payswap-app",
+          "occurrences": 6
+        }
+      ],
       "dependency_layers": []
     },
     {
       "dir": "packages/onchain-extensions",
       "name": "@payswap/onchain-extensions",
       "declared_layer": "rails",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/payswap-app",
+          "occurrences": 7
+        }
+      ],
       "dependency_layers": []
     },
     {
@@ -829,8 +844,20 @@
       "status": "FAIL",
       "dependencies": [
         {
-          "target": "packages/provider-runtime",
+          "target": "packages/onchain-adapters",
           "occurrences": 1
+        },
+        {
+          "target": "packages/onchain-domain",
+          "occurrences": 6
+        },
+        {
+          "target": "packages/onchain-extensions",
+          "occurrences": 7
+        },
+        {
+          "target": "packages/provider-runtime",
+          "occurrences": 4
         },
         {
           "target": "packages/surface",
@@ -838,7 +865,7 @@
         },
         {
           "target": "packages/ui",
-          "occurrences": 22
+          "occurrences": 25
         }
       ],
       "dependents": [
@@ -958,7 +985,7 @@
       "dependents": [
         {
           "source": "packages/payswap-app",
-          "occurrences": 1
+          "occurrences": 4
         }
       ],
       "dependency_layers": []
@@ -1140,7 +1167,7 @@
         },
         {
           "source": "packages/desktop",
-          "occurrences": 202
+          "occurrences": 203
         },
         {
           "source": "packages/provider",
@@ -1241,7 +1268,7 @@
         },
         {
           "source": "packages/payswap-app",
-          "occurrences": 22
+          "occurrences": 25
         },
         {
           "source": "packages/web",
@@ -2036,6 +2063,232 @@
       "rule": "R3-not-in-may-depend-on",
       "severity": "error",
       "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/onchain-adapters",
+      "detail": "layer \"platform\" -> layer \"rails\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-adapters",
+          "specifier": "../../../onchain-adapters/src/environment.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 26,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-adapters/src/environment.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/onchain-domain",
+      "detail": "layer \"platform\" -> layer \"rails\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/family.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 14,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/family.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/operations.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 15,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/operations.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/execution-observation.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 19,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/execution-observation.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/wallet.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 20,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/wallet.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/onchain-capabilities.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 21,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/onchain-capabilities.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/asset-observation.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 22,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/asset-observation.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/onchain-extensions",
+      "detail": "layer \"platform\" -> layer \"rails\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/uniswap-v2.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 27,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/uniswap-v2.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/zeroswap-aggregator.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 28,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/zeroswap-aggregator.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/solverbatch-intents.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 29,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/solverbatch-intents.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/lockport-bridge.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 30,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/lockport-bridge.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/coinramp-offramp.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 31,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/coinramp-offramp.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/meridian-lending.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 32,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/meridian-lending.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/tidalpools-liquidity.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 33,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/tidalpools-liquidity.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
       "targetPkg": "packages/provider-runtime",
       "detail": "layer \"platform\" -> layer \"rails\" is not in may_depend_on [contracts, platform]",
       "occurrences": [
@@ -2052,6 +2305,274 @@
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/connection-forms.ts",
+          "file": "packages/payswap-app/test/payswap/provider-connection-pins-mirror.test.ts",
+          "line": 15,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/connection-forms.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/connection-scope.ts",
+          "file": "packages/payswap-app/test/payswap/provider-connection-pins-mirror.test.ts",
+          "line": 19,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/connection-scope.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/connection-lifecycle.ts",
+          "file": "packages/payswap-app/test/payswap/provider-connection-pins-mirror.test.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/connection-lifecycle.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/onchain-adapters",
+      "detail": "1 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-adapters",
+          "specifier": "../../../onchain-adapters/src/environment.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 26,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-adapters/src/environment.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/onchain-domain",
+      "detail": "6 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/family.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 14,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/family.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/operations.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 15,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/operations.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/execution-observation.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 19,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/execution-observation.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/wallet.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 20,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/wallet.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/onchain-capabilities.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 21,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/onchain-capabilities.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-domain",
+          "specifier": "../../../onchain-domain/src/asset-observation.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 22,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-domain/src/asset-observation.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/onchain-extensions",
+      "detail": "7 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/uniswap-v2.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 27,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/uniswap-v2.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/zeroswap-aggregator.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 28,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/zeroswap-aggregator.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/solverbatch-intents.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 29,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/solverbatch-intents.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/lockport-bridge.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 30,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/lockport-bridge.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/coinramp-offramp.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 31,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/coinramp-offramp.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/meridian-lending.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 32,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/meridian-lending.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/onchain-extensions",
+          "specifier": "../../../onchain-extensions/src/packs/tidalpools-liquidity.ts",
+          "file": "packages/payswap-app/test/payswap/onchain-pins-mirror.test.ts",
+          "line": 33,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/onchain-extensions/src/packs/tidalpools-liquidity.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
         }
       ],
       "occurrences_capped": false
@@ -2061,7 +2582,7 @@
       "severity": "error",
       "sourcePkg": "packages/payswap-app",
       "targetPkg": "packages/provider-runtime",
-      "detail": "1 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "4 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
         {
           "sourcePkg": "packages/payswap-app",
@@ -2073,6 +2594,48 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/provider-runtime/src/result-envelope.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/connection-forms.ts",
+          "file": "packages/payswap-app/test/payswap/provider-connection-pins-mirror.test.ts",
+          "line": 15,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/connection-forms.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/connection-scope.ts",
+          "file": "packages/payswap-app/test/payswap/provider-connection-pins-mirror.test.ts",
+          "line": 19,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/connection-scope.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/connection-lifecycle.ts",
+          "file": "packages/payswap-app/test/payswap/provider-connection-pins-mirror.test.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/connection-lifecycle.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -2249,6 +2812,141 @@
       "line": 4
     },
     {
+      "file": "packages/desktop/bundled-agents/linux-x64/glm/packages/browser-use-plugin/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/bundled-agents/linux-x64/glm/packages/node-repl-host/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/bundled-agents/linux-x64/glm/zcode.cjs",
+      "specifier": "ripgrep",
+      "line": 1910
+    },
+    {
+      "file": "packages/desktop/bundled-agents/linux-x64/glm/zcode.cjs",
+      "specifier": "koffi",
+      "line": 2125
+    },
+    {
+      "file": "packages/desktop/bundled-agents/linux-x64/glm/zcode.cjs",
+      "specifier": "${rt}",
+      "line": 3635
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/packages/browser-use-plugin/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/packages/node-repl-host/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/zcode.cjs",
+      "specifier": "ripgrep",
+      "line": 1910
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/zcode.cjs",
+      "specifier": "koffi",
+      "line": 2125
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/zcode.cjs",
+      "specifier": "${rt}",
+      "line": 3635
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/packages/browser-use-plugin/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/packages/node-repl-host/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/zcode.cjs",
+      "specifier": "ripgrep",
+      "line": 1910
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/zcode.cjs",
+      "specifier": "koffi",
+      "line": 2125
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/zcode.cjs",
+      "specifier": "${rt}",
+      "line": 3635
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/packages/browser-use-plugin/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/packages/node-repl-host/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/zcode.cjs",
+      "specifier": "ripgrep",
+      "line": 1910
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/zcode.cjs",
+      "specifier": "koffi",
+      "line": 2125
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/zcode.cjs",
+      "specifier": "${rt}",
+      "line": 3635
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/packages/browser-use-plugin/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/packages/node-repl-host/scripts/build.mjs",
+      "specifier": "esbuild",
+      "line": 4
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/zcode.cjs",
+      "specifier": "ripgrep",
+      "line": 1910
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/zcode.cjs",
+      "specifier": "koffi",
+      "line": 2125
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/zcode.cjs",
+      "specifier": "${rt}",
+      "line": 3635
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/server/zcode-server.cjs",
+      "specifier": "bufferutil",
+      "line": 27784
+    },
+    {
+      "file": "packages/desktop/mock-cdn/releases/3.14.3/server/zcode-server.cjs",
+      "specifier": "utf-8-validate",
+      "line": 28423
+    },
+    {
       "file": "packages/desktop/scripts/ttft-otlp-receiver.mjs",
       "specifier": "@opentelemetry/otlp-transformer/build/src/generated/root.js",
       "line": 10
@@ -2324,149 +3022,14 @@
       "line": 7
     },
     {
-      "file": "packages/desktop/test/payswap/security-gate.test.ts",
+      "file": "packages/desktop/test/payswap/scroll-contract.test.ts",
       "specifier": "vitest",
-      "line": 7
-    },
-    {
-      "file": "packages/desktop/test/payswap/shell-integration.test.ts",
-      "specifier": "vitest",
-      "line": 9
-    },
-    {
-      "file": "packages/desktop/test/payswap/update-authority.test.ts",
-      "specifier": "vitest",
-      "line": 21
-    },
-    {
-      "file": "packages/desktop/test/payswap/workspace-store.test.ts",
-      "specifier": "vitest",
-      "line": 12
-    },
-    {
-      "file": "packages/desktop/vitest.config.ts",
-      "specifier": "vitest/config",
-      "line": 1
-    },
-    {
-      "file": "packages/journey-verification/support/axe.ts",
-      "specifier": "axe-core",
-      "line": 27
-    },
-    {
-      "file": "packages/onchain-extensions/test/registry.test.ts",
-      "specifier": "onchain-pack/dex/absent@1.0.0",
-      "line": 57
-    },
-    {
-      "file": "packages/onchain-extensions/test/registry.test.ts",
-      "specifier": "onchain-pack/dex/uniswap-v2@1.0.0",
-      "line": 61
-    },
-    {
-      "file": "packages/payswap-app/test/payswap/console-sections.test.tsx",
-      "specifier": "@testing-library/react",
-      "line": 28
-    },
-    {
-      "file": "packages/payswap-app/test/payswap/console-workspace.test.tsx",
-      "specifier": "@testing-library/react",
-      "line": 29
-    },
-    {
-      "file": "packages/payswap-app/test/payswap/product-navigation.test.tsx",
-      "specifier": "@testing-library/react",
-      "line": 16
-    },
-    {
-      "file": "packages/payswap-app/test/payswap/routes.test.tsx",
-      "specifier": "@testing-library/react",
       "line": 18
     },
     {
-      "file": "packages/provider-runtime/test/idempotency.test.ts",
-      "specifier": "psp.create_transfer",
-      "line": 47
-    },
-    {
-      "file": "packages/provider-runtime/test/idempotency.test.ts",
-      "specifier": "psp.other_operation",
-      "line": 48
-    },
-    {
-      "file": "packages/provider-runtime/test/idempotency.test.ts",
-      "specifier": "psp.create_payout",
-      "line": 59
-    },
-    {
-      "file": "packages/services/src/bigmodel/codingPlanEntitlement.ts",
-      "specifier": "#src/providers/api/apiJson.js",
-      "line": 3
-    },
-    {
-      "file": "packages/services/src/bigmodel/codingPlanEntitlement.ts",
-      "specifier": "#src/bigmodel/teamPlanApiKey.js",
-      "line": 4
-    },
-    {
-      "file": "packages/services/src/bigmodel/teamPlanApiKey.ts",
-      "specifier": "#src/providers/api/apiJson.js",
-      "line": 2
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
-      "specifier": "#src/session/zcodeTaskService.js",
-      "line": 11
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
-      "specifier": "#src/zcode-agent/zcodeAgent.js",
-      "line": 15
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
-      "specifier": "#src/zcode-session/zcodeSession.js",
-      "line": 19
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
-      "specifier": "#src/model-provider/providerFacadeServices.js",
-      "line": 23
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteWorkspaceBridge.ts",
-      "specifier": "#src/bots/botRemoteRuntimeServices.js",
-      "line": 16
-    },
-    {
-      "file": "packages/services/src/bots/botsService.ts",
-      "specifier": "#src/session/sessionModeOptions.js",
-      "line": 59
-    },
-    {
-      "file": "packages/services/src/bots/botsService.ts",
-      "specifier": "#src/session/sessionTitle.js",
-      "line": 60
-    },
-    {
-      "file": "packages/services/src/bots/botsService.ts",
-      "specifier": "#src/logger/serviceLogger.js",
-      "line": 70
-    },
-    {
-      "file": "packages/services/src/bots/botsService.ts",
-      "specifier": "#src/memoryDiagnostics.js",
-      "line": 159
-    },
-    {
-      "file": "packages/services/src/bots/providers/feishuProvider.ts",
-      "specifier": "#src/bots/providers/providerRequest.js",
-      "line": 17
-    },
-    {
-      "file": "packages/services/src/bots/providers/telegramProvider.ts",
-      "specifier": "#src/bots/providers/providerRequest.js",
-      "line": 14
+      "file": "packages/desktop/test/payswap/security-gate.test.ts",
+      "specifier": "vitest",
+      "line": 7
     }
   ],
   "example_hints_without_packages": [

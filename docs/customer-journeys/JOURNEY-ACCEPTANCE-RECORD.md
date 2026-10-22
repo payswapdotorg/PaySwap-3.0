@@ -421,3 +421,57 @@ design at the :3000 preview and the operator confirmed the wave).
   receipts; the four productization gates on Issue #1 remain closed
   on the new release (brand/UX, installer publication, clean-install
   verification, core journeys).
+
+## P12 RELEASE VERIFICATION — v1.3.0 (TL-filled, 2026-10-22, Issue #2 — the desktop experience wave)
+
+The release-blocking Issue #2 handoff: green checks but a failed
+desktop experience. The P12 wave answered all three blocks.
+
+- **Integration**: Lane A (`6be5c18` startup cause taxonomy + retryable
+  recovery), Lane B (`0dc9615` Linux native frame + viewport/scroll
+  contract), Lane C (`aeab9e4` FEATURE-MAP + the first-class payments/
+  onchain/PSP surfaces + J16–J19) merged clean at `732da13` + the
+  journey-gate fixes. Batteries: desktop **179/179**, app **287/287**,
+  root `tsc -b` **0**, lints 0 errors, and the full journey suite
+  **77 passed / 1 skipped / 0 failed** — including the 12 NEW J16–J19
+  `@contract` tests (payments action set with verbatim prerequisites +
+  configure/learn routes; the onchain rail's typed UNAVAILABLE/REFERENCE/
+  NO_OBSERVATIONS rows + the chain catalogue + synthetic venue packs +
+  the accounts observation anchor; the PSP setup steps with the
+  catalogue-never-connection law + the connect typed prerequisite +
+  sandbox/live structural; the advanced-workspace entry honestly
+  labeled + the web-truth cross-mount handoff) and the no-orphans law
+  at the J19 map.
+- **The packaged-RC verification** (the Issue #2 acceptance, on the
+  production-identity `PaySwap_1.3.0_amd64.deb` payload under Xvfb +
+  a purpose-built minimal ICCCM window manager — full record:
+  `docs/productization-evidence/P12-RELEASE-CLOSURE-2026-10-22.md` +
+  the station delivery receipts): boot-to-ready in ~2.5 s on fresh
+  install, after clean close AND after SIGKILL (durable state
+  preserved — no dead screen, no lock-out); the native-frame contract
+  at the X protocol level (WM_CLASS `('payswap','PaySwap')`,
+  `_NET_WM_WINDOW_TYPE_NORMAL`, `_MOTIF_WM_HINTS` decorations ALL,
+  `WM_DELETE_WINDOW` honored with exit 0); the five-size resize sweep
+  (1280×800, 1440×900, 1024×768, 800×600, 1920×1080) with content
+  reflow at every size; the home page keyboard-scrolls with a
+  byte-identical top→bottom→top round trip (the v1.2.0 home-crop
+  defect fixed — the VLM-verified footer renders fully with the ZCode
+  attribution); keyboard navigation to `/app` ("App — PaySwap"
+  per-route title) with the bounded-shell internal scroll; the VLM-
+  verified `/app` shell renders the eleven-area navigation + the
+  honest authentication gate. Honest limitations recorded: XTEST
+  pointer clicks inert under the minimal WM (keyboard is the verified
+  input path; pointer + window identity additionally covered by the CI
+  install-verify receipt and the web journey suite).
+- **Release `v1.3.0`** (tag on the closure commit): CI + journeys
+  green on the tag; the CI install-verify receipt (clean Ubuntu
+  runner: published-asset checksums, apt dependency-resolving install,
+  identity assertions, Xvfb launch with the PaySwap-branded window,
+  AppImage structure) — the receipt URL recorded in the README
+  current-release block with the tested direct asset links.
+- **Governance**: the module-ownership report regenerated and
+  committed — 13 violations (base 7; the +6 are Lane C's test-only
+  mirror imports of onchain/provider-runtime sources, the same
+  recorded-debt pattern the base already carries for
+  surface/provider-runtime mirror tests; the app `src/**` still
+  imports no onchain package — the substrate-layer law holds).
