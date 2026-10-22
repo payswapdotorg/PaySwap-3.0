@@ -211,6 +211,52 @@ export interface IPaySwapDesktopService {
 
   /** The typed store health report (quarantine surfaced, never dropped). */
   workspaceStoreHealth(): Promise<WorkspaceStoreHealthReport>;
+
+  // -------------------------------------------------------------------------
+  // Provider connections (P13-B) — the connection session authority surface
+  // (ADR-0007 D3/D4/D5; additive, B-exclusive during the P13 wave)
+  // -------------------------------------------------------------------------
+
+  /** The provider registry catalogue (typed data — never a connection instance). */
+  connectionRegistry(): Promise<readonly import("../connections/contracts.js").DesktopProviderRegistryView[]>;
+
+  /** The evidence-backed connection statuses (never fabricate — empty is honest). */
+  connectionStatuses(): Promise<
+    readonly import("../connections/contracts.js").DesktopConnectionStatusView[]
+  >;
+
+  /** Seed a connection setup (create-or-resume; UNCONFIGURED refused with the exact missing operator configuration). */
+  connectionSeedSetup(input: {
+    readonly providerId: string;
+    readonly useCaseRef: string;
+  }): Promise<import("../connections/contracts.js").DesktopConnectionSetupOutcome>;
+
+  /**
+   * The U1 key-entry verb — the ONE material-carrying method on this
+   * service (renderer → host, once; sealed immediately; non-returnable
+   * handle). LIVE keys are refused (SANDBOX-only deployment, INV-25).
+   * Never called by the composer/agent plane — the chat law.
+   */
+  connectionSubmitStripeRestrictedKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<import("../connections/contracts.js").DesktopCredentialSealReceipt>;
+
+  /** Record a verification-probe outcome (the ONLY ACTIVE path — evidence required). */
+  connectionRecordVerificationOutcome(input: {
+    readonly connectionId: string;
+    readonly outcome: "CONFIRMED" | "UNKNOWN" | "FAILED";
+    readonly evidenceSummary: string;
+  }): Promise<import("../connections/contracts.js").DesktopConnectionStatusView>;
+
+  /** Validate + consume a provider deep-link return (D3: single-use, 10-minute states). */
+  connectionConsumeProviderCallback(input: {
+    readonly state: string;
+    readonly error?: string;
+  }): Promise<import("../connections/contracts.js").DesktopProviderCallbackView>;
+
+  /** Revoke a connection (principal act — deletes the sealed credential). */
+  connectionRevoke(connectionId: string): Promise<import("../connections/contracts.js").DesktopConnectionStatusView>;
 }
 
 // ---------------------------------------------------------------------------

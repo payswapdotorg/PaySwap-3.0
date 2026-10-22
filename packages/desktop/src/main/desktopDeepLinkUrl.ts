@@ -2,6 +2,7 @@ const DEEP_LINK_SCHEME = "zcode";
 const DEEP_LINK_RE = /\bzcode:(?:\/\/|\/)?[^\s"'<>]+/i;
 const OAUTH_CALLBACK_HOSTS = new Set(["oauth"]);
 const PAYMENT_CALLBACK_HOST = "payment";
+const PROVIDER_CALLBACK_HOST = "provider";
 const WORKSPACE_OPEN_HOST = "workspace";
 const SHARE_IMPORT_HOST = "share";
 const DEEP_LINK_ADDITIONAL_DATA_KEY = "deepLinkUrl";
@@ -50,6 +51,29 @@ export function isPaymentCallbackUrl(parsedUrl: URL): boolean {
 
   const [, host, ...pathParts] = normalizedPath.split("/");
   return Boolean(host === PAYMENT_CALLBACK_HOST && `/${pathParts.join("/")}` === "/callback");
+}
+
+/**
+ * (P13-B, ADR-0007 D3) The provider connection-onboarding return host:
+ * zcode://provider/callback?state=…&code=… (or error=…). Same host
+ * discipline as the oauth/payment callback classifiers.
+ */
+export function isProviderCallbackUrl(parsedUrl: URL): boolean {
+  if (parsedUrl.protocol !== `${DEEP_LINK_SCHEME}:`) {
+    return false;
+  }
+
+  const normalizedPath = normalizeOAuthCallbackPath(parsedUrl.pathname);
+  if (parsedUrl.hostname === PROVIDER_CALLBACK_HOST) {
+    return normalizedPath === "/callback";
+  }
+
+  if (parsedUrl.hostname) {
+    return false;
+  }
+
+  const [, host, ...pathParts] = normalizedPath.split("/");
+  return Boolean(host === PROVIDER_CALLBACK_HOST && `/${pathParts.join("/")}` === "/callback");
 }
 
 export function isWorkspaceOpenUrl(parsedUrl: URL): boolean {
@@ -169,6 +193,15 @@ function isCompleteDeepLinkUrl(value: string): boolean {
       parsedUrl.searchParams.has("provider") &&
       parsedUrl.searchParams.has("channel") &&
       parsedUrl.searchParams.has("status")
+    );
+  }
+
+  if (isProviderCallbackUrl(parsedUrl)) {
+    // (P13-B, D3) A provider return is complete when it carries the
+    // single-use state and either a code or an honest error.
+    return (
+      parsedUrl.searchParams.has("state") &&
+      (parsedUrl.searchParams.has("code") || parsedUrl.searchParams.has("error"))
     );
   }
 

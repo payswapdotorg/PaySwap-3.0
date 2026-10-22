@@ -308,6 +308,8 @@ export const PlatformChannels = {
   OAuthCallback: "zcode:oauth-callback",
   /** Main → Renderer：转发支付 deep link URL */
   PaymentCallback: "zcode:payment-callback",
+  /** Main → Renderer：转发 provider 连接回调 deep link URL（P13-B，ADR-0007 D3） */
+  ProviderCallback: "zcode:provider-callback",
   /** Main → Renderer：外部分享页请求导入 share code。 */
   ShareImport: "zcode:share-import",
   /** Renderer → Main：OAuth 回调已处理完成，可继续后置启动流程 */
@@ -905,6 +907,10 @@ export interface PlatformChannelMap {
     response: void;
   };
   [PlatformChannels.PaymentCallback]: {
+    request: string;
+    response: void;
+  };
+  [PlatformChannels.ProviderCallback]: {
     request: string;
     response: void;
   };

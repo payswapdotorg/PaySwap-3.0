@@ -82,3 +82,15 @@ export * from './retrieval.ts';
 export * from './operation.ts';
 export * from './attempts.ts';
 export * from './execution-bridge.ts';
+
+// Payment-provider adapters (P13-B): the typed registry declaration
+// contracts + the Stripe vertical slice (real HTTPS transport, read-only
+// verification probe, capability→scope mapping, OAuth state machinery for
+// the declared-but-unconfigured U2/U3 forms). Names are provider-prefixed
+// so the adapter surface can never collide with the kernel vocabulary.
+export * from './adapters/registry-declaration.ts';
+export * from './adapters/stripe/declaration.ts';
+export * from './adapters/stripe/capabilities.ts';
+export * from './adapters/stripe/https-transport.ts';
+export * from './adapters/stripe/verification-probe.ts';
+export * from './adapters/stripe/oauth-state.ts';

@@ -20,3 +20,8 @@ export * from "./product/index.js";
 
 // The desktop shell integration seams + host composition root.
 export * from "./shell/index.js";
+
+// The provider connection plane (P13-B — ADR-0007 D3/D4/D5): the
+// connection session authority, the durable credential broker, the
+// pinned provider vocabularies and the node composition edge.
+export * from "./connections/index.js";

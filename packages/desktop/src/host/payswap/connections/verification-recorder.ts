@@ -1,0 +1,164 @@
+/**
+ * PaySwap Desktop (P13-B) — the VERIFICATION RECORDER, split from
+ * ./session-authority.ts for the ≤400-line file law.
+ *
+ * The ONLY-ACTIVE path (ADR-0007 D1): the U1 key-entry verb (validate
+ * the test-mode restricted-key shape fail-closed, seal through the
+ * durable broker, record PENDING_VERIFICATION) and the probe-outcome
+ * recorder (CONFIRMED → ACTIVE with evidence; UNKNOWN/FAILED recorded
+ * on PENDING_VERIFICATION — UNKNOWN must reconcile before any
+ * conclusion, INV-04). The probe itself runs INSIDE the seal at the
+ * composition edge; this module records the evidence.
+ */
+
+import type { DurableConnectionCredentialBroker } from "./credential-broker.js";
+import { ConnectionSessionError } from "./session-authority.js";
+import type {
+  DesktopConnectionStatusView,
+  DesktopCredentialSealReceipt,
+} from "./contracts.js";
+import { recordViewOf, type PersistedConnectionRecord } from "./record-store.js";
+import type { PinnedConnectionLifecycleState } from "./provider-pins.js";
+import {
+  EVIDENCE_PROBE_CONFIRMED,
+  EVIDENCE_PROBE_FAILED,
+  EVIDENCE_PROBE_UNKNOWN,
+  EVIDENCE_SEALED,
+} from "./evidence-copy.js";
+
+/** The narrow port the recorder needs from the authority. */
+export interface VerificationRecorderPort {
+  readonly broker: DurableConnectionCredentialBroker;
+  getRecord(connectionId: string): Promise<PersistedConnectionRecord | null>;
+  setRecord(record: PersistedConnectionRecord): Promise<void>;
+  transition(
+    record: PersistedConnectionRecord,
+    to: PinnedConnectionLifecycleState,
+    cause: string,
+    evidence: string,
+  ): PersistedConnectionRecord;
+  nowIso(): string;
+}
+
+export class VerificationRecorder {
+  readonly #port: VerificationRecorderPort;
+
+  constructor(port: VerificationRecorderPort) {
+    this.#port = port;
+  }
+
+  /**
+   * The U1 key-entry verb (the ONE material-carrying path): validate the
+   * key shape fail-closed, seal it through the durable broker, and record
+   * the credential handle + the PENDING_VERIFICATION transition. The
+   * connection is STILL NOT ACTIVE — only the probe can do that.
+   */
+  async submitStripeRestrictedKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<DesktopCredentialSealReceipt> {
+    const record = await this.#port.getRecord(input.connectionId);
+    if (record === null) {
+      throw new ConnectionSessionError(
+        "UNKNOWN_CONNECTION",
+        `No connection '${input.connectionId}' exists — the key entry is refused`,
+      );
+    }
+    if (record.state === "ACTIVE" || record.state === "PENDING_VERIFICATION") {
+      // Key rotation on an existing connection: allowed (falls through).
+    }
+    const key = input.secretKey;
+    if (
+      typeof key !== "string" ||
+      !(key.startsWith("rk_test_") || key.startsWith("sk_test_")) ||
+      key.length < 16
+    ) {
+      throw new ConnectionSessionError(
+        "CREDENTIAL_REQUIRED",
+        "The supplied key is not a Stripe test-mode restricted key (expected rk_test_… or sk_test_…). LIVE keys are refused: this deployment is SANDBOX-only (INV-25).",
+      );
+    }
+    const { credentialHandleRef, sealedSecretCount } = await this.#port.broker.sealApiKey(
+      record.connectionId,
+      key,
+      this.#port.nowIso(),
+    );
+    const updated = this.#port.transition(
+      record,
+      "PENDING_VERIFICATION",
+      "CREDENTIAL_SEALED",
+      EVIDENCE_SEALED,
+    );
+    const next: PersistedConnectionRecord = {
+      ...updated,
+      credentialHandleRef,
+    };
+    await this.#port.setRecord(next);
+    return {
+      connectionId: record.connectionId,
+      credentialHandleRef,
+      sealedSecretCount,
+      nextState: next.state,
+    };
+  }
+
+  /**
+   * Record a verification-probe outcome (the ONLY ACTIVE path). The probe
+   * itself runs INSIDE the broker seal at the composition edge (the real
+   * transport + the sealed key); the authority records the evidence.
+   */
+  async recordVerificationOutcome(input: {
+    readonly connectionId: string;
+    readonly outcome: "CONFIRMED" | "UNKNOWN" | "FAILED";
+    readonly evidenceSummary: string;
+  }): Promise<DesktopConnectionStatusView> {
+    const record = await this.#port.getRecord(input.connectionId);
+    if (record === null) {
+      throw new ConnectionSessionError("UNKNOWN_CONNECTION", `Unknown connection '${input.connectionId}'`);
+    }
+    if (record.credentialHandleRef === null) {
+      throw new ConnectionSessionError(
+        "CREDENTIAL_REQUIRED",
+        "A verification outcome cannot be recorded before a credential is sealed",
+      );
+    }
+    if (input.outcome === "CONFIRMED") {
+      const updated = this.#port.transition(
+        record,
+        "ACTIVE",
+        "PROBE_CONFIRMED",
+        `${EVIDENCE_PROBE_CONFIRMED} — ${input.evidenceSummary}`,
+      );
+      await this.#port.setRecord(updated);
+      return recordViewOf(updated);
+    }
+    // UNKNOWN and FAILED both stay PENDING_VERIFICATION: UNKNOWN must be
+    // reconciled (re-probed) before any conclusion; FAILED is recorded
+    // as evidence but does not disconnect (the operator may rotate the
+    // key and retry — the record keeps its history).
+    const updated = this.#port.transition(
+      record,
+      "PENDING_VERIFICATION",
+      input.outcome === "UNKNOWN" ? "PROBE_UNKNOWN" : "PROBE_FAILED",
+      `${input.outcome === "UNKNOWN" ? EVIDENCE_PROBE_UNKNOWN : EVIDENCE_PROBE_FAILED} — ${input.evidenceSummary}`,
+    );
+    await this.#port.setRecord(updated);
+    return recordViewOf(updated);
+  }
+
+  /** Run a consumer inside the credential seal (the composition edge's probe path). */
+  async withSealedCredential<T>(
+    connectionId: string,
+    consumer: (material: unknown) => T,
+    context: string,
+  ): Promise<Awaited<T>> {
+    const record = await this.#port.getRecord(connectionId);
+    if (record === null || record.credentialHandleRef === null) {
+      throw new ConnectionSessionError(
+        "CREDENTIAL_REQUIRED",
+        `Connection '${connectionId}' has no sealed credential`,
+      );
+    }
+    return this.#port.broker.withMaterial(record.credentialHandleRef, consumer, context);
+  }
+}

@@ -103,6 +103,17 @@ describe("delegated money movement laws (P7-W2)", () => {
     });
     const methodNames = Object.keys(service).filter((key) => key !== "session");
     expect(methodNames.sort()).toEqual([
+      // P13-B connection-plane members: registry/records/setup-seed/key
+      // seal/probe-evidence/callback-consume/revocation — connection
+      // orchestration ONLY (never money movement; connectionRevoke
+      // closes a CONNECTION record and deletes its credential).
+      "connectionConsumeProviderCallback",
+      "connectionRecordVerificationOutcome",
+      "connectionRegistry",
+      "connectionRevoke",
+      "connectionSeedSetup",
+      "connectionStatuses",
+      "connectionSubmitStripeRestrictedKey",
       "delegateMoneyMovement",
       "deploymentFacts",
       "journeyState",
