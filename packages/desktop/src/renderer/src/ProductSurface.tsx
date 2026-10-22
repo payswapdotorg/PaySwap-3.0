@@ -90,14 +90,14 @@ export function ProductSurfaceSwitch({
 
   // Document titles are a platform concern (the window title bar):
   // route-specific "… — PaySwap" on the product; the workspace console
-  // is framed as a capability of PaySwap ("PaySwap — Agent Console");
-  // the advanced surface is titled as the developer workspace it is.
+  // is framed as a capability of PaySwap ("PaySwap — Agent Workspace",
+  // P11 rename); the advanced surface is titled as the developer workspace.
   useEffect(() => {
     document.title =
       surface === "console"
-        ? "PaySwap — Agent Console"
+        ? "PaySwap — Agent Workspace"
         : surface === "console-advanced"
-          ? "Developer Workspace — PaySwap Agent Console"
+          ? "Developer Workspace — PaySwap Agent Workspace"
           : routeDocumentTitle(resolvePaySwapRoute(desktopProductPathFromHash(hash)));
   }, [surface, hash]);
 

@@ -46,15 +46,15 @@ test("[J14] /console renders the PaySwap Agent Workspace: PaySwap chrome, the ei
   const record = trackConsole(page);
   await page.goto(CONTRACT_ROUTES.console);
 
-  // §1: the workspace root title.
-  await expect.poll(() => page.title()).toBe("PaySwap — Agent Console");
+  // §1: the workspace root title (P11 framing rename).
+  await expect.poll(() => page.title()).toBe("PaySwap — Agent Workspace");
 
-  // §1: PaySwap chrome — the wordmark + the "Agent Console" framing,
+  // §1: PaySwap chrome — the wordmark + the "Agent Workspace" framing,
   // the ps- design-system theme root, the skip link, the main landmark.
   const root = page.locator(".ps-console-root");
   await expect(root).toBeVisible();
   await expect(page.locator(".ps-console-brand-name")).toHaveText("PaySwap");
-  await expect(page.locator(".ps-console-brand-frame")).toHaveText("Agent Console");
+  await expect(page.locator(".ps-console-brand-frame")).toHaveText("Agent Workspace");
   await expect(page.locator("a.ps-skip-link")).toHaveText("Skip to main content");
   await expect(page.locator("main#ps-console-main")).toBeVisible();
 
@@ -86,6 +86,24 @@ test("[J14] /console renders the PaySwap Agent Workspace: PaySwap chrome, the ei
   const text = await visibleText(page);
   expect(text).toContain("Decisions needing attention");
 
+  // §8 (P11): the outcome-first home — the question, the intake entry
+  // card, the four outcome shortcuts, and the workspace footer with the
+  // honest store fact + the live mission count.
+  await expect(
+    page.locator("#ps-console-overview-question"),
+  ).toHaveText("What should PaySwap accomplish?");
+  await expect(page.locator("#ps-console-overview-goal")).toBeVisible();
+  await expect(page.getByRole("button", { name: "New mission" })).toBeVisible();
+  const shortcuts = page.locator(".ps-console-outcome-card");
+  await expect(shortcuts).toHaveCount(4);
+  for (const title of ["Pay", "Receive", "Move", "Convert"]) {
+    await expect(shortcuts.filter({ hasText: title })).toHaveCount(1);
+  }
+  await expect(page.locator("footer.ps-console-footer")).toBeVisible();
+  const footerText = await page.locator(".ps-console-footer").innerText();
+  expect(footerText).toContain("browser profile");
+  expect(footerText).toContain("0 missions recorded");
+
   await evidenceShot(page, "01-console-overview-empty.png");
   await expectZeroConsoleDefects(record);
 });
@@ -112,7 +130,7 @@ test("[J14] console section navigation works in-tree: overview → missions → 
   await expect(page.locator(".ps-console-sidebar a[aria-current='page']")).toHaveText("Missions");
   // §1: the route-specific document title (the workspace's own title
   // effect once navigation happens inside the mounted tree).
-  await expect.poll(() => page.title()).toBe("Missions — PaySwap Agent Console");
+  await expect.poll(() => page.title()).toBe("Missions — PaySwap Agent Workspace");
 
   // missions → settings
   await sidebar.locator("a[href='/console/settings']").click();

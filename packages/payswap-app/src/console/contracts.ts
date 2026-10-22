@@ -299,22 +299,22 @@ export function resolveConsoleSection(path: string): ConsoleRoute {
 }
 
 /* ====================================================================
- * Document titles (CONSOLE-WORKSPACE.md §1 — "… — PaySwap Agent Console")
+ * Document titles (CONSOLE-WORKSPACE.md §1 — "… — PaySwap Agent Workspace"; P11 rename)
  * ==================================================================== */
 
 /**
  * The document title for a console route. The workspace root reads
- * "PaySwap — Agent Console"; every other surface is route-specific
- * ("<Section> — PaySwap Agent Console"); the honest not-found follows
+ * "PaySwap — Agent Workspace"; every other surface is route-specific
+ * ("<Section> — PaySwap Agent Workspace"); the honest not-found follows
  * the same law.
  */
 export function consoleDocumentTitle(route: ConsoleRoute): string {
   switch (route.kind) {
     case "overview":
-      return "PaySwap — Agent Console";
+      return "PaySwap — Agent Workspace";
     case "section":
-      return `${consoleSection(route.sectionId)?.title ?? "Console"} — PaySwap Agent Console`;
+      return `${consoleSection(route.sectionId)?.title ?? "Console"} — PaySwap Agent Workspace`;
     case "not-found":
-      return "Not found — PaySwap Agent Console";
+      return "Not found — PaySwap Agent Workspace";
   }
 }

@@ -213,7 +213,7 @@ export function foldWorkspaceSettingsFacts(durability: WorkspaceStoreDurability)
   return {
     identity: {
       name: "PaySwap",
-      line: "The Agent Console is the console surface of PaySwap — a supporting capability, never the default landing.",
+      line: "The Agent Workspace is the console surface of PaySwap — a supporting capability, never the default landing.",
     },
     attribution: {
       line: "PaySwap is built on the ZCode open-source platform (zai-org/ZCode, Apache-2.0).",

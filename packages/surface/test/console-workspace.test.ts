@@ -141,25 +141,25 @@ describe("console sub-route law (§2 — pure, total, never throws)", () => {
 
 describe("console document titles (§1)", () => {
   it("the workspace root reads the pinned title", () => {
-    expect(CONSOLE_ROOT_TITLE).toBe("PaySwap — Agent Console");
-    expect(consoleDocumentTitle("")).toBe("PaySwap — Agent Console");
-    expect(consoleDocumentTitle("/")).toBe("PaySwap — Agent Console");
+    expect(CONSOLE_ROOT_TITLE).toBe("PaySwap — Agent Workspace");
+    expect(consoleDocumentTitle("")).toBe("PaySwap — Agent Workspace");
+    expect(consoleDocumentTitle("/")).toBe("PaySwap — Agent Workspace");
   });
 
   it("every section title follows the pinned suffix pattern", () => {
-    expect(CONSOLE_TITLE_SUFFIX).toBe(" — PaySwap Agent Console");
-    expect(consoleDocumentTitle("/overview")).toBe("Overview — PaySwap Agent Console");
-    expect(consoleDocumentTitle("/activity")).toBe("Activity & receipts — PaySwap Agent Console");
-    expect(consoleDocumentTitle("/settings")).toBe("Settings — PaySwap Agent Console");
+    expect(CONSOLE_TITLE_SUFFIX).toBe(" — PaySwap Agent Workspace");
+    expect(consoleDocumentTitle("/overview")).toBe("Overview — PaySwap Agent Workspace");
+    expect(consoleDocumentTitle("/activity")).toBe("Activity & receipts — PaySwap Agent Workspace");
+    expect(consoleDocumentTitle("/settings")).toBe("Settings — PaySwap Agent Workspace");
     for (const section of WORKSPACE_SECTIONS) {
       expect(consoleDocumentTitle(`/${section.id}`)).toBe(
-        `${section.title} — PaySwap Agent Console`,
+        `${section.title} — PaySwap Agent Workspace`,
       );
     }
   });
 
   it("unknown paths render the honest not-found title; advanced carries the honest label", () => {
-    expect(consoleDocumentTitle("/unknown")).toBe("Not found — PaySwap Agent Console");
+    expect(consoleDocumentTitle("/unknown")).toBe("Not found — PaySwap Agent Workspace");
     expect(CONSOLE_ADVANCED_ROUTE).toBe("/console/advanced");
     expect(consoleDocumentTitle("/advanced")).toBe(CONSOLE_ADVANCED_LABEL);
     expect(consoleDocumentTitle("/advanced/deeper")).toBe(CONSOLE_ADVANCED_LABEL);

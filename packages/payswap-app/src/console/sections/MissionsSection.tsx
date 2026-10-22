@@ -9,7 +9,7 @@
  * the intake that is on the page — no fabricated rows anywhere.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, KeyValue, StatusPill } from "@zcode/ui/payswap";
 import type {
   ConsoleSectionRecord,
@@ -25,8 +25,19 @@ import {
   LoadingBlock,
   SectionScaffold,
 } from "./shared.js";
-import { MissionIntakeForm } from "./MissionIntakeForm.js";
+import { MissionIntakeForm, type MissionIntakePrefill } from "./MissionIntakeForm.js";
 import { MissionDetailView } from "./MissionDetailView.js";
+
+/**
+ * An intake request handed from the overview home (P11): the prefill +
+ * a monotonically increasing seq. The seq keys the intake form's remount
+ * so each new request is consumed as INITIAL state exactly once (two
+ * clicks on "New mission" re-prefill — never a stale no-op).
+ */
+export interface MissionsIntakeRequest {
+  readonly seq: number;
+  readonly prefill: MissionIntakePrefill;
+}
 
 function ListStatusPill({ status }: { readonly status: MissionRecord["status"] }) {
   if (status === "INTENT_RECORDED") {
@@ -108,10 +119,13 @@ export function MissionsSection({
   section,
   workspace,
   navigation,
+  intakeRequest,
 }: {
   readonly section: ConsoleSectionRecord;
   readonly workspace: WorkspaceStoreBinding;
   readonly navigation: PaySwapNavigation;
+  /** The pending overview-originated intake prefill, if any (P11). */
+  readonly intakeRequest?: MissionsIntakeRequest;
 }) {
   const { list, detail, mutation } = workspace;
   const [reviewRecord, setReviewRecord] = useState<MissionRecord | null>(null);
@@ -170,6 +184,18 @@ export function MissionsSection({
   };
 
   const detailOpen = detail.phase !== "idle";
+
+  // A prefill arriving from the overview home scrolls the intake into
+  // view (the list may be long; the prefill must be visible — §8's
+  // zero-dead-actions law). Presentation-only: no state mutation here.
+  useEffect(() => {
+    if (intakeRequest === undefined || typeof document === "undefined") {
+      return;
+    }
+    document
+      .getElementById("missions-intake")
+      ?.scrollIntoView?.({ block: "start" });
+  }, [intakeRequest?.seq]);
 
   return (
     <SectionScaffold section={section}>
@@ -285,7 +311,9 @@ export function MissionsSection({
               />
             ) : (
               <MissionIntakeForm
+                key={intakeRequest === undefined ? "intake" : `intake-${intakeRequest.seq}`}
                 mode="create"
+                prefill={intakeRequest?.prefill}
                 pending={pending}
                 error={mutation.phase === "error" ? mutation.error : undefined}
                 onSubmit={handleCreate}

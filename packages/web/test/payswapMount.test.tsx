@@ -238,13 +238,13 @@ describe("the PaySwap web surfaces switch (P10-B — product ↔ workspace witho
       // REAL P10-C component (merged at integration): PaySwap chrome +
       // the eight-section navigation + honest loading states (the store
       // port loads asynchronously; "Loading…" is the truthful state).
-      expect(container.textContent).toContain("PaySwap Agent Console");
+      expect(container.textContent).toContain("PaySwap Agent Workspace");
       expect(container.textContent).toContain("Overview");
       expect(container.textContent).toContain("Missions");
       expect(container.textContent).toContain("Settings");
       expect(container.textContent).not.toContain("Welcome to ZCode");
       // The document title follows the surface (CONSOLE-WORKSPACE §1).
-      expect(document.title).toBe("PaySwap — Agent Console");
+      expect(document.title).toBe("PaySwap — Agent Workspace");
     } finally {
       unmount();
     }
@@ -279,7 +279,7 @@ describe("the PaySwap web surfaces switch (P10-B — product ↔ workspace witho
     try {
       // The REAL workspace deep-links into the Missions section (its
       // intake form renders — the honest first-run state).
-      expect(container.textContent).toContain("PaySwap Agent Console");
+      expect(container.textContent).toContain("PaySwap Agent Workspace");
       expect(container.textContent).toContain("Create a mission");
       expect(window.location.pathname).toBe("/console/missions");
     } finally {

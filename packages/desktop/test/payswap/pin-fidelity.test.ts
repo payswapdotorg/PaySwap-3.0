@@ -77,8 +77,9 @@ const FEE_BASES: readonly PinnedQuoteFeeBasis[] = [
 
 describe("pin registry (P7-W2 + P10-B)", () => {
   it("the pin set is versioned and mirrors the exact base commits of its lanes", () => {
-    // Bumped 1.0.0 → 1.1.0 by P10-B (pin law: any pin change bumps the set).
-    expect(PAYSWAP_DESKTOP_PIN_SET_VERSION).toBe("1.1.0");
+    // Bumped 1.0.0 → 1.1.0 by P10-B; 1.1.0 → 1.2.0 by P11 (pin law:
+    // any pin change bumps the set — the framing rename reaches the pins).
+    expect(PAYSWAP_DESKTOP_PIN_SET_VERSION).toBe("1.2.0");
     expect(PAYSWAP_DESKTOP_PIN_SOURCE_COMMIT).toBe(recordedBaseCommit);
     expect(recordedBaseCommit).toBe("2999bbb1658443b72ce9644f32cabbebdbecaa37");
     expect(PAYSWAP_CONSOLE_WORKSPACE_PIN_SOURCE_COMMIT).toBe(
@@ -113,7 +114,7 @@ describe("pin registry (P7-W2 + P10-B)", () => {
 describe("pin fidelity vs recorded fixtures (surface pins)", () => {
   it("the pinned surface API version equals the recorded contract version", () => {
     expect(PINNED_SURFACE_API_VERSION).toBe(recordedSurface.apiVersion);
-    expect(PINNED_SURFACE_API_VERSION).toBe("1.1.0");
+    expect(PINNED_SURFACE_API_VERSION).toBe("1.2.0");
   });
 
   it("the five pinned outcome actions mirror the recorded registry (ids, labels, dispatch authority, journey ids)", () => {

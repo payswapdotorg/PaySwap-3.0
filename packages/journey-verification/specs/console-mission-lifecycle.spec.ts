@@ -18,6 +18,12 @@
  * All of flow 16 is J14. Browser flows verify the WEB mount; the
  * DESKTOP_PROFILE store path is verified by the desktop suites + the
  * station desktop GUI inspection (CONSOLE-WORKSPACE.md §9).
+ *
+ * P11 (§6/§8): the OVERVIEW INTAKE-ENTRY golden path — a goal typed on
+ * the outcome-first home reaches the missions creation intake PREFILLED
+ * (in-tree navigation, never a reload), and each outcome shortcut
+ * prefills its direction. Covered here because this spec owns the
+ * intake helpers.
  */
 
 import { test, expect } from "@playwright/test";
@@ -49,6 +55,51 @@ async function submitValidIntake(
   await amountInputs.nth(1).fill("1234");
   await page.locator("button[type='submit']").click();
 }
+
+test("[J14] the overview intake entry prefills the missions creation intake (P11: type a goal → New mission → prefilled intake, in-tree)", async ({
+  page,
+}) => {
+  const record = trackConsole(page);
+  await page.goto(CONTRACT_ROUTES.console);
+  await expect(page.locator("#ps-console-overview-goal")).toBeVisible();
+
+  // A renderer-reload marker: the entry must be an in-tree navigation.
+  await page.evaluate(() => {
+    (window as { __p11NoReloadMarker?: boolean }).__p11NoReloadMarker = true;
+  });
+
+  // Type a goal on the home, press "New mission".
+  await page.locator("#ps-console-overview-goal").fill("Move the reserve to the payout account");
+  await page.getByRole("button", { name: "New mission" }).click();
+  await expect(page).toHaveURL(/\/console\/missions$/);
+  await expect(page.locator("form.ps-console-intake")).toBeVisible();
+
+  // The intake opens PREFILLED with the typed goal (no direction yet).
+  const goalBox = page.locator(".ps-console-textarea").first();
+  await expect(goalBox).toHaveValue("Move the reserve to the payout account");
+  await expect(page.locator("select")).toHaveValue("");
+
+  // The navigation never reloaded the renderer (§2).
+  const marker = await page.evaluate(
+    () => (window as { __p11NoReloadMarker?: boolean }).__p11NoReloadMarker === true,
+  );
+  expect(marker, "the overview intake entry never reloaded the renderer (§2)").toBe(true);
+
+  // Back to the home: an outcome shortcut prefills its DIRECTION.
+  await page.locator(".ps-console-sidebar a[href='/console/overview']").click();
+  await page.locator(".ps-console-outcome-card", { hasText: "Convert" }).click();
+  await expect(page).toHaveURL(/\/console\/missions$/);
+  await expect(page.locator("select")).toHaveValue("CONVERT");
+  await expect(page.locator(".ps-console-textarea").first()).toHaveValue("");
+
+  // Nothing was recorded by either entry (the prefill is intent-ENTRY,
+  // not an intent record — the store stays empty until a valid submit).
+  const store = await readWorkspaceStore(page);
+  expect(store, "the intake entry itself records nothing").toBeNull();
+
+  await evidenceShot(page, "08-overview-intake-prefill.png");
+  await expectZeroConsoleDefects(record);
+});
 
 test("[J14] the creation intake validates structurally before recording: an invalid submit renders the findings verbatim and nothing is recorded", async ({
   page,

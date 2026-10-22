@@ -56,31 +56,45 @@
 }
 
 /* The mobile section nav: visible below lg, hidden at lg and up (the
-   static sidebar takes over there — the substrate responsive pattern). */
+   static sidebar takes over there). P11: a horizontal SCROLL row (the
+   operator's target design) — one line, icons + labels, 44px targets. */
 .ps-console-sectionnav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--ps-space-1);
   padding: var(--ps-space-2) var(--ps-space-4);
   border-bottom: 1px solid var(--ps-border);
   background: var(--ps-surface);
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .ps-console-nav-link {
   display: inline-flex;
   align-items: center;
+  gap: var(--ps-space-2);
+  flex: none;
   min-height: 44px;
   padding: 0 12px;
   border-radius: var(--ps-radius-md);
   color: var(--ps-fg-muted);
   font-size: var(--ps-text-sm);
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.ps-console-nav-link .ps-sidebar__item-icon {
+  color: var(--ps-fg-muted);
 }
 
 .ps-console-nav-link.is-active {
   background: var(--ps-accent-tint);
   color: var(--ps-fg);
   font-weight: 600;
+}
+
+.ps-console-nav-link.is-active .ps-sidebar__item-icon {
+  color: var(--ps-accent-emphasis);
 }
 
 .ps-console-nav-item.is-active {
@@ -96,6 +110,19 @@
 
 /* ------------------------------ shell ------------------------------- */
 
+/* P11: the operator's target width for the iconed sidebar (the design
+   system default is 240px). */
+.ps-console-sidebar.ps-sidebar {
+  width: 260px;
+}
+
+/* The divider above the pinned Settings link (§8 — presentation only). */
+.ps-console-sidebar-divider {
+  height: 1px;
+  margin: var(--ps-space-3) var(--ps-space-3) var(--ps-space-1);
+  background: var(--ps-border);
+}
+
 .ps-console-shell {
   display: flex;
   flex: 1 1 auto;
@@ -110,6 +137,7 @@
   min-width: 0;
   padding: var(--ps-space-6) var(--ps-space-6) var(--ps-space-8);
 }
+
 
 /* --------------------------- section scaffold ------------------------ */
 
@@ -333,6 +361,10 @@
 
   .ps-console-section-title {
     font-size: 21px;
+  }
+
+  .ps-console-footer {
+    padding: var(--ps-space-3) var(--ps-space-4);
   }
 }
 

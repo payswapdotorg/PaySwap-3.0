@@ -274,8 +274,8 @@ describe("the renderer identity (title + boot shell + product mount)", () => {
 
   it("the surface switch titles all three surfaces honestly (source-scan)", () => {
     const source = readSource("src/renderer/src/ProductSurface.tsx");
-    expect(source).toContain('"PaySwap — Agent Console"');
-    expect(source).toContain('"Developer Workspace — PaySwap Agent Console"');
+    expect(source).toContain('"PaySwap — Agent Workspace"');
+    expect(source).toContain('"Developer Workspace — PaySwap Agent Workspace"');
     expect(source).toContain("routeDocumentTitle");
     expect(source).toContain("HONEST_DEPLOYMENT_CONTEXT");
     expect(source).toContain("NO_EVIDENCE_COVERAGE");

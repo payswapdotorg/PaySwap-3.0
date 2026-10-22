@@ -3,10 +3,137 @@
  * console.css to satisfy the <=400-line file law; the shell/chrome/
  * scaffold/action laws and the responsive + reduced-motion blocks live
  * there). Mission rows and the detail ladder, the creation intake +
- * intent review + validation findings + mission controls, and the
- * per-section reference rows (model providers, outcome states, the Lab
- * law, the settings identity).
+ * intent review + validation findings + mission controls, the overview
+ * OUTCOME-FIRST HOME (P11 — the question, the intake-entry card, the
+ * outcome shortcuts, the workspace note), and the per-section reference
+ * rows (model providers, outcome states, the Lab law, the settings
+ * identity).
  */
+
+/* ------------------- overview: the outcome-first home ----------------- */
+
+.ps-console-question {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.ps-console-question-sub {
+  margin: var(--ps-space-2) 0 0;
+  max-width: 62ch;
+  color: var(--ps-fg-muted);
+}
+
+.ps-console-intake-entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-3);
+  padding: var(--ps-space-5) var(--ps-space-5) var(--ps-space-4);
+}
+
+.ps-console-intake-entry-input {
+  width: 100%;
+  resize: none;
+  min-height: 44px;
+  padding: var(--ps-space-2) 0;
+  border: none;
+  background: transparent;
+  color: var(--ps-fg);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.ps-console-intake-entry-input::placeholder {
+  color: var(--ps-fg-muted);
+}
+
+.ps-console-intake-entry-input:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 2px;
+  border-radius: var(--ps-radius-md);
+}
+
+.ps-console-intake-entry-suggestion {
+  margin: 0;
+  max-width: 72ch;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.ps-console-intake-entry-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ps-console-outcomes-title {
+  margin: var(--ps-space-2) 0 0;
+  font-size: 16px;
+}
+
+.ps-console-outcome-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ps-space-3);
+}
+
+.ps-console-outcome-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ps-space-2);
+  padding: var(--ps-space-5);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-lg);
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--ps-duration-fast) var(--ps-ease-out),
+    box-shadow var(--ps-duration-fast) var(--ps-ease-out);
+}
+
+.ps-console-outcome-card:hover {
+  border-color: var(--ps-fg-muted);
+  box-shadow: var(--ps-shadow-sm, 0 1px 2px rgba(16, 24, 40, 0.06));
+}
+
+.ps-console-outcome-card:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 2px;
+}
+
+.ps-console-outcome-glyph {
+  display: inline-flex;
+  color: var(--ps-fg);
+}
+
+.ps-console-outcome-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ps-console-outcome-description {
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+  line-height: 1.45;
+}
+
+.ps-console-workspace-note {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+  line-height: 1.55;
+}
+
+.ps-console-workspace-count {
+  margin: var(--ps-space-2) 0 0;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+}
 
 /* ---------------------------- mission rows --------------------------- */
 
@@ -197,3 +324,41 @@
   flex-wrap: wrap;
 }
 
+
+
+/* --------------------------- workspace footer ------------------------ */
+
+/* P11 (§8): the honest one-line store fact + live mission count. */
+.ps-console-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-1);
+  padding: var(--ps-space-3) var(--ps-space-6);
+  border-top: 1px solid var(--ps-border);
+  background: var(--ps-surface);
+}
+
+.ps-console-footer-line {
+  margin: 0;
+  max-width: 110ch;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-xs);
+}
+
+.ps-console-footer-meta {
+  margin: 0;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-xs);
+}
+
+/* --------------------------- responsive (P11) ------------------------ */
+
+@media (max-width: 560px) {
+  .ps-console-outcome-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ps-console-question {
+    font-size: 22px;
+  }
+}

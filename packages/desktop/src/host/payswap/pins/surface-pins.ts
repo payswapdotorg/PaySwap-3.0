@@ -19,8 +19,8 @@ import { DESKTOP_PIN_PROVENANCE } from "./pin-registry.js";
 // Versioning (pin surface.versioning)
 // ---------------------------------------------------------------------------
 
-/** Mirrors SURFACE_API_VERSION (@payswap/surface, P2-W3). */
-export const PINNED_SURFACE_API_VERSION = "1.1.0" as const;
+/** Mirrors SURFACE_API_VERSION (@payswap/surface, P2-W3; P11 bump: the console framing rename reaches the pinned title literals). */
+export const PINNED_SURFACE_API_VERSION = "1.2.0" as const;
 
 /** Mirrors SurfaceStability. */
 export type PinnedSurfaceStability = "stable" | "experimental";

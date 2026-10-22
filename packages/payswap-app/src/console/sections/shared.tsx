@@ -39,7 +39,7 @@ export function SectionScaffold({
   return (
     <section aria-labelledby={headingId} className="ps-console-section">
       <header className="ps-console-section-header">
-        <p className="ps-console-eyebrow">PaySwap Agent Console</p>
+        <p className="ps-console-eyebrow">PaySwap Agent Workspace</p>
         <h1 id={headingId} className="ps-console-section-title">
           {section.title}
         </h1>

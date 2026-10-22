@@ -10,6 +10,17 @@ substrate default disagree for the console surface, this document wins,
 EXCEPT where upstream attribution is legally required
 (PRODUCT-IDENTITY.md §4).
 
+AMENDED 2026-10-21 by the resident TL (operator design directive
+"move the current app from current to target" — the workspace-design
+port, P11): §1 framing ("Agent Console" → "Agent Workspace", including
+the pinned document-title literals), §6 overview fold RENDERING (the
+outcome-first home per the operator's target design) and §8 (the chrome
+laws: section icons, the pinned Settings placement, the workspace
+footer) are amended as marked. §2 (IA/routing), §3/§4/§5 (the pinned
+mission vocabulary, ladder and store port), §7 and §9 are UNCHANGED;
+`foldWorkspaceOverview` and every other pinned shape/fold are
+UNCHANGED — P11 is a presentation-contract amendment only.
+
 Lanes: P10-A implements these presentation contracts + folds in
 `@payswap/surface`; P10-B implements the desktop integration
 (packages/desktop: the mission-intake store + host service extension +
@@ -36,8 +47,12 @@ capability (J14), never the default landing (PRODUCT-IDENTITY.md §3).
 It is PaySwap-branded end-to-end: the existing `ps-` design system
 (warm-neutral + restrained-emerald; amber for attention/UNKNOWN; red
 for failure), the PaySwap wordmark, and PaySwap document titles
-(`"… — PaySwap Agent Console"` route-specific; the workspace root
-reads `"PaySwap — Agent Console"`).
+(`"… — PaySwap Agent Workspace"` route-specific; the workspace root
+reads `"PaySwap — Agent Workspace"`). The console CHROME frames the
+surface as the PaySwap **Agent Workspace** (topbar wordmark framing,
+section-scaffold eyebrow and not-found copy alike — P11 renamed the
+remaining "Agent Console" literals; historical evidence records that
+predate the rename quote their own era verbatim and are not rewritten).
 
 It renders PROJECTIONS only (SV-6): it never owns financial truth,
 never invents balances, providers, agents, history, approval counts or
@@ -266,11 +281,23 @@ All folds are pure, deterministic, fail-closed (typed errors), and
 render honest empty states (SV-8: typed reason + real next action,
 never a failure tone, never a dead action):
 
-- `overview`: in-progress missions (`status !== "ARCHIVED"`); an
-  attention line carrying the honest approvals-plane fact; recent
-  activity = real mission events (reverse-chronological, capped at 20);
-  when no missions exist, the designed-empty state with the
-  create-first-mission next action (which WORKS — §5 store).
+- `overview` (P11 — the OUTCOME-FIRST HOME per the operator's target
+  design): the outcome question ("What should PaySwap accomplish?"),
+  the mission INTAKE ENTRY CARD (a real goal-statement textarea whose
+  content prefills the missions creation intake — never a decorative
+  search box; its "New mission" action and the four outcome shortcuts
+  PAY/RECEIVE/MOVE/CONVERT each navigate to the missions intake with
+  the corresponding prefill — §2 no-reload law), and the "Your
+  workspace" honest note carrying the live mission count; when no
+  in-progress mission exists the note carries the two-reason
+  designed-empty line (zero missions ≠ all-archived). The attention
+  line (the honest approvals-plane fact) stays on the home. When
+  in-progress missions exist they list on the home (in-progress only,
+  the fold's order); recent activity = real mission events
+  (reverse-chronological, capped at 20). `foldWorkspaceOverview` is
+  UNCHANGED — the pure fold keeps producing
+  inProgress/attention/recentEvents/emptyState; only the overview
+  rendering is redesigned.
 - `missions`: the real mission list (summaries) + creation intake
   (goal statement, direction, optional amount, hints, note) with
   structural validation findings rendered verbatim; the intent-review
@@ -314,13 +341,29 @@ and it mutates demand-side intent records only.
 - Zero ZCode product branding in the eight product sections; the
   developer workspace entry and the legal/about surfaces carry the
   upstream attribution (PRODUCT-IDENTITY §4).
+- The workspace CHROME (P11, the operator's target design): the topbar
+  carries the PaySwap wordmark with the "Agent Workspace" framing and
+  the back-to-product control; the desktop sidebar carries the seven
+  workspace sections WITH THEIR ICONS under a "Workspace" label, with
+  Settings pinned at the section end (still inside the same `nav`
+  landmark, still the eighth link in the §2 pinned order); the mobile
+  nav is a horizontal scroll row carrying the same items with icons;
+  the workspace FOOTER carries the honest one-line store fact (the
+  mount's durability, verbatim from §5) + the live mission count + the
+  no-live-corridors line. Section icons are PRESENTATION-ONLY (never
+  contract data; they carry `aria-hidden`); navigation stays real
+  hrefs + adapter routing (§2) — an icon is never a substitute for a
+  text label.
 - WCAG 2.2 AA for the workspace: keyboard-traversable navigation,
   visible focus, semantic landmarks (`nav`/`main`/`section` with
   accessible names), `aria-current` on the active section, honest
   `role="status"`/`alert` semantics, reduced-motion respected, minimum
   44px touch targets, responsive 1280×800 / 1440×900 / 390×844.
 - Every navigation item and visible action works or explains its typed
-  prerequisite with a route to resolve it (zero dead buttons).
+  prerequisite with a route to resolve it (zero dead buttons) — the
+  overview intake-entry actions included (P11: typing a goal and
+  pressing "New mission" lands on a PREFILLED missions intake; the
+  outcome shortcuts land on a direction-prefilled intake).
 
 ## 9. Wave verification gates (P10-D, each on its own evidence)
 
@@ -344,3 +387,11 @@ and it mutates demand-side intent records only.
    approval detail (honest empty), no-provider state, and the
    UNKNOWN/reconciliation reference rendering.
 9. JOURNEY-ACCEPTANCE-RECORD.md J14 updated ONLY after 1–8 pass.
+
+P11 re-verification note: gates 1–9 re-run on the redesigned
+chrome/overview at the v1.2.0 release commit; the overview
+intake-entry golden path (type a goal → "New mission" → the missions
+intake PREFILLED; outcome shortcut → direction-prefilled intake) is
+verified under gate 4's every-visible-action law, and the pinned
+§1/§3/§4/§5 shapes are drift-checked unchanged (the pinned-contract
+version literals bump to 1.2.0 per the pin law).

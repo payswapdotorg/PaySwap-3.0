@@ -3,7 +3,7 @@
   "baseCommit": "2999bbb1658443b72ce9644f32cabbebdbecaa37",
   "surface": {
     "packageName": "@payswap/surface",
-    "apiVersion": "1.1.0",
+    "apiVersion": "1.2.0",
     "outcomeActions": [
       {
         "id": "pay",

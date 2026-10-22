@@ -31,7 +31,7 @@
  */
 
 /** The pin-set version for the PaySwap Desktop product (bumps on any pin change). */
-export const PAYSWAP_DESKTOP_PIN_SET_VERSION = "1.1.0" as const;
+export const PAYSWAP_DESKTOP_PIN_SET_VERSION = "1.2.0" as const;
 
 /** The PaySwap 3.0 base commit whose accepted contracts this pin set mirrors. */
 export const PAYSWAP_DESKTOP_PIN_SOURCE_COMMIT =

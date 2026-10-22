@@ -166,7 +166,7 @@ test("[J2][J14][@contract] the route map: every contract route renders its surfa
   // cycle) — the honest report renders when it fails; poll for it.
   await expect
     .poll(
-      async () => /Agent Console|bootstrap/i.test(await visibleText(page)),
+      async () => /Agent Workspace|bootstrap/i.test(await visibleText(page)),
       { timeout: 15_000 },
     )
     .toBe(true);

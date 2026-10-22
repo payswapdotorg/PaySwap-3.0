@@ -40,6 +40,9 @@ import {
   orderInProgressMissions,
   OVERVIEW_ACTIVITY_CAP,
 } from "../../src/console/sections/OverviewSection.js";
+import { MissionsSection } from "../../src/console/sections/MissionsSection.js";
+import { useWorkspaceStore } from "../../src/console/useWorkspaceStore.js";
+import { consoleSection, type ConsoleSectionRecord } from "../../src/console/contracts.js";
 import { createStaticNavigation } from "../../src/shell/navigation.js";
 import {
   EMPTY_STATES_FIXTURE,
@@ -274,15 +277,36 @@ describe("the overview section over a populated store", () => {
     expect(ordered.map((mission) => mission.id)).toEqual(["m-z", "m-a", "m-b"]);
   });
 
-  it("the designed-empty state when zero missions exist (typed reason + working next action)", async () => {
+  it("the designed-empty state when zero missions exist (typed reason + the home's own working create action, P11)", async () => {
     const { navigation } = mountWorkspace("/console", fakeWorkspaceStore());
     await screen.findByText(EMPTY_STATES_FIXTURE.overview.reason);
-    const action = screen.getByText(EMPTY_STATES_FIXTURE.overview.nextAction.label);
-    expect(action.getAttribute("href")).toBe("/console/missions");
+    // The outcome-first home: the create-first-mission next action is the
+    // home's OWN intake entry — "New mission" navigates to the missions
+    // intake (the typed reason + a working action, §6/§8). The static
+    // adapter records the visit; the end-to-end prefill golden path is the
+    // browser journey's (console-mission-lifecycle spec).
+    const cta = screen.getByRole("button", { name: "New mission" });
     await act(async () => {
-      fireEvent.click(action);
+      fireEvent.click(cta);
     });
     expect(navigation.visits).toContain("/console/missions");
+  });
+
+  it("the overview intake entry hands its prefill to onStartMission verbatim (P11)", async () => {
+    const { navigation } = mountWorkspace("/console", fakeWorkspaceStore());
+    await screen.findByText(EMPTY_STATES_FIXTURE.overview.reason);
+    // A typed goal + "New mission" carries the goal into the request.
+    const goalBox = screen.getByLabelText("Tell your agents what you need");
+    fireEvent.change(goalBox, { target: { value: GOAL } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "New mission" }));
+    });
+    expect(navigation.visits).toContain("/console/missions");
+    // An outcome shortcut carries its direction (and no goal).
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /^Convert/ }));
+    });
+    expect(navigation.visits.filter((v) => v === "/console/missions")).toHaveLength(2);
   });
 
   it("the honest all-archived state (never the zero-missions lie)", async () => {
@@ -294,6 +318,47 @@ describe("the overview section over a populated store", () => {
 });
 
 /* -------------------- the missions lifecycle (§5/§6) ------------------ */
+
+describe("the missions intake consumes an overview-originated prefill (P11)", () => {
+  function IntakeHarness(props: {
+    readonly store: WorkspaceStorePort;
+    readonly request: { readonly seq: number; readonly prefill: { readonly goalStatement?: string; readonly direction?: "PAY" | "RECEIVE" | "MOVE" | "CONVERT" } } | undefined;
+  }) {
+    const workspace = useWorkspaceStore(props.store, { clock: () => NOW });
+    const section = consoleSection("missions") as ConsoleSectionRecord;
+    return (
+      <MissionsSection
+        section={section}
+        workspace={workspace}
+        navigation={createStaticNavigation("/console/missions")}
+        intakeRequest={props.request}
+      />
+    );
+  }
+
+  it("a prefill request seeds the creation intake's initial state", async () => {
+    render(
+      <IntakeHarness
+        store={fakeWorkspaceStore()}
+        request={{ seq: 1, prefill: { goalStatement: GOAL, direction: "MOVE" } }}
+      />,
+    );
+    // The prefilled goal + direction render as the intake's initial state.
+    const goalBox = await screen.findByRole("textbox", { name: /Goal statement/ });
+    expect((goalBox as HTMLTextAreaElement).value).toBe(GOAL);
+    const direction = screen.getByRole("combobox", { name: /Direction/ }) as HTMLSelectElement;
+    expect(direction.value).toBe("MOVE");
+  });
+
+  it("no request renders the plain empty intake (never a stale prefill)", async () => {
+    render(<IntakeHarness store={fakeWorkspaceStore()} request={undefined} />);
+    const goalBox = await screen.findByRole("textbox", { name: /Goal statement/ });
+    expect((goalBox as HTMLTextAreaElement).value).toBe("");
+    const direction = screen.getByRole("combobox", { name: /Direction/ }) as HTMLSelectElement;
+    expect(direction.value).toBe("");
+  });
+});
+
 
 async function fillIntake(goal: string): Promise<void> {
   fireEvent.change(screen.getByRole("textbox", { name: /Goal statement/ }), {
@@ -441,17 +506,17 @@ describe("the missions section: creation intake → validation → review → in
 /* ----------------------- document titles (§1) ------------------------- */
 
 describe("the document-title effect (jsdom)", () => {
-  it("the route-specific PaySwap Agent Console titles", async () => {
+  it("the route-specific PaySwap Agent Workspace titles", async () => {
     mountWorkspace("/console", fakeWorkspaceStore());
     await screen.findByText(EMPTY_STATES_FIXTURE.overview.reason);
-    expect(document.title).toBe("PaySwap — Agent Console");
+    expect(document.title).toBe("PaySwap — Agent Workspace");
     cleanup();
     mountWorkspace("/console/missions", fakeWorkspaceStore());
     await screen.findByText(EMPTY_STATES_FIXTURE.missions.reason);
-    expect(document.title).toBe("Missions — PaySwap Agent Console");
+    expect(document.title).toBe("Missions — PaySwap Agent Workspace");
     cleanup();
     mountWorkspace("/console/nowhere", fakeWorkspaceStore());
     await screen.findByText("Section not found");
-    expect(document.title).toBe("Not found — PaySwap Agent Console");
+    expect(document.title).toBe("Not found — PaySwap Agent Workspace");
   });
 });

@@ -64,10 +64,10 @@ export function PaySwapSurfaces({ apiRuntime }: PaySwapSurfacesProps) {
   const decision = resolveWebSurface({ pathname: path, hasState: false, hasCodeOrError: false });
 
   // Document titles are a platform concern: the workspace reads
-  // "PaySwap — Agent Console" (CONSOLE-WORKSPACE §1); the product's
-  // route titles are reported by its own onRouteChange below.
+  // "PaySwap — Agent Workspace" (CONSOLE-WORKSPACE §1, P11 rename);
+  // the product's route titles are reported by its own onRouteChange below.
   useEffect(() => {
-    document.title = decision.kind === "console" ? "PaySwap — Agent Console" : "PaySwap";
+    document.title = decision.kind === "console" ? "PaySwap — Agent Workspace" : "PaySwap";
   }, [decision.kind]);
 
   // Bootstrap-owned surfaces (advanced developer workspace, share,

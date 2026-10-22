@@ -102,9 +102,9 @@ describe("mission board composition laws (P7-W2)", () => {
 
   it("every view carries the desktop pin provenance (versioned, canonical)", () => {
     const board = foldDesktopMissionBoard(FULLY_CONFIGURED);
-    // Bumped to 1.1.0 by P10-B (the console workspace mission-intake pins
-    // joined the set; the pin law bumps the version on any pin change).
-    expect(board.pin.pinSetVersion).toBe("1.1.0");
+    // Bumped to 1.1.0 by P10-B; 1.2.0 by P11 (the pin law bumps the
+    // version on any pin change — the framing rename reaches the pins).
+    expect(board.pin.pinSetVersion).toBe("1.2.0");
     expect(board.pin.sourceCommit).toBe("2999bbb1658443b72ce9644f32cabbebdbecaa37");
     expect(board.pin.workOrder).toBe("P7-W2");
   });

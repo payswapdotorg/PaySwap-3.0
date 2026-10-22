@@ -6,7 +6,7 @@
  * The shell laws, machine-checked over deterministic static renders
  * (renderToStaticMarkup; the store's initial phase is honestly loading —
  * a skeleton, never fabricated rows):
- * - §1 branding: PaySwap wordmark + "Agent Console" framing, the ps-
+ * - §1 branding: PaySwap wordmark + "Agent Workspace" framing, the ps-
  *   design-system root (ps-theme-light), zero ZCode branding in the
  *   eight sections;
  * - §8 a11y: skip link → #ps-console-main, semantic landmarks (header,
@@ -73,12 +73,12 @@ function doc(markup: string): Document {
 const BACK_LABEL = "Back to PaySwap";
 
 describe("the console shell renders the PaySwap chrome (§1)", () => {
-  it("the wordmark + Agent Console framing + theme root are present", () => {
+  it("the wordmark + Agent Workspace framing + theme root are present", () => {
     const html = renderWorkspace(CONSOLE_ROOT);
     expect(html).toContain("ps-theme-light");
     expect(html).toContain("ps-console-root");
     expect(html).toContain("PaySwap");
-    expect(html).toContain("Agent Console");
+    expect(html).toContain("Agent Workspace");
   });
 
   it("zero ZCode product branding inside the workspace sections (attribution is settings-only)", () => {
@@ -112,9 +112,9 @@ describe("the console shell carries the §8 landmark + navigation contracts", ()
     const document = doc(renderWorkspace(CONSOLE_ROOT));
     expect(document.querySelectorAll("header.ps-topbar")).toHaveLength(1);
     const navs = Array.from(document.querySelectorAll("nav")).filter(
-      (nav) => nav.getAttribute("aria-label") === "Console sections",
+      (nav) => nav.getAttribute("aria-label") === "Workspace sections",
     );
-    expect(navs).toHaveLength(2); // desktop sidebar + mobile wrap
+    expect(navs).toHaveLength(2); // desktop sidebar + mobile scroll row (P11)
     const main = document.querySelector("main");
     expect(main?.id).toBe("ps-console-main");
     expect(main?.getAttribute("tabindex")).toBe("-1");

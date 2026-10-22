@@ -166,8 +166,8 @@ test("[J14] keyboard traversal: skip link first, the section nav reachable, the 
       // project's testMatch regex matches this file name): the section
       // navigation renders as the desktop sidebar at ≥lg and the
       // wrapping section nav below; either way the third tab stop is
-      // the active section link inside nav[aria-label='Console sections'].
-      inSectionNav: active?.closest("nav[aria-label='Console sections']") !== null,
+      // the active section link inside nav[aria-label='Workspace sections'].
+      inSectionNav: active?.closest("nav[aria-label='Workspace sections']") !== null,
       cls: active?.getAttribute("class") ?? "",
       text: active?.textContent ?? "",
       current: active?.getAttribute("aria-current") ?? "",
@@ -250,7 +250,7 @@ test("[J14] keyboard traversal: skip link first, the section nav reachable, the 
   // present. Both rendered section navs (the desktop sidebar's nav and
   // the wrapping section nav) carry the accessible name; exactly ONE
   // is visible per viewport (the design system's responsive swap).
-  const sectionNavs = page.locator("nav[aria-label='Console sections']");
+  const sectionNavs = page.locator("nav[aria-label='Workspace sections']");
   await expect(sectionNavs).toHaveCount(2);
   const visibleNavCount = await sectionNavs.evaluateAll((navs) =>
     navs.filter((nav) => nav.getClientRects().length > 0).length,

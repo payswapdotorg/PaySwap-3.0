@@ -474,7 +474,7 @@ async function bootstrapWebApp() {
   // not-found answer for them (routes.ts law). The advanced developer
   // workspace mount below owns only /console/advanced (+ deeper).
   if (surface.kind === "product" || surface.kind === "legacy-redirect" || surface.kind === "console") {
-    document.title = surface.kind === "console" ? "PaySwap — Agent Console" : "PaySwap";
+    document.title = surface.kind === "console" ? "PaySwap — Agent Workspace" : "PaySwap";
     root.render(
       <AppErrorBoundary>
         <PaySwapSurfaces apiRuntime={resolveApiRuntimeInput()} />
@@ -507,7 +507,7 @@ async function bootstrapWebApp() {
     // never removed (CONSOLE-WORKSPACE §1). The workspace store does NOT
     // live here (the BROWSER_PROFILE store serves the /console workspace
     // mount above); this mount is the substrate Root exactly as in P9-A.
-    document.title = "Developer Workspace — PaySwap Agent Console";
+    document.title = "Developer Workspace — PaySwap Agent Workspace";
 
     root.render(
       <AppErrorBoundary>

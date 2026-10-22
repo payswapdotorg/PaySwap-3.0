@@ -71,10 +71,21 @@ function toIntakeInput(fields: IntakeFields): MissionIntakeInput {
   };
 }
 
+/** The create-mode prefill (P11 overview intake entry): the goal the
+ * operator typed on the home and/or the direction an outcome shortcut
+ * chose. Consumed ONCE as the initial state (the seq-keyed remount
+ * re-consumes on each new request); never a silent later mutation. */
+export interface MissionIntakePrefill {
+  readonly goalStatement?: string;
+  readonly direction?: MissionIntentDirection;
+}
+
 export interface MissionIntakeFormProps {
   readonly mode: "create" | "revise";
   /** Pre-fill (revise mode: the record's current intake). */
   readonly initial?: MissionIntakeInput;
+  /** Create-mode prefill (P11): goal statement and/or direction from the overview home. */
+  readonly prefill?: MissionIntakePrefill;
   /** The store mutation pending state (the submit button shows it). */
   readonly pending: boolean;
   /** The honest typed store error, if the last mutation failed. */
@@ -86,14 +97,27 @@ export interface MissionIntakeFormProps {
 export function MissionIntakeForm({
   mode,
   initial,
+  prefill,
   pending,
   error,
   onSubmit,
   onCancel,
 }: MissionIntakeFormProps) {
-  const [fields, setFields] = useState<IntakeFields>(() =>
-    initial === undefined ? emptyFields() : fieldsFromIntake(initial),
-  );
+  const [fields, setFields] = useState<IntakeFields>(() => {
+    if (initial !== undefined) {
+      return fieldsFromIntake(initial);
+    }
+    if (prefill !== undefined) {
+      return {
+        ...emptyFields(),
+        ...(prefill.goalStatement !== undefined && prefill.goalStatement !== ""
+          ? { goalStatement: prefill.goalStatement }
+          : {}),
+        ...(prefill.direction !== undefined ? { direction: prefill.direction } : {}),
+      };
+    }
+    return emptyFields();
+  });
   const [findings, setFindings] = useState<readonly string[]>([]);
   const goalId = useId("ps-console-goal");
   const noteId = useId("ps-console-note");

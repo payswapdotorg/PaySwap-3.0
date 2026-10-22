@@ -17,7 +17,7 @@ import {
 } from "@zcode/ui";
 import "@zcode/ui/styles.css";
 import { createMessagePortServiceConnection } from "@zcode/client";
-// PaySwap 产品面（P9-A）+ Agent Console（P10-B）：主窗口默认打开 PaySwap 产品体验
+// PaySwap 产品面（P9-A）+ Agent Workspace 控制台（P10-B；P11 更名）：主窗口默认打开 PaySwap 产品体验
 // （@payswap/app），Agent Workspace 控制台作为支撑面通过 #/console 哈希可达，
 // ZCode 开发者工作台保留在 #/console/advanced —— 渲染管线（数据库准入、服务连接、
 // 平台桥）完全不变，只有最终挂载的表面换了默认值。console 连接复用同一

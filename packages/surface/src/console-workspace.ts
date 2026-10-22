@@ -5,8 +5,8 @@
  * console contract, registered by the TL 2026-10-21): the eight product
  * sections of the Agent Workspace, the console sub-route law as a pure
  * TOTAL function, and the PaySwap document-title helper (§1: the root
- * reads "PaySwap — Agent Console"; route-specific titles read
- * "… — PaySwap Agent Console").
+ * reads "PaySwap — Agent Workspace"; route-specific titles read
+ * "… — PaySwap Agent Workspace").
  *
  * LAWS enforced here (canonical):
  * - The workspace is a SUPPORTING capability (J14) — never the default
@@ -145,11 +145,11 @@ export const WORKSPACE_SECTIONS: readonly ConsoleSection[] = SECTIONS;
 /** The eight section ids, in §2 order. */
 export const CONSOLE_SECTION_IDS: readonly ConsoleSectionId[] = SECTIONS.map((s) => s.id);
 
-/** The pinned workspace-root document title (§1). */
-export const CONSOLE_ROOT_TITLE = "PaySwap — Agent Console" as const;
+/** The pinned workspace-root document title (§1; P11 framing rename). */
+export const CONSOLE_ROOT_TITLE = "PaySwap — Agent Workspace" as const;
 
-/** The pinned route suffix for every workspace-section title (§1). */
-export const CONSOLE_TITLE_SUFFIX = " — PaySwap Agent Console" as const;
+/** The pinned route suffix for every workspace-section title (§1; P11). */
+export const CONSOLE_TITLE_SUFFIX = " — PaySwap Agent Workspace" as const;
 
 /** The advanced developer workspace mount point (§2: NOT a workspace section). */
 export const CONSOLE_ADVANCED_ROUTE = "/console/advanced" as const;
@@ -207,8 +207,8 @@ export function resolveConsoleSection(subPath: string): ConsoleRouteResolution {
 
 /**
  * The PaySwap document-title helper (§1). The workspace root reads
- * "PaySwap — Agent Console"; a known section reads
- * "<Title> — PaySwap Agent Console"; an unknown path reads the honest
+ * "PaySwap — Agent Workspace"; a known section reads
+ * "<Title> — PaySwap Agent Workspace"; an unknown path reads the honest
  * not-found title; the advanced mount carries the honest developer-workspace
  * label (the mount may use the upstream platform's own title instead —
  * the advanced surface is never branded away).

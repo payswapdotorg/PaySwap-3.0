@@ -127,12 +127,12 @@ export const ADVANCED_PATH_FIXTURE = {
   resolvesTo: "not-found",
 } as const;
 
-/** §1 — document titles ("… — PaySwap Agent Console"; root is special). */
+/** §1 — document titles ("… — PaySwap Agent Workspace"; root is special). */
 export const DOCUMENT_TITLES_FIXTURE = {
-  root: "PaySwap — Agent Console",
-  section: "Missions — PaySwap Agent Console",
-  sectionActivity: "Activity & receipts — PaySwap Agent Console",
-  notFound: "Not found — PaySwap Agent Console",
+  root: "PaySwap — Agent Workspace",
+  section: "Missions — PaySwap Agent Workspace",
+  sectionActivity: "Activity & receipts — PaySwap Agent Workspace",
+  notFound: "Not found — PaySwap Agent Workspace",
 } as const;
 
 /** §3 — the validation law (recorded finding strings of the mirror). */

@@ -9,19 +9,23 @@
  * (byte-exact to spec/surface/CONSOLE-WORKSPACE.md §3/§5) and are
  * re-exported here so the module path stays the single import site.
  *
- * The real shell (CONSOLE-WORKSPACE.md §1/§2/§8): PaySwap chrome (the
- * ps- design system + ps-theme-light, the wordmark with "Agent Console"
- * framing), the eight-section navigation (sidebar at desktop widths,
- * wrapping nav at mobile), aria-current on the active section, semantic
+ * The real shell (CONSOLE-WORKSPACE.md §1/§2/§8, P11 redesign): PaySwap
+ * chrome (the ps- design system + ps-theme-light, the wordmark with
+ * "Agent Workspace" framing), the eight-section navigation (iconed
+ * sidebar with Settings pinned at desktop widths, horizontal scroll
+ * nav at mobile), the honest workspace footer (§5 durability fact +
+ * live mission count), aria-current on the active section, semantic
  * landmarks, a skip link to the main region, route-specific document
  * titles via the pure consoleDocumentTitle helper + an effect, and the
  * honest not-found for unknown section paths — inside the workspace
- * chrome, never the ZCode shell, never a blank screen. Projections
+ * chrome, never the ZCode shell, never a blank screen. The overview
+ * intake-entry actions navigate to the missions intake PREFILLED
+ * (in-component request state; the path space is unchanged). Projections
  * only: the store port is the single mutation surface; UNKNOWN never
  * renders as failure or success.
  */
 
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { EmptyState, SkipLink, useReducedMotion } from "@zcode/ui/payswap";
 import "@zcode/ui/payswap-styles.css";
 import "../payswap-product.css";
@@ -43,14 +47,16 @@ import {
   resolveConsoleSection,
 } from "./contracts.js";
 import {
+  ConsoleFooter,
   ConsoleSidebar,
   ConsoleSectionNav,
   ConsoleTopbar,
   type ConsoleBackToProduct,
 } from "./ConsoleChrome.js";
 import { useWorkspaceStore } from "./useWorkspaceStore.js";
-import { OverviewSection } from "./sections/OverviewSection.js";
-import { MissionsSection } from "./sections/MissionsSection.js";
+import { storeDurabilityLabel } from "./section-vocabulary.js";
+import { OverviewSection, type OverviewIntakePrefill } from "./sections/OverviewSection.js";
+import { MissionsSection, type MissionsIntakeRequest } from "./sections/MissionsSection.js";
 import { AgentsSection } from "./sections/AgentsSection.js";
 import { ApprovalsSection } from "./sections/ApprovalsSection.js";
 import { ConnectionsSection } from "./sections/ConnectionsSection.js";
@@ -133,7 +139,7 @@ export function ConsoleNotFound({
   return (
     <section aria-labelledby="ps-console-notfound-heading" className="ps-console-section">
       <header className="ps-console-section-header">
-        <p className="ps-console-eyebrow">PaySwap Agent Console</p>
+        <p className="ps-console-eyebrow">PaySwap Agent Workspace</p>
         <h1 id="ps-console-notfound-heading" className="ps-console-section-title">
           Section not found
         </h1>
@@ -202,6 +208,21 @@ export function PaySwapAgentWorkspace({
     [navigation, workspace],
   );
 
+  // The overview intake-entry request (P11): the prefill lives in
+  // component state (the path space is unchanged — §2); the seq keys the
+  // missions intake's remount so each request is consumed exactly once.
+  const [intakeRequest, setIntakeRequest] = useState<MissionsIntakeRequest | null>(null);
+  const startMissionFromOverview = useCallback(
+    (prefill: OverviewIntakePrefill) => {
+      setIntakeRequest((current) => ({
+        seq: (current?.seq ?? 0) + 1,
+        prefill,
+      }));
+      navigation.navigate(`${CONSOLE_ROOT}/missions`);
+    },
+    [navigation],
+  );
+
   const sectionById = (id: string): ConsoleSectionRecord => {
     const record = consoleSection(id);
     if (record === undefined) {
@@ -230,6 +251,7 @@ export function PaySwapAgentWorkspace({
               workspace={workspace}
               navigation={navigation}
               onOpenMission={openMissionFromOverview}
+              onStartMission={startMissionFromOverview}
             />
           ) : null}
           {route.kind === "section" && route.sectionId === "missions" ? (
@@ -237,6 +259,7 @@ export function PaySwapAgentWorkspace({
               section={sectionById("missions")}
               workspace={workspace}
               navigation={navigation}
+              intakeRequest={intakeRequest ?? undefined}
             />
           ) : null}
           {route.kind === "section" && route.sectionId === "agents" ? (
@@ -275,6 +298,12 @@ export function PaySwapAgentWorkspace({
           ) : null}
         </main>
       </div>
+      <ConsoleFooter
+        durabilityFact={storeDurabilityLabel(store.durability).fact}
+        missionCount={
+          workspace.list.phase === "ready" ? workspace.list.summaries.length : undefined
+        }
+      />
     </div>
   );
 }

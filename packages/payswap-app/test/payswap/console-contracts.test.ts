@@ -269,7 +269,7 @@ describe("the eight-section IA and the console path law (§2)", () => {
     );
     for (const section of CONSOLE_SECTIONS) {
       expect(consoleDocumentTitle({ kind: "section", sectionId: section.id })).toBe(
-        `${section.title} — PaySwap Agent Console`,
+        `${section.title} — PaySwap Agent Workspace`,
       );
     }
   });
