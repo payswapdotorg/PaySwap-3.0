@@ -33,6 +33,53 @@
   flex: 1 1 auto;
 }
 
+/* --------------------- P12-B viewport/scroll contract ---------------- */
+
+/*
+ * THE SCROLL TRAP (Issue #2 Lane B): the inherited substrate stylesheet
+ * (packages/ui/src/styles.css — required by the advanced ZCode workspace
+ * mount) declares `body { overflow: hidden }` and
+ * `#root { height: 100dvh; overflow: hidden }` GLOBALLY, which traps the
+ * whole document in BOTH the web and desktop mounts. The bounded
+ * workspace shells need that trap; the PUBLIC marketing surfaces (home,
+ * capabilities, security, developers) must actually scroll — the v1.2.0
+ * packaged app cropped the home page at the fold with no way past it.
+ *
+ * The unlock uses `:has()` (Chromium 105+; Electron 41 here) so it wins
+ * the cascade against the substrate globals WITHOUT touching them: when
+ * a product root is mounted, the document scrolls again. It is inert on
+ * the Agent Workspace and advanced-workspace surfaces (no
+ * .ps-product-root there — their own bounded shells govern) and inert on
+ * the /app/* area surfaces below, where the bounded app shell is exactly
+ * viewport-high so the document has nothing to scroll anyway.
+ */
+body:has(.ps-product-root) {
+  overflow: auto;
+}
+
+#root:has(.ps-product-root) {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+}
+
+/*
+ * The /app/* eleven-area surfaces (route-marked by the .ps-area-nav row
+ * the area pages render): a BOUNDED app shell — pinned chrome, the main
+ * region owns vertical scrolling. Flex hygiene (`min-height: 0`) so the
+ * scroll container can actually shrink inside the column flex shell.
+ */
+.ps-product-root:has(.ps-area-nav) {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ps-product-root:has(.ps-area-nav) .ps-product-main {
+  min-height: 0;
+  overflow-y: auto;
+}
+
 /* ------------------------------ site chrome -------------------------- */
 
 .ps-site-brand {

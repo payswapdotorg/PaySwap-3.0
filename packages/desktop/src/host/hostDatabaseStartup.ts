@@ -3,7 +3,10 @@ import {
   markTasksStoragePrepared,
   resolveZCodeAgentSpawnCwd,
 } from "@zcode/services/storage-startup";
-import type { DatabaseStartupState } from "@zcode/shared";
+import {
+  extractDatabaseStartupFailure,
+  type DatabaseStartupState,
+} from "@zcode/shared";
 import { DatabaseStartupCoordinator } from "./databaseStartupCoordinator.js";
 import { StartupDiskSampler } from "./startupDiskSampler.js";
 import { prepareHostStorage, prepareSessionStorage } from "./storagePreparationProcesses.js";
@@ -87,10 +90,16 @@ export function createHostDatabaseStartup(options: {
         report("starting_services");
         await options.initializeServices();
       } catch (error) {
-        try {
-          options.onFailure(error);
-        } catch {
-          /* 诊断失败不覆盖原始错误。 */
+        // P12-A: an abort is a shutdown-time cancellation, not a product
+        // failure — the failure-telemetry hook must not record it (the
+        // published state still carries the sanitized `aborted` category
+        // for any consumer that needs the distinction).
+        if (extractDatabaseStartupFailure(error)?.category !== "aborted") {
+          try {
+            options.onFailure(error);
+          } catch {
+            /* 诊断失败不覆盖原始错误。 */
+          }
         }
         throw error;
       } finally {

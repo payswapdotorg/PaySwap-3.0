@@ -1,8 +1,12 @@
 import { nativeTheme, type BrowserWindow, type Point } from "electron";
 import { PlatformChannels } from "@zcode/shared";
 import { resolveDesktopZoomFactorForLevel } from "./desktopZoom.js";
+// P12-B: the base position moved to the electron-free pure seam
+// (desktopWindowVisualOptions.ts) so the window-chrome contract is
+// unit-testable without Electron; re-exported here for existing importers.
+import { MACOS_TRAFFIC_LIGHT_BASE_POSITION } from "./desktopWindowVisualOptions.js";
 
-export const MACOS_TRAFFIC_LIGHT_BASE_POSITION = { x: 22, y: 23 } as const;
+export { MACOS_TRAFFIC_LIGHT_BASE_POSITION };
 const MACOS_TRAFFIC_LIGHT_BASE_LEFT_PADDING_PX = 96;
 const MACOS_TRAFFIC_LIGHT_POSITION_MOVEMENT_GAIN = 1.5;
 export const WINDOWS_WINDOW_CONTROLS_BASE_RIGHT_PADDING_PX = 136;

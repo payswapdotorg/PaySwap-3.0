@@ -1,6 +1,16 @@
 /*
  * @zcode/desktop — the PaySwap product-surface switch styles (P9-A).
  *
+ * P12-B VIEWPORT/SCROLL CONTRACT: this file deliberately introduces NO
+ * surface wrapper — the switch renders its subtrees as fragments, so the
+ * scroll behavior is owned entirely by the mounted surfaces themselves:
+ * the marketing surfaces unlock true document scrolling and the /app/*
+ * areas + Agent Workspace use bounded shells with internal scroll
+ * containers (see packages/payswap-app/src/payswap-product.css and
+ * console/console.css). Any wrapper added here MUST NOT impose a second
+ * scroll context or trap wheel events — test-pinned by
+ * desktop/test/payswap/scroll-contract.test.ts.
+ *
  * The floating back-to-product control rendered while the SUPPORTING
  * agent-console surface is open: compact, quiet, PaySwap-branded — it
  * must never compete with the console's own chrome (which belongs to

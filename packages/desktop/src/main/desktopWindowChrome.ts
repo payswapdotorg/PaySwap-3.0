@@ -22,7 +22,6 @@ import {
   buildWindowsTitleBarOverlayForZoomLevel,
   hasCustomWindowsControls,
   registerCustomWindowsControls,
-  MACOS_TRAFFIC_LIGHT_BASE_POSITION,
   syncWindowControlsOverlayForZoomLevel,
 } from "./desktopWindowButtonPosition.js";
 import {
@@ -31,6 +30,7 @@ import {
   resolveDesktopZoomLevelFromFactor,
 } from "./desktopZoom.js";
 import { resolveDesktopWindowChromeState } from "./desktopWindowChromeState.js";
+import { resolveDesktopWindowVisualOptions } from "./desktopWindowVisualOptions.js";
 import {
   MIN_DESKTOP_WINDOW_HEIGHT,
   MIN_DESKTOP_WINDOW_WIDTH,
@@ -133,39 +133,10 @@ function isLinuxDesktopWindow() {
   return process.platform === "linux";
 }
 
-function buildDesktopWindowVisualOptions() {
-  if (process.platform === "darwin") {
-    return {
-      backgroundColor: "#00000000",
-      titleBarStyle: "hidden" as const,
-      trafficLightPosition: MACOS_TRAFFIC_LIGHT_BASE_POSITION,
-      vibrancy: "under-window" as const,
-      visualEffectState: "active" as const,
-    };
-  }
-
-  if (process.platform === "win32") {
-    return {
-      backgroundColor: "#00000000",
-      // Windows 窗口操作由 renderer 绘制，禁用原生标题栏，避免出现两套按钮。
-      frame: false,
-      backgroundMaterial: "acrylic" as const,
-    };
-  }
-
-  return {
-    // 不透明 BrowserWindow 会把 renderer 的圆角裁切重新填成直角黑底，
-    // Linux 外壳无法与内层 12px 面板形成同心圆弧。透明底只负责露出四角，
-    // renderer 根面仍使用不透明 token，避免桌面底色混入侧栏。
-    backgroundColor: "#00000000",
-    transparent: true,
-    // Linux 原生标题栏会和 renderer 自绘顶部菜单重复，隐藏 frame 后统一用自定义窗口控制。
-    frame: false,
-    // Linux 部分窗口管理器会给 frameless 窗口绘制额外外侧阴影/描边，
-    // 用户看到的是窗口外缘黑线。只在 Linux 禁用系统阴影，避免影响 macOS/Windows 的原生材质。
-    hasShadow: false,
-  };
-}
+/* P12-B: the per-platform visual options moved to the electron-free pure
+ * seam desktopWindowVisualOptions.ts (unit-tested there). Linux uses the
+ * NATIVE frame (Issue #2 Lane B): the WM supplies close/minimize/maximize/
+ * restore, edge+corner resize and titlebar drag. */
 
 export function applyAppIcon(iconPath: string) {
   if (process.platform !== "darwin" || app.dock == null) {
@@ -576,9 +547,10 @@ export function createBrowserWindow(options: {
     minHeight: MIN_DESKTOP_WINDOW_HEIGHT,
     title: options.title,
     icon: options.iconPath,
-    // Linux frameless 后部分桌面环境仍可能显示 Electron 原生菜单栏，自动隐藏避免顶部出现两套菜单。
+    // Linux 原生框架下 Electron 菜单栏会出现在原生标题栏下方，自动隐藏避免
+    // 顶部出现两套菜单（Alt 仍可唤起）。macOS 走系统菜单栏；Windows 无菜单栏。
     autoHideMenuBar: isLinuxDesktopWindow(),
-    ...buildDesktopWindowVisualOptions(),
+    ...resolveDesktopWindowVisualOptions(process.platform),
     webPreferences: {
       preload: options.preloadPath,
       contextIsolation: true,

@@ -3,6 +3,7 @@ import {
   classifyDatabaseStartupError,
   canRetryDatabaseStartup,
   databaseStartupErrorDetails,
+  extractDatabaseStartupFailure,
   databaseMigrationFactsSchema,
   type DatabaseStartupState,
   type DatabaseMigrationFacts,
@@ -75,6 +76,7 @@ export class DatabaseStartupCoordinator {
       startedAt: Date.now(),
       phase: "starting",
       errorCode: undefined,
+      startupFailure: undefined,
       sqliteCode: undefined,
       systemCode: undefined,
       migrationId: undefined,
@@ -145,10 +147,21 @@ export class DatabaseStartupCoordinator {
       await this.options.prepare(report);
       report("ready");
     } catch (error) {
+      // P12-A: carry the sanitized cause (category, worker exit code, system
+      // code) into the published state — and record truthfully whether
+      // trustworthy in-lock migration baselines were already collected (a
+      // later failure never implies the committed work was rolled back).
+      const startupFailure = extractDatabaseStartupFailure(error);
       this.state = {
         ...this.state,
         failedPhase: this.state.phase,
         errorCode: classifyDatabaseStartupError(error),
+        startupFailure: startupFailure
+          ? {
+              ...startupFailure,
+              ...(this.baselines.size > 0 ? { migrationPreserved: true } : {}),
+            }
+          : undefined,
         ...databaseStartupErrorDetails(error),
       };
       const update = (

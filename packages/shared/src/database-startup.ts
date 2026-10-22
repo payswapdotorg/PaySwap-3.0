@@ -16,6 +16,61 @@ export const databaseStartupErrorCodeSchema = z.enum([
 ]);
 export type DatabaseStartupErrorCode = z.infer<typeof databaseStartupErrorCodeSchema>;
 
+/**
+ * P12-A (Issue #2 Lane A): the sanitized CAUSE taxonomy. `errorCode` alone
+ * mapped several very different failures onto the generic
+ * `transport_closed` (worker spawn failure, module-load failure, early
+ * exit, protocol violation, abort) — the operator's v1.2.0 failure payload
+ * could not be root-caused from the evidence the app emitted. The category
+ * is ADDITIVE: old states (and uninstrumented paths) simply carry no
+ * `startupFailure`, and every consumer falls back to today's behavior.
+ *
+ * Sanitization law: only enums, exit codes, short system codes and booleans
+ * — never secrets, raw SQL, DB contents or unbounded local paths.
+ */
+export const databaseStartupFailureCategorySchema = z.enum([
+  "worker_spawn_failed",
+  "worker_load_failed",
+  "worker_early_exit",
+  "worker_protocol_violation",
+  "aborted",
+  "first_state_timeout",
+  "database_failed",
+  "unknown",
+]);
+export type DatabaseStartupFailureCategory = z.infer<typeof databaseStartupFailureCategorySchema>;
+
+export const databaseStartupFailureSchema = z
+  .object({
+    category: databaseStartupFailureCategorySchema,
+    /** The worker thread/process exit code when the failure is an exit-side diagnosis. */
+    workerExitCode: z.number().int().nullable().optional(),
+    /** A short OS/Node system code (already constrained by the details schema). */
+    systemCode: z.string().max(64).optional(),
+    /** True when trustworthy in-lock migration baselines were recorded before the failure. */
+    migrationPreserved: z.boolean().optional(),
+  })
+  .strict();
+export type DatabaseStartupFailure = z.infer<typeof databaseStartupFailureSchema>;
+
+/**
+ * Extract a sanitized `startupFailure` from an error chain (max depth 12,
+ * same walk discipline as the classifiers). Returns undefined when no
+ * instrumented cause is present — callers then keep legacy behavior.
+ */
+export function extractDatabaseStartupFailure(error: unknown): DatabaseStartupFailure | undefined {
+  const seen = new Set<unknown>();
+  while (error && typeof error === "object" && !seen.has(error) && seen.size < 12) {
+    seen.add(error);
+    const parsed = databaseStartupFailureSchema.safeParse(
+      (error as { startupFailure?: unknown }).startupFailure,
+    );
+    if (parsed.success) return parsed.data;
+    error = (error as { cause?: unknown }).cause;
+  }
+  return undefined;
+}
+
 /** 原始结构化 cause 比外层通用包装更准确；禁止从错误文案推断满盘或 OOM。 */
 export function classifyDatabaseStartupError(error: unknown): DatabaseStartupErrorCode {
   const seen = new Set<unknown>();
@@ -142,6 +197,7 @@ export const databaseStartupStateSchema = z
     finalDatabase: z.boolean().optional(),
     failedPhase: databaseStartupPhaseSchema.optional(),
     errorCode: databaseStartupErrorCodeSchema.optional(),
+    startupFailure: databaseStartupFailureSchema.optional(),
     ...databaseStartupErrorDetailsSchema.shape,
     disk: z.array(startupDiskSummarySchema).max(8),
   })
@@ -160,19 +216,37 @@ export const databaseStartupControlSchema = z.discriminatedUnion("action", [
 ]);
 export type DatabaseStartupControl = z.infer<typeof databaseStartupControlSchema>;
 
-/** 迁移可手动重试；已部分装配服务或损坏/失联时通过退出重开恢复，避免重复启动副作用。 */
+/**
+ * 迁移可手动重试；已部分装配服务或损坏/失联时通过退出重开恢复，避免重复启动副作用。
+ *
+ * P12-A: the retry law now also reads the sanitized cause category. Legacy
+ * states (no `startupFailure`) classify EXACTLY as before — the compat test
+ * pins this. New instrumented causes: worker spawn/load/early-exit/protocol
+ * failures and timeouts are transient or re-attemptable (non-destructive,
+ * guarded preparation) so they become retryable; `aborted` (the app is
+ * closing) never surfaces a user retry; `database_failed` keeps the
+ * per-errorCode law (corrupt/checksum stay non-retryable).
+ */
 export function canRetryDatabaseStartup(
-  state: Pick<DatabaseStartupState, "phase" | "failedPhase" | "errorCode">,
+  state: Pick<DatabaseStartupState, "phase" | "failedPhase" | "errorCode"> & {
+    startupFailure?: DatabaseStartupFailure;
+  },
 ): boolean {
-  return (
-    state.phase === "failed" &&
-    state.failedPhase !== "starting_services" &&
-    ![
+  if (state.phase !== "failed") return false;
+  if (state.failedPhase === "starting_services") return false;
+  const category = state.startupFailure?.category;
+  if (category === undefined) {
+    return ![
       "corrupt",
       "checksum_mismatch",
       "transport_closed",
       "startup_status_timeout",
       "unsupported_runtime",
-    ].includes(state.errorCode ?? "sql_failed")
-  );
+    ].includes(state.errorCode ?? "sql_failed");
+  }
+  if (category === "aborted") return false;
+  if (category === "database_failed") {
+    return !["corrupt", "checksum_mismatch"].includes(state.errorCode ?? "sql_failed");
+  }
+  return true;
 }
