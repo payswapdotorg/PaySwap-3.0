@@ -1,0 +1,364 @@
+/**
+ * PaySwap Desktop (P13-C) — the payment-mission plane's typed vocabulary
+ * and durable record contracts.
+ *
+ * THE LANE (ADR-0007 D7, the payment-dispatch authority boundary): this
+ * tree implements the guided Pay intake, the authorization gate, the
+ * durable mission and the reconciliation driver INSIDE the desktop host.
+ * The canonical consequential path is the only one implemented:
+ *
+ *   intake (conversational, never guessing)
+ *     → validation against REAL state (accounts / corridor / quote /
+ *       limits / provider scopes / policy — all honestly absent here)
+ *     → structured preview (provenance + expiry + destination + risk)
+ *     → EXPLICIT scoped user authorization (a UI act on the preview;
+ *       text/NLP/voice is NEVER authorization)
+ *     → execution through the typed ExecutionAuthorityPort ONLY
+ *     → observations with evidence (UNKNOWN reconciles before retry)
+ *     → append-only mission timeline + reconciliation
+ *
+ * LAYER LAW (the desktop host discipline): this tree imports NO @payswap/*
+ * package. The shared agent-task vocabulary (@payswap/surface
+ * agent-tasks.ts, TL-frozen) and the canonical PaymentIntent shape
+ * (@payswap/economic payment-intent.ts) are pinned BY VALUE here and in
+ * ./adapters/ — the established two-step mirror discipline; behavioral
+ * fidelity against the REAL contracts is asserted by
+ * test/payswap/payments-contract-mirrors.test.ts (which imports the real
+ * packages from the test tier, where cross-package source imports are
+ * lawful). Live-import composition is the TL's integration step.
+ *
+ * ADVISORY DEMAND ONLY: a payment mission record is a demand-side
+ * orchestration artifact. It is NOT authorization (the artifact in
+ * authorization-gate.ts is), NOT financial truth, NOT capability state.
+ */
+
+// ---------------------------------------------------------------------------
+// The shared agent-task vocabulary (pinned BY VALUE from
+// packages/surface/src/agent-tasks.ts — drift is a two-step conscious
+// change caught by the mirror test)
+// ---------------------------------------------------------------------------
+
+/** Mirrors AGENT_TASK_ORIGINS. Voice is declared-unsupported in this deployment. */
+export const PAYMENT_TASK_ORIGINS = [
+  "SURFACE_ACTION",
+  "COMPOSER_TEXT",
+  "COMPOSER_VOICE",
+  "SYSTEM",
+] as const;
+export type PaymentTaskOrigin = (typeof PAYMENT_TASK_ORIGINS)[number];
+
+/** Mirrors SUPPORTED_AGENT_TASK_ORIGINS. */
+export const SUPPORTED_PAYMENT_TASK_ORIGINS: readonly PaymentTaskOrigin[] = Object.freeze([
+  "SURFACE_ACTION",
+  "COMPOSER_TEXT",
+  "SYSTEM",
+]);
+
+/** Mirrors AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT (rendered verbatim, never bypassed). */
+export const PAYMENT_TASK_VOICE_UNSUPPORTED_STATEMENT =
+  "Voice input is not supported in this deployment — there is no speech-to-text capability to route. Type your request instead; it reaches the same task system.";
+
+/** Mirrors AGENT_TASK_STATUSES (the task lifecycle; terminal = monotonic). */
+export const PAYMENT_TASK_STATUSES = [
+  "DRAFT",
+  "ACTIVE",
+  "AWAITING_EXTERNAL_RETURN",
+  "PAUSED",
+  "COMPLETED",
+  "FAILED",
+  "CANCELLED",
+  "EXPIRED",
+] as const;
+export type PaymentTaskStatus = (typeof PAYMENT_TASK_STATUSES)[number];
+
+/** Mirrors TERMINAL_AGENT_TASK_STATUSES. */
+export const TERMINAL_PAYMENT_TASK_STATUSES: readonly PaymentTaskStatus[] = Object.freeze([
+  "COMPLETED",
+  "FAILED",
+  "CANCELLED",
+  "EXPIRED",
+]);
+
+export function isTerminalPaymentTaskStatus(status: PaymentTaskStatus): boolean {
+  return TERMINAL_PAYMENT_TASK_STATUSES.includes(status);
+}
+
+/** Mirrors AGENT_TASK_EVENT_KINDS (append-only mission event kinds). */
+export const PAYMENT_TASK_EVENT_KINDS = [
+  "CREATED",
+  "RESUMED",
+  "FIELD_CAPTURED",
+  "MISSING_FIELD_ASKED",
+  "VALIDATED",
+  "PREVIEW_PRESENTED",
+  "AUTHORIZATION_GRANTED",
+  "AUTHORIZATION_DECLINED",
+  "EXTERNAL_RETURN_VALIDATED",
+  "EXTERNAL_RETURN_REJECTED",
+  "ATTEMPT_STARTED",
+  "ATTEMPT_CONFIRMED",
+  "ATTEMPT_FAILED",
+  "OUTCOME_UNKNOWN",
+  "RECONCILED",
+  "CANCELLED",
+  "EXPIRED",
+] as const;
+export type PaymentTaskEventKind = (typeof PAYMENT_TASK_EVENT_KINDS)[number];
+
+/** Mirrors MissionIntentDirection (console-missions vocabulary). */
+export const PAYMENT_MISSION_DIRECTIONS = ["PAY", "RECEIVE", "MOVE", "CONVERT"] as const;
+export type PaymentMissionDirection = (typeof PAYMENT_MISSION_DIRECTIONS)[number];
+
+/** One append-only mission event (mirrors the AgentTaskEvent shape). */
+export interface PaymentMissionEvent {
+  readonly id: string;
+  /** ISO-8601 UTC instant — explicit input, never ambient. */
+  readonly at: string;
+  readonly kind: PaymentTaskEventKind;
+  /** People-language summary (no secret material ever — the chat law). */
+  readonly summary: string;
+  /** Correlation reference (idempotency key, artifact id, evidence ref…). */
+  readonly correlationRef?: string;
+}
+
+// ---------------------------------------------------------------------------
+// The nine required intake fields (work-order law: gathered
+// conversationally WITHOUT guessing — every field is MISSING until an
+// EXPLICIT capture; "no preference" is an explicit captured value, never
+// a default)
+// ---------------------------------------------------------------------------
+
+export const PAYMENT_INTAKE_FIELD_IDS = [
+  "amountAndCurrency",
+  "fundingSource",
+  "recipient",
+  "countryCorridor",
+  "speedDeadline",
+  "feeCap",
+  "purpose",
+  "privacyCompliance",
+  "partialPaymentPreference",
+] as const;
+export type PaymentIntakeFieldId = (typeof PAYMENT_INTAKE_FIELD_IDS)[number];
+
+/** The exact-money wire shape (pinned AmountSpec — integer minor units). */
+export interface PaymentAmountSpec {
+  readonly currency: string;
+  readonly minorUnits: string;
+}
+
+/** What one capture carries, per field (all explicit; none defaulted). */
+export interface PaymentIntakeCaptures {
+  /** Exact amount + currency leaving the funding source (positive). */
+  amountAndCurrency: PaymentAmountSpec;
+  /** User-stated funding-source preference (NOT an observed account). */
+  fundingSource: string;
+  /** Recipient reference as stated (NOT a verified payee). */
+  recipient: string;
+  /** Corridor: source country, destination country, destination currency. */
+  countryCorridor: {
+    readonly sourceCountry: string;
+    readonly destinationCountry: string;
+    readonly destinationCurrency: string;
+  };
+  /** Delivery deadline (ISO-8601 UTC; strictly after the mission creation). */
+  speedDeadline: { readonly deadlineAt: string };
+  /** Fee cap — an explicit cap, or an explicit no-cap statement. */
+  feeCap: { readonly kind: "CAPPED"; readonly amount: PaymentAmountSpec } | { readonly kind: "UNCAPPED" };
+  /** Purpose of payment, as stated. */
+  purpose: string;
+  /** Privacy/compliance constraints — explicit constraints, or an explicit none-stated. */
+  privacyCompliance:
+    | { readonly kind: "CONSTRAINED"; readonly notes: string }
+    | { readonly kind: "NONE_STATED" };
+  /** Supported partial-payment preference — explicit either way. */
+  partialPaymentPreference: { readonly kind: "REQUIRE_FULL" } | { readonly kind: "ALLOW_PARTIAL" };
+}
+
+/** Field capture state: MISSING until an explicit capture exists. */
+export type PaymentIntakeFieldState<T> = { readonly status: "MISSING" } | { readonly status: "CAPTURED"; readonly value: T };
+
+export type PaymentIntakeFieldStates = {
+  readonly [F in PaymentIntakeFieldId]: PaymentIntakeFieldState<PaymentIntakeCaptures[F]>;
+};
+
+// ---------------------------------------------------------------------------
+// Attempts (execution records with idempotency + correlation references)
+// ---------------------------------------------------------------------------
+
+/** The three-value external-effect outcome (pinned INV-04 vocabulary). */
+export const PAYMENT_EFFECT_OUTCOMES = ["CONFIRMED", "UNKNOWN", "FAILED"] as const;
+export type PaymentEffectOutcome = (typeof PAYMENT_EFFECT_OUTCOMES)[number];
+
+/** The pinned ambiguity reasons (UNKNOWN is never bare). */
+export const PAYMENT_AMBIGUITY_REASONS = [
+  "TRANSPORT_TIMEOUT_AFTER_DISPATCH",
+  "TRANSPORT_CONNECTION_LOST_AFTER_DISPATCH",
+  "MALFORMED_RESPONSE_AFTER_DISPATCH",
+] as const;
+export type PaymentAmbiguityReason = (typeof PAYMENT_AMBIGUITY_REASONS)[number];
+
+/** The execution modes (pinned INV-25 SANDBOX/LIVE law). */
+export const PAYMENT_EXECUTION_MODES = ["SANDBOX", "LIVE"] as const;
+export type PaymentExecutionMode = (typeof PAYMENT_EXECUTION_MODES)[number];
+
+/**
+ * Provider failure metadata (pinned shape — mirrors the real
+ * ProviderFailureMetadata including the REQUIRED outcome-ambiguity
+ * classification: 'NONE' = definitive failure; 'OUTCOME_UNKNOWN' feeds
+ * ambiguity handling and can NEVER ride a FAILED envelope (INV-04)).
+ */
+export interface PaymentProviderFailure {
+  readonly providerErrorCode?: string;
+  readonly providerErrorMessage?: string;
+  readonly retryable: boolean;
+  readonly ambiguity: "NONE" | "OUTCOME_UNKNOWN";
+}
+
+/**
+ * The pinned execution result envelope — field-for-field the REAL
+ * @payswap/provider-runtime ExecutionResultEnvelope (mirror-asserted by
+ * test/payswap/payments-contract-mirrors.test.ts): dispatched/completed
+ * are TimestampMs INTEGERS, the raw-state pointer is retained losslessly,
+ * and there is NO executionMode field here — the execution mode is a
+ * property of the ATTEMPT (INV-25 brands every attempt record), never of
+ * the authority's answer. UNKNOWN ≠ FAILED (INV-04).
+ */
+export interface PaymentResultEnvelope {
+  readonly outcome: PaymentEffectOutcome;
+  readonly providerReferences: readonly string[];
+  readonly providerFailure?: PaymentProviderFailure;
+  /** Present for UNKNOWN — the recorded ambiguity reason. */
+  readonly ambiguityReason?: PaymentAmbiguityReason;
+  /** Retained raw provider-state record (lossless retention upstream). */
+  readonly rawStateRecordId?: string;
+  readonly dispatchedAt: number;
+  readonly completedAt: number;
+}
+
+/** One consequential attempt on a mission (append-only fields after start). */
+export interface PaymentAttemptRecord {
+  readonly attemptId: string;
+  readonly operation: "CREATE_EXTERNAL_EFFECT" | "CANCEL_OR_REVERSE_EFFECT";
+  /** Durable idempotency key (deterministic per mission+operation+intent digest). */
+  readonly idempotencyKey: string;
+  readonly commandId: string;
+  readonly correlationId: string;
+  /** The executing connected instance (opaque; the registry owns meaning). */
+  readonly connectionRef: string;
+  /** INV-25: every attempt record is branded with its execution mode. */
+  readonly executionMode: PaymentExecutionMode;
+  readonly authorizationArtifactId: string;
+  readonly startedAt: string;
+  /** Present once the authority answered; the envelope is never mutated. */
+  readonly envelope?: PaymentResultEnvelope;
+  /**
+   * Present when the authority REFUSED the command before any effect (a
+   * typed refusal is definitively not a provider answer — no envelope is
+   * fabricated for it, and the attempt is resolved-no-effect).
+   */
+  readonly refusal?: {
+    readonly kind: "NO_AUTHORITY_WIRED" | "CONNECTION_NOT_ACTIVE" | "MODE_NOT_OFFERED" | "AUTHORIZATION_INVALID" | "COMMAND_REJECTED";
+    readonly reason: string;
+  };
+  /** Present once reconciliation evidence closed an UNKNOWN. */
+  readonly reconciliation?: {
+    readonly resolvedTo: "CONFIRMED" | "FAILED";
+    readonly source: "EXTERNAL_PROVIDER_STATEMENT" | "EXTERNAL_PROVIDER_RETRIEVAL";
+    readonly evidenceRefs: readonly string[];
+    readonly resolvedAt: string;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// The durable mission record
+// ---------------------------------------------------------------------------
+
+/** The mission record persisted under the workspace-store discipline. */
+export interface PaymentMissionRecord {
+  /**
+   * Durable task id (ADR-0007 D6): host-minted
+   * `task:PAYMENT_MISSION:<crypto-random>`, persisted with the record —
+   * stable across restarts, never reused (crypto-random, not a counter).
+   */
+  readonly id: string;
+  readonly direction: PaymentMissionDirection;
+  readonly goalStatement: string;
+  readonly origin: PaymentTaskOrigin;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+  readonly status: PaymentTaskStatus;
+  /** The status the mission returns to on resume (never a terminal). */
+  readonly resumeFrom: PaymentTaskStatus;
+  /** Append-only history, newest-first (the writer appends, never rewrites). */
+  readonly events: readonly PaymentMissionEvent[];
+  /** The nine-field intake state. */
+  readonly fields: PaymentIntakeFieldStates;
+  /** The compiled ADVISORY demand record (11-field canonical), once compilable. */
+  readonly intent?: CompiledPaymentIntent;
+  /** The presented preview id, once a preview passed the gate chain. */
+  readonly previewId?: string;
+  /** The consumed authorization artifact id, once dispatch was armed. */
+  readonly authorizationArtifactId?: string;
+  /** Consequential attempts (execution + compensation), in start order. */
+  readonly attempts: readonly PaymentAttemptRecord[];
+}
+
+// ---------------------------------------------------------------------------
+// The compiled ADVISORY demand record — the 11-field canonical
+// PaymentIntent pin (see ./adapters/economic-payment-intent.ts)
+// ---------------------------------------------------------------------------
+
+import type {
+  CanonicalPaymentIntent,
+  CanonicalFundsLocationRef,
+} from "./adapters/economic-payment-intent.js";
+
+/** The compiled intent (the canonical 11-field shape, advisory only). */
+export type CompiledPaymentIntent = CanonicalPaymentIntent;
+export type { CanonicalFundsLocationRef };
+
+// ---------------------------------------------------------------------------
+// Typed errors (fail-closed; never stringly-typed control flow)
+// ---------------------------------------------------------------------------
+
+export type PaymentMissionErrorKind =
+  | "MISSION_NOT_FOUND"
+  | "INVALID_TRANSITION"
+  | "FIELD_ALREADY_CAPTURED"
+  | "INVALID_FIELD_VALUE"
+  | "INTAKE_INCOMPLETE"
+  | "GATES_BLOCKED"
+  | "PREVIEW_REQUIRED"
+  | "PREVIEW_EXPIRED"
+  | "AUTHORIZATION_REQUIRED"
+  | "AUTHORIZATION_ORIGIN_REJECTED"
+  | "AUTHORIZATION_EXPIRED"
+  | "AUTHORIZATION_CONSUMED"
+  | "AUTHORIZATION_MISMATCH"
+  | "IDEMPOTENCY_CONFLICT"
+  | "RETRY_BLOCKED_UNKNOWN"
+  | "RECONCILIATION_NOT_PENDING"
+  | "RECONCILIATION_EVIDENCE_INVALID"
+  | "MISSION_TERMINAL"
+  | "STORE_NOT_CONFIGURED"
+  | "PERSISTENCE_FAILED";
+
+/** The one typed error family of the payment-mission runtime. */
+export class PaymentMissionError extends Error {
+  readonly kind: PaymentMissionErrorKind;
+  readonly missionId?: string;
+  readonly reasons?: readonly string[];
+
+  constructor(
+    kind: PaymentMissionErrorKind,
+    message: string,
+    details: { readonly missionId?: string; readonly reasons?: readonly string[] } = {},
+  ) {
+    super(message);
+    this.name = "PaymentMissionError";
+    this.kind = kind;
+    if (details.missionId !== undefined) this.missionId = details.missionId;
+    if (details.reasons !== undefined) this.reasons = details.reasons;
+  }
+}
