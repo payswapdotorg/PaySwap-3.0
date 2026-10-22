@@ -19,7 +19,7 @@
       "R3-not-in-may-depend-on": 8,
       "R6-cross-package-relative": 5
     },
-    "unresolved_external_specifiers": 306
+    "unresolved_external_specifiers": 279
   },
   "packages": [
     {
@@ -2812,141 +2812,6 @@
       "line": 4
     },
     {
-      "file": "packages/desktop/bundled-agents/linux-x64/glm/packages/browser-use-plugin/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/bundled-agents/linux-x64/glm/packages/node-repl-host/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/bundled-agents/linux-x64/glm/zcode.cjs",
-      "specifier": "ripgrep",
-      "line": 1910
-    },
-    {
-      "file": "packages/desktop/bundled-agents/linux-x64/glm/zcode.cjs",
-      "specifier": "koffi",
-      "line": 2125
-    },
-    {
-      "file": "packages/desktop/bundled-agents/linux-x64/glm/zcode.cjs",
-      "specifier": "${rt}",
-      "line": 3635
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/packages/browser-use-plugin/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/packages/node-repl-host/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/zcode.cjs",
-      "specifier": "ripgrep",
-      "line": 1910
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/zcode.cjs",
-      "specifier": "koffi",
-      "line": 2125
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-arm64/zcode.cjs",
-      "specifier": "${rt}",
-      "line": 3635
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/packages/browser-use-plugin/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/packages/node-repl-host/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/zcode.cjs",
-      "specifier": "ripgrep",
-      "line": 1910
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/zcode.cjs",
-      "specifier": "koffi",
-      "line": 2125
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/darwin-x64/zcode.cjs",
-      "specifier": "${rt}",
-      "line": 3635
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/packages/browser-use-plugin/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/packages/node-repl-host/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/zcode.cjs",
-      "specifier": "ripgrep",
-      "line": 1910
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/zcode.cjs",
-      "specifier": "koffi",
-      "line": 2125
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-arm64/zcode.cjs",
-      "specifier": "${rt}",
-      "line": 3635
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/packages/browser-use-plugin/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/packages/node-repl-host/scripts/build.mjs",
-      "specifier": "esbuild",
-      "line": 4
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/zcode.cjs",
-      "specifier": "ripgrep",
-      "line": 1910
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/zcode.cjs",
-      "specifier": "koffi",
-      "line": 2125
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/glm/linux-x64/zcode.cjs",
-      "specifier": "${rt}",
-      "line": 3635
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/server/zcode-server.cjs",
-      "specifier": "bufferutil",
-      "line": 27784
-    },
-    {
-      "file": "packages/desktop/mock-cdn/releases/3.14.3/server/zcode-server.cjs",
-      "specifier": "utf-8-validate",
-      "line": 28423
-    },
-    {
       "file": "packages/desktop/scripts/ttft-otlp-receiver.mjs",
       "specifier": "@opentelemetry/otlp-transformer/build/src/generated/root.js",
       "line": 10
@@ -3030,6 +2895,141 @@
       "file": "packages/desktop/test/payswap/security-gate.test.ts",
       "specifier": "vitest",
       "line": 7
+    },
+    {
+      "file": "packages/desktop/test/payswap/shell-integration.test.ts",
+      "specifier": "vitest",
+      "line": 9
+    },
+    {
+      "file": "packages/desktop/test/payswap/startup-transport.test.ts",
+      "specifier": "vitest",
+      "line": 23
+    },
+    {
+      "file": "packages/desktop/test/payswap/update-authority.test.ts",
+      "specifier": "vitest",
+      "line": 21
+    },
+    {
+      "file": "packages/desktop/test/payswap/window-chrome.test.ts",
+      "specifier": "vitest",
+      "line": 25
+    },
+    {
+      "file": "packages/desktop/test/payswap/workspace-store.test.ts",
+      "specifier": "vitest",
+      "line": 12
+    },
+    {
+      "file": "packages/desktop/vitest.config.ts",
+      "specifier": "vitest/config",
+      "line": 1
+    },
+    {
+      "file": "packages/journey-verification/support/axe.ts",
+      "specifier": "axe-core",
+      "line": 27
+    },
+    {
+      "file": "packages/onchain-extensions/test/registry.test.ts",
+      "specifier": "onchain-pack/dex/absent@1.0.0",
+      "line": 57
+    },
+    {
+      "file": "packages/onchain-extensions/test/registry.test.ts",
+      "specifier": "onchain-pack/dex/uniswap-v2@1.0.0",
+      "line": 61
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/console-sections.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 28
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/console-workspace.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 29
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/navigation-totality.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 18
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/product-navigation.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 16
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/routes.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 18
+    },
+    {
+      "file": "packages/provider-runtime/test/idempotency.test.ts",
+      "specifier": "psp.create_transfer",
+      "line": 47
+    },
+    {
+      "file": "packages/provider-runtime/test/idempotency.test.ts",
+      "specifier": "psp.other_operation",
+      "line": 48
+    },
+    {
+      "file": "packages/provider-runtime/test/idempotency.test.ts",
+      "specifier": "psp.create_payout",
+      "line": 59
+    },
+    {
+      "file": "packages/services/src/bigmodel/codingPlanEntitlement.ts",
+      "specifier": "#src/providers/api/apiJson.js",
+      "line": 3
+    },
+    {
+      "file": "packages/services/src/bigmodel/codingPlanEntitlement.ts",
+      "specifier": "#src/bigmodel/teamPlanApiKey.js",
+      "line": 4
+    },
+    {
+      "file": "packages/services/src/bigmodel/teamPlanApiKey.ts",
+      "specifier": "#src/providers/api/apiJson.js",
+      "line": 2
+    },
+    {
+      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
+      "specifier": "#src/session/zcodeTaskService.js",
+      "line": 11
+    },
+    {
+      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
+      "specifier": "#src/zcode-agent/zcodeAgent.js",
+      "line": 15
+    },
+    {
+      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
+      "specifier": "#src/zcode-session/zcodeSession.js",
+      "line": 19
+    },
+    {
+      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
+      "specifier": "#src/model-provider/providerFacadeServices.js",
+      "line": 23
+    },
+    {
+      "file": "packages/services/src/bots/botRemoteWorkspaceBridge.ts",
+      "specifier": "#src/bots/botRemoteRuntimeServices.js",
+      "line": 16
+    },
+    {
+      "file": "packages/services/src/bots/botsService.ts",
+      "specifier": "#src/session/sessionModeOptions.js",
+      "line": 59
+    },
+    {
+      "file": "packages/services/src/bots/botsService.ts",
+      "specifier": "#src/session/sessionTitle.js",
+      "line": 60
     }
   ],
   "example_hints_without_packages": [
