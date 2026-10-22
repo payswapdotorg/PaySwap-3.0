@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+<title id="title">One PaySwap agent, multiple entry points</title>
+<desc id="desc">Connections button, agent chat text, voice and Pay action converge into one typed intent router and durable mission system. Authentication and payment execution remain behind separate authorization boundaries.</desc>
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fbfcfd"/><stop offset="1" stop-color="#edf3f5"/></linearGradient><style>
+.text{font-family:Inter,ui-sans-serif,system-ui,sans-serif;fill:#102642}.muted{font-family:Inter,ui-sans-serif,system-ui,sans-serif;fill:#5e7487}.h{font-size:28px;font-weight:750}.t{font-size:17px;font-weight:700}.s{font-size:14px}.xs{font-size:12px}.box{fill:#fff;stroke:#d4e0e6;stroke-width:1.4}.green{fill:#edf8f3;stroke:#9dd8c4;stroke-width:1.5}.purple{fill:#f1efff;stroke:#c4befb;stroke-width:1.5}.line{stroke:#7d9b9c;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}.dash{stroke:#7d9b9c;stroke-width:1.8;fill:none;stroke-dasharray:6 6}
+</style></defs>
+<rect width="1280" height="720" rx="20" fill="url(#bg)"/><rect x="1" y="1" width="1278" height="718" rx="20" fill="none" stroke="#dce5e8"/>
+<text x="44" y="56" class="text h">One PaySwap Agent. Every entry point.</text><text x="44" y="84" class="muted s">A user action or natural-language intent creates the same typed, resumable task — never a second parallel flow.</text>
+<g transform="translate(44 128)">
+<rect width="266" height="100" rx="15" class="box"/><rect x="18" y="18" width="34" height="34" rx="9" fill="#635bff"/><text x="35" y="41" text-anchor="middle" fill="#fff" font-family="system-ui" font-weight="700" font-size="21">S</text><text x="66" y="32" class="text t">Connections → Stripe</text><text x="66" y="53" class="muted s">Click “Connect Stripe”</text><text x="18" y="80" class="muted xs">Provider setup intent</text>
+<rect x="0" y="124" width="266" height="100" rx="15" class="box"/><circle cx="35" cy="159" r="17" fill="#eaf7f2" stroke="#a2d7c5"/><path d="M27 159h16M35 151v16" stroke="#0a8767" stroke-width="2"/><text x="66" y="156" class="text t">Agent chat · text</text><text x="66" y="178" class="muted s">“Connect Stripe”</text><text x="18" y="204" class="muted xs">Same typed intent</text>
+<rect x="0" y="248" width="266" height="100" rx="15" class="box"/><circle cx="35" cy="283" r="17" fill="#eef3fa" stroke="#c9d7e7"/><path d="M34 270v24m-5-5q5 8 10 0m-12-6q7 12 14 0" fill="none" stroke="#395e7e" stroke-width="1.7"/><text x="66" y="280" class="text t">Agent chat · voice</text><text x="66" y="302" class="muted s">“Help me accept payments”</text><text x="18" y="328" class="muted xs">Transcribed goal, explicit review</text>
+<rect x="0" y="372" width="266" height="100" rx="15" class="box"/><circle cx="35" cy="407" r="17" fill="#e2f5ec" stroke="#a7ddc9"/><path d="M29 405l12-6-4 14-3-5z" fill="none" stroke="#0d8167" stroke-width="1.7"/><text x="66" y="404" class="text t">Pay action card</text><text x="66" y="426" class="muted s">“Pay” → seeded composer</text><text x="18" y="452" class="muted xs">Payment-intent draft</text>
+</g>
+<path d="M310 178H356V352H390M310 302H356M310 426H356M310 550H356V352" class="line"/>
+<rect x="390" y="258" width="280" height="188" rx="18" class="purple"/>
+<text x="530" y="292" text-anchor="middle" class="text t">Typed intent router</text>
+<text x="414" y="326" class="text s">• Parse goal into a validated intent</text>
+<text x="414" y="351" class="text s">• Ask for missing facts only</text>
+<text x="414" y="376" class="text s">• Confirm interpretation to user</text>
+<text x="414" y="401" class="text s">• Attach one durable task/session ID</text>
+<text x="530" y="428" text-anchor="middle" class="muted xs">UI / LLM is not execution authority</text>
+<path d="M670 352H718" class="line"/><path d="M708 344l10 8-10 8" class="line"/>
+<rect x="718" y="258" width="230" height="188" rx="18" class="green"/>
+<text x="833" y="292" text-anchor="middle" class="text t">Durable mission</text>
+<text x="740" y="326" class="text s">• Current step + event timeline</text>
+<text x="740" y="351" class="text s">• Pause / resume / retry safely</text>
+<text x="740" y="376" class="text s">• Persist across app restart</text>
+<text x="740" y="401" class="text s">• Reopen from Missions / Activity</text>
+<path d="M948 352H978V216H1000M978 352V486H1000" class="line"/>
+<rect x="1000" y="146" width="234" height="142" rx="15" class="box"/>
+<rect x="1018" y="164" width="35" height="35" rx="9" fill="#e7ebff"/><path d="M1027 174h17v15h-17z" fill="none" stroke="#5650cc" stroke-width="1.5"/><text x="1065" y="178" class="text t">Connector task</text><text x="1018" y="223" class="text s">Browser / OAuth / hosted setup</text><text x="1018" y="245" class="muted s">Secret broker + verified scopes</text><text x="1018" y="267" class="muted xs">Catalogue ≠ connected</text>
+<rect x="1000" y="416" width="234" height="142" rx="15" class="box"/>
+<rect x="1018" y="434" width="35" height="35" rx="9" fill="#e7f6ef"/><path d="M1027 447h17m-12-6l-6 6 6 6" stroke="#0c8768" stroke-width="1.7" fill="none"/><text x="1065" y="448" class="text t">Payment task</text><text x="1018" y="493" class="text s">Preview → scoped approval</text><text x="1018" y="515" class="muted s">Authorized rail executes</text><text x="1018" y="537" class="muted xs">Unknown outcome → reconcile</text>
+<rect x="390" y="488" width="558" height="90" rx="14" fill="#fff5e8" stroke="#f0d5a5"/>
+<text x="412" y="516" class="text t">Security / authority boundary</text><text x="412" y="541" class="text s">No secret keys in chat. No consequential effects before explicit scoped approval.</text><text x="412" y="562" class="muted xs">UNKNOWN is not FAILED. Agent text or voice alone never authorizes a payment.</text>
+<text x="44" y="653" class="muted xs">P13 architecture reference · All paths are a target model; provider connection and payment execution must be proven in the real deployment.</text>
+</svg>
