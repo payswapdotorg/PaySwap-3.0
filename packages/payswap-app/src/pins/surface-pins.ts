@@ -30,10 +30,11 @@
 
 /**
  * The surface contract version this product compiled against (mirrors
- * packages/surface/src/version.ts SURFACE_API_VERSION — "1.2.0"). Drift is
+ * packages/surface/src/version.ts SURFACE_API_VERSION — "1.3.0"; bumped by
+ * P13-0's publication of the shared agent-task contract, ADR-0007). Drift is
  * detectable by the mirror test, not discovered in production.
  */
-export const PINNED_SURFACE_API_VERSION = "1.2.0" as const;
+export const PINNED_SURFACE_API_VERSION = "1.3.0" as const;
 
 /** Mirrors surface's SurfaceContractProvenance (version.ts). */
 export interface SurfaceProvenancePin {
