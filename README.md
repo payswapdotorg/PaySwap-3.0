@@ -8,13 +8,13 @@ PaySwap Desktop ships as a Debian package (`.deb`, the recommended install) and 
 
 **→ <https://github.com/payswapdotorg/PaySwap-3.0/releases>**
 
-> **Current release: [`v1.2.0`](https://github.com/payswapdotorg/PaySwap-3.0/releases/tag/v1.2.0)** — the workspace-design release: the operator's target design in the shipped console (the Agent Workspace framing, the outcome-first overview home — "What should PaySwap accomplish?" with an intake entry that prefills the missions creation form, and PAY/RECEIVE/MOVE/CONVERT shortcuts — the iconed sidebar with Settings pinned, and the honest workspace footer; missions keep their real intake lifecycle and the ZCode developer workspace remains at `/console/advanced`). Tested: checksum-verified, apt-installed, launched and window-verified on a clean Ubuntu CI runner — [the verification receipt](https://github.com/payswapdotorg/PaySwap-3.0/actions/runs/39705000283). Every tagged release ships with that CI install + launch + window-identity receipt. `v1.0.0` is marked pre-release: it carried a launch-blocking defect (found by GUI verification of the published artifacts, fixed by the PaySwap update-authority law — see [`docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`](docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md)). Direct asset links for the current release:
+> **Current release: [`v1.3.0`](https://github.com/payswapdotorg/PaySwap-3.0/releases/tag/v1.3.0)** — the desktop-experience release (GitHub Issue #2): retryable, diagnosable startup with cause taxonomy (a dead screen never swallows the failure class again), the Linux native window frame (working close/min/max/resize/drag from your desktop environment), the fixed viewport/scroll contract (the home page scrolls; the app areas and Agent Workspace use bounded shells with internal scroll), and the PaySwap-first IA — the typed payments action set, the onchain rail and the PSP setup flow on Connections, the FEATURE-MAP-driven discoverability, and the advanced developer workspace entry from /developers (the Agent Workspace stays primary). Tested: checksum-verified, apt-installed, launched and window-verified on a clean Ubuntu CI runner — [the verification receipt](https://github.com/payswapdotorg/PaySwap-3.0/actions/runs/39797612679) — plus the station packaged-app run (five window sizes, scroll round-trip, keyboard navigation, restart durability; see [docs/productization-evidence/P12-RELEASE-CLOSURE-2026-10-22.md](docs/productization-evidence/P12-RELEASE-CLOSURE-2026-10-22.md)). the operator's target design in the shipped console (the Agent Workspace framing, the outcome-first overview home — "What should PaySwap accomplish?" with an intake entry that prefills the missions creation form, and PAY/RECEIVE/MOVE/CONVERT shortcuts — the iconed sidebar with Settings pinned, and the honest workspace footer; missions keep their real intake lifecycle and the ZCode developer workspace remains at `/console/advanced`). Tested: checksum-verified, apt-installed, launched and window-verified on a clean Ubuntu CI runner — [the verification receipt](https://github.com/payswapdotorg/PaySwap-3.0/actions/runs/39797612679). Every tagged release ships with that CI install + launch + window-identity receipt. `v1.0.0` is marked pre-release: it carried a launch-blocking defect (found by GUI verification of the published artifacts, fixed by the PaySwap update-authority law — see [`docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md`](docs/productization-evidence/P9-RELEASE-CLOSURE-2026-10-21.md)). Direct asset links for the current release:
 
 
 ```
-https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.2.0/PaySwap_1.2.0_amd64.deb
-https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.2.0/PaySwap-1.2.0.AppImage
-https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.2.0/SHA256SUMS.txt
+https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.3.0/PaySwap_1.3.0_amd64.deb
+https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.3.0/PaySwap-1.3.0.AppImage
+https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.3.0/SHA256SUMS.txt
 ```
 
 (Verified reachable and checksum-matching at publication; newer releases follow the same `v<version>` URL pattern.)
@@ -24,7 +24,7 @@ https://github.com/payswapdotorg/PaySwap-3.0/releases/download/v1.2.0/SHA256SUMS
 Download `PaySwap_<version>_amd64.deb` from the release, then:
 
 ```bash
-sudo apt install ./PaySwap_1.2.0_amd64.deb
+sudo apt install ./PaySwap_1.3.0_amd64.deb
 ```
 
 `apt` resolves the runtime dependencies (GTK3, NSS, X11 libs, …) from your system repositories. After install, PaySwap appears in your application menu as **PaySwap** (menu category: Office/Finance) and can also be launched from the terminal with `payswap`.
@@ -32,11 +32,11 @@ sudo apt install ./PaySwap_1.2.0_amd64.deb
 ### Install the AppImage (portable, no install)
 
 ```bash
-chmod +x PaySwap-1.2.0.AppImage
-./PaySwap-1.2.0.AppImage
+chmod +x PaySwap-1.3.0.AppImage
+./PaySwap-1.3.0.AppImage
 ```
 
-On Ubuntu 24.04+ the AppImage needs the FUSE 2 compatibility package: `sudo apt install libfuse2t64` (Ubuntu 22.04: `sudo apt install libfuse2`). Without FUSE you can still run it extracted: `./PaySwap-1.2.0.AppImage --appimage-extract-and-run`.
+On Ubuntu 24.04+ the AppImage needs the FUSE 2 compatibility package: `sudo apt install libfuse2t64` (Ubuntu 22.04: `sudo apt install libfuse2`). Without FUSE you can still run it extracted: `./PaySwap-1.3.0.AppImage --appimage-extract-and-run`.
 
 ### Verify the download
 
@@ -49,7 +49,7 @@ sha256sum -c SHA256SUMS.txt
 ### Launch, upgrade, uninstall
 
 - **Launch:** from the application menu, or run `payswap`.
-- **Upgrade:** install the new `.deb` over the old one (`sudo apt install ./PaySwap_1.2.0_amd64.deb`); your data under `~/.config/PaySwap` is preserved. For the AppImage, replace the file.
+- **Upgrade:** install the new `.deb` over the old one (`sudo apt install ./PaySwap_1.3.0_amd64.deb`); your data under `~/.config/PaySwap` is preserved. For the AppImage, replace the file.
 - **Uninstall:** `sudo apt remove payswap` (add `--purge` to also remove system packaging state; your `~/.config/PaySwap` data is never touched by the package). For the AppImage, delete the file.
 
 ### Troubleshooting
@@ -61,7 +61,7 @@ sha256sum -c SHA256SUMS.txt
 
 ### Minimum requirements
 
-Ubuntu 20.04 or newer (or Debian 11+, glibc ≥ 2.28) on x86_64 (amd64), 8 GB RAM recommended, ~2 GB free disk for the installed app. The `.deb` is built on ubuntu-latest (GitHub Actions) and was install + launch verified on a clean Ubuntu runner at v1.0.1, v1.1.0 and v1.2.0.
+Ubuntu 20.04 or newer (or Debian 11+, glibc ≥ 2.28) on x86_64 (amd64), 8 GB RAM recommended, ~2 GB free disk for the installed app. The `.deb` is built on ubuntu-latest (GitHub Actions) and was install + launch verified on a clean Ubuntu runner at v1.0.1, v1.1.0, v1.2.0 and v1.3.0.
 
 ## Repository authority
 
