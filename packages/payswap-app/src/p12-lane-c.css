@@ -1,0 +1,35 @@
+/**
+ * @payswap/app — P12 Lane C view styles (owned by this lane; the
+ * pre-existing payswap-*.css files belong to Lane B and are untouched).
+ *
+ * Minimal additive styles for the P12 area surfaces (payments action set,
+ * connections setup flow + onchain rail, accounts observations): the
+ * surfaces reuse the existing ps- design-system classes; these few
+ * helpers cover the new density/typography needs only.
+ */
+
+.p12-subsection-title {
+  margin: 32px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.p12-area-alias-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ps-fg-muted);
+}
+
+.p12-setup-steps {
+  counter-reset: p12-step;
+}
+
+.p12-mono {
+  font-family: var(--ps-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 13px;
+}
+
+.p12-chain-grid {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}

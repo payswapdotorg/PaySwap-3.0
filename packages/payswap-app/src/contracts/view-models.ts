@@ -177,7 +177,7 @@ export interface HomePageView {
   readonly commitments: readonly string[];
 }
 
-/** The developers page view: the honest API runtime state. */
+/** The honest API runtime state for the developers page view. */
 export interface DevelopersPageView {
   readonly apiRuntime: {
     readonly configured: boolean;
@@ -186,6 +186,30 @@ export interface DevelopersPageView {
   };
   readonly consumableContracts: readonly string[];
 }
+
+/**
+ * The advanced developer tooling catalogue (P12 Lane C, C5): the
+ * ZCode-derived capabilities that are REAL in the advanced developer
+ * workspace of the PaySwap Agent Console (FEATURE-MAP §6). Surfaced
+ * from the PaySwap IA as honest catalogued pointers — the services
+ * themselves live in the advanced workspace and are NEVER duplicated
+ * here. Wording law: no upstream product branding on the normal user
+ * surfaces (attribution stays in the legal/footer location per
+ * PRODUCT-IDENTITY §4).
+ */
+export const ADVANCED_TOOLING_CATALOGUE: readonly string[] = [
+  "Model & provider selection",
+  "Projects & workspaces",
+  "Tasks, sessions & history",
+  "Agents & subagents",
+  "Terminal",
+  "Command palette",
+  "Artifacts & files",
+  "Browser tooling",
+  "Tools & MCP",
+  "Extensions",
+  "Automations (hooks & commands)",
+];
 
 /** Render outcome of a provider-verified observation (display vocabulary). */
 export type ObservationOutcomeWord = ExternalEffectOutcomePin;

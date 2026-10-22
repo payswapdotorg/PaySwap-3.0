@@ -13,10 +13,21 @@
  * commands before they exist.
  */
 
-import { Card, KeyValue } from "@zcode/ui/payswap";
-import type { DevelopersPageView } from "../contracts/view-models.js";
+import { Card, KeyValue, StatusPill } from "@zcode/ui/payswap";
+import {
+  ADVANCED_TOOLING_CATALOGUE,
+  type DevelopersPageView,
+} from "../contracts/view-models.js";
+import type { PaySwapNavigation } from "../shell/navigation.js";
+import { ProductLink } from "../shell/ProductLink.js";
 
-export function DevelopersPage({ view }: { readonly view: DevelopersPageView }) {
+export function DevelopersPage({
+  view,
+  productNavigation,
+}: {
+  readonly view: DevelopersPageView;
+  readonly productNavigation?: PaySwapNavigation;
+}) {
   const { apiRuntime, consumableContracts } = view;
   return (
     <article className="ps-page">
@@ -86,6 +97,43 @@ export function DevelopersPage({ view }: { readonly view: DevelopersPageView }) 
             external-agent APIs, webhooks) lands with Work Order P7-W3 —
             until then there are no certified command endpoints to document,
             and this page will not invent them.
+          </p>
+        </Card>
+      </section>
+
+      <section aria-labelledby="advanced-tooling-heading" className="ps-page-section">
+        <h2 id="advanced-tooling-heading" className="ps-page-section-title">
+          Advanced developer tooling
+        </h2>
+        <p className="ps-page-section-note">
+          The advanced developer workspace of the PaySwap Agent Console
+          carries the full development toolchain — the same upstream
+          open-source platform this product is built on (see the
+          attribution in this page&apos;s footer). These capabilities are
+          real THERE; they are catalogued here as pointers, and this
+          product never duplicates their services. The Agent Workspace
+          remains the primary PaySwap work surface.
+        </p>
+        <ul className="ps-page-bullets">
+          {ADVANCED_TOOLING_CATALOGUE.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <Card className="ps-dev-card">
+          <div className="ps-cap-card-head">
+            <h3 className="ps-sec-title">Open the advanced developer workspace</h3>
+            <StatusPill tone="disabled">Advanced surface</StatusPill>
+          </div>
+          <p className="ps-sec-body">
+            An advanced technical interface for development work — distinct
+            from the PaySwap product surfaces. It requires the console
+            backend; without it, the workspace reports its honest
+            no-backend state rather than a fabricated one.
+          </p>
+          <p className="ps-area-learn">
+            <ProductLink to="/console/advanced" navigation={productNavigation}>
+              Advanced developer workspace
+            </ProductLink>
           </p>
         </Card>
       </section>
