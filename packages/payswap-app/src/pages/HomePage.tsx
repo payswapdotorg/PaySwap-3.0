@@ -26,6 +26,7 @@ import { formatUtcTimestamp, providerLabel } from "../lib/coverage.js";
 import { outcomeAreaAlias } from "../lib/outcome-area-aliases.js";
 import type { PaySwapNavigation } from "../shell/navigation.js";
 import { ProductLink } from "../shell/ProductLink.js";
+import { AgentComposer } from "../agent/AgentComposer.js";
 
 function productLink(
   href: string,
@@ -257,6 +258,27 @@ export function HomePage({
           >
             Start with the API
           </ProductLink>
+        </div>
+      </section>
+
+      {/* The shared agent composer — the pre-auth entry */}
+      <section aria-labelledby="home-agent-heading" className="ps-home-section">
+        <div className="ps-home-container">
+          <h2 id="home-agent-heading" className="ps-home-h2">
+            Meet the PaySwap agent
+          </h2>
+          <p className="ps-home-section-lede">
+            One shared composer reaches every task: ask for a payment or a
+            connection in plain words here, or use the agent-led sections
+            inside the product areas. Card clicks and typed requests
+            converge on the SAME resumable task — one task list, one
+            history, never a duplicate. The composer records requests and
+            progress in this browser profile (honestly labeled); it holds
+            zero financial authority, and no payment or connection ever
+            happens from chat alone. Voice input is not supported in this
+            deployment — stated honestly, never simulated.
+          </p>
+          <AgentComposer area="home" />
         </div>
       </section>
     </>

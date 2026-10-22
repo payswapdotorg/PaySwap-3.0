@@ -17,8 +17,11 @@
 import { Card, StatusPill } from "@zcode/ui/payswap";
 import type { NavigationAreaView, OutcomeBoardView } from "../../contracts/view-models.js";
 import { outcomeActionsForArea } from "../../lib/outcome-area-aliases.js";
+import { agentPaymentDirectionEntries } from "../../lib/agent-payment-entries.js";
 import type { PaySwapNavigation } from "../../shell/navigation.js";
 import { ProductLink } from "../../shell/ProductLink.js";
+import { sharedAgentComposerController } from "../../agent/agentComposerController.js";
+import { AgentComposer } from "../../agent/AgentComposer.js";
 
 /** The typed unavailable/adjacent rows (verbatim laws, never stubs). */
 const PAYMENTS_ADJACENT_SURFACES: readonly {
@@ -74,6 +77,19 @@ export function PaymentsAreaSurface({
     alias,
     row: outcomeBoard.rows.find((row) => row.actionId === alias.actionId),
   }));
+  const agentEntries = agentPaymentDirectionEntries("payments");
+
+  const seedPaymentDirection = (entry: (typeof agentEntries)[number]): void => {
+    void sharedAgentComposerController().seedFromSurface({
+      intent: {
+        kind: "PAYMENT_MISSION",
+        direction: entry.direction,
+        goalStatement: entry.goalStatement,
+      },
+      originNote: entry.cardActionLabel,
+      area: "payments",
+    });
+  };
 
   return (
     <>
@@ -131,6 +147,53 @@ export function PaymentsAreaSurface({
             fact of this deployment phase, recorded here instead of hidden.
           </p>
         ) : null}
+      </section>
+
+      <section aria-labelledby="payments-agent-heading" className="ps-page-section">
+        <h2 id="payments-agent-heading" className="ps-page-section-title">
+          Agent-led payments — click a direction or just ask
+        </h2>
+        <p className="ps-page-section-note">
+          The shared PaySwap agent composer lives on this surface (and on
+          Connections, Accounts and the Agent Workspace). Clicking a
+          direction below and typing “pay the supplier” into the composer
+          reach the SAME resumable payment-intake task — one task, one
+          history, never a duplicate. Starting a task pays nothing: a
+          payment exists only after guided intake, a structured preview
+          and your explicit authorization on that preview — never text,
+          never voice, never a guess.
+        </p>
+        <ul className="ps-page-grid">
+          {agentEntries.map((entry) => (
+            <li key={entry.actionId} className="ps-page-grid-item">
+              <Card className="ps-area-card">
+                <div className="ps-cap-card-head">
+                  <h3 className="ps-cap-name">{entry.cardTitle}</h3>
+                  <StatusPill tone="disabled">Intake task — never a dispatch</StatusPill>
+                </div>
+                <p className="ps-cap-summary">{entry.cardLine}</p>
+                <button
+                  type="button"
+                  className="ps-agent-entry-action"
+                  onClick={() => seedPaymentDirection(entry)}
+                >
+                  {entry.cardActionLabel}
+                </button>
+              </Card>
+            </li>
+          ))}
+        </ul>
+        <p className="ps-page-section-note">
+          Checkout has no agent card here: the mission vocabulary has
+          exactly four directions — pay, receive, move and convert — and
+          checkout is a hosted merchant lane with no direction mapping, so
+          no seed is invented for it. Checkout is live only with a
+          connected merchant context (its typed prerequisite renders in
+          the action set above). Voice input is not supported in this
+          deployment and is never simulated; the composer states it where
+          voice would be offered.
+        </p>
+        <AgentComposer area="payments" />
       </section>
 
       <section aria-labelledby="payments-adjacent-heading" className="ps-page-section">

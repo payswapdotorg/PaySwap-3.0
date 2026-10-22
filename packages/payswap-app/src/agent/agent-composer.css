@@ -1,0 +1,401 @@
+/**
+ * @payswap/app — the AGENT COMPOSER styles (P13-A, owned by this lane).
+ *
+ * The persistent composer chrome: the fixed DOCK (minimized state) and
+ * the fixed PANEL (open state). Additive, token-driven (the ps- design
+ * system), no motion (nothing animates — reduced-motion safe by
+ * construction), self-scoped focus rings so the panel is usable inside
+ * BOTH shells (the product root and the Agent Workspace root).
+ */
+
+/* ------------------------------ the dock ----------------------------- */
+
+.ps-agent-dock {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 999px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(19, 18, 17, 0.16);
+}
+
+.ps-agent-dock-glyph {
+  display: inline-flex;
+  color: var(--ps-accent);
+}
+
+.ps-agent-dock-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--ps-accent);
+  color: var(--ps-on-accent);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ------------------------------ the panel ---------------------------- */
+
+.ps-agent-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, calc(100vw - 24px));
+  max-height: min(72vh, 640px);
+  padding: 14px 14px 12px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 14px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font-size: 13px;
+  line-height: 1.55;
+  box-shadow: 0 18px 48px rgba(19, 18, 17, 0.22);
+}
+
+.ps-agent-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ps-agent-panel-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ps-accent);
+}
+
+.ps-agent-panel-title {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ps-agent-panel-actions {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+
+.ps-agent-panel-action {
+  padding: 5px 9px;
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  background: var(--ps-surface-sunken);
+  color: var(--ps-fg-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ps-agent-panel-entry {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-panel-law {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-left: 3px solid var(--ps-accent);
+  border-radius: 6px;
+  background: var(--ps-accent-tint);
+  color: var(--ps-fg);
+  font-size: 12px;
+}
+
+/* ---------------------------- the transcript ------------------------- */
+
+.ps-agent-transcript {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  background: var(--ps-bg);
+  overflow-y: auto;
+  min-height: 64px;
+  max-height: 200px;
+  flex: none;
+}
+
+.ps-agent-line {
+  margin: 0 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ps-agent-line:last-child {
+  margin-bottom: 0;
+}
+
+.ps-agent-line-speaker {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-line--you .ps-agent-line-speaker {
+  color: var(--ps-accent);
+}
+
+.ps-agent-line--system .ps-agent-line-speaker {
+  color: var(--ps-attention);
+}
+
+.ps-agent-line--error .ps-agent-line-text {
+  color: var(--ps-danger);
+}
+
+.ps-agent-line--empty .ps-agent-line-text {
+  color: var(--ps-fg-muted);
+  font-style: italic;
+}
+
+/* ------------------------------- the tasks --------------------------- */
+
+.ps-agent-tasks {
+  margin: 10px 0 0;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.ps-agent-tasks-title {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ps-agent-task {
+  padding: 8px 10px;
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  background: var(--ps-surface);
+}
+
+.ps-agent-task-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ps-agent-task-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.ps-agent-task-meta {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-task-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.ps-agent-task-action {
+  padding: 3px 8px;
+  border: 1px solid var(--ps-border);
+  border-radius: 6px;
+  background: var(--ps-surface-sunken);
+  color: var(--ps-fg-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ps-agent-task-events {
+  margin: 8px 0 0;
+  padding: 8px 0 0 16px;
+  border-top: 1px dashed var(--ps-border);
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ps-agent-task-event strong {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ps-fg);
+}
+
+/* ------------------------------- the input --------------------------- */
+
+.ps-agent-input {
+  margin: 10px 0 0;
+  flex: none;
+}
+
+.ps-agent-input-field {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 8px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.ps-agent-input-field::placeholder {
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 6px 0 0;
+}
+
+.ps-agent-input-hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-send {
+  padding: 7px 14px;
+  border: 1px solid var(--ps-accent-emphasis);
+  border-radius: 8px;
+  background: var(--ps-accent);
+  color: var(--ps-on-accent);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ps-agent-send:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* --------------------------- the honest notes ------------------------ */
+
+.ps-agent-voice-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-panel-foot {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--ps-border);
+  font-size: 11px;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-panel-foot p {
+  margin: 0 0 4px;
+}
+
+.ps-agent-panel-foot p:last-child {
+  margin-bottom: 0;
+}
+
+/* --------------------- focus (self-scoped, both shells) -------------- */
+
+.ps-agent-dock:focus-visible,
+.ps-agent-entry-action:focus-visible,
+.ps-agent-panel-action:focus-visible,
+.ps-agent-task-action:focus-visible,
+.ps-agent-send:focus-visible,
+.ps-agent-input-field:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 2px;
+}
+
+/* ------------- the surface seed buttons (the area cards) -------------- */
+
+/*
+ * The "Start a … task" / "Connect …" buttons rendered inside the
+ * agent-led sections of the area surfaces (Connections, Payments,
+ * Accounts). A quiet secondary action: the entry SEEDS a task — the
+ * pill above it already says "never a dispatch" — so the button reads
+ * as a request, never a primary financial CTA.
+ */
+.ps-agent-entry-action {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 8px 14px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 8px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.ps-agent-entry-action:hover {
+  border-color: var(--ps-accent);
+  color: var(--ps-accent);
+}
+
+/* ------------------------------ small screens ------------------------ */
+
+@media (max-width: 560px) {
+  .ps-agent-dock,
+  .ps-agent-panel {
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+
+  .ps-agent-panel {
+    max-height: 78vh;
+  }
+}
