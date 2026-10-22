@@ -73,6 +73,16 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   "workspaceReviseMissionDraft",
   "workspaceArchiveMissionDraft",
   "workspaceStoreHealth",
+  // P13-B connection-plane members (registry/records/setup-seed/key
+  // seal/probe-evidence/callback-consume/revocation — connection
+  // orchestration only, never money movement).
+  "connectionRegistry",
+  "connectionStatuses",
+  "connectionSeedSetup",
+  "connectionSubmitStripeRestrictedKey",
+  "connectionRecordVerificationOutcome",
+  "connectionConsumeProviderCallback",
+  "connectionRevoke",
 ] as const;
 
 /**

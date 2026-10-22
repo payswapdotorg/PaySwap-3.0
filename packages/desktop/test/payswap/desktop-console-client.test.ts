@@ -83,6 +83,13 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
     expect(hostMembers).toEqual([...PAYSWAP_DESKTOP_CLIENT_MEMBERS].sort());
     // The known host members, spelled out (a drift in EITHER list fails).
     expect(hostMembers).toEqual([
+      "connectionConsumeProviderCallback",
+      "connectionRecordVerificationOutcome",
+      "connectionRegistry",
+      "connectionRevoke",
+      "connectionSeedSetup",
+      "connectionStatuses",
+      "connectionSubmitStripeRestrictedKey",
       "delegateMoneyMovement",
       "deploymentFacts",
       "journeyState",

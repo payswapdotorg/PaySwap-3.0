@@ -14,6 +14,7 @@ import {
   extractShareImportCode,
   isOAuthCallbackUrl,
   isPaymentCallbackUrl,
+  isProviderCallbackUrl,
   isWorkspaceOpenUrl,
   isShareImportUrl,
 } from "./desktopDeepLinkUrl.js";
@@ -43,6 +44,7 @@ const oauthStateToWindow = new Map<string, OAuthRouteTarget>();
 const rendererReadyWebContentsIds = new Set<number>();
 let pendingDeepLinkUrl: string | null = null;
 let pendingPaymentDeepLinkUrl: string | null = null;
+let pendingProviderDeepLinkUrl: string | null = null;
 let pendingOpenWorkspaceRequest: {
   path: string;
   targetWebContentsId?: number;
@@ -315,6 +317,31 @@ export function handleDeepLink(
     return false;
   }
 
+  // (P13-B, ADR-0007 D3) zcode://provider/callback?state=…&code=…|error=…
+  // 连接引导回调：同 payment 的 pending 队列 + renderer-ready 重放纪律。
+  if (isProviderCallbackUrl(parsedUrl)) {
+    const targetWindow = options.resolveApplicationWindow
+      ? options.resolveApplicationWindow()
+      : (BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0] ?? null);
+    if (targetWindow) {
+      targetWindow.webContents.send(PlatformChannels.ProviderCallback, url);
+      focusDeepLinkTargetWindow(targetWindow);
+      logger.info("[deep-link] provider 连接回调路由成功", {
+        windowId: targetWindow.webContents.id,
+        host: parsedUrl.hostname,
+        path: parsedUrl.pathname,
+      });
+      return true;
+    }
+
+    pendingProviderDeepLinkUrl = url;
+    logger.warn("[deep-link] provider 连接回调暂未命中窗口，先缓存等待 renderer ready", {
+      host: parsedUrl.hostname,
+      path: parsedUrl.pathname,
+    });
+    return false;
+  }
+
   if (isShareImportUrl(parsedUrl)) {
     const shareCode = extractShareImportCode(parsedUrl);
     if (!shareCode) {
@@ -474,6 +501,11 @@ export function deliverPendingDeepLink(webContents: WebContents): boolean {
   if (pendingPaymentDeepLinkUrl) {
     webContents.send(PlatformChannels.PaymentCallback, pendingPaymentDeepLinkUrl);
     pendingPaymentDeepLinkUrl = null;
+  }
+  if (pendingProviderDeepLinkUrl) {
+    // (P13-B) 冷启动排队重放：renderer ready 时投递 provider 连接回调。
+    webContents.send(PlatformChannels.ProviderCallback, pendingProviderDeepLinkUrl);
+    pendingProviderDeepLinkUrl = null;
   }
   if (
     pendingOpenWorkspaceRequest &&

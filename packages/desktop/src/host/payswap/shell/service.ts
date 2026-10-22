@@ -44,6 +44,14 @@ import {
   type WorkspaceStoreFileSystem,
 } from "../product/workspace-store-persistence.js";
 import { WorkspaceStoreError } from "../product/workspace-store.js";
+import type { ConnectionSessionAuthority } from "../connections/session-authority.js";
+import type {
+  DesktopConnectionSetupOutcome,
+  DesktopConnectionStatusView,
+  DesktopCredentialSealReceipt,
+  DesktopProviderCallbackView,
+  DesktopProviderRegistryView,
+} from "../connections/contracts.js";
 import type {
   PinnedMissionDetail,
   PinnedMissionIntakeInput,
@@ -64,6 +72,26 @@ export interface PaySwapDesktopServiceOptions {
    * seam carries a storeDirectory — otherwise the service fails closed.
    */
   readonly workspaceStoreFileSystem?: WorkspaceStoreFileSystem;
+  /**
+   * (P13-B) The connection session authority (registry + records +
+   * broker + state bindings), composed at the composition edge with the
+   * substrate ICredentialService and the node:fs binding. When ABSENT,
+   * the connection-plane members fail closed with a typed error on
+   * first use — never a silent no-op, never an in-memory-only plane
+   * pretending to be durable.
+   */
+  readonly connectionAuthority?: ConnectionSessionAuthority;
+}
+
+/** The typed fail-closed error for an unconfigured connection plane (the workspace-store precedent). */
+export class ConnectionPlaneNotConfiguredError extends Error {
+  readonly kind = "CONNECTION_PLANE_NOT_CONFIGURED" as const;
+  constructor() {
+    super(
+      "The provider connection plane is not configured in this host (no connection session authority on the seam) — connection calls fail closed",
+    );
+    this.name = "ConnectionPlaneNotConfiguredError";
+  }
 }
 
 function defaultSessionId(): string {
@@ -150,6 +178,16 @@ export function createPaySwapDesktopService(
         .catch(() => {});
     }
     return storePromise;
+  }
+
+  // (P13-B) The connection session authority — optional at construction
+  // (unconfigured seams compose fine) and fail-closed per-call.
+  const connectionAuthority = options.connectionAuthority;
+  function resolveConnectionAuthority(): ConnectionSessionAuthority {
+    if (connectionAuthority === undefined) {
+      throw new ConnectionPlaneNotConfiguredError();
+    }
+    return connectionAuthority;
   }
 
   const service: IPaySwapDesktopService = {
@@ -266,6 +304,68 @@ export function createPaySwapDesktopService(
         );
       }
       return health;
+    },
+
+    // -----------------------------------------------------------------------
+    // Provider connections (P13-B — ADR-0007 D3/D4/D5)
+    // -----------------------------------------------------------------------
+
+    async connectionRegistry(): Promise<readonly DesktopProviderRegistryView[]> {
+      return resolveConnectionAuthority().registry();
+    },
+
+    async connectionStatuses(): Promise<readonly DesktopConnectionStatusView[]> {
+      return resolveConnectionAuthority().connectionStatuses();
+    },
+
+    async connectionSeedSetup(input: {
+      readonly providerId: string;
+      readonly useCaseRef: string;
+    }): Promise<DesktopConnectionSetupOutcome> {
+      const outcome = await resolveConnectionAuthority().seedConnectionSetup(input);
+      seam.log(
+        "info",
+        "payswap-desktop: connection setup seeded (record only — nothing connected)",
+        JSON.stringify({ kind: outcome.kind, providerId: input.providerId }),
+      );
+      return outcome;
+    },
+
+    async connectionSubmitStripeRestrictedKey(input: {
+      readonly connectionId: string;
+      readonly secretKey: string;
+    }): Promise<DesktopCredentialSealReceipt> {
+      const receipt = await resolveConnectionAuthority().submitStripeRestrictedKey(input);
+      // NO key material in the log line — the receipt shape guarantees it.
+      seam.log(
+        "info",
+        "payswap-desktop: stripe restricted key sealed (verification still required)",
+        JSON.stringify({
+          connectionId: receipt.connectionId,
+          sealedSecretCount: receipt.sealedSecretCount,
+          nextState: receipt.nextState,
+        }),
+      );
+      return receipt;
+    },
+
+    async connectionRecordVerificationOutcome(input: {
+      readonly connectionId: string;
+      readonly outcome: "CONFIRMED" | "UNKNOWN" | "FAILED";
+      readonly evidenceSummary: string;
+    }): Promise<DesktopConnectionStatusView> {
+      return resolveConnectionAuthority().recordVerificationOutcome(input);
+    },
+
+    async connectionConsumeProviderCallback(input: {
+      readonly state: string;
+      readonly error?: string;
+    }): Promise<DesktopProviderCallbackView> {
+      return resolveConnectionAuthority().consumeProviderCallback(input);
+    },
+
+    async connectionRevoke(connectionId: string): Promise<DesktopConnectionStatusView> {
+      return resolveConnectionAuthority().revokeConnection(connectionId);
     },
   };
   return service;
