@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
+<title id="title">PaySwap Connections — guided Stripe setup concept</title>
+<desc id="desc">Concept wireframe showing PaySwap navigation, a provider catalogue, a secure provider-onboarding workspace, a progress rail, and a persistent agent composer. This is not a screenshot of a working integration.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbfcfd"/><stop offset="1" stop-color="#f1f5f6"/></linearGradient>
+  <linearGradient id="green" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0e8066"/><stop offset="1" stop-color="#07966e"/></linearGradient>
+  <filter id="shadow" x="-15%" y="-15%" width="130%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="8" flood-color="#132f3f" flood-opacity=".08"/></filter>
+  <style>
+    .ink{font-family:Inter,ui-sans-serif,system-ui,sans-serif;fill:#102642}
+    .muted{font-family:Inter,ui-sans-serif,system-ui,sans-serif;fill:#5a7189}
+    .tiny{font-size:12px}.small{font-size:14px}.normal{font-size:16px}.large{font-size:22px;font-weight:650}.heading{font-size:30px;font-weight:700}
+    .line{stroke:#dce5e9;stroke-width:1.3}.card{fill:#fff;stroke:#dce5e9;stroke-width:1.2}.pill{fill:#e8f6f1;stroke:#bfe5d8}
+  </style>
+</defs>
+<rect width="1280" height="900" rx="22" fill="url(#bg)"/>
+<rect x="1" y="1" width="1278" height="898" rx="22" fill="none" stroke="#d9e1e6"/>
+<rect x="0" y="0" width="1280" height="44" rx="22" fill="#fff"/>
+<path d="M0 44H1280" class="line"/>
+<circle cx="23" cy="22" r="6" fill="#ef665e"/><circle cx="43" cy="22" r="6" fill="#f3bd4f"/><circle cx="63" cy="22" r="6" fill="#41bd79"/>
+<text x="100" y="28" class="ink small" font-weight="650">PaySwap Desktop</text>
+<rect x="1080" y="10" width="180" height="24" rx="12" fill="#fff6e8" stroke="#f1d9ac"/>
+<text x="1170" y="26" text-anchor="middle" class="ink tiny" font-weight="700">CONCEPT · NOT LIVE</text>
+<rect x="0" y="44" width="222" height="856" fill="#f8fafb"/>
+<path d="M222 44V900" class="line"/>
+<rect x="24" y="68" width="40" height="40" rx="12" fill="#0b2b3d"/>
+<path d="M34 88l10-10 12 10-12 10z" fill="#29c29a"/><path d="M34 88h22" stroke="#fff" stroke-width="2"/>
+<text x="76" y="85" class="ink large">PaySwap</text><text x="76" y="104" class="muted tiny">Payments · DeFi · Global</text>
+<text x="26" y="150" class="muted tiny" font-weight="700" letter-spacing="1.1">WORKSPACE</text>
+<g class="ink normal">
+<text x="54" y="190">Overview</text><text x="54" y="230">Missions</text><text x="54" y="270">Agents</text><text x="54" y="310">Approvals</text><text x="54" y="350" fill="#087d62" font-weight="700">Connections</text><text x="54" y="390">Activity</text><text x="54" y="430">Lab</text>
+</g>
+<rect x="12" y="328" width="198" height="38" rx="10" fill="#e2f4ed"/>
+<g stroke="#557188" stroke-width="1.8" fill="none"><circle cx="34" cy="182" r="7"/><path d="M27 222h14m-7-7v14M28 261h12v12H28zM28 301l6-6 6 6-6 6zM28 340h12M34 334v12M28 380l12 0m-6-6v12M29 422l10-10m-10 0l10 10"/></g>
+<path d="M24 812H198" class="line"/><text x="54" y="848" class="ink normal">Settings</text><text x="26" y="884" class="muted tiny">Agent Workspace remains primary</text>
+<g transform="translate(248 72)">
+  <text x="0" y="0" class="ink heading">Connections</text>
+  <text x="0" y="28" class="muted normal">Connect payment providers and manage verified capabilities.</text>
+  <rect x="824" y="-18" width="174" height="28" rx="14" class="pill"/><circle cx="841" cy="-4" r="4" fill="#0a9872"/><text x="853" y="0" class="ink tiny" font-weight="650">Test environment</text>
+  <g transform="translate(0 52)">
+    <rect x="0" y="0" width="174" height="128" rx="13" fill="#f7fcf9" stroke="#159775" stroke-width="1.8"/>
+    <rect x="14" y="14" width="35" height="35" rx="9" fill="#635bff"/><text x="31.5" y="38" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="22" font-weight="700">S</text>
+    <text x="60" y="35" class="ink normal" font-weight="700">Stripe</text><rect x="14" y="58" width="103" height="21" rx="10" fill="#f0f4f6"/><text x="65" y="72" text-anchor="middle" class="muted tiny">Not connected</text>
+    <text x="14" y="97" class="muted tiny">Create or connect an</text><text x="14" y="112" class="muted tiny">account, then verify it.</text>
+    <rect x="14" y="138" width="146" height="28" rx="8" fill="url(#green)"/><text x="87" y="156" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="12" font-weight="700">Connect Stripe</text>
+  </g>
+  <g transform="translate(188 52)">
+    <rect x="0" y="0" width="174" height="128" rx="13" class="card"/>
+    <rect x="14" y="14" width="35" height="35" rx="9" fill="#eaf1ff"/><text x="31.5" y="37" text-anchor="middle" fill="#1d67b4" font-family="system-ui" font-size="19" font-weight="700">P</text>
+    <text x="60" y="35" class="ink normal" font-weight="700">PayPal</text><rect x="14" y="58" width="103" height="21" rx="10" fill="#f0f4f6"/><text x="65" y="72" text-anchor="middle" class="muted tiny">Not connected</text><text x="14" y="97" class="muted tiny">Shown as catalogue</text><text x="14" y="112" class="muted tiny">entry until verified.</text>
+    <rect x="14" y="138" width="146" height="28" rx="8" fill="#fff" stroke="#cbd9df"/><text x="87" y="156" text-anchor="middle" class="ink tiny" font-weight="650">Explore setup</text>
+  </g>
+  <g transform="translate(376 52)">
+    <rect x="0" y="0" width="174" height="128" rx="13" class="card"/>
+    <rect x="14" y="14" width="35" height="35" rx="9" fill="#e5f8ed"/><text x="31.5" y="37" text-anchor="middle" fill="#169a62" font-family="system-ui" font-size="18" font-weight="700">A</text>
+    <text x="60" y="35" class="ink normal" font-weight="700">Adyen</text><rect x="14" y="58" width="103" height="21" rx="10" fill="#f0f4f6"/><text x="65" y="72" text-anchor="middle" class="muted tiny">Not connected</text><text x="14" y="97" class="muted tiny">Provider-specific</text><text x="14" y="112" class="muted tiny">prerequisites shown.</text>
+    <rect x="14" y="138" width="146" height="28" rx="8" fill="#fff" stroke="#cbd9df"/><text x="87" y="156" text-anchor="middle" class="ink tiny" font-weight="650">Explore setup</text>
+  </g>
+  <g transform="translate(564 52)">
+    <rect x="0" y="0" width="194" height="128" rx="13" class="card"/>
+    <rect x="14" y="14" width="35" height="35" rx="9" fill="#1f3c50"/><path d="M23 24h17v15H23z" fill="none" stroke="#fff" stroke-width="1.6"/><text x="60" y="35" class="ink small" font-weight="700">Blockchain wallet</text><rect x="14" y="58" width="103" height="21" rx="10" fill="#f0f4f6"/><text x="65" y="72" text-anchor="middle" class="muted tiny">Not connected</text><text x="14" y="97" class="muted tiny">Separate wallet and</text><text x="14" y="112" class="muted tiny">signing permissions.</text>
+    <rect x="14" y="138" width="166" height="28" rx="8" fill="#fff" stroke="#cbd9df"/><text x="97" y="156" text-anchor="middle" class="ink tiny" font-weight="650">Explore setup</text>
+  </g>
+</g>
+<g transform="translate(248 270)">
+  <rect x="0" y="0" width="758" height="364" rx="14" class="card" filter="url(#shadow)"/>
+  <rect x="0" y="0" width="758" height="44" rx="14" fill="#fbfcfd"/><path d="M0 44H758" class="line"/>
+  <circle cx="24" cy="22" r="5" fill="#0b9b73"/><text x="38" y="27" class="ink small" font-weight="650">Secure provider setup</text>
+  <rect x="520" y="10" width="218" height="24" rx="12" fill="#eaf7f2" stroke="#c6e6db"/><path d="M531 17v10m-4-7h8" stroke="#087d62" stroke-width="1.6"/><text x="544" y="26" class="ink tiny">Expected domain: stripe.com</text>
+  <rect x="16" y="60" width="726" height="286" rx="10" fill="#f5f8fb" stroke="#e0e8ed"/>
+  <rect x="16" y="60" width="726" height="42" rx="10" fill="#fff"/><path d="M16 102H742" class="line"/>
+  <text x="34" y="86" class="ink small" font-weight="700">Stripe-hosted onboarding</text><text x="724" y="86" text-anchor="end" class="muted tiny">Illustrative authorized session area</text>
+  <rect x="48" y="123" width="662" height="203" rx="10" fill="#fff" stroke="#dfe7ec"/>
+  <rect x="74" y="145" width="40" height="40" rx="12" fill="#635bff"/><text x="94" y="173" text-anchor="middle" fill="#fff" font-size="24" font-family="system-ui" font-weight="700">S</text>
+  <text x="132" y="158" class="ink large">Continue with Stripe</text><text x="132" y="181" class="muted small">PaySwap will guide you through the provider's official onboarding steps.</text>
+  <rect x="76" y="204" width="605" height="49" rx="8" fill="#f4f7fa" stroke="#e0e8ed"/><circle cx="96" cy="228" r="8" fill="#e3f4ed" stroke="#aadbc9"/><path d="M92 228l3 3 5-6" fill="none" stroke="#087d62" stroke-width="1.7"/><text x="114" y="224" class="ink small" font-weight="650">You will authenticate directly with the provider</text><text x="114" y="241" class="muted tiny">Credentials and one-time codes must never be entered into agent chat.</text>
+  <rect x="76" y="268" width="174" height="35" rx="9" fill="url(#green)"/><text x="163" y="290" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="13" font-weight="700">Continue securely</text>
+  <text x="270" y="289" class="muted tiny">Not a real Stripe page or a live auth session.</text>
+</g>
+<g transform="translate(1022 122)">
+  <rect x="0" y="0" width="234" height="512" rx="14" class="card" filter="url(#shadow)"/>
+  <text x="18" y="30" class="ink large">Connect Stripe</text><rect x="18" y="44" width="95" height="23" rx="11" fill="#eaf7f2" stroke="#c4e7dc"/><circle cx="31" cy="55" r="4" fill="#0c9a72"/><text x="42" y="59" class="ink tiny" font-weight="650">Setup draft</text>
+  <text x="18" y="93" class="muted small">One task, safely resumable</text>
+  <path d="M31 130V388" stroke="#d7e3e7" stroke-width="2"/>
+  <g><circle cx="31" cy="130" r="12" fill="#0b8b6c"/><text x="31" y="134" text-anchor="middle" fill="#fff" font-size="11" font-family="system-ui" font-weight="700">1</text><text x="54" y="127" class="ink small" font-weight="700">Choose integration</text><text x="54" y="145" class="muted tiny">Store payments or marketplace?</text></g>
+  <g><circle cx="31" cy="196" r="12" fill="#e5f1ed" stroke="#b9ded2"/><text x="31" y="200" text-anchor="middle" class="ink small">2</text><text x="54" y="193" class="ink small" font-weight="700">Authenticate</text><text x="54" y="211" class="muted tiny">Use official provider flow</text></g>
+  <g><circle cx="31" cy="262" r="12" fill="#f2f5f6" stroke="#d7e1e5"/><text x="31" y="266" text-anchor="middle" class="muted small">3</text><text x="54" y="259" class="ink small" font-weight="700">Verify permissions</text><text x="54" y="277" class="muted tiny">Persist verified scopes</text></g>
+  <g><circle cx="31" cy="328" r="12" fill="#f2f5f6" stroke="#d7e1e5"/><text x="31" y="332" text-anchor="middle" class="muted small">4</text><text x="54" y="325" class="ink small" font-weight="700">Test in sandbox</text><text x="54" y="343" class="muted tiny">No live effects yet</text></g>
+  <g><circle cx="31" cy="394" r="12" fill="#f2f5f6" stroke="#d7e1e5"/><text x="31" y="398" text-anchor="middle" class="muted small">5</text><text x="54" y="391" class="ink small" font-weight="700">Review live enablement</text><text x="54" y="409" class="muted tiny">Separate explicit decision</text></g>
+  <rect x="16" y="439" width="202" height="57" rx="10" fill="#f3f8f8" stroke="#d9e7e8"/><text x="29" y="459" class="ink tiny" font-weight="700">Security boundary</text><text x="29" y="476" class="muted tiny">Open auth ≠ connected;</text><text x="29" y="490" class="muted tiny">only verified evidence can activate.</text>
+</g>
+<g transform="translate(248 650)">
+  <rect x="0" y="0" width="758" height="202" rx="14" class="card"/>
+  <rect x="16" y="16" width="38" height="38" rx="11" fill="#0b2b3d"/><path d="M24 35l11-11 11 11-11 11z" fill="#2fc49c"/>
+  <text x="66" y="31" class="ink normal" font-weight="700">PaySwap Agent</text><text x="66" y="49" class="muted tiny">Stripe setup · resumable mission</text>
+  <rect x="66" y="66" width="662" height="52" rx="10" fill="#eaf7f2" stroke="#d1ece2"/>
+  <text x="82" y="87" class="ink small">I can guide you through the setup. First, are you connecting an existing</text><text x="82" y="105" class="ink small">Stripe account, or creating a marketplace using Stripe Connect?</text>
+  <rect x="16" y="134" width="712" height="50" rx="11" fill="#fff" stroke="#ccdce3"/>
+  <text x="33" y="164" class="muted small">Reply with text or describe your goal…</text>
+  <circle cx="654" cy="159" r="14" fill="#f2f6f7" stroke="#d7e2e7"/><path d="M651 154q3-5 6 0v7q-3 5-6 0zM648 161q0 9 6 9t6-9" fill="none" stroke="#506b7f" stroke-width="1.5"/>
+  <circle cx="699" cy="159" r="16" fill="url(#green)"/><path d="M692 159l14-6-5 13-3-5z" fill="none" stroke="#fff" stroke-width="1.6"/>
+</g>
+<text x="640" y="878" text-anchor="middle" class="muted tiny">P13 UX CONCEPT · Illustrative layout only · No live connection, credentials, balance, or provider state is represented.</text>
+</svg>
