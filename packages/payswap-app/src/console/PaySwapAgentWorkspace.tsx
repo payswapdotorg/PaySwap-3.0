@@ -25,7 +25,7 @@
  * renders as failure or success.
  */
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { EmptyState, SkipLink, useReducedMotion } from "@zcode/ui/payswap";
 import "@zcode/ui/payswap-styles.css";
 import "../payswap-product.css";
@@ -35,15 +35,13 @@ import "./console-sections.css";
 import type { PaySwapNavigation } from "../shell/navigation.js";
 import { ProductLink } from "../shell/ProductLink.js";
 import type {
-  ConsoleSectionRecord,
+  ConsoleSectionId,
   ModelProviderStatus,
   WorkspaceStorePort,
 } from "./contracts.js";
 import {
   CONSOLE_ROOT,
   consoleDocumentTitle,
-  consoleSection,
-  isConsoleAdvancedPath,
   resolveConsoleSection,
 } from "./contracts.js";
 import {
@@ -55,14 +53,7 @@ import {
 } from "./ConsoleChrome.js";
 import { useWorkspaceStore } from "./useWorkspaceStore.js";
 import { storeDurabilityLabel } from "./section-vocabulary.js";
-import { OverviewSection, type OverviewIntakePrefill } from "./sections/OverviewSection.js";
-import { MissionsSection, type MissionsIntakeRequest } from "./sections/MissionsSection.js";
-import { AgentsSection } from "./sections/AgentsSection.js";
-import { ApprovalsSection } from "./sections/ApprovalsSection.js";
-import { ConnectionsSection } from "./sections/ConnectionsSection.js";
-import { ActivitySection } from "./sections/ActivitySection.js";
-import { LabSection } from "./sections/LabSection.js";
-import { SettingsSection } from "./sections/SettingsSection.js";
+import { ConsoleSectionSwitch } from "./ConsoleSectionSwitch.js";
 
 /* ====================================================================
  * The pinned cross-lane shapes (re-exported from contracts.ts — the
@@ -197,42 +188,6 @@ export function PaySwapAgentWorkspace({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- titleKey fully identifies the title change.
   }, [titleKey]);
 
-  const activeSectionId =
-    route.kind === "overview" ? "overview" : route.kind === "section" ? route.sectionId : null;
-
-  const openMissionFromOverview = useCallback(
-    (id: string) => {
-      workspace.openDetail(id);
-      navigation.navigate(`${CONSOLE_ROOT}/missions`);
-    },
-    [navigation, workspace],
-  );
-
-  // The overview intake-entry request (P11): the prefill lives in
-  // component state (the path space is unchanged — §2); the seq keys the
-  // missions intake's remount so each request is consumed exactly once.
-  const [intakeRequest, setIntakeRequest] = useState<MissionsIntakeRequest | null>(null);
-  const startMissionFromOverview = useCallback(
-    (prefill: OverviewIntakePrefill) => {
-      setIntakeRequest((current) => ({
-        seq: (current?.seq ?? 0) + 1,
-        prefill,
-      }));
-      navigation.navigate(`${CONSOLE_ROOT}/missions`);
-    },
-    [navigation],
-  );
-
-  const sectionById = (id: string): ConsoleSectionRecord => {
-    const record = consoleSection(id);
-    if (record === undefined) {
-      // Fail-closed: the route table never resolves an unknown section,
-      // but a drifted IA mirror must never render a half-invented view.
-      throw new Error(`PaySwapAgentWorkspace: unknown console section ${JSON.stringify(id)}`);
-    }
-    return record;
-  };
-
   return (
     <div
       className="ps-theme-light ps-console-root"
@@ -240,62 +195,21 @@ export function PaySwapAgentWorkspace({
     >
       <SkipLink href="#ps-console-main">Skip to main content</SkipLink>
       <ConsoleTopbar backToProduct={backToProduct} />
-      <ConsoleSectionNav activeSectionId={activeSectionId} navigation={navigation} />
+      <ConsoleSectionNav activeSectionId={activeSectionIdOf(route)} navigation={navigation} />
       <div className="ps-console-shell">
-        <ConsoleSidebar activeSectionId={activeSectionId} navigation={navigation} />
+        <ConsoleSidebar activeSectionId={activeSectionIdOf(route)} navigation={navigation} />
         <main id="ps-console-main" tabIndex={-1} className="ps-console-main">
-          {route.kind === "overview" ||
-          (route.kind === "section" && route.sectionId === "overview") ? (
-            <OverviewSection
-              section={sectionById("overview")}
+          {route.kind === "not-found" ? (
+            <ConsoleNotFound path={route.path} navigation={navigation} backToProduct={backToProduct} />
+          ) : (
+            <ConsoleSectionSwitch
+              route={route}
               workspace={workspace}
-              navigation={navigation}
-              onOpenMission={openMissionFromOverview}
-              onStartMission={startMissionFromOverview}
-            />
-          ) : null}
-          {route.kind === "section" && route.sectionId === "missions" ? (
-            <MissionsSection
-              section={sectionById("missions")}
-              workspace={workspace}
-              navigation={navigation}
-              intakeRequest={intakeRequest ?? undefined}
-            />
-          ) : null}
-          {route.kind === "section" && route.sectionId === "agents" ? (
-            <AgentsSection section={sectionById("agents")} modelProviders={modelProviders} />
-          ) : null}
-          {route.kind === "section" && route.sectionId === "approvals" ? (
-            <ApprovalsSection section={sectionById("approvals")} />
-          ) : null}
-          {route.kind === "section" && route.sectionId === "connections" ? (
-            <ConnectionsSection
-              section={sectionById("connections")}
               navigation={navigation}
               backToProduct={backToProduct}
               modelProviders={modelProviders}
             />
-          ) : null}
-          {route.kind === "section" && route.sectionId === "activity" ? (
-            <ActivitySection
-              section={sectionById("activity")}
-              workspace={workspace}
-              navigation={navigation}
-            />
-          ) : null}
-          {route.kind === "section" && route.sectionId === "lab" ? (
-            <LabSection section={sectionById("lab")} />
-          ) : null}
-          {route.kind === "section" && route.sectionId === "settings" ? (
-            <SettingsSection
-              section={sectionById("settings")}
-              durability={store.durability}
-              navigation={navigation}
-            />
-          ) : null}
-          {route.kind === "not-found" ? (
-            <ConsoleNotFound path={route.path} navigation={navigation} backToProduct={backToProduct} />
-          ) : null}
+          )}
         </main>
       </div>
       <ConsoleFooter
@@ -306,4 +220,15 @@ export function PaySwapAgentWorkspace({
       />
     </div>
   );
+}
+
+/** The active section id for a resolved route (null outside sections). */
+function activeSectionIdOf(
+  route: ReturnType<typeof resolveConsoleSection>,
+): ConsoleSectionId | null {
+  return route.kind === "overview"
+    ? "overview"
+    : route.kind === "section"
+      ? route.sectionId
+      : null;
 }

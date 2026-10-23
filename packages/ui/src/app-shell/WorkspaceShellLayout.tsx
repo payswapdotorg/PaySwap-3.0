@@ -50,6 +50,7 @@ import { TaskFindDialog } from "@/quickpick/TaskFindDialog.js";
 import { WorkspaceHeader } from "@/WorkspaceHeader.js";
 import { WorkspaceSidebar, type SidebarFileTreeOpenRequest } from "@/WorkspaceSidebar.js";
 import { AnimatedSidePanePanel } from "@/app-shell/AnimatedSidePanePanel.js";
+import { useExtensionSurface } from "@/app-shell/extensionSurface.js";
 import {
   findScreenshotSurfaceTabForRender,
   useBrowserScreenshotSurfaceRequest,
@@ -191,6 +192,8 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
   services,
   workspaceReadOnlyReason,
   workspaceMainView,
+  extensionSectionId,
+  onOpenExtensionSection,
   pluginStoreOpenVersion,
   openAutomationId,
   openAutomationTab,
@@ -820,7 +823,11 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
     onWorkspaceMainViewChange("chat");
   }, [onWorkspaceMainViewChange]);
   const primaryNavigationBack =
-    workspaceMainView === "plugin-store" ? handleManageInstalledPlugins : handleTaskNavBack;
+    workspaceMainView === "plugin-store"
+      ? handleManageInstalledPlugins
+      : workspaceMainView === "extension"
+        ? showChatMainView
+        : handleTaskNavBack;
   const canPrimaryNavigationBack = workspaceMainView === "plugin-store" || canTaskNavBack;
   const handleCreateTaskInChat = useCallback(
     (request?: Parameters<typeof onCreateTask>[0]) => {
@@ -1492,7 +1499,22 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
   // 与 Task Header 分叉。桌面端统一复用 WorkspaceHeader，只由 variant 裁剪 task 专属内容；
   // 手机远控无 active task 时仍不渲染桌面 chrome，继续遵守 replayable overlay 边界。
   const shouldRenderMainViewHeader =
-    workspaceMainView !== "automations" && workspaceMainView !== "plugin-store";
+    workspaceMainView !== "automations" &&
+    workspaceMainView !== "plugin-store" &&
+    workspaceMainView !== "extension";
+  // The host-injected extension surface (generic; null when no host
+  // surface is mounted). The active section resolves from shell state
+  // with the surface's own first item as the default — the shell never
+  // invents a section id.
+  const extensionSurface = useExtensionSurface();
+  const activeExtensionSectionId =
+    extensionSurface !== null && extensionSurface.navItems.length > 0
+      ? (extensionSectionId ?? extensionSurface.navItems[0]!.id)
+      : null;
+  const activeExtensionLabel =
+    extensionSurface?.navItems.find((item) => item.id === activeExtensionSectionId)?.label ??
+    extensionSurface?.navGroupLabel ??
+    "";
   const shouldRenderWorkspaceHeader =
     shouldRenderMainViewHeader && (activeTaskId !== null || isDesktop);
   // ErrorBoundary resetKeys 的数组如果每次 render 都重新创建，
@@ -1600,6 +1622,12 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
                     automationsActive={workspaceMainView === "automations"}
                     onOpenPluginStore={handleOpenPluginStore}
                     pluginStoreActive={workspaceMainView === "plugin-store"}
+                    extensionNavItems={extensionSurface?.navItems}
+                    extensionNavGroupLabel={extensionSurface?.navGroupLabel}
+                    extensionActiveSectionId={
+                      workspaceMainView === "extension" ? activeExtensionSectionId : null
+                    }
+                    onOpenExtensionSection={onOpenExtensionSection}
                     onFileTreeOpenChange={setIsSidebarFileTreeOpen}
                   />
                 </WorkflowRunOpenProvider>
@@ -1744,7 +1772,36 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
                       </ScopedErrorBoundary>
                     ) : null}
                     <div className="min-h-0 flex-1 overflow-hidden">
-                      {workspaceMainView === "automations" ? (
+                      {workspaceMainView === "extension" &&
+                      extensionSurface !== null &&
+                      activeExtensionSectionId !== null ? (
+                        <main className="flex h-full min-h-0 flex-1 flex-col bg-background">
+                          <AutomationsMainBreadcrumbFrame
+                            isDesktop={Boolean(isDesktop)}
+                            sectionLabel={activeExtensionLabel}
+                            ariaLabel={activeExtensionLabel}
+                          >
+                            <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
+                              <ScopedErrorBoundary
+                                scope="extension-main"
+                                resetKeys={workspaceOnlyResetKeys}
+                                variant="panel"
+                                className="min-h-full"
+                              >
+                                {extensionSurface.renderMain({
+                                  sectionId: activeExtensionSectionId,
+                                  onSectionChange: (sectionId: string) => {
+                                    if (sectionId !== activeExtensionSectionId) {
+                                      onOpenExtensionSection?.(sectionId);
+                                    }
+                                  },
+                                  onNavigateBack: showChatMainView,
+                                })}
+                              </ScopedErrorBoundary>
+                            </div>
+                          </AutomationsMainBreadcrumbFrame>
+                        </main>
+                      ) : workspaceMainView === "automations" ? (
                         <main
                           id={AUTOMATIONS_TOAST_ANCHOR_ID}
                           className="flex h-full min-h-0 flex-1 flex-col bg-background"
@@ -1899,7 +1956,9 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
                     </div>
                   </section>
                 </ResizablePanel>
-                {workspaceMainView !== "automations" && workspaceMainView !== "plugin-store" ? (
+                {workspaceMainView !== "automations" &&
+                workspaceMainView !== "plugin-store" &&
+                workspaceMainView !== "extension" ? (
                   <AnimatedTerminalPanel
                     frameClassName={cn(
                       isSidePaneVisible

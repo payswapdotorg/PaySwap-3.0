@@ -116,3 +116,31 @@ export type {
   OutcomeBoardRow,
   OutcomeBoardView,
 } from "./contracts/view-models.js";
+
+// The console-sections bridge for a HOST SHELL (P15 — the ZCode
+// workspace integration): the PaySwap Agent Workspace's sections
+// rendered inside the host's main content area, over the restored
+// BROWSER_PROFILE workspace store (the P10-B laws, new home).
+export {
+  PaySwapConsoleSections,
+  type PaySwapConsoleSectionsProps,
+} from "./console/PaySwapConsoleSections.js";
+export {
+  PAYSWAP_CONSOLE_NAV_GROUP_LABEL,
+  PAYSWAP_CONSOLE_NAV_ITEMS,
+  paySwapConsoleNavLabel,
+  type PaySwapConsoleNavDescriptor,
+} from "./console/consoleNav.js";
+export {
+  createBrowserWorkspaceStore,
+  BrowserWorkspaceStoreError,
+  WORKSPACE_STORE_LOCALSTORAGE_KEY,
+  type BrowserWorkspaceStorage,
+  type BrowserWorkspaceStore,
+  type BrowserWorkspaceStoreErrorKind,
+  type BrowserWorkspaceStoreHealthReport,
+  type BrowserWorkspaceStoreQuarantineEntry,
+} from "./console/browserWorkspaceStore.js";
+export {
+  createMemoryNavigation,
+} from "./console/memoryNavigation.js";

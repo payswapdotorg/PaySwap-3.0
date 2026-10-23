@@ -41,6 +41,7 @@ import { isSettingsTab, isWorkspaceTab, type WorkspaceTabState } from "@/store/t
 import { logger } from "@/logger.js";
 import { RootShell } from "@/root/RootShell.js";
 import { RootWorkspaceContent } from "@/root/RootWorkspaceContent.js";
+import { ExtensionSurfaceProvider } from "@/app-shell/extensionSurface.js";
 import { resolveRootWorkspaceShellTarget } from "@/root/rootWorkspaceShellTarget.js";
 import { OccupationOnboarding } from "@/onboarding/OccupationOnboarding.js";
 import { OnboardingDialog } from "@/onboarding/OnboardingDialog.js";
@@ -116,26 +117,31 @@ export function Root(props: RootProps) {
          * 大会话消息动作里会出现大量 tooltip。Provider 如果跟随每个 tooltip 实例创建，
          * React 点击切换任务时会同步构造数量级相同的 Radix 上下文树；根层共享一次即可保留零延迟配置。
          */}
-        <ServiceProvider services={props.services}>
-          <PlatformProvider platform={props.platform}>
-            <StoreProvider
-              broadcastService={props.services.broadcastService}
-              initialIsRestoringOAuthSession
-            >
-              <TabStoreProvider>
-                <DiffsWorkerPoolProvider>
-                  <AssistantCodeCommentFeatureProvider
-                    enabled={props.assistantCodeCommentCardsEnabled}
-                  >
-                    <CodingPlanUpgradeDialogProvider>
-                      <RootInner {...props} />
-                    </CodingPlanUpgradeDialogProvider>
-                  </AssistantCodeCommentFeatureProvider>
-                </DiffsWorkerPoolProvider>
-              </TabStoreProvider>
-            </StoreProvider>
-          </PlatformProvider>
-        </ServiceProvider>
+        {/* 宿主注入的扩展主面（generic extension surface）：context 交付，
+            深层组合（App → WorkspaceShellLayout → WorkspaceSidebar）直接消费，
+            不经过 props 钻透。无宿主面时 value=null，壳层不渲染任何扩展入口。 */}
+        <ExtensionSurfaceProvider value={props.extensionSurface ?? null}>
+          <ServiceProvider services={props.services}>
+            <PlatformProvider platform={props.platform}>
+              <StoreProvider
+                broadcastService={props.services.broadcastService}
+                initialIsRestoringOAuthSession
+              >
+                <TabStoreProvider>
+                  <DiffsWorkerPoolProvider>
+                    <AssistantCodeCommentFeatureProvider
+                      enabled={props.assistantCodeCommentCardsEnabled}
+                    >
+                      <CodingPlanUpgradeDialogProvider>
+                        <RootInner {...props} />
+                      </CodingPlanUpgradeDialogProvider>
+                    </AssistantCodeCommentFeatureProvider>
+                  </DiffsWorkerPoolProvider>
+                </TabStoreProvider>
+              </StoreProvider>
+            </PlatformProvider>
+          </ServiceProvider>
+        </ExtensionSurfaceProvider>
       </TooltipProvider>
     </LucideProvider>
   );

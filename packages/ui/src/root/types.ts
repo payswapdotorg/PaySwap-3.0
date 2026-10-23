@@ -2,6 +2,7 @@ import type { IPlatformService, UserInfo } from "@zcode/shared";
 import type { IServiceAccessor } from "@zcode/services";
 import type { ReactNode } from "react";
 import type { CreateTaskRequest } from "@/app-shell/types.js";
+import type { ExtensionSurfaceMount } from "@/app-shell/extensionSurface.js";
 
 export interface RootProps {
   services: IServiceAccessor;
@@ -38,6 +39,13 @@ export interface RootProps {
   initialWorkspaceLoadingFallback?: ReactNode;
   /** Assistant code-comment 卡片灰度；默认关闭，关闭时保留原始 directive。 */
   assistantCodeCommentCardsEnabled?: boolean;
+  /**
+   * 宿主注入的扩展主面（generic extension surface）：宿主自己的辅助导航区 +
+   * 主内容渲染回调，渲染在本壳层主内容区（workspaceMainView === "extension"
+   * 时）。壳层不感知其内容 —— 无产品词汇、无样式耦合（substrate 保持
+   * product-free；parallel-design law）。缺省不渲染任何扩展入口。
+   */
+  extensionSurface?: ExtensionSurfaceMount;
 }
 
 export interface WorkspaceSettingsLayerProps {

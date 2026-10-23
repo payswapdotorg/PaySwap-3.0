@@ -117,11 +117,15 @@ export interface GitChangeSummary {
   removed: number;
 }
 
-export type WorkspaceMainView = "chat" | "automations" | "plugin-store";
+export type WorkspaceMainView = "chat" | "automations" | "plugin-store" | "extension";
 
 export interface WorkspaceShellLayoutProps extends Omit<AppProps, "baseFeedbackService"> {
   workspaceReadOnlyReason?: string;
   workspaceMainView: WorkspaceMainView;
+  /** The active host-surface section id (workspaceMainView === "extension"). */
+  extensionSectionId?: string | null;
+  /** Opens a host-surface section (sidebar nav + in-section mirrors). */
+  onOpenExtensionSection?: (sectionId: string) => void;
   pluginStoreOpenVersion: number;
   openAutomationId: string | null;
   openAutomationTab: AutomationsNavigationTab | null;

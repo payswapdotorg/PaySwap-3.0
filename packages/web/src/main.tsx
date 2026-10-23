@@ -37,7 +37,12 @@ import {
 // ORIGINAL ZCode UI (the Root mount). The PaySwap product/workspace
 // surface tree is unmounted from the web experience per the operator
 // direction — the repo history (P9-A..P14) retains every surface.
-import { PaySwapAgentExperience } from "@payswap/app";
+import {
+  PAYSWAP_CONSOLE_NAV_GROUP_LABEL,
+  PAYSWAP_CONSOLE_NAV_ITEMS,
+  PaySwapAgentExperience,
+  PaySwapConsoleSections,
+} from "@payswap/app";
 import type { IPlatformService, RemoteTarget, ServerRemoteInfo } from "@zcode/shared";
 import { WEB_DEFAULT_THEME, resolveWebInitialTheme } from "./webThemeSeed.js";
 import { resolveSubstrateRoute } from "./substrateRoutes.js";
@@ -488,6 +493,23 @@ async function bootstrapWebApp() {
             preferDirectoryBrowser
             supportsEmbeddedBrowser={false}
             allowRemoteWorkspace={false}
+            extensionSurface={{
+              // The PaySwap console sections as HOST-INJECTED main views
+              // (the P13 workspace IA): the shell renders the nav items
+              // in its sidebar (generic extension surface — the substrate
+              // stays product-free) and hands the active section to the
+              // bridge, which renders the same console sections the full
+              // PaySwap Agent Workspace uses.
+              navGroupLabel: PAYSWAP_CONSOLE_NAV_GROUP_LABEL,
+              navItems: PAYSWAP_CONSOLE_NAV_ITEMS,
+              renderMain: ({ sectionId, onSectionChange, onNavigateBack }) => (
+                <PaySwapConsoleSections
+                  sectionId={sectionId}
+                  onSectionChange={onSectionChange}
+                  onNavigateBack={onNavigateBack}
+                />
+              ),
+            }}
           />
           {/* The P15 integration (the P13 UX reference): the PaySwap
               agent experience — the Pay/Receive/Move/Convert + Connect

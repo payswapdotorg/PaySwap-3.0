@@ -830,6 +830,17 @@ export function App({
   > | null>(null);
   const [pluginStoreReturnScopeKey, setPluginStoreReturnScopeKey] = useState("user");
   const [pluginStoreOpenVersion, setPluginStoreOpenVersion] = useState(0);
+  // The host-injected extension surface (generic): its nav items live in
+  // the sidebar, its main content in the shell's main area. The shell
+  // knows nothing about what the surface is (substrate stays
+  // product-free; the layout consumes the surface descriptor through
+  // the context directly); the active section id is shell state so the
+  // nav highlight and the back affordance stay coherent.
+  const [extensionSectionId, setExtensionSectionId] = useState<string | null>(null);
+  const handleNavigateToExtensionSection = useCallback((sectionId: string) => {
+    setExtensionSectionId(sectionId);
+    setWorkspaceMainView("extension");
+  }, []);
   const handleNavigateToTaskMain = useCallback(() => {
     setWorkspaceMainView("chat");
   }, []);
@@ -1126,6 +1137,8 @@ export function App({
         services={services}
         workspaceReadOnlyReason={workspaceReadOnlyReason}
         workspaceMainView={workspaceMainView}
+        extensionSectionId={extensionSectionId}
+        onOpenExtensionSection={handleNavigateToExtensionSection}
         pluginStoreOpenVersion={pluginStoreOpenVersion}
         openAutomationId={openAutomationId}
         openAutomationTab={openAutomationTab}

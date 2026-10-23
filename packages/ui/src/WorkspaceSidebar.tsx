@@ -20,6 +20,7 @@ import {
   Folder,
   FolderOpen,
   Hash,
+  Layers,
   ListFilter,
   Maximize2,
   MessageCircleCheck,
@@ -261,6 +262,10 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   onOpenPluginStore,
   automationsActive = false,
   pluginStoreActive = false,
+  extensionNavItems,
+  extensionNavGroupLabel,
+  extensionActiveSectionId = null,
+  onOpenExtensionSection,
   onFileTreeOpenChange,
 }: {
   workspacePath: string;
@@ -313,6 +318,14 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   onOpenPluginStore?: () => void;
   automationsActive?: boolean;
   pluginStoreActive?: boolean;
+  /** 宿主扩展面的导航项（generic；无宿主面时不渲染任何入口）。 */
+  extensionNavItems?: readonly { readonly id: string; readonly label: string }[];
+  /** 宿主扩展面导航组的标题（缺省无标题）。 */
+  extensionNavGroupLabel?: string;
+  /** 当前激活的宿主扩展面分节（null = 未激活）。 */
+  extensionActiveSectionId?: string | null;
+  /** 打开宿主扩展面的一个分节。 */
+  onOpenExtensionSection?: (sectionId: string) => void;
   onFileTreeOpenChange?: (open: boolean) => void;
 }) {
   const { intl, localePreference, setLocalePreference } = useZCodeIntl();
@@ -1346,6 +1359,38 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
               <Blocks className="size-4" />
               {intl.formatMessage({ id: "workspace.openPluginsSettings" })}
             </Button>
+            {/* 宿主注入的扩展面导航（generic extension surface）：标签来自宿主数据，
+                样式与本栏内置项一致 —— 壳层不感知其内容（substrate 保持 product-free）。 */}
+            {extensionNavItems !== undefined && extensionNavItems.length > 0 ? (
+              <div className="flex flex-col gap-1 pt-1" data-testid="extension-surface-nav">
+                {extensionNavGroupLabel ? (
+                  <p className="px-3 pb-1 text-ui-xs font-medium tracking-wide text-foreground-subtlest">
+                    {extensionNavGroupLabel}
+                  </p>
+                ) : null}
+                {extensionNavItems.map((item) => {
+                  const active = extensionActiveSectionId === item.id;
+                  return (
+                    <Button
+                      key={item.id}
+                      variant="ghost"
+                      onClick={() => onOpenExtensionSection?.(item.id)}
+                      data-icon="inline-start"
+                      data-testid={`extension-surface-nav-${item.id}`}
+                      size="lg"
+                      aria-pressed={active}
+                      className={cn(
+                        "w-full justify-start gap-2 text-foreground hover:bg-surface-hover hover:text-foreground",
+                        active && "bg-selected text-foreground",
+                      )}
+                    >
+                      <Layers className="size-4" />
+                      <span className="min-w-0 flex-1 truncate text-left">{item.label}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
 
           <div className="relative flex min-h-0 flex-1 flex-col">
