@@ -441,7 +441,9 @@
 /* The concept's provider-card row (Stripe highlighted + 3 catalogue). */
 .ps-connections-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  /* The concept's four-across row: 4×~205px + gaps at the console's
+     ~880px content width; wider viewports keep the same four columns. */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--ps-space-3);
 }
 
@@ -916,4 +918,21 @@
   .ps-connections-domain-pill {
     margin-left: 0;
   }
+}
+
+/* The concept's section subtitle + disclaimer footer. */
+.ps-connections-lede {
+  margin: 0;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-base);
+  line-height: 1.5;
+}
+
+.ps-connections-disclaimer {
+  margin: 0;
+  padding-top: var(--ps-space-2);
+  border-top: 1px solid var(--ps-border);
+  color: var(--ps-fg-subtle);
+  font-size: var(--ps-text-2xs);
+  text-align: center;
 }

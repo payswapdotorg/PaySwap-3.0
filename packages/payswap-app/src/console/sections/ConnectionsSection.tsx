@@ -220,6 +220,11 @@ export function ConnectionsSection({
       }
     >
       <div className="ps-connections-scope">
+        {/* The concept's section subtitle (the pinned §2 purpose stays in
+            the scaffold header above; this is the concept's own line). */}
+        <p className="ps-connections-lede">
+          Connect payment providers and manage verified capabilities.
+        </p>
         {/* The concept's provider catalogue row. */}
         <section
           aria-labelledby="ps-connections-catalogue-heading"
@@ -414,6 +419,13 @@ export function ConnectionsSection({
         {/* The concept's embedded PaySwap agent panel — the SAME shared
             orchestration the floating composer drives (in place). */}
         <AgentComposerEmbed />
+
+        {/* The concept's disclaimer line, honest: what this surface shows
+            is catalogue + task records — never live provider state. */}
+        <p className="ps-connections-disclaimer">
+          Catalogue view · illustrative layout only — no live connection,
+          credentials, balance or provider state is represented here.
+        </p>
       </div>
 
       {/* The pinned honest contracts (below the concept layout). */}
