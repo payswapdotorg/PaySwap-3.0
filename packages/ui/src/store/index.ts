@@ -252,9 +252,10 @@ export function createZCodeStore(
       writeSafeLocalStorage(INTERFACE_MODE_STORAGE_KEY, interfaceMode);
       set({ interfaceMode });
     },
-    // 默认主题统一收敛到 Zai dark，避免首次启动时 store 与其他主题入口表现不一致。
-    // 仍然优先尊重 localStorage 中已保存的用户选择，不覆盖已有偏好。
-    theme: normalizeThemePreference((readSafeLocalStorage("zcode-theme") as Theme) || "zai-dark"),
+    // P15 概念方向：默认主题收敛到 Zai light（操作员提供的 P13 UX 参考是浅色桌面），
+    // 与 useTheme / webThemeSeed 的默认保持一致。仍然优先尊重 localStorage 中
+    // 已保存的用户选择，不覆盖已有偏好。
+    theme: normalizeThemePreference((readSafeLocalStorage("zcode-theme") as Theme) || "zai-light"),
     setTheme: (theme: Theme) => {
       const normalizedTheme = normalizeThemePreference(theme);
       writeSafeLocalStorage("zcode-theme", normalizedTheme);
