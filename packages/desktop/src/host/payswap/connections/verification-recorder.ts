@@ -57,6 +57,53 @@ export class VerificationRecorder {
     readonly connectionId: string;
     readonly secretKey: string;
   }): Promise<DesktopCredentialSealReceipt> {
+    return this.#sealTestModeApiKey(input, {
+      testPrefixes: ["rk_test_", "sk_test_"],
+      providerLabel: "Stripe",
+      expectedShape: "rk_test_… or sk_test_…",
+    });
+  }
+
+  /**
+   * The Flutterwave key-entry verb (P14-D): the same ONE material-carrying
+   * path with the FLWSECK_TEST- prefix law (INV-25 — live keys refused).
+   */
+  async submitFlutterwaveSecretKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<DesktopCredentialSealReceipt> {
+    return this.#sealTestModeApiKey(input, {
+      testPrefixes: ["FLWSECK_TEST-"],
+      providerLabel: "Flutterwave",
+      expectedShape: "FLWSECK_TEST-…",
+    });
+  }
+
+  /**
+   * The Paystack key-entry verb (P14-D): the same ONE material-carrying
+   * path with the sk_test_ prefix law (INV-25 — live keys refused).
+   */
+  async submitPaystackSecretKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<DesktopCredentialSealReceipt> {
+    return this.#sealTestModeApiKey(input, {
+      testPrefixes: ["sk_test_"],
+      providerLabel: "Paystack",
+      expectedShape: "sk_test_…",
+    });
+  }
+
+  /**
+   * The shared key-entry law: validate the TEST-MODE key shape fail-closed
+   * (this deployment is SANDBOX-only — INV-25: a LIVE key is refused at
+   * the verb, never sealed), seal through the durable broker, and record
+   * the PENDING_VERIFICATION transition (the ONLY pre-ACTIVE state).
+   */
+  async #sealTestModeApiKey(
+    input: { readonly connectionId: string; readonly secretKey: string },
+    shape: { readonly testPrefixes: readonly string[]; readonly providerLabel: string; readonly expectedShape: string },
+  ): Promise<DesktopCredentialSealReceipt> {
     const record = await this.#port.getRecord(input.connectionId);
     if (record === null) {
       throw new ConnectionSessionError(
@@ -70,12 +117,12 @@ export class VerificationRecorder {
     const key = input.secretKey;
     if (
       typeof key !== "string" ||
-      !(key.startsWith("rk_test_") || key.startsWith("sk_test_")) ||
+      !shape.testPrefixes.some((prefix) => key.startsWith(prefix)) ||
       key.length < 16
     ) {
       throw new ConnectionSessionError(
         "CREDENTIAL_REQUIRED",
-        "The supplied key is not a Stripe test-mode restricted key (expected rk_test_… or sk_test_…). LIVE keys are refused: this deployment is SANDBOX-only (INV-25).",
+        `The supplied key is not a ${shape.providerLabel} test-mode secret key (expected ${shape.expectedShape}). LIVE keys are refused: this deployment is SANDBOX-only (INV-25).`,
       );
     }
     const { credentialHandleRef, sealedSecretCount } = await this.#port.broker.sealApiKey(

@@ -1,0 +1,197 @@
+{
+  "harness": "p14-c1-flw-paystack-probe-e2e",
+  "ranAt": "2026-10-23T06:20:14.222Z",
+  "providers": [
+    {
+      "providerId": "flutterwave",
+      "gates": {
+        "N1-never-active-before-probe": {
+          "held": true,
+          "detail": "seeded state PROPOSED (PROPOSED expected, never ACTIVE)"
+        },
+        "seal": {
+          "held": true,
+          "detail": "sealed 1 secret(s); state PENDING_VERIFICATION; handle opaque"
+        },
+        "N2-inv25-live-key-refused": {
+          "held": true,
+          "detail": "refused: The supplied key is not a Flutterwave test-mode secret key (expected FLWSECK_TEST-…). LIVE keys are refused: this deployment is SANDBOX-only"
+        },
+        "N3-seal-escape-scan": {
+          "held": true,
+          "detail": "threw as designed: a sealed secret string leaked through the consumer result (context: c1-escape-scan-control) — the result is refused, never sanitized"
+        },
+        "probe": {
+          "held": true,
+          "detail": "CONFIRMED — provider references NGN, KES, GHS, USD, EUR, ZAR, BRL, eNGN, MWK, EGP, AED, MAD, XAF, AUD, CAD, MYR, CNY, ZMW, INR, XOF, MUR, ETB, JPY, GBP, TZS, UGX, MZN, RWF, USDC, USDT, RLUSD"
+        },
+        "N4-convergence-resume": {
+          "held": true,
+          "detail": "re-seed → RESUMED conn:ff9cd360-99e5-479d-a220-50ecd763b511 (same id expected)"
+        },
+        "active-on-real-evidence": {
+          "held": true,
+          "detail": "final state ACTIVE"
+        },
+        "N5-restart-record-stability": {
+          "held": true,
+          "detail": "fresh authority over the same dir → ACTIVE with 3 transitions"
+        }
+      },
+      "probe": {
+        "outcome": "CONFIRMED",
+        "providerReferences": [
+          "NGN",
+          "KES",
+          "GHS",
+          "USD",
+          "EUR",
+          "ZAR",
+          "BRL",
+          "eNGN",
+          "MWK",
+          "EGP",
+          "AED",
+          "MAD",
+          "XAF",
+          "AUD",
+          "CAD",
+          "MYR",
+          "CNY",
+          "ZMW",
+          "INR",
+          "XOF",
+          "MUR",
+          "ETB",
+          "JPY",
+          "GBP",
+          "TZS",
+          "UGX",
+          "MZN",
+          "RWF",
+          "USDC",
+          "USDT",
+          "RLUSD"
+        ],
+        "transportId": "flutterwave-https",
+        "transportClass": "PRODUCTION_HTTP",
+        "latencyMs": 2708
+      },
+      "connection": {
+        "connectionId": "conn:ff9cd360-99e5-479d-a220-50ecd763b511",
+        "finalState": "ACTIVE",
+        "transitionHistory": [
+          {
+            "at": "2026-10-23T06:20:14.226Z",
+            "from": "PROPOSED",
+            "to": "PROPOSED",
+            "cause": "SETUP_SEEDED"
+          },
+          {
+            "at": "2026-10-23T06:20:14.228Z",
+            "from": "PROPOSED",
+            "to": "PENDING_VERIFICATION",
+            "cause": "CREDENTIAL_SEALED"
+          },
+          {
+            "at": "2026-10-23T06:20:16.937Z",
+            "from": "PENDING_VERIFICATION",
+            "to": "ACTIVE",
+            "cause": "PROBE_CONFIRMED"
+          }
+        ]
+      },
+      "honestNotes": [
+        "credential source: the station secret store (FLUTTERWAVE_SECRET_KEY env); never chat, never echoed, never in this receipt",
+        "credential service: harness-local AES-256-GCM (node:crypto) standing in for the substrate safeStorage-backed service — the U1-harness boundary",
+        "read-only slice: the probe observes provider state; NO Flutterwave/Paystack execution surface exists in this wave (fail-closed by construction)",
+        "SANDBOX only (INV-25): test-mode keys; no live corridor is touched or certified",
+        "broker storage-key law held: payswap.connection.conn:ff9cd360-99e5-479d-a220-50ecd763b511.credential (payswap.connection.<connectionId>.credential)",
+        "N5 boundary: the RECORD store persists across restart; unsealing the credential blob across restarts is the substrate safeStorage migration path (out of the slice) — the harness master key is per-run"
+      ]
+    },
+    {
+      "providerId": "paystack",
+      "gates": {
+        "N1-never-active-before-probe": {
+          "held": true,
+          "detail": "seeded state PROPOSED (PROPOSED expected, never ACTIVE)"
+        },
+        "seal": {
+          "held": true,
+          "detail": "sealed 1 secret(s); state PENDING_VERIFICATION; handle opaque"
+        },
+        "N2-inv25-live-key-refused": {
+          "held": true,
+          "detail": "refused: The supplied key is not a Paystack test-mode secret key (expected sk_test_…). LIVE keys are refused: this deployment is SANDBOX-only (INV-25"
+        },
+        "N3-seal-escape-scan": {
+          "held": true,
+          "detail": "threw as designed: a sealed secret string leaked through the consumer result (context: c1-escape-scan-control) — the result is refused, never sanitized"
+        },
+        "probe": {
+          "held": true,
+          "detail": "CONFIRMED — provider references txn_6432088601, txn_6424965940, txn_6424932808, txn_6424930600, txn_6424907480, txn_6424817922"
+        },
+        "N4-convergence-resume": {
+          "held": true,
+          "detail": "re-seed → RESUMED conn:ab5da541-4c70-4888-8465-57051840ed00 (same id expected)"
+        },
+        "active-on-real-evidence": {
+          "held": true,
+          "detail": "final state ACTIVE"
+        },
+        "N5-restart-record-stability": {
+          "held": true,
+          "detail": "fresh authority over the same dir → ACTIVE with 3 transitions"
+        }
+      },
+      "probe": {
+        "outcome": "CONFIRMED",
+        "providerReferences": [
+          "txn_6432088601",
+          "txn_6424965940",
+          "txn_6424932808",
+          "txn_6424930600",
+          "txn_6424907480",
+          "txn_6424817922"
+        ],
+        "transportId": "paystack-https",
+        "transportClass": "PRODUCTION_HTTP",
+        "latencyMs": 460
+      },
+      "connection": {
+        "connectionId": "conn:ab5da541-4c70-4888-8465-57051840ed00",
+        "finalState": "ACTIVE",
+        "transitionHistory": [
+          {
+            "at": "2026-10-23T06:20:16.941Z",
+            "from": "PROPOSED",
+            "to": "PROPOSED",
+            "cause": "SETUP_SEEDED"
+          },
+          {
+            "at": "2026-10-23T06:20:16.942Z",
+            "from": "PROPOSED",
+            "to": "PENDING_VERIFICATION",
+            "cause": "CREDENTIAL_SEALED"
+          },
+          {
+            "at": "2026-10-23T06:20:17.404Z",
+            "from": "PENDING_VERIFICATION",
+            "to": "ACTIVE",
+            "cause": "PROBE_CONFIRMED"
+          }
+        ]
+      },
+      "honestNotes": [
+        "credential source: the station secret store (PAYSTACK_SECRET_KEY env); never chat, never echoed, never in this receipt",
+        "credential service: harness-local AES-256-GCM (node:crypto) standing in for the substrate safeStorage-backed service — the U1-harness boundary",
+        "read-only slice: the probe observes provider state; NO Flutterwave/Paystack execution surface exists in this wave (fail-closed by construction)",
+        "SANDBOX only (INV-25): test-mode keys; no live corridor is touched or certified",
+        "broker storage-key law held: payswap.connection.conn:ab5da541-4c70-4888-8465-57051840ed00.credential (payswap.connection.<connectionId>.credential)",
+        "N5 boundary: the RECORD store persists across restart; unsealing the credential blob across restarts is the substrate safeStorage migration path (out of the slice) — the harness master key is per-run"
+      ]
+    }
+  ]
+}

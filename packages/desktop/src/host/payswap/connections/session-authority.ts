@@ -127,6 +127,22 @@ export class ConnectionSessionAuthority {
     return this.#verification.submitStripeRestrictedKey(input);
   }
 
+  /** The Flutterwave key-entry verb (P14-D — the same seal law). */
+  submitFlutterwaveSecretKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<DesktopCredentialSealReceipt> {
+    return this.#verification.submitFlutterwaveSecretKey(input);
+  }
+
+  /** The Paystack key-entry verb (P14-D — the same seal law). */
+  submitPaystackSecretKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<DesktopCredentialSealReceipt> {
+    return this.#verification.submitPaystackSecretKey(input);
+  }
+
   /** Record a verification-probe outcome (the ONLY ACTIVE path). */
   recordVerificationOutcome(input: {
     readonly connectionId: string;

@@ -1,0 +1,42 @@
+{
+  "harness": "p14-a1-stripe-execution-real-flow-e2e",
+  "ranAt": "2026-10-23T06:20:28.235Z",
+  "connection": {
+    "connectionId": "conn:4a25ddd4-b191-4826-b1c0-001b46e83d26",
+    "state": "ACTIVE",
+    "verifiedVia": "probe CONFIRMED (acct_1FPs7UAkPdhgtN6I)"
+  },
+  "mission": {
+    "missionId": "task:PAYMENT_MISSION:65162a9f3ae2f356377ea3adda5a6df0",
+    "finalStatus": "COMPLETED",
+    "authorizationOrigin": "PREVIEW_UI_ACT",
+    "attemptCount": 1
+  },
+  "dispatch": {
+    "outcome": "CONFIRMED",
+    "providerReferences": [
+      "pi_3UTbq5AkPdhgtN6I1D4zwPRk",
+      "succeeded"
+    ],
+    "paymentIntentId": "pi_3UTbq5AkPdhgtN6I1D4zwPRk",
+    "paymentIntentStatus": "succeeded",
+    "dispatchLatencyMs": 1227,
+    "envelopeDispatchedAt": 1792736429507,
+    "envelopeCompletedAt": 1792736430349
+  },
+  "readBack": {
+    "operation": "stripe.payment_intent.retrieve",
+    "status": "succeeded",
+    "providerReferences": [
+      "pi_3UTbq5AkPdhgtN6I1D4zwPRk",
+      "succeeded"
+    ]
+  },
+  "honestNotes": [
+    "credential source: the station secret store (STRIPE_SECRET_KEY env); never chat, never echoed, never in this receipt",
+    "credential service: harness-local AES-256-GCM (node:crypto) standing in for the substrate safeStorage-backed service — the U1-harness boundary",
+    "gate-environment inputs: the funding source + connected scope are REAL (the probed account + the ACTIVE connection); the corridor projection, quote terms, limits and policy decision are DECLARED test-corridor inputs (recorded here — never presented as provider facts)",
+    "negative controls (restricted-key/live-key grant refusals, UNKNOWN-reconcile, the reversal path) are CONTRACT-TIER battery-proven — this harness proves the positive consequential path only",
+    "SANDBOX corridor only (INV-25): test mode, the published pm_card_visa test payment method; no live corridor is touched or certified"
+  ]
+}

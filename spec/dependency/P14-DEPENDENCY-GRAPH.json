@@ -69,7 +69,7 @@
     {
       "id": "P14-D",
       "owner": "resident-tl",
-      "status": "BLOCKED",
+      "status": "COMPLETE",
       "depends_on": [
         "P14-A",
         "P14-B",
@@ -77,7 +77,9 @@
       ],
       "lane_scope": "TL integration: the merged batteries, the real-flow gates (the U1-execution E2E, the webhook receipt, the Flutterwave/Paystack probe E2Es), the map/state reconciliation, the acceptance record with the honest evidence-tier separation.",
       "unlocks": [],
-      "acceptance": "Exact commit has passing integrated batteries + the real-flow gate receipts; offline/contract/sandbox/live claims separated; P14 acceptance record and canonical state agree."
+      "acceptance": "Exact commit has passing integrated batteries + the real-flow gate receipts; offline/contract/sandbox/live claims separated; P14 acceptance record and canonical state agree.",
+      "completed_at": "2026-10-23T06:40:00Z",
+      "completed_via": "main@<this-commit> (TL-direct) \u2014 the desktop provider seal verbs (submitFlutterwaveSecretKey/submitPaystackSecretKey refactored onto the shared #sealTestModeApiKey law) + the c1 harness; ALL real-flow gates green at the integrated tip: the a1 execution re-run (mission COMPLETED, intent pi_3UTbq5AkPdhgtN6I1D4zwPRk succeeded + read-back), the b1 webhook receipt (8/8 gates, real whsec_, locally signed, no live-delivery claim), the c1 FLW+Paystack E2Es (8/8 gates each; FLW ACTIVE reading 31 currency wallets ~2.7s; Paystack ACTIVE reading 6 transaction refs ~0.46s). Integrated batteries: provider-runtime 302/302, desktop 244/244, root tsc clean, oxlint 0/0, architecture 0. Acceptance record: P14-ACCEPTANCE-RECORD-2026-10-23.md (three defects found+fixed during the wave recorded: the webhook consumption-order harness fix, the three pre-existing P13-B pin drifts, the latent P14-A envelope-import defect)"
     }
   ]
 }

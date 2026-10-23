@@ -1,0 +1,21 @@
+{
+  "harness": "p14-b1-stripe-webhook-real-key-receipt",
+  "ranAt": "2026-10-23T06:20:31.425Z",
+  "scheme": "Stripe-Signature t=/v1= HMAC-SHA256 over t.body (the pinned scheme; constant-time compare; 300s tolerance; 5s future skew; event-id single consumption)",
+  "keyMaterial": "the REAL operator whsec_ endpoint secret (STRIPE_WEBHOOK_SECRET from the station secret store; never echoed, never in this receipt)",
+  "signing": "LOCAL (events signed by this harness with the real key — the machinery is verified with real key material)",
+  "honestBoundary": "NO LIVE DELIVERY CLAIMED: no inbound public endpoint exists in this station; live provider→station delivery is a future deployment concern, never simulated (ADR-0008 D4, verbatim law)",
+  "gates": {
+    "G1_verified_typed_extraction": "payment_intent.succeeded → intent pi_b1_98a728c7b13d (succeeded, 1500 usd)",
+    "G2_unmapped_type_honest": "charge.refunded → VERIFIED_UNMAPPED (nothing invented)",
+    "G3_tamper_refused": "SIGNATURE_INVALID",
+    "G4_wrong_key_refused": "SIGNATURE_INVALID",
+    "G5_expired_refused": "TIMESTAMP_OUTSIDE_WINDOW (>300s)",
+    "G6_future_refused": "FUTURE_TIMESTAMP (>5s skew)",
+    "G7_replay_refused": "EVENT_ALREADY_CONSUMED (single consumption)",
+    "G8_secret_free_results": "escape-scan clean on every result shape (in-module + receipt scan)"
+  },
+  "observations": [
+    "evidence mapping: succeeded → resolvedTo CONFIRMED (paymentIntentId pi_b1_98a728c7b13d)"
+  ]
+}
