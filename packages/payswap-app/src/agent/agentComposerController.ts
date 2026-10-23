@@ -281,6 +281,12 @@ export function createAgentComposerController(
 
     async seedFromSurface(seedInput: AgentComposerSurfaceSeed): Promise<void> {
       const note = seedInput.originNote.trim();
+      // The floating panel's visibility after the seed: default OPEN; a
+      // surface with its OWN embedded panel (openPanel: false) keeps the
+      // current mode — the seed + transcript land in the shared state
+      // either way (the convergence law is about the orchestration,
+      // never about which panel renders it).
+      const nextMode = seedInput.openPanel === false ? state.mode : "open";
       if (note.length === 0) {
         return;
       }
@@ -289,14 +295,14 @@ export function createAgentComposerController(
       } catch (thrown: unknown) {
         const message = thrown instanceof Error ? thrown.message : String(thrown);
         appendEntries([{ kind: "COMPOSER_ERROR", text: message }], clock());
-        setState({ mode: "open", entryArea: seedInput.area });
+        setState({ mode: nextMode, entryArea: seedInput.area });
         return;
       }
       appendEntries(
         [{ kind: "SURFACE_ACTION", text: `From the ${seedInput.area} area: ${note}` }],
         clock(),
       );
-      setState({ mode: "open", entryArea: seedInput.area, sendPhase: "sending" });
+      setState({ mode: nextMode, entryArea: seedInput.area, sendPhase: "sending" });
 
       const outcome = await seed(seedInput.intent, "SURFACE_ACTION", note);
       if (outcome.action === "REFUSED") {

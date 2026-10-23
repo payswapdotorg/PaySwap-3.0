@@ -38,7 +38,6 @@ import {
 // surface tree is unmounted from the web experience per the operator
 // direction — the repo history (P9-A..P14) retains every surface.
 import {
-  PAYSWAP_CONSOLE_NAV_GROUP_LABEL,
   PAYSWAP_CONSOLE_NAV_ITEMS,
   PaySwapAgentExperience,
   PaySwapConsoleSections,
@@ -499,8 +498,12 @@ async function bootstrapWebApp() {
               // in its sidebar (generic extension surface — the substrate
               // stays product-free) and hands the active section to the
               // bridge, which renders the same console sections the full
-              // PaySwap Agent Workspace uses.
-              navGroupLabel: PAYSWAP_CONSOLE_NAV_GROUP_LABEL,
+              // PaySwap Agent Workspace uses. The brand block carries the
+              // host identity above the nav (the P13 concept's sidebar).
+              brand: {
+                label: "PaySwap",
+                sublabel: "Payments · DeFi · Global",
+              },
               navItems: PAYSWAP_CONSOLE_NAV_ITEMS,
               renderMain: ({ sectionId, onSectionChange, onNavigateBack }) => (
                 <PaySwapConsoleSections

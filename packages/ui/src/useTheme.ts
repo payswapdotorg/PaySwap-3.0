@@ -82,8 +82,9 @@ function isTheme(value: string | null): value is Theme {
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    // 默认主题统一收敛到 Zai dark，避免旧 hook 兜底值和 Zustand store 默认值分叉。
-    return isTheme(saved) ? normalizeThemePreference(saved) : "zai-dark";
+    // P15 概念方向：默认主题收敛到 Zai light（操作员提供的 P13 UX 参考是浅色桌面）。
+    // 用户显式选择过的主题（localStorage 有值）始终优先。
+    return isTheme(saved) ? normalizeThemePreference(saved) : "zai-light";
   });
 
   const setTheme = useCallback((t: Theme) => {

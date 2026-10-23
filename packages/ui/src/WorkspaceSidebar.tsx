@@ -264,6 +264,7 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   pluginStoreActive = false,
   extensionNavItems,
   extensionNavGroupLabel,
+  extensionBrand,
   extensionActiveSectionId = null,
   onOpenExtensionSection,
   onFileTreeOpenChange,
@@ -322,6 +323,8 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
   extensionNavItems?: readonly { readonly id: string; readonly label: string }[];
   /** 宿主扩展面导航组的标题（缺省无标题）。 */
   extensionNavGroupLabel?: string;
+  /** 宿主扩展面的品牌块（标签 + 可选副标签，宿主数据；壳层保持 product-free）。 */
+  extensionBrand?: { readonly label: string; readonly sublabel?: string };
   /** 当前激活的宿主扩展面分节（null = 未激活）。 */
   extensionActiveSectionId?: string | null;
   /** 打开宿主扩展面的一个分节。 */
@@ -1363,7 +1366,14 @@ export const WorkspaceSidebar = memo(function WorkspaceSidebarComponent({
                 样式与本栏内置项一致 —— 壳层不感知其内容（substrate 保持 product-free）。 */}
             {extensionNavItems !== undefined && extensionNavItems.length > 0 ? (
               <div className="flex flex-col gap-1 pt-1" data-testid="extension-surface-nav">
-                {extensionNavGroupLabel ? (
+                {extensionBrand !== undefined ? (
+                  <div className="px-3 pb-1 pt-2" data-testid="extension-surface-brand">
+                    <p className="text-ui-sm font-semibold text-foreground">{extensionBrand.label}</p>
+                    {extensionBrand.sublabel !== undefined ? (
+                      <p className="text-ui-xs text-foreground-subtlest">{extensionBrand.sublabel}</p>
+                    ) : null}
+                  </div>
+                ) : extensionNavGroupLabel ? (
                   <p className="px-3 pb-1 text-ui-xs font-medium tracking-wide text-foreground-subtlest">
                     {extensionNavGroupLabel}
                   </p>

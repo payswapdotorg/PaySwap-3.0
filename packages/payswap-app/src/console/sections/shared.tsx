@@ -30,20 +30,32 @@ import type { WorkspaceStoreError } from "../useWorkspaceStore.js";
 /** The per-section scaffold: an accessible section + title + purpose. */
 export function SectionScaffold({
   section,
+  headerAside,
   children,
 }: {
   readonly section: ConsoleSectionRecord;
+  /** Optional right-side element in the header row (e.g. an environment pill). */
+  readonly headerAside?: ReactNode;
   readonly children: ReactNode;
 }) {
   const headingId = `ps-console-${section.id}-heading`;
   return (
     <section aria-labelledby={headingId} className="ps-console-section">
-      <header className="ps-console-section-header">
-        <p className="ps-console-eyebrow">PaySwap Agent Workspace</p>
-        <h1 id={headingId} className="ps-console-section-title">
-          {section.title}
-        </h1>
-        <p className="ps-console-section-lede">{section.purpose}</p>
+      <header
+        className={
+          headerAside !== undefined
+            ? "ps-console-section-header ps-console-section-header--aside"
+            : "ps-console-section-header"
+        }
+      >
+        <div className="ps-console-section-header-main">
+          <p className="ps-console-eyebrow">PaySwap Agent Workspace</p>
+          <h1 id={headingId} className="ps-console-section-title">
+            {section.title}
+          </h1>
+          <p className="ps-console-section-lede">{section.purpose}</p>
+        </div>
+        {headerAside}
       </header>
       {children}
     </section>

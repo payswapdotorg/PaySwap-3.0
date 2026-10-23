@@ -1624,6 +1624,7 @@ export const WorkspaceShellLayout = memo(function WorkspaceShellLayoutComponent(
                     pluginStoreActive={workspaceMainView === "plugin-store"}
                     extensionNavItems={extensionSurface?.navItems}
                     extensionNavGroupLabel={extensionSurface?.navGroupLabel}
+                    extensionBrand={extensionSurface?.brand}
                     extensionActiveSectionId={
                       workspaceMainView === "extension" ? activeExtensionSectionId : null
                     }

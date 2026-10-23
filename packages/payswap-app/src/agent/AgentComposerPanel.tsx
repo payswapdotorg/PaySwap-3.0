@@ -98,22 +98,61 @@ function AgentComposerTaskCard({
   );
 }
 
+/** The brand mark of the embedded panel (presentation-only). */
+function AgentBrandMark(): React.ReactNode {
+  return (
+    <span className="ps-agent-brand-mark" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        width="18"
+        height="18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M4 8l6-6 6 6" />
+        <path d="M20 16l-6 6-6-6" />
+        <path d="M10 2h10M4 22h10" />
+      </svg>
+    </span>
+  );
+}
+
 export function AgentComposerPanel({
   state,
   controller,
   onMinimize,
+  variant = "floating",
 }: {
   readonly state: AgentComposerState;
   readonly controller: AgentComposerController;
-  readonly onMinimize: () => void;
+  readonly onMinimize?: () => void;
+  /**
+   * floating (default): the fixed overlay panel the workspace mount
+   * shows. inline: the embedded variant a surface renders INSIDE its
+   * own layout (e.g. the connections page's agent panel) — static
+   * positioning, the surface-context header, no minimize/close chrome
+   * and no focus steal on mount.
+   */
+  readonly variant?: "floating" | "inline";
 }) {
+  const inline = variant === "inline";
+  const panelId = inline ? "ps-connections-agent-panel" : "ps-agent-composer-panel";
+  const inputId = inline ? "ps-connections-agent-input" : "ps-agent-composer-input";
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
-  // Opening the composer puts the user in the input (a user-initiated
-  // focus move — the dock click / entry action asked for this panel).
+  // Opening the FLOATING composer puts the user in the input (a
+  // user-initiated focus move — the dock click / entry action asked for
+  // this panel). The inline variant never steals page focus on mount.
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    if (!inline) {
+      inputRef.current?.focus();
+    }
+  }, [inline]);
 
   const handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
@@ -129,38 +168,57 @@ export function AgentComposerPanel({
 
   const draftEmpty = state.draftText.trim().length === 0;
 
+  // The embedded panel's surface-context subtitle (the P13 concept's
+  // "Stripe setup · resumable mission"): the latest resumable task's
+  // people-language title, or the honest standing invitation.
+  const latestResumable = state.tasks.find((task) => task.resumable);
+  const inlineSubtitle =
+    latestResumable !== undefined
+      ? `${latestResumable.title.split(" — ")[0]} · resumable mission`
+      : "Ask about payments or connections";
+
   return (
     <section
-      id="ps-agent-composer-panel"
-      className="ps-agent-panel"
+      id={panelId}
+      className={inline ? "ps-agent-panel ps-agent-panel--inline" : "ps-agent-panel"}
       aria-label="PaySwap agent composer"
       onKeyDown={(event) => {
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && !inline && onMinimize !== undefined) {
           event.preventDefault();
           onMinimize();
         }
       }}
     >
-      <header className="ps-agent-panel-head">
-        <div>
-          <p className="ps-agent-panel-eyebrow">PaySwap agent</p>
-          <h2 className="ps-agent-panel-title">Ask about payments or connections</h2>
-        </div>
-        <div className="ps-agent-panel-actions">
-          <button
-            type="button"
-            className="ps-agent-panel-action"
-            aria-expanded="true"
-            aria-controls="ps-agent-composer-panel"
-            onClick={onMinimize}
-          >
-            Minimize
-          </button>
-          <button type="button" className="ps-agent-panel-action" onClick={() => controller.close()}>
-            Close
-          </button>
-        </div>
-      </header>
+      {inline ? (
+        <header className="ps-agent-panel-head ps-agent-panel-head--inline">
+          <AgentBrandMark />
+          <div>
+            <h2 className="ps-agent-panel-title">PaySwap Agent</h2>
+            <p className="ps-agent-panel-subtitle">{inlineSubtitle}</p>
+          </div>
+        </header>
+      ) : (
+        <header className="ps-agent-panel-head">
+          <div>
+            <p className="ps-agent-panel-eyebrow">PaySwap agent</p>
+            <h2 className="ps-agent-panel-title">Ask about payments or connections</h2>
+          </div>
+          <div className="ps-agent-panel-actions">
+            <button
+              type="button"
+              className="ps-agent-panel-action"
+              aria-expanded="true"
+              aria-controls={panelId}
+              onClick={onMinimize}
+            >
+              Minimize
+            </button>
+            <button type="button" className="ps-agent-panel-action" onClick={() => controller.close()}>
+              Close
+            </button>
+          </div>
+        </header>
+      )}
       {state.entryArea !== null ? (
         <p className="ps-agent-panel-entry">Opened from the {state.entryArea} area.</p>
       ) : null}
@@ -168,7 +226,15 @@ export function AgentComposerPanel({
 
       <div className="ps-agent-transcript" role="log" aria-live="polite" aria-label="Composer conversation">
         {state.entries.length === 0 ? (
-          <p className="ps-agent-line ps-agent-line--empty">{AGENT_COMPOSER_EMPTY_TRANSCRIPT_NOTE}</p>
+          inline ? (
+            <p className="ps-agent-guidance">
+              I can guide you through the setup. First, are you connecting an existing Stripe
+              account, or creating a marketplace using Stripe Connect? Reply with text or describe
+              your goal — for other providers I will answer honestly with what is declared.
+            </p>
+          ) : (
+            <p className="ps-agent-line ps-agent-line--empty">{AGENT_COMPOSER_EMPTY_TRANSCRIPT_NOTE}</p>
+          )
         ) : (
           state.entries.map((entry) => <AgentComposerLine key={entry.id} entry={entry} />)
         )}
@@ -198,18 +264,22 @@ export function AgentComposerPanel({
       </div>
 
       <form className="ps-agent-input" onSubmit={handleSubmit}>
-        <label htmlFor="ps-agent-composer-input" className="ps-sr-only">
+        <label htmlFor={inputId} className="ps-sr-only">
           Ask the PaySwap agent
         </label>
         <textarea
-          id="ps-agent-composer-input"
+          id={inputId}
           ref={inputRef}
           className="ps-agent-input-field"
           rows={2}
           value={state.draftText}
           onChange={(event) => controller.setDraft(event.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type a request — for example: connect Stripe, or pay the supplier"
+          placeholder={
+            inline
+              ? "Reply with text or describe your goal…"
+              : "Type a request — for example: connect Stripe, or pay the supplier"
+          }
         />
         <div className="ps-agent-input-row">
           <p className="ps-agent-input-hint">{AGENT_COMPOSER_INPUT_HINT}</p>

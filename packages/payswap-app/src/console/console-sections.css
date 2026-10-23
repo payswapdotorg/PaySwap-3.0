@@ -363,9 +363,67 @@
   }
 }
 
-/* ==================== P13 connections (the concept, honest) ========== */
+/* ==================== P13 connections (the operator's concept) ======== */
+/*
+ * The concept-exact palette (p13-stripe-connection-concept.svg), scoped
+ * to the connections surface: the ps-* var system with the concept's
+ * cool-light ramp. The parallel-token law holds — these are scoped var
+ * values, never cross-wired with the host shell's tokens.
+ */
+.ps-connections-scope {
+  --ps-fg: #102642;
+  --ps-fg-muted: #5a7189;
+  --ps-fg-subtle: #7b8fa2;
+  --ps-surface: #ffffff;
+  --ps-surface-raised: #ffffff;
+  --ps-surface-sunken: #f5f8fb;
+  --ps-border: #dce5e9;
+  --ps-border-strong: #cbd9df;
+  --ps-accent: #0e8066;
+  --ps-accent-emphasis: #07966e;
+  --ps-accent-tint: #eaf7f2;
+  color: #102642;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-4);
+}
 
-/* A generic content block inside a section (head + note + body). */
+/* The header-aside environment pill (the concept's top-right badge). */
+.ps-connections-env-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: #e8f6f1;
+  border: 1px solid #bfe5d8;
+  color: #102642;
+  font-size: var(--ps-text-xs);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.ps-connections-env-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: #0a9872;
+  flex-shrink: 0;
+}
+
+.ps-console-section-header--aside {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ps-space-3);
+  flex-wrap: wrap;
+}
+
+.ps-console-section-header--aside .ps-console-section-header-main {
+  min-width: 0;
+}
+
+/* A generic content block inside the section. */
 .ps-console-block {
   display: flex;
   flex-direction: column;
@@ -380,10 +438,10 @@
   flex-wrap: wrap;
 }
 
-/* The provider-card grid (the reference's provider row). */
+/* The concept's provider-card row (Stripe highlighted + 3 catalogue). */
 .ps-connections-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--ps-space-3);
 }
 
@@ -392,6 +450,12 @@
   flex-direction: column;
   gap: var(--ps-space-2);
   height: 100%;
+  border-radius: 13px;
+}
+
+.ps-connections-card--primary {
+  background: #f7fcf9;
+  border-color: #159775;
 }
 
 .ps-connections-card-head {
@@ -411,28 +475,51 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 35px;
+  height: 35px;
   flex-shrink: 0;
-  border-radius: var(--ps-radius-md);
-  border: 1px solid var(--ps-border-strong);
-  background: var(--ps-surface-sunken);
-  color: var(--ps-fg);
-  font-size: var(--ps-text-sm);
-  font-weight: 600;
+  border-radius: 9px;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.ps-connections-mark--stripe {
+  background: #635bff;
+}
+
+.ps-connections-mark--paypal {
+  background: #eaf1ff;
+  color: #1d67b4;
+}
+
+.ps-connections-mark--adyen {
+  background: #e5f8ed;
+  color: #169a62;
+}
+
+.ps-connections-mark--blockchain {
+  background: #1f3c50;
+  font-size: 16px;
 }
 
 .ps-connections-card-title {
   margin: 0;
-  font-size: var(--ps-text-sm);
-  font-weight: 600;
+  font-size: var(--ps-text-base);
+  font-weight: 700;
 }
 
 .ps-connections-card-line {
   margin: 0;
   color: var(--ps-fg-muted);
   font-size: var(--ps-text-xs);
-  line-height: 1.5;
+  line-height: 1.45;
+}
+
+.ps-connections-card-meta {
+  margin: 0;
+  color: var(--ps-fg-subtle);
+  font-size: var(--ps-text-xs);
 }
 
 .ps-connections-card-actions {
@@ -442,64 +529,207 @@
   margin-top: auto;
 }
 
-/* The two-lane composition: the secure-setup panel + the setup rail. */
+/* The concept's primary button: the green gradient. */
+.ps-connections-scope .ps-button--primary {
+  background: linear-gradient(90deg, #0e8066, #07966e);
+  border-color: transparent;
+}
+
+.ps-connections-scope .ps-button--primary:hover {
+  background: linear-gradient(90deg, #0c755d, #068a64);
+}
+
+.ps-connections-registry-note {
+  margin: 0;
+  color: var(--ps-fg-subtle);
+  font-size: var(--ps-text-xs);
+  max-width: 110ch;
+}
+
+/* The concept's two-lane composition: secure setup + the draft rail. */
 .ps-connections-lanes {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: var(--ps-space-4);
   align-items: start;
 }
 
-/* The illustrative authorized-session placeholder (never a fake login). */
-.ps-connections-session {
+/* The secure provider setup panel. */
+.ps-connections-secure {
+  background: var(--ps-surface);
+  border: 1px solid var(--ps-border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.ps-connections-secure-bar {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: var(--ps-space-2);
-  padding: var(--ps-space-6) var(--ps-space-4);
-  border: 1px dashed var(--ps-border-strong);
-  border-radius: var(--ps-radius-md);
-  background: var(--ps-surface-sunken);
-  text-align: center;
+  padding: 11px var(--ps-space-4);
+  background: #fbfcfd;
+  border-bottom: 1px solid var(--ps-border);
+  flex-wrap: wrap;
+}
+
+.ps-connections-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background: #0b9b73;
+  flex-shrink: 0;
+}
+
+.ps-connections-secure-title {
+  margin: 0;
+  font-size: var(--ps-text-sm);
+  font-weight: 650;
+}
+
+.ps-connections-domain-pill {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 9999px;
+  background: #eaf7f2;
+  border: 1px solid #c6e6db;
+  color: var(--ps-fg);
+  font-size: var(--ps-text-xs);
+  white-space: nowrap;
+}
+
+.ps-connections-secure-body {
+  padding: var(--ps-space-3) var(--ps-space-4) var(--ps-space-4);
+  background: #f5f8fb;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-3);
+}
+
+.ps-connections-secure-toolbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ps-space-2);
+  background: var(--ps-surface);
+  border: 1px solid var(--ps-border);
+  border-radius: 10px 10px 0 0;
+  border-bottom: 1px solid var(--ps-border);
+  padding: 10px var(--ps-space-3);
+  flex-wrap: wrap;
+  margin-bottom: calc(-1 * var(--ps-space-3));
+}
+
+.ps-connections-secure-toolbar-title {
+  margin: 0;
+  font-size: var(--ps-text-sm);
+  font-weight: 700;
+}
+
+.ps-connections-secure-toolbar-note {
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-xs);
+}
+
+/* The illustrative authorized-session card (never a fake login). */
+.ps-connections-session-card {
+  background: var(--ps-surface);
+  border: 1px solid #dfe7ec;
+  border-radius: 10px;
+  padding: var(--ps-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-3);
+}
+
+.ps-connections-session-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ps-space-3);
 }
 
 .ps-connections-session-mark {
-  margin: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: var(--ps-radius-full);
-  border: 1px solid var(--ps-border-strong);
-  background: var(--ps-surface);
-  color: var(--ps-fg);
-  font-size: var(--ps-text-lg);
-  font-weight: 600;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #635bff;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.ps-connections-session-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .ps-connections-session-title {
   margin: 0;
-  font-size: var(--ps-text-sm);
-  font-weight: 600;
+  font-size: var(--ps-text-lg);
+  font-weight: 650;
 }
 
 .ps-connections-session-line {
   margin: 0;
-  max-width: 46ch;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-sm);
+}
+
+/* The concept's authenticate-directly checklist row. */
+.ps-connections-checkrow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ps-space-3);
+  padding: 12px var(--ps-space-3);
+  background: #f4f7fa;
+  border: 1px solid #e0e8ed;
+  border-radius: 8px;
+}
+
+.ps-connections-checkglyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border-radius: 9999px;
+  background: #e3f4ed;
+  border: 1px solid #aadbc9;
+  color: #087d62;
+}
+
+.ps-connections-checkrow-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ps-connections-checkrow-title {
+  margin: 0;
+  font-size: var(--ps-text-sm);
+  font-weight: 650;
+}
+
+.ps-connections-checkrow-line {
+  margin: 0;
   color: var(--ps-fg-muted);
   font-size: var(--ps-text-xs);
 }
 
-.ps-connections-security-list {
-  margin: 0;
-  padding-left: 18px;
+.ps-connections-secure-actions {
   display: flex;
-  flex-direction: column;
-  gap: var(--ps-space-1);
-  color: var(--ps-fg-muted);
-  font-size: var(--ps-text-xs);
-  line-height: 1.5;
+  align-items: center;
+  gap: var(--ps-space-3);
+  flex-wrap: wrap;
 }
 
 .ps-connections-honesty-line {
@@ -507,55 +737,92 @@
   color: var(--ps-fg-subtle);
   font-size: var(--ps-text-xs);
   line-height: 1.5;
+  max-width: 60ch;
 }
 
-/* The setup-draft rail (the resumable five-step ladder). */
+/* The setup-draft rail (the concept's vertical timeline). */
 .ps-connections-draft {
   padding: var(--ps-space-4);
   border: 1px solid var(--ps-border);
-  border-radius: var(--ps-radius-lg);
+  border-radius: 14px;
   background: var(--ps-surface-raised);
 }
 
-.ps-connections-steps {
+.ps-connections-draft-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 9999px;
+  background: #eaf7f2;
+  border: 1px solid #c4e7dc;
+  color: var(--ps-fg);
+  font-size: var(--ps-text-xs);
+  font-weight: 650;
+}
+
+.ps-connections-timeline {
   margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--ps-space-2);
+  gap: var(--ps-space-3);
+  position: relative;
 }
 
-.ps-connections-step {
+/* The vertical connector line through the step indexes. */
+.ps-connections-timeline::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  background: #d7e3e7;
+}
+
+.ps-connections-timeline-step {
   display: flex;
-  gap: var(--ps-space-2);
+  gap: var(--ps-space-3);
   align-items: flex-start;
+  position: relative;
 }
 
-.ps-connections-step-index {
+.ps-connections-timeline-index {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
-  border-radius: var(--ps-radius-full);
-  border: 1px solid var(--ps-border-strong);
-  background: var(--ps-surface);
+  border-radius: 9999px;
+  background: #f2f5f6;
+  border: 1px solid #d7e1e5;
   color: var(--ps-fg-muted);
   font-size: var(--ps-text-xs);
+  font-weight: 650;
+  position: relative;
+  z-index: 1;
+}
+
+.ps-connections-timeline-step--active .ps-connections-timeline-index {
+  background: #0b8b6c;
+  border-color: #0b8b6c;
+  color: #fff;
 }
 
 .ps-connections-step-body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  padding-top: 2px;
 }
 
 .ps-connections-step-title {
   margin: 0;
   font-size: var(--ps-text-sm);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .ps-connections-step-line {
@@ -565,18 +832,88 @@
 }
 
 .ps-connections-boundary {
-  margin: 0;
-  padding: var(--ps-space-2) var(--ps-space-3);
-  border-left: 3px solid var(--ps-accent);
-  border-radius: var(--ps-radius-sm);
-  background: var(--ps-accent-tint);
-  color: var(--ps-fg);
-  font-size: var(--ps-text-xs);
-  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--ps-space-3);
+  background: #f3f8f8;
+  border: 1px solid #d9e7e8;
+  border-radius: 10px;
 }
 
-@media (max-width: 900px) {
+.ps-connections-boundary-title {
+  margin: 0;
+  font-size: var(--ps-text-xs);
+  font-weight: 700;
+}
+
+.ps-connections-boundary-line {
+  margin: 0;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-xs);
+  line-height: 1.45;
+}
+
+/* The embedded agent panel (the concept's in-page PaySwap Agent). */
+.ps-agent-panel--inline {
+  position: static;
+  width: 100%;
+  max-width: none;
+  z-index: auto;
+  border-radius: 14px;
+  box-shadow: none;
+  background: var(--ps-surface);
+  border: 1px solid var(--ps-border);
+}
+
+.ps-agent-panel-head--inline {
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-3);
+}
+
+.ps-agent-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: #0b2b3d;
+  color: #2fc49c;
+}
+
+.ps-agent-panel-subtitle {
+  margin: 2px 0 0;
+  color: var(--ps-fg-muted);
+  font-size: var(--ps-text-xs);
+}
+
+/* The concept's green guidance bubble (the standing introduction). */
+.ps-agent-guidance {
+  margin: 0;
+  padding: var(--ps-space-3) var(--ps-space-4);
+  background: #eaf7f2;
+  border: 1px solid #d1ece2;
+  border-radius: 10px;
+  color: var(--ps-fg);
+  font-size: var(--ps-text-sm);
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
   .ps-connections-lanes {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .ps-connections-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ps-connections-domain-pill {
+    margin-left: 0;
   }
 }

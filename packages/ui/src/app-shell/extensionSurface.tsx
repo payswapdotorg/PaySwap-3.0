@@ -40,6 +40,16 @@ export interface ExtensionSurfaceRenderRequest {
 
 /** The host-provided extension surface descriptor. */
 export interface ExtensionSurfaceMount {
+  /**
+   * Optional brand block above the nav items (the host's identity on
+   * this surface): a label + optional sublabel, rendered in the
+   * shell's own design language. Generic data — the shell stays
+   * product-free.
+   */
+  readonly brand?: {
+    readonly label: string;
+    readonly sublabel?: string;
+  };
   /** Optional group label above the nav items (the host's IA name). */
   readonly navGroupLabel?: string;
   /** The nav items (rendered in order; ids are host-stable strings). */

@@ -42,6 +42,14 @@ export interface AgentComposerSurfaceSeed {
   readonly originNote: string;
   /** The area id the entry lives on (e.g. "connections"). */
   readonly area: string;
+  /**
+   * Open the floating composer panel after the seed (default true). A
+   * surface that renders its OWN embedded composer panel (e.g. the
+   * connections page's inline agent panel) passes false: the seed and
+   * its transcript land in the shared state either way — only the
+   * floating panel's visibility changes, never the orchestration.
+   */
+  readonly openPanel?: boolean;
 }
 
 export interface AgentComposerControllerOptions {

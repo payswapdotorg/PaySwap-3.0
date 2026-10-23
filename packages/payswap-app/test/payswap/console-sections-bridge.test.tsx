@@ -153,42 +153,79 @@ describe("the host-shell bridge (the two-way mirror)", () => {
   });
 });
 
-describe("the P13 connections composition (honest provider catalogue)", () => {
-  it("renders the registry-declared Stripe cards with Connect actions", () => {
+describe("the P13 connections composition (the operator's concept, honest)", () => {
+  it("renders the concept's four provider cards — Stripe highlighted + the catalogue entries", () => {
     render(<PaySwapConsoleSections sectionId="connections" />);
-    const cards = agentProviderSetupCards();
-    expect(cards.length).toBeGreaterThanOrEqual(3);
-    for (const card of cards) {
-      expect(screen.getByText(card.cardTitle)).toBeDefined();
+    // The four concept cards, by name.
+    for (const label of ["Stripe", "PayPal", "Adyen", "Blockchain wallet"]) {
+      expect(screen.getByRole("heading", { level: 3, name: label })).toBeDefined();
     }
-    // The primary card's action + the secure-setup Continue action.
-    expect(
-      screen.getAllByRole("button", { name: /^Connect Stripe/ }).length,
-    ).toBeGreaterThanOrEqual(1);
+    // The concept card lines, verbatim.
+    expect(screen.getByText("Create or connect an account, then verify it.")).toBeDefined();
+    expect(screen.getByText("Shown as catalogue entry until verified.")).toBeDefined();
+    expect(screen.getByText("Provider-specific prerequisites shown.")).toBeDefined();
+    expect(screen.getByText("Separate wallet and signing permissions.")).toBeDefined();
+    // The highlighted Stripe card + its primary action.
+    expect(document.querySelector(".ps-connections-card--primary")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Connect Stripe" })).toBeDefined();
     expect(screen.getByRole("button", { name: "Continue securely" })).toBeDefined();
+    // The registry honesty note.
+    expect(
+      screen.getByText(/registry declares Stripe alone \(ADR-0007 D5\)/),
+    ).toBeDefined();
   });
 
-  it("renders the declared-UX-surface providers with DISABLED controls — never a connected state", () => {
+  it("the declared-UX-surface providers Explore honestly — the router never guesses", async () => {
     render(<PaySwapConsoleSections sectionId="connections" />);
-    for (const label of ["PayPal", "Adyen", "Blockchain wallet"]) {
-      const card = screen.getByText(label).closest(".ps-connections-card");
-      expect(card).not.toBeNull();
-      const control = within(card as HTMLElement).getByRole("button", {
-        name: "Setup not declared",
-      });
-      expect((control as HTMLButtonElement).disabled).toBe(true);
+    // All three Explore controls are real, enabled buttons.
+    const exploreButtons = screen.getAllByRole("button", { name: "Explore setup" });
+    expect(exploreButtons.length).toBe(3);
+    for (const button of exploreButtons) {
+      expect((button as HTMLButtonElement).disabled).toBe(false);
     }
-    // The honesty line for undeclared providers, verbatim.
-    expect(screen.getAllByText(/not declared in the provider registry/i).length).toBe(3);
-    // No connected state is ever fabricated for them.
+    // No connected state is ever fabricated.
     expect(screen.queryByText(/^Connected$/)).toBeNull();
+    // Exploring PayPal puts the provider mention in the EMBEDDED panel's
+    // draft (visible, editable — never a fabricated user utterance).
+    await act(async () => {
+      fireEvent.click(exploreButtons[0]!);
+    });
+    const input = screen.getByLabelText("Ask the PaySwap agent") as HTMLTextAreaElement;
+    expect(input.value).toBe("connect PayPal");
+    // Sending yields the HONEST undeclared-provider reply.
+    await act(async () => {
+      fireEvent.submit(input.closest("form")!);
+    });
+    expect(
+      await screen.findByText(/Stripe is the one provider declared in this deployment/i),
+    ).toBeDefined();
+    expect(screen.getByText(/I never guess a provider or a direction/i)).toBeDefined();
+  });
+
+  it("renders the concept's embedded PaySwap agent panel with the standing guidance", () => {
+    render(<PaySwapConsoleSections sectionId="connections" />);
+    expect(screen.getByRole("heading", { name: "PaySwap Agent" })).toBeDefined();
+    // The concept's guided integration-type question, verbatim intent.
+    expect(
+      screen.getByText(/are you connecting an existing Stripe account, or creating a marketplace using Stripe Connect\?/i),
+    ).toBeDefined();
+    // The concept's input placeholder.
+    expect(
+      screen.getByPlaceholderText("Reply with text or describe your goal…"),
+    ).toBeDefined();
   });
 
   it("renders the P13 secure-setup copy (the security laws, verbatim intent)", () => {
     render(<PaySwapConsoleSections sectionId="connections" />);
     expect(screen.getByText(/Expected domain: stripe\.com/)).toBeDefined();
+    expect(screen.getByText("Stripe-hosted onboarding")).toBeDefined();
+    expect(screen.getByText("Illustrative authorized session area")).toBeDefined();
+    expect(screen.getByRole("heading", { level: 3, name: "Continue with Stripe" })).toBeDefined();
     expect(
-      screen.getByText(/You will authenticate directly with the provider\./),
+      screen.getByText(/PaySwap will guide you through the provider.s official onboarding steps\./),
+    ).toBeDefined();
+    expect(
+      screen.getByText(/You will authenticate directly with the provider/),
     ).toBeDefined();
     expect(
       screen.getByText(/Credentials and one-time codes must never be entered into agent chat\./),
@@ -215,8 +252,8 @@ describe("the P13 connections composition (honest provider catalogue)", () => {
 
   it("the CONVERGENCE LAW: Connect Stripe seeds the ONE shared typed-intent controller", async () => {
     // The real composition: the console sections bridge seeds the ONE
-    // shared controller; the shared composer panel (the same mount the
-    // zcode shell rides beside the substrate Root) renders it.
+    // shared controller; the EMBEDDED panel (the concept's in-page
+    // agent) renders it — the floating composer stays docked.
     render(
       <>
         <PaySwapConsoleSections sectionId="connections" />
@@ -243,6 +280,12 @@ describe("the P13 connections composition (honest provider catalogue)", () => {
     expect(
       await screen.findByText(/^Stripe setup — own-store payments \(test mode\)$/),
     ).toBeDefined();
+    // The embedded panel is the surface: the floating composer stays
+    // docked (the entry rail remains visible — nothing covers the page).
+    expect(
+      screen.getByRole("navigation", { name: "PaySwap agent entry actions" }),
+    ).toBeDefined();
+    expect(screen.queryByRole("button", { name: "Minimize" })).toBeNull();
   });
 
   it("Continue securely seeds the same shared controller (the same convergence)", async () => {
