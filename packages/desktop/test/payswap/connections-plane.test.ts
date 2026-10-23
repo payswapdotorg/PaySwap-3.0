@@ -117,7 +117,7 @@ const U2 = { providerId: "stripe", useCaseRef: "existing-account-grant" } as con
 describe("the registry catalogue (typed data — never a connection)", () => {
   it("renders Stripe with three forms; U1 CONFIGURED, U2/U3 UNCONFIGURED with the exact missing operator configuration", () => {
     const views = desktopProviderRegistryViews();
-    expect(views).toHaveLength(1);
+    expect(views).toHaveLength(4);
     const stripe = views[0]!;
     expect(stripe.providerId).toBe("stripe");
     expect(stripe.forms).toHaveLength(3);
@@ -129,6 +129,27 @@ describe("the registry catalogue (typed data — never a connection)", () => {
     expect(u2?.missingOperatorConfiguration.join(" ")).toContain("client_id");
     expect(u3?.status).toBe("UNCONFIGURED");
     expect(u3?.missingOperatorConfiguration.join(" ")).toContain("webhook");
+  });
+
+  it("renders the P14-C providers: Flutterwave + Paystack CONFIGURED read-only, MTN MoMo the typed prerequisite", () => {
+    const views = desktopProviderRegistryViews();
+    const flutterwave = views.find((view) => view.providerId === "flutterwave");
+    const paystack = views.find((view) => view.providerId === "paystack");
+    const momo = views.find((view) => view.providerId === "mtn-momo");
+    expect(flutterwave?.forms).toHaveLength(1);
+    expect(flutterwave?.forms[0]?.status).toBe("CONFIGURED");
+    expect(flutterwave?.forms[0]?.executionModes).toEqual(["SANDBOX"]);
+    expect(paystack?.forms).toHaveLength(1);
+    expect(paystack?.forms[0]?.status).toBe("CONFIGURED");
+    expect(paystack?.forms[0]?.executionModes).toEqual(["SANDBOX"]);
+    // MTN MoMo: the typed prerequisite — UNCONFIGURED with the EXACT
+    // missing configuration naming the 401 fact, never a dead button.
+    expect(momo?.forms).toHaveLength(1);
+    expect(momo?.forms[0]?.status).toBe("UNCONFIGURED");
+    const missing = momo?.forms[0]?.missingOperatorConfiguration.join(" ") ?? "";
+    expect(missing).toContain("Ocp-Apim-Subscription-Key");
+    expect(missing).toContain("401");
+    expect(missing).toContain("API user");
   });
 });
 

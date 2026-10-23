@@ -212,7 +212,6 @@ export const STRIPE_REGISTRY_ENTRY: PaymentProviderRegistryEntry = Object.freeze
 // is a construction defect, never a runtime surprise.
 validatePaymentProviderRegistryEntry(STRIPE_REGISTRY_ENTRY);
 
-/** The canonical payment-provider registry: Stripe is the first real entry. */
-export const PAYMENT_PROVIDER_REGISTRY: readonly PaymentProviderRegistryEntry[] = Object.freeze([
-  STRIPE_REGISTRY_ENTRY,
-]);
+// The COMPOSED canonical registry (all providers) lives in
+// ../payment-provider-registry.ts — the P14-C composition point
+// (each provider owns its declaration; the list is frozen data).

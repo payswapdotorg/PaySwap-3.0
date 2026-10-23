@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
-  PAYMENT_PROVIDER_REGISTRY,
   STRIPE_REGISTRY_ENTRY,
   STRIPE_PROVIDER_ID,
   STRIPE_API_BASE_URL,
   STRIPE_OPERATION_IDS,
 } from '../../src/adapters/stripe/declaration.ts';
+import { PAYMENT_PROVIDER_REGISTRY } from '../../src/adapters/payment-provider-registry.ts';
 import {
   findPaymentProviderForm,
   validatePaymentProviderFormDeclaration,
@@ -35,9 +35,9 @@ const U3 = STRIPE_REGISTRY_ENTRY.forms.find(
 );
 
 describe('the Stripe registry entry (ADR-0007 D1)', () => {
-  it('is the single real entry of the canonical payment-provider registry', () => {
-    expect(PAYMENT_PROVIDER_REGISTRY).toHaveLength(1);
+  it('is the first real entry of the canonical composed payment-provider registry', () => {
     expect(PAYMENT_PROVIDER_REGISTRY[0]).toBe(STRIPE_REGISTRY_ENTRY);
+    expect(PAYMENT_PROVIDER_REGISTRY.length).toBeGreaterThanOrEqual(1);
     expect(STRIPE_REGISTRY_ENTRY.providerId).toBe('stripe');
     expect(STRIPE_PROVIDER_ID).toBe('stripe');
   });

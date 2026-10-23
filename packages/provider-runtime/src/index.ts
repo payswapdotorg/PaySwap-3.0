@@ -83,12 +83,16 @@ export * from './operation.ts';
 export * from './attempts.ts';
 export * from './execution-bridge.ts';
 
-// Payment-provider adapters (P13-B): the typed registry declaration
-// contracts + the Stripe vertical slice (real HTTPS transport, read-only
-// verification probe, capability→scope mapping, OAuth state machinery for
-// the declared-but-unconfigured U2/U3 forms). Names are provider-prefixed
-// so the adapter surface can never collide with the kernel vocabulary.
+// Payment-provider adapters (P13-B + P14-B/C): the typed registry
+// declaration contracts, the per-provider vertical slices (Stripe:
+// real HTTPS transport, read-only verification probe, capability→scope
+// mapping, OAuth state machinery, the P14-A execution surface, the P14-B
+// webhook machinery; Flutterwave + Paystack: the P14-C read-only slices;
+// MTN MoMo: the typed-prerequisite declaration), and the composed
+// canonical registry. Names are provider-prefixed so the adapter surface
+// can never collide with the kernel vocabulary.
 export * from './adapters/registry-declaration.ts';
+export * from './adapters/payment-provider-registry.ts';
 export * from './adapters/stripe/declaration.ts';
 export * from './adapters/stripe/capabilities.ts';
 export * from './adapters/stripe/https-transport.ts';
@@ -101,3 +105,14 @@ export * from './adapters/stripe/payment-execution.ts';
 // verification module + the typed event feed.
 export * from './adapters/stripe/webhook-signature.ts';
 export * from './adapters/stripe/webhook-verification.ts';
+// P14-C: the Flutterwave + Paystack vertical slices (read-only) + the
+// MTN MoMo typed-prerequisite declaration (no adapter).
+export * from './adapters/flutterwave/declaration.ts';
+export * from './adapters/flutterwave/capabilities.ts';
+export * from './adapters/flutterwave/https-transport.ts';
+export * from './adapters/flutterwave/verification-probe.ts';
+export * from './adapters/paystack/declaration.ts';
+export * from './adapters/paystack/capabilities.ts';
+export * from './adapters/paystack/https-transport.ts';
+export * from './adapters/paystack/verification-probe.ts';
+export * from './adapters/mtn-momo/declaration.ts';

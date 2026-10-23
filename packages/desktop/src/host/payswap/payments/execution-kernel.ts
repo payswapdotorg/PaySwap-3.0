@@ -33,10 +33,14 @@ import {
   type ExecutionAuthorityPort,
   type ExecutionAuthorityRefusal,
   type PaymentDispatchCommand,
-  type PaymentResultEnvelope,
 } from "./execution-authority.js";
 import { PaymentMissionError } from "./contracts.js";
 import type { CompiledPaymentIntent } from "./contracts.js";
+// P14-C gate fix: the envelope type lives in contracts.js (the port file
+// imports it, it does not re-export it) — a latent P14-A defect the full
+// host-tsc gate caught; the batteries passed because vitest does not
+// typecheck. Importing from the owning module is the canonical shape.
+import type { PaymentResultEnvelope } from "./contracts.js";
 
 /** The structural transport-call seam (mirrors the canonical call). */
 export interface KernelTransportCall {

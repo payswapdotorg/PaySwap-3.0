@@ -54,7 +54,7 @@
     {
       "id": "P14-C",
       "owner": "worker-3",
-      "status": "QUEUED",
+      "status": "COMPLETE",
       "depends_on": [
         "P14-0"
       ],
@@ -62,7 +62,9 @@
       "unlocks": [
         "P14-D"
       ],
-      "acceptance": "Adapter contract batteries green; never-ACTIVE + INV-25 mode laws pinned; the live probe E2Es ready for P14-D with the verified credentials."
+      "acceptance": "Adapter contract batteries green; never-ACTIVE + INV-25 mode laws pinned; the live probe E2Es ready for P14-D with the verified credentials.",
+      "completed_at": "2026-10-23T06:20:00Z",
+      "completed_via": "main@<this-commit> (TL-direct) \u2014 flutterwave/ + paystack/ four-file slices (declaration, capabilities with the FLWSECK_TEST-/sk_test_ prefix mode laws, https transports with injected fetch, read-only probes: GET /v3/balances + GET /transaction) + mtn-momo/declaration.ts (the UNCONFIGURED typed prerequisite naming the 401 fact; NO adapter) + the composed payment-provider-registry.ts (4 entries; the single-entry registry removed from stripe/declaration.ts) + the desktop pins (3 new pinned entries, the widened registry, and THREE REAL pre-existing P13-B pin drifts fixed to canonical: the U3 useCaseRef singular, the U2/U3 LIVE-mode overclaim, the paraphrased U2/U3 prerequisites \u2014 caught by the new provider-registry-mirror fidelity test) + one latent P14-A defect fixed (execution-kernel imported PaymentResultEnvelope from the port file that does not re-export it; the full host-tsc gate now clean). provider-runtime 302/302 (+44), desktop 244/244 (+3), root tsc clean, oxlint 0/0, architecture:check 0 violations"
     },
     {
       "id": "P14-D",
