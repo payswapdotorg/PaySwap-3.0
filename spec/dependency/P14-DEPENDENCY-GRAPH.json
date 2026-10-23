@@ -9,44 +9,66 @@
     {
       "id": "P14-0",
       "owner": "TL",
-      "status": "QUEUED",
+      "status": "COMPLETE",
       "depends_on": [],
       "lane_scope": "Source-backed gap matrix + ADR-0008: the execution-kernel composition law, the grant-derivation amendment (key-class-derived, fail-closed, LIVE refused), the Stripe write-operation surface with the INV-04 reconcile loop, the webhook verification machinery, the provider expansion shape (Flutterwave + Paystack slices; MTN MoMo typed prerequisite), the file-disjoint lane map.",
-      "unlocks": ["P14-A", "P14-B", "P14-C"],
-      "acceptance": "ADR-0008 + the P14-0 gap matrix committed; the disjoint ownership agreed; implementation dispatch begins."
+      "unlocks": [
+        "P14-A",
+        "P14-B",
+        "P14-C"
+      ],
+      "acceptance": "ADR-0008 + the P14-0 gap matrix committed; the disjoint ownership agreed; implementation dispatch begins.",
+      "completed_at": "2026-10-22T23:20:00Z",
+      "completed_via": "main@<this-commit> \u2014 the gap matrix (P14-0-GAP-MATRIX-2026-10-22.md) + ADR-0008 + the file-disjoint lane map; lanes unblocked"
     },
     {
       "id": "P14-A",
       "owner": "worker-1",
       "status": "QUEUED",
-      "depends_on": ["P14-0"],
-      "lane_scope": "The payment execution kernel: the real kernel behind the desktop ExecutionAuthorityPort — dispatch inside the credential seal through the real transport against the ACTIVE connection; the Stripe write operations; the grant derivation per ADR-0008; the registrar discipline preserved.",
-      "unlocks": ["P14-D"],
-      "acceptance": "The full consequential path runs for real in test mode (intake → gates → preview → PREVIEW_UI_ACT → dispatch → envelope → mission COMPLETED); UNKNOWN reconciles against a real retrieval; idempotent replay proven; grant-refusal negative controls green."
+      "depends_on": [
+        "P14-0"
+      ],
+      "lane_scope": "The payment execution kernel: the real kernel behind the desktop ExecutionAuthorityPort \u2014 dispatch inside the credential seal through the real transport against the ACTIVE connection; the Stripe write operations; the grant derivation per ADR-0008; the registrar discipline preserved.",
+      "unlocks": [
+        "P14-D"
+      ],
+      "acceptance": "The full consequential path runs for real in test mode (intake \u2192 gates \u2192 preview \u2192 PREVIEW_UI_ACT \u2192 dispatch \u2192 envelope \u2192 mission COMPLETED); UNKNOWN reconciles against a real retrieval; idempotent replay proven; grant-refusal negative controls green."
     },
     {
       "id": "P14-B",
       "owner": "worker-2",
       "status": "QUEUED",
-      "depends_on": ["P14-0"],
+      "depends_on": [
+        "P14-0"
+      ],
       "lane_scope": "Stripe webhook verification: the whsec_ signature scheme, tolerance window, replay protection, typed event extraction feeding the mission reconciliation; the locally-signed real-key battery; tamper/expiry/replay negative controls.",
-      "unlocks": ["P14-D"],
+      "unlocks": [
+        "P14-D"
+      ],
       "acceptance": "The verification machinery green against locally-signed events with the real key; no live-delivery claim; the reconciliation feed wires verified events into the mission runtime."
     },
     {
       "id": "P14-C",
       "owner": "worker-3",
       "status": "QUEUED",
-      "depends_on": ["P14-0"],
+      "depends_on": [
+        "P14-0"
+      ],
       "lane_scope": "The Flutterwave + Paystack vertical slices in the P13-B shape (declarations, capabilities, transports, read-only probes, pin vocabularies) + the MTN MoMo typed-prerequisite registry entry (no adapter).",
-      "unlocks": ["P14-D"],
+      "unlocks": [
+        "P14-D"
+      ],
       "acceptance": "Adapter contract batteries green; never-ACTIVE + INV-25 mode laws pinned; the live probe E2Es ready for P14-D with the verified credentials."
     },
     {
       "id": "P14-D",
       "owner": "resident-tl",
       "status": "BLOCKED",
-      "depends_on": ["P14-A", "P14-B", "P14-C"],
+      "depends_on": [
+        "P14-A",
+        "P14-B",
+        "P14-C"
+      ],
       "lane_scope": "TL integration: the merged batteries, the real-flow gates (the U1-execution E2E, the webhook receipt, the Flutterwave/Paystack probe E2Es), the map/state reconciliation, the acceptance record with the honest evidence-tier separation.",
       "unlocks": [],
       "acceptance": "Exact commit has passing integrated batteries + the real-flow gate receipts; offline/contract/sandbox/live claims separated; P14 acceptance record and canonical state agree."
