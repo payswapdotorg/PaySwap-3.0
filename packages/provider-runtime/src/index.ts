@@ -94,3 +94,4 @@ export * from './adapters/stripe/capabilities.ts';
 export * from './adapters/stripe/https-transport.ts';
 export * from './adapters/stripe/verification-probe.ts';
 export * from './adapters/stripe/oauth-state.ts';
+export * from './adapters/stripe/payment-execution.ts';

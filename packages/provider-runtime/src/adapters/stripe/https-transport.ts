@@ -38,6 +38,8 @@ export type StripeFetch = (
   init: {
     readonly method: 'GET' | 'POST';
     readonly headers: Readonly<Record<string, string>>;
+    /** Present iff POST (form-encoded body — the Stripe REST convention). */
+    readonly body?: string;
     readonly signal?: AbortSignal;
   },
 ) => Promise<StripeFetchResponse>;
@@ -55,11 +57,46 @@ export interface StripeHttpsTransportOptions {
 
 const DEFAULT_TIMEOUT_MS = 15_000;
 
+/** One endpoint mapping: method + path with optional {param} placeholders. */
+interface EndpointSpec {
+  readonly method: 'GET' | 'POST';
+  /** Path may contain {name} placeholders filled from the call params. */
+  readonly path: string;
+}
+
 /** The operation → endpoint mapping (frozen evidence surface). */
-const OPERATION_ENDPOINTS: ReadonlyMap<string, { method: 'GET'; path: string }> = new Map([
+const OPERATION_ENDPOINTS: ReadonlyMap<string, EndpointSpec> = new Map([
   ['stripe.balance.read', { method: 'GET', path: '/v1/balance' }],
   ['stripe.account.read', { method: 'GET', path: '/v1/account' }],
+  // The P14-A write surface (ADR-0008 D3) — additive; the read endpoints
+  // above are untouched.
+  ['stripe.payment_intent.create', { method: 'POST', path: '/v1/payment_intents' }],
+  ['stripe.payment_intent.confirm', { method: 'POST', path: '/v1/payment_intents/{id}/confirm' }],
+  ['stripe.payment_intent.retrieve', { method: 'GET', path: '/v1/payment_intents/{id}' }],
+  ['stripe.payment_intent.cancel', { method: 'POST', path: '/v1/payment_intents/{id}/cancel' }],
 ]);
+
+/** Split params into path-fillers and the rest (fail-closed on bad fills). */
+function fillPathParams(
+  path: string,
+  params: Record<string, unknown>,
+): { path: string; rest: Record<string, unknown> } {
+  const rest: Record<string, unknown> = { ...params };
+  const filled = path.replace(/\{(\w+)\}/g, (_match, name: string) => {
+    const value = rest[name];
+    if (typeof value !== 'string' || value.length === 0) {
+      throw new ValidationError(`the path parameter '${name}' is required and must be a non-empty string`);
+    }
+    if (!/^[A-Za-z0-9_-]+$/.test(value)) {
+      // Fail-closed: a path parameter may never carry separators or
+      // traversal shapes onto the wire.
+      throw new ValidationError(`the path parameter '${name}' carries characters outside the safe set`);
+    }
+    delete rest[name];
+    return value;
+  });
+  return { path: filled, rest };
+}
 
 function isAbortLikeError(error: unknown): boolean {
   return (
@@ -129,20 +166,35 @@ export class StripeHttpsTransport implements ProviderTransport {
         `unknown Stripe operation '${call.operationId}'`,
       );
     }
-    const url = `${this.#baseUrl}${endpoint.path}${queryStringOf(call.params)}`;
+    if (typeof call.params !== 'object' || call.params === null || Array.isArray(call.params)) {
+      throw new ValidationError('transport call params must be a plain record');
+    }
+    const { path: filledPath, rest } = fillPathParams(endpoint.path, { ...call.params });
+    const url = `${this.#baseUrl}${filledPath}${endpoint.method === 'GET' ? queryStringOf(rest) : ''}`;
     // The secret-bearing Authorization header exists only inside this
     // call frame; nothing here logs, and the response never carries it.
-    // The caller's headers spread verbatim (a POST idempotency field the
-    // adapter binds inside the seal arrives here as an ordinary header).
+    // The caller's headers spread verbatim; POST calls additionally bind
+    // the registrar's idempotency key (ADR-0008 D3 — Stripe replays the
+    // ORIGINAL result for a repeated key; the mission registrar owns the
+    // law, the header is the wire mechanism).
     const headers: Record<string, string> = {
       ...call.headers,
       'Stripe-Version': this.#apiVersion,
     };
+    let requestBody: string | undefined;
+    if (endpoint.method === 'POST') {
+      headers['Content-Type'] = 'application/x-www-form-urlencoded';
+      if (typeof call.idempotencyKey === 'string' && call.idempotencyKey.length > 0) {
+        headers['Idempotency-Key'] = call.idempotencyKey;
+      }
+      requestBody = queryStringOf(rest).replace(/^\?/, '');
+    }
     let response: StripeFetchResponse;
     try {
       response = await this.#fetchImpl(url, {
         method: endpoint.method,
         headers,
+        ...(requestBody !== undefined ? { body: requestBody } : {}),
         signal: AbortSignal.timeout(this.#timeoutMs),
       });
     } catch (error) {

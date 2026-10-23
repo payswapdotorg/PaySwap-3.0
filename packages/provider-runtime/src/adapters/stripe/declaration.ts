@@ -36,6 +36,10 @@ export const STRIPE_API_VERSION = '2025-08-27.basil' as const;
 export const STRIPE_OPERATION_IDS = [
   'stripe.balance.read',
   'stripe.account.read',
+  'stripe.payment_intent.create',
+  'stripe.payment_intent.confirm',
+  'stripe.payment_intent.retrieve',
+  'stripe.payment_intent.cancel',
 ] as const;
 export type StripeOperationId = (typeof STRIPE_OPERATION_IDS)[number];
 

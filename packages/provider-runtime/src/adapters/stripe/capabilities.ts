@@ -145,6 +145,91 @@ export function refuseConsequentialStripeGrant(operationClass: OperationClass): 
   }
 }
 
+// ---------------------------------------------------------------------------
+// The P14-A execution grant (ADR-0008 D2 — amends the P13-B read-only
+// default for the FULL test-secret key class only, fail-closed).
+// ---------------------------------------------------------------------------
+
+/** The Stripe key classes (the prefix pairs select mode AND class). */
+export const STRIPE_FULL_KEY_PREFIXES = ['sk_test_', 'sk_live_'] as const;
+export const STRIPE_RESTRICTED_KEY_PREFIXES = ['rk_test_', 'rk_live_'] as const;
+
+/** The key class a Stripe key prefix selects. */
+export type StripeKeyClass = 'FULL_SECRET' | 'RESTRICTED';
+
+/** The operation classes the SANDBOX execution grant carries (closed set). */
+export const STRIPE_SANDBOX_EXECUTION_OPERATION_CLASSES: readonly OperationClass[] = Object.freeze([
+  'READ_PROVIDER_STATE',
+  'OBSERVE_EXTERNAL_FUNDS',
+  'MANAGE_CONNECTION',
+  'CREATE_EXTERNAL_EFFECT',
+  'CANCEL_OR_REVERSE_EFFECT',
+]);
+
+/** The effect classes the SANDBOX execution grant permits. */
+export const STRIPE_SANDBOX_EXECUTION_EFFECT_CLASSES: readonly EffectClass[] = Object.freeze([
+  'NONE',
+  'OBSERVATION_ONLY',
+  'STATE_CHANGING',
+]);
+
+/** The key class a canonical Stripe key prefix selects, or null. */
+export function stripeKeyClass(apiKey: string): StripeKeyClass | null {
+  if (typeof apiKey !== 'string' || apiKey.length === 0) {
+    return null;
+  }
+  if (STRIPE_FULL_KEY_PREFIXES.some((prefix) => apiKey.startsWith(prefix))) {
+    return 'FULL_SECRET';
+  }
+  if (STRIPE_RESTRICTED_KEY_PREFIXES.some((prefix) => apiKey.startsWith(prefix))) {
+    return 'RESTRICTED';
+  }
+  return null;
+}
+
+/**
+ * THE EXECUTION GRANT DERIVATION (ADR-0008 D2):
+ * - INV-25 first: the key mode must bind the runtime (test keys serve
+ *   SANDBOX; live keys serve LIVE) — unchanged.
+ * - This derivation is SANDBOX-ONLY by name and by law: any other
+ *   execution mode is refused (a live corridor is never derived here).
+ * - A FULL test secret key (sk_test_…) bound to a SANDBOX runtime may
+ *   derive the SANDBOX execution grant — the write operation classes of
+ *   the payment-intent surface.
+ * - A RESTRICTED key (rk_…) NEVER derives an execution grant from the key
+ *   alone: restricted-key grants derive ONLY from their DECLARED scopes
+ *   (recorded at connection setup), and the P13-B read-only default +
+ *   refuseConsequentialStripeGrant remain the enforcement points.
+ */
+export function deriveStripeSandboxExecutionGrant(
+  apiKey: string,
+  executionMode: ExecutionMode,
+): ConnectionScope {
+  if (executionMode !== 'SANDBOX') {
+    throw new SandboxLiveBoundaryError(
+      `INV-25: the execution grant derivation is SANDBOX-only (a live corridor is never derived in this deployment; got ${executionMode})`,
+      { keyMode: stripeKeyMode(apiKey), executionMode },
+    );
+  }
+  validateStripeKeyModeBinding(apiKey, executionMode);
+  const keyClass = stripeKeyClass(apiKey);
+  if (keyClass === null) {
+    throw new ValidationError('the Stripe apiKey does not carry a canonical key prefix');
+  }
+  if (keyClass === 'RESTRICTED') {
+    throw new ValidationError(
+      'a RESTRICTED Stripe key never derives an execution grant from the key alone — restricted-key grants derive only from their DECLARED scopes (the P13-B read-only default and refuseConsequentialStripeGrant remain the enforcement points)',
+      { keyClass },
+    );
+  }
+  return Object.freeze({
+    allowedOperations: Object.freeze([...STRIPE_SANDBOX_EXECUTION_OPERATION_CLASSES]),
+    allowedEffectClasses: Object.freeze([...STRIPE_SANDBOX_EXECUTION_EFFECT_CLASSES]),
+    scopedCapabilities: Object.freeze([]),
+    allowedDataClasses: Object.freeze([...STRIPE_READ_ONLY_DATA_CLASSES, 'PAYMENT_INTENT_WRITE']),
+  });
+}
+
 /**
  * The full scope-mapping fold for the U1 use case: validates the material
  * shape, enforces the key-mode binding, refuses any requested consequential

@@ -131,7 +131,17 @@ describe('the Stripe registry entry (ADR-0007 D1)', () => {
 
   it('pins the public Stripe API surface constants (no SDK, transport-owned endpoints)', () => {
     expect(STRIPE_API_BASE_URL).toBe('https://api.stripe.com');
-    expect([...STRIPE_OPERATION_IDS]).toEqual(['stripe.balance.read', 'stripe.account.read']);
+    // P14-A (ADR-0008 D3): the write surface extends the map additively
+    // — the two P13-B read endpoints first, then the four payment-intent
+    // operations (create / confirm / retrieve / cancel).
+    expect([...STRIPE_OPERATION_IDS]).toEqual([
+      'stripe.balance.read',
+      'stripe.account.read',
+      'stripe.payment_intent.create',
+      'stripe.payment_intent.confirm',
+      'stripe.payment_intent.retrieve',
+      'stripe.payment_intent.cancel',
+    ]);
   });
 });
 
