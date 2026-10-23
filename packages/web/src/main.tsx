@@ -28,24 +28,14 @@ import {
   isConversationSharePath,
   resolveConversationShareCodeFromPath,
 } from "./share/conversationShareRoute.js";
-// PaySwap web product (P9-A): the product surface lives in the
-// @payswap/app package (consumed by web AND desktop); this mount passes
-// the web platform adapters (history navigation + the vite env API
-// runtime) + the repository's honest deployment facts. The substrate's
-// own routes (OAuth callback, conversation share) are untouched; the
-// agent console moved to /console (PRODUCT-IDENTITY.md §3).
-// P10-B: /console is the PaySwap Agent Workspace (rendered by the same
-// PaySwapSurfaces tree as the product — history-push transitions, no
-// reloads); the ZCode-derived developer workspace stays at
-// /console/advanced (CONSOLE-WORKSPACE.md §1/§2).
-import {
-  PAYSWAP_CONSOLE_PATH,
-} from "@payswap/app";
-import { resolveApiRuntimeInput } from "./payswap/apiRuntime.js";
-import { resolveWebSurface } from "./payswap/webRouteGate.js";
-import { PaySwapSurfaces } from "./payswap/webSurfaces.js";
+// The ZCode web entry (the P15 strip): every path that is not the
+// substrate's own OAuth callback or conversation-share page boots the
+// ORIGINAL ZCode UI (the Root mount). The PaySwap product/workspace
+// surface tree is unmounted from the web experience per the operator
+// direction — the repo history (P9-A..P14) retains every surface.
 import type { IPlatformService, RemoteTarget, ServerRemoteInfo } from "@zcode/shared";
 import { WEB_DEFAULT_THEME, resolveWebInitialTheme } from "./webThemeSeed.js";
+import { resolveSubstrateRoute } from "./substrateRoutes.js";
 
 function resolveWebThemePreference(defaultTheme: Theme = WEB_DEFAULT_THEME): Theme {
   const saved = localStorage.getItem("zcode-theme");
@@ -107,7 +97,7 @@ function renderWebAuthCallbackPage(): void {
   // The console mount owns the default post-auth landing now (the old
   // "/" client root moved to /console in the P9-A route flip) — a share
   // return-to still wins when the state carries one.
-  document.title = "PaySwap — Sign In";
+  document.title = "ZCode";
   const callbackState = parseOAuthState(
     new URLSearchParams(window.location.search).get("state") ?? "",
   );
@@ -116,10 +106,10 @@ function renderWebAuthCallbackPage(): void {
     <WebCallbackPage
       authService={webAuthService}
       onSuccess={({ appReturnTo }) => {
-        window.location.replace(appReturnTo ?? PAYSWAP_CONSOLE_PATH);
+        window.location.replace(appReturnTo ?? "/");
       }}
       onRetry={() => {
-        window.location.replace(safeRetryTarget ?? PAYSWAP_CONSOLE_PATH);
+        window.location.replace(safeRetryTarget ?? "/");
       }}
     />,
   );
@@ -427,7 +417,7 @@ function WebBootstrapErrorScreen({ message }: { message: string }) {
 }
 
 function renderWebBootstrapError(error: unknown): void {
-  document.title = "PaySwap";
+  document.title = "ZCode";
   root.render(
     <WebBootstrapErrorScreen message={error instanceof Error ? error.message : String(error)} />,
   );
@@ -436,54 +426,24 @@ function renderWebBootstrapError(error: unknown): void {
 async function bootstrapWebApp() {
   const params = new URLSearchParams(window.location.search);
 
-  // The P9-A route gate (PRODUCT-IDENTITY.md §3): which surface owns
-  // this pathname — the OAuth callback, the PaySwap product (incl. the
-  // J15 legacy /payswap permanent redirect), the conversation-share
-  // substrate route, or the agent console (the old client root, now the
-  // supporting surface at /console and every other substrate path).
-  const surface = resolveWebSurface({
+  // The substrate routes only (the P15 strip): the OAuth callback pages
+  // (state + code|error arrive via query) and the conversation-share
+  // pages keep their dedicated mounts; EVERY other pathname — including
+  // the former product/console/advanced paths — boots the ORIGINAL
+  // ZCode UI below. No route gate stands between the browser and the
+  // ZCode Root any more.
+  const route = resolveSubstrateRoute({
     pathname: window.location.pathname,
     hasState: params.has("state"),
     hasCodeOrError: params.has("code") || params.has("error"),
   });
 
-  if (surface.kind === "oauth-callback") {
+  if (route.kind === "oauth-callback") {
     renderWebAuthCallbackPage();
     return;
   }
 
-  if (surface.kind === "legacy-redirect") {
-    // J15 — a permanent CLIENT-SIDE redirect: the URL bar is corrected
-    // with replaceState (no history entry, no reload) and the bootstrap
-    // continues against the target, so recorded URLs keep working.
-    window.history.replaceState(null, "", surface.target);
-  }
-
-  // The PaySwap product + the Agent Workspace (P9-A flip + P10-B): the
-  // top-level product routes AND the /console workspace render ONE
-  // PaySwapSurfaces tree over the shared history adapter — every product
-  // ↔ workspace transition is a pushState (CONSOLE-WORKSPACE §2: never a
-  // reload), the console entry is an in-tree push (J14), and the
-  // workspace back affordance returns the same way. The repository's
-  // honest deployment facts are the input (nothing configured, no
-  // recorded provider evidence).
-  //
-  // INTEGRATION FIX (J7): the branch keys on the GATE's decision, not a
-  // re-check of isPaySwapProductPath — the gate (post-fix) sends unknown
-  // top-level paths here too, and the product router renders the honest
-  // not-found answer for them (routes.ts law). The advanced developer
-  // workspace mount below owns only /console/advanced (+ deeper).
-  if (surface.kind === "product" || surface.kind === "legacy-redirect" || surface.kind === "console") {
-    document.title = surface.kind === "console" ? "PaySwap — Agent Workspace" : "PaySwap";
-    root.render(
-      <AppErrorBoundary>
-        <PaySwapSurfaces apiRuntime={resolveApiRuntimeInput()} />
-      </AppErrorBoundary>,
-    );
-    return;
-  }
-
-  if (surface.kind === "share" || isConversationSharePath(window.location.pathname)) {
+  if (route.kind === "share") {
     await renderConversationSharePage();
     return;
   }
@@ -501,13 +461,10 @@ async function bootstrapWebApp() {
       onClose: () => {},
     });
     const platform = createWebPlatform();
-    // The ADVANCED developer workspace (P10-B split): the ZCode-derived
-    // substrate client at /console/advanced — the advanced TECHNICAL
-    // interface, clearly labeled, never the default console experience,
-    // never removed (CONSOLE-WORKSPACE §1). The workspace store does NOT
-    // live here (the BROWSER_PROFILE store serves the /console workspace
-    // mount above); this mount is the substrate Root exactly as in P9-A.
-    document.title = "Developer Workspace — PaySwap Agent Workspace";
+    // The ORIGINAL ZCode UI (the P15 strip): the substrate Root is THE
+    // web experience again — every non-substrate pathname boots here,
+    // exactly as before the P9-A route flip.
+    document.title = "ZCode";
 
     root.render(
       <AppErrorBoundary>

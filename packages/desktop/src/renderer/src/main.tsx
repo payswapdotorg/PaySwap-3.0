@@ -17,14 +17,14 @@ import {
 } from "@zcode/ui";
 import "@zcode/ui/styles.css";
 import { createMessagePortServiceConnection } from "@zcode/client";
-// PaySwap 产品面（P9-A）+ Agent Workspace 控制台（P10-B；P11 更名）：主窗口默认打开 PaySwap 产品体验
-// （@payswap/app），Agent Workspace 控制台作为支撑面通过 #/console 哈希可达，
-// ZCode 开发者工作台保留在 #/console/advanced —— 渲染管线（数据库准入、服务连接、
-// 平台桥）完全不变，只有最终挂载的表面换了默认值。console 连接复用同一
-// ChannelClient 并多出一个 payswap-desktop channel 代理（工作区 store 走 host）。
-import { ProductSurfaceSwitch } from "./ProductSurface.js";
-import { createBrowserHashLocation } from "./payswapDesktop.js";
-import { DesktopConsoleWorkspace, connectDesktopConsoleServices } from "./consoleWorkspaceMount.js";
+// The P15 strip: the desktop main window boots the ORIGINAL ZCode UI
+// (the substrate Root) directly — the PaySwap product/workspace surfaces
+// are unmounted from the renderer experience. The rendering pipeline
+// (database admission, service connection, platform bridge) is
+// unchanged; the connection still carries the payswap-desktop channel
+// proxy (the host-side DESKTOP_PROFILE store plumbing, kept for the
+// agent-led payment UX integration).
+import { connectDesktopConsoleServices } from "./consoleWorkspaceMount.js";
 import {
   InternalChannels,
   databaseStartupStateSchema,
@@ -47,10 +47,6 @@ import {
   parseRemoteWorkspaceServicePortMessage,
   type RemoteWorkspaceServicePortRegistration,
 } from "./remoteWorkspaceServicePortBridge.js";
-// PaySwap 产品面（P9-A）：主窗口默认打开 PaySwap 产品体验（@payswap/app），
-// agent 控制台（Root）作为支撑面通过 #/console 哈希可达 —— 渲染管线（数据库
-// 准入、服务连接、平台桥）完全不变，只有最终挂载的表面换了默认值。
-
 type DesktopRendererImportMetaEnv = {
   VITE_ZCODE_E2E_STORE_BRIDGE?: string;
 };
@@ -333,15 +329,14 @@ function initializeBusinessRoot(port: MessagePort): void {
   // 初始化稳定的设备 ID，确保所有 hook 在首次渲染前就使用正确的值
   setStreamClientId(desktopPlatform.getDeviceId());
 
-  // P10-B：产品面 switch 与 console 工作区共享同一个 hash location 实例
-  // （hash 变化不重载 renderer；工作区导航与产品导航共用同一条哈希历史）。
-  const hashLocation = createBrowserHashLocation();
-
   // React 错误边界捕获的异常不会冒泡到 window.onerror，RUM Browser SDK 默认收不到。
   // 必须在 createRoot 之前注入 reporter：根级 AppErrorBoundary 的职责正是兜住 Root 自身
   // 渲染崩溃，若依赖 Root 的 effect 注入，则 Root 首帧就崩时上报会丢失。
   setReactErrorArmsReporter(desktopPlatform);
 
+  // The P15 strip: the ORIGINAL ZCode UI is the desktop experience — the
+  // substrate Root mounts directly with ALL its existing wiring (the
+  // former #/console/advanced mount, promoted to the default).
   appRoot?.render(
     <AppErrorBoundary isDesktop isMacDesktop={isMacDesktop} isWindowsDesktop={isWindowsDesktop}>
       <ZCodeIntlProvider
@@ -350,31 +345,20 @@ function initializeBusinessRoot(port: MessagePort): void {
         resolveSystemLocale={desktopPlatform.getSystemLocale}
       >
         <StartupReadyNotifier />
-        {/* P9-A：默认表面是 PaySwap 产品；P10-B 后 #/console 是 PaySwap Agent
-            Workspace（注入的 renderWorkspace），ZCode 开发者工作台（下面的 Root
-            子树，全部原有 wiring 不变）保留在 #/console/advanced。 */}
-        <ProductSurfaceSwitch
-          location={hashLocation}
-          renderConsole={() => (
-            <Root
-              services={services}
-              platform={desktopPlatform}
-              isDesktop
-              assistantCodeCommentCardsEnabled
-              isMacDesktop={isMacDesktop}
-              isWindowsDesktop={isWindowsDesktop}
-              restoreSession={restoreSession}
-              supportsSettings={supportsSettings}
-              initialWorkspaceAbsPath={initialWorkspaceAbsPath}
-              initialWorkspacePurpose={
-                initialWorkspacePurpose === "conversation" ? "conversation" : "project"
-              }
-              unavailableWorkspacePath={unavailableWorkspacePath}
-            />
-          )}
-          renderWorkspace={() => (
-            <DesktopConsoleWorkspace location={hashLocation} services={services} />
-          )}
+        <Root
+          services={services}
+          platform={desktopPlatform}
+          isDesktop
+          assistantCodeCommentCardsEnabled
+          isMacDesktop={isMacDesktop}
+          isWindowsDesktop={isWindowsDesktop}
+          restoreSession={restoreSession}
+          supportsSettings={supportsSettings}
+          initialWorkspaceAbsPath={initialWorkspaceAbsPath}
+          initialWorkspacePurpose={
+            initialWorkspacePurpose === "conversation" ? "conversation" : "project"
+          }
+          unavailableWorkspacePath={unavailableWorkspacePath}
         />
       </ZCodeIntlProvider>
     </AppErrorBoundary>,

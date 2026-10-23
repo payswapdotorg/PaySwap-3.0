@@ -1,9 +1,9 @@
 /**
- * @zcode/desktop — the renderer-side console workspace mount (P10-B).
+ * @zcode/desktop — the renderer-side payswap-desktop channel client
+ * (P10-B; the P15 strip keeps the plumbing, drops the workspace UI).
  *
- * The glue that connects the PaySwap Agent Workspace (the @payswap/app
- * console component) to the DESKTOP_PROFILE workspace store living in
- * the host process:
+ * The glue that connects a renderer consumer to the DESKTOP_PROFILE
+ * workspace store living in the host process:
  *
  * - CHANNEL CLIENT: the host exposes the "payswap-desktop" service over
  *   the substrate's message-port RPC (ChannelServer → the renderer's
@@ -18,14 +18,11 @@
  *   spec/surface/CONSOLE-WORKSPACE.md) with durability DESKTOP_PROFILE.
  *   The store holds DEMAND-SIDE MISSION INTENT ONLY — never financial
  *   truth, never authorization, never capability state.
- * - WORKSPACE COMPONENT: DesktopConsoleWorkspace composes the
- *   PaySwapAgentWorkspace (the TL seam stub today; P10-C replaces the
- *   implementation) with the console navigation adapter and the
- *   back-to-product affordance over the SAME injected hash location the
- *   product surface uses — hash navigation never reloads the renderer.
+ * (The P15 strip unmounted the workspace COMPONENT — the renderer now
+ * boots the ORIGINAL ZCode UI; this module keeps the channel client +
+ * the store-port adapter for the agent-led payment UX integration.)
  */
 
-import { useMemo } from "react";
 import type { IChannelClient } from "@zcode/rpc";
 import { ChannelClient, MessagePortProtocol, ProxyChannel } from "@zcode/rpc";
 import { RemoteServiceAccess } from "@zcode/client";
@@ -36,9 +33,6 @@ import type {
   MissionSummary,
   WorkspaceStorePort,
 } from "@payswap/app";
-import { PaySwapAgentWorkspace } from "@payswap/app";
-import type { DesktopHashLocation } from "./payswapDesktop.js";
-import { createConsoleWorkspaceNavigation } from "./payswapDesktop.js";
 
 // ---------------------------------------------------------------------------
 // The re-declared client descriptor (renderer-reachable; drift-tested)
@@ -195,30 +189,3 @@ export function createDesktopWorkspaceStorePort(
 }
 
 // ---------------------------------------------------------------------------
-// The workspace mount component (the console branch of the switch)
-// ---------------------------------------------------------------------------
-
-/**
- * The PaySwap Agent Workspace as mounted on the desktop console surface:
- * the @payswap/app component with the console navigation adapter (the
- * "/console…" hash path space), the DESKTOP_PROFILE store port over the
- * payswap-desktop channel, and the back-to-product affordance — all over
- * the SAME injected hash location the product surface switch uses.
- */
-export function DesktopConsoleWorkspace({
-  location,
-  services,
-}: {
-  readonly location: DesktopHashLocation;
-  readonly services: DesktopConsoleChannelServices;
-}) {
-  const navigation = useMemo(() => createConsoleWorkspaceNavigation(location), [location]);
-  const store = useMemo(() => createDesktopWorkspaceStorePort(services), [services]);
-  return (
-    <PaySwapAgentWorkspace
-      navigation={navigation}
-      store={store}
-      backToProduct={{ label: "PaySwap", onActivate: () => location.setHash("#/") }}
-    />
-  );
-}
