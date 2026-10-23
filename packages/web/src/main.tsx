@@ -10,6 +10,10 @@ import {
   type Theme,
 } from "@zcode/ui";
 import "@zcode/ui/styles.css";
+// The PaySwap agent-experience design layer (the ps- token system —
+// parallel to the zai-* tokens, never cross-wired).
+import "@zcode/ui/payswap-tokens.css";
+import "@zcode/ui/payswap-styles.css";
 import { connectViaWebSocket } from "@zcode/client";
 import { WebCallbackPage } from "./auth/WebCallbackPage.js";
 import { createWebAuthService } from "./auth/webAuthService.js";
@@ -33,6 +37,7 @@ import {
 // ORIGINAL ZCode UI (the Root mount). The PaySwap product/workspace
 // surface tree is unmounted from the web experience per the operator
 // direction — the repo history (P9-A..P14) retains every surface.
+import { PaySwapAgentExperience } from "@payswap/app";
 import type { IPlatformService, RemoteTarget, ServerRemoteInfo } from "@zcode/shared";
 import { WEB_DEFAULT_THEME, resolveWebInitialTheme } from "./webThemeSeed.js";
 import { resolveSubstrateRoute } from "./substrateRoutes.js";
@@ -484,6 +489,11 @@ async function bootstrapWebApp() {
             supportsEmbeddedBrowser={false}
             allowRemoteWorkspace={false}
           />
+          {/* The P15 integration (the P13 UX reference): the PaySwap
+              agent experience — the Pay/Receive/Move/Convert + Connect
+              entry actions and the shared typed-intent composer —
+              mounted BESIDE the substrate Root, never inside it. */}
+          <PaySwapAgentExperience area="zcode-workspace" />
         </ZCodeIntlProvider>
       </AppErrorBoundary>,
     );

@@ -66,6 +66,36 @@ export {
   type WorkspaceStorePort,
 } from "./console/PaySwapAgentWorkspace.js";
 
+// The agent-led payment UX (P13; the public API for the P15 zcode-shell
+// integration — the shared typed-intent composer + the entry actions).
+export {
+  AgentComposer,
+  type AgentComposerProps,
+} from "./agent/AgentComposer.js";
+export {
+  PaySwapAgentExperience,
+  type PaySwapAgentExperienceProps,
+} from "./agent/AgentExperience.js";
+export {
+  createAgentComposerController,
+  resetSharedAgentComposerController,
+  sharedAgentComposerController,
+  type AgentComposerController,
+} from "./agent/agentComposerController.js";
+export {
+  routeAgentText,
+  AGENT_INTENT_UNKNOWN_REPLY,
+} from "./agent/intentRouter.js";
+export {
+  AGENT_PAYMENT_DIRECTION_ENTRIES,
+  agentPaymentDirectionEntries,
+  type AgentPaymentDirectionEntry,
+} from "./lib/agent-payment-entries.js";
+export {
+  agentProviderSetupCards,
+  type AgentProviderSetupCard,
+} from "./lib/agent-provider-entries.js";
+
 // The honest harness facts (the deployment truth this repository phase).
 export {
   HONEST_DEPLOYMENT_CONTEXT,

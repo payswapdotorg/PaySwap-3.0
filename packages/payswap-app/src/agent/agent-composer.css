@@ -399,3 +399,74 @@
     max-height: 78vh;
   }
 }
+
+/* ------------------------ the entry rail (P15) ----------------------- */
+/* The ZCode-shell mount's entry actions: Pay/Receive/Move/Convert + the
+ * primary Connect action, stacked above the dock. Token-driven, no
+ * motion, self-scoped focus — the same posture as the dock/panel. */
+
+.ps-agent-entry-rail {
+  position: fixed;
+  right: 16px;
+  bottom: 68px;
+  z-index: 59;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: min(240px, calc(100vw - 32px));
+}
+
+.ps-agent-entry-rail-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-agent-entry-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 999px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(19, 18, 17, 0.12);
+}
+
+.ps-agent-entry-chip:hover {
+  background: var(--ps-surface-hover, var(--ps-surface));
+}
+
+.ps-agent-entry-chip:focus-visible {
+  outline: 2px solid var(--ps-accent);
+  outline-offset: 2px;
+}
+
+.ps-agent-entry-chip-glyph {
+  display: inline-flex;
+  color: var(--ps-accent);
+}
+
+.ps-agent-entry-chip-label {
+  white-space: nowrap;
+}
+
+.ps-agent-entry-rail-note {
+  margin: 2px 2px 0 0;
+  max-width: 220px;
+  color: var(--ps-fg-subtle, var(--ps-fg));
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: right;
+}

@@ -16,6 +16,10 @@ import {
   setReactErrorArmsReporter,
 } from "@zcode/ui";
 import "@zcode/ui/styles.css";
+// The PaySwap agent-experience design layer (the ps- token system —
+// parallel to the zai-* tokens, never cross-wired).
+import "@zcode/ui/payswap-tokens.css";
+import "@zcode/ui/payswap-styles.css";
 import { createMessagePortServiceConnection } from "@zcode/client";
 // The P15 strip: the desktop main window boots the ORIGINAL ZCode UI
 // (the substrate Root) directly — the PaySwap product/workspace surfaces
@@ -25,6 +29,7 @@ import { createMessagePortServiceConnection } from "@zcode/client";
 // proxy (the host-side DESKTOP_PROFILE store plumbing, kept for the
 // agent-led payment UX integration).
 import { connectDesktopConsoleServices } from "./consoleWorkspaceMount.js";
+import { PaySwapAgentExperience } from "@payswap/app";
 import {
   InternalChannels,
   databaseStartupStateSchema,
@@ -360,6 +365,9 @@ function initializeBusinessRoot(port: MessagePort): void {
           }
           unavailableWorkspacePath={unavailableWorkspacePath}
         />
+        {/* The P15 integration (the P13 UX reference): the PaySwap agent
+            experience mounted BESIDE the substrate Root, never inside it. */}
+        <PaySwapAgentExperience area="zcode-workspace" />
       </ZCodeIntlProvider>
     </AppErrorBoundary>,
   );
