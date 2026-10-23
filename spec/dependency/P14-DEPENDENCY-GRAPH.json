@@ -24,7 +24,7 @@
     {
       "id": "P14-A",
       "owner": "worker-1",
-      "status": "QUEUED",
+      "status": "COMPLETE",
       "depends_on": [
         "P14-0"
       ],
@@ -32,7 +32,9 @@
       "unlocks": [
         "P14-D"
       ],
-      "acceptance": "The full consequential path runs for real in test mode (intake \u2192 gates \u2192 preview \u2192 PREVIEW_UI_ACT \u2192 dispatch \u2192 envelope \u2192 mission COMPLETED); UNKNOWN reconciles against a real retrieval; idempotent replay proven; grant-refusal negative controls green."
+      "acceptance": "The full consequential path runs for real in test mode (intake \u2192 gates \u2192 preview \u2192 PREVIEW_UI_ACT \u2192 dispatch \u2192 envelope \u2192 mission COMPLETED); UNKNOWN reconciles against a real retrieval; idempotent replay proven; grant-refusal negative controls green.",
+      "completed_at": "2026-10-23T00:52:05Z",
+      "completed_via": "main@d4b806a (TL-direct) \u2014 the kernel + the 16-test battery green; the REAL consequential path: mission COMPLETED, PaymentIntent pi_3UTWgAAkPdhgtN6I08dJ5eEC succeeded (create+confirm inside the seal via the real transport), read-back verified; receipt p14-a1-execution-real-flow-RECEIPT-2026-10-22.json"
     },
     {
       "id": "P14-B",
