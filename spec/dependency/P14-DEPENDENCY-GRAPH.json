@@ -39,7 +39,7 @@
     {
       "id": "P14-B",
       "owner": "worker-2",
-      "status": "QUEUED",
+      "status": "COMPLETE",
       "depends_on": [
         "P14-0"
       ],
@@ -47,7 +47,9 @@
       "unlocks": [
         "P14-D"
       ],
-      "acceptance": "The verification machinery green against locally-signed events with the real key; no live-delivery claim; the reconciliation feed wires verified events into the mission runtime."
+      "acceptance": "The verification machinery green against locally-signed events with the real key; no live-delivery claim; the reconciliation feed wires verified events into the mission runtime.",
+      "completed_at": "2026-10-23T05:58:00Z",
+      "completed_via": "main@<this-commit> (TL-direct) \u2014 webhook-signature.ts + webhook-verification.ts (the pinned t=/v1= HMAC-SHA256 scheme, 300s tolerance, 5s skew, constant-time compare, event-id single consumption, typed 4-event vocabulary, evidence mapping: succeeded\u2192CONFIRMED / payment_failed\u2192FAILED / processing+amount_captured_updated\u2192observation-only); provider-runtime 258/258 (+22 unit), desktop 241/241 (+5 feed: UNKNOWN\u2192verified event\u2192reconcile\u2192COMPLETED with replay+ tamper negatives); the REAL-key receipt p14-b1-webhook-real-key-RECEIPT-2026-10-23.json (8/8 gates, locally signed, no live-delivery claim)"
     },
     {
       "id": "P14-C",

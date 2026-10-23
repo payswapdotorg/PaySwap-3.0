@@ -95,3 +95,9 @@ export * from './adapters/stripe/https-transport.ts';
 export * from './adapters/stripe/verification-probe.ts';
 export * from './adapters/stripe/oauth-state.ts';
 export * from './adapters/stripe/payment-execution.ts';
+// P14-B: the whsec_ webhook verification machinery (locally-signed
+// battery; the real-key receipt is the P14-D tier). Split per the
+// <=400-line file law: the signature scheme + ingestor plug, then the
+// verification module + the typed event feed.
+export * from './adapters/stripe/webhook-signature.ts';
+export * from './adapters/stripe/webhook-verification.ts';
