@@ -9,7 +9,7 @@
     {
       "id": "P16-0",
       "owner": "TL",
-      "status": "QUEUED",
+      "status": "COMPLETE",
       "depends_on": [],
       "lane_scope": "Source-backed gap matrix, routine/skill loader architecture decision, typed trigger contract, deterministic routine manifest/state-machine and file-disjoint integration agreement; reconcile P15/current-state drift.",
       "unlocks": [
@@ -17,12 +17,17 @@
         "P16-B",
         "P16-C"
       ],
-      "acceptance": "Gap matrix names exact existing source APIs and missing seams; ADR/decision preserves frozen architecture; routine/skill version pin and typed trigger behavior specified; dependencies and owners confirmed."
+      "acceptance": "Gap matrix names exact existing source APIs and missing seams; ADR/decision preserves frozen architecture; routine/skill version pin and typed trigger behavior specified; dependencies and owners confirmed.",
+      "acceptance_evidence": [
+        "spec/routines/payment-route-planning/P16-0-GAP-MATRIX.md",
+        "docs/architecture-governance/adr/ADR-0009-p16-payment-route-planning-routine.md",
+        "spec/development-state/current-state.json (dispatch_log accept P16-0 @ 2026-10-26T15:38:00Z)"
+      ]
     },
     {
       "id": "P16-A",
       "owner": "worker-1",
-      "status": "BLOCKED",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "P16-0"
       ],
@@ -35,7 +40,7 @@
     {
       "id": "P16-B",
       "owner": "worker-2",
-      "status": "BLOCKED",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "P16-0"
       ],
@@ -48,7 +53,7 @@
     {
       "id": "P16-C",
       "owner": "worker-3",
-      "status": "BLOCKED",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "P16-0"
       ],
@@ -71,5 +76,6 @@
       "unlocks": [],
       "acceptance": "Validated typed payment intent triggers exactly one pinned routine; routine/skill load failure fails closed; real evidence-backed routes and exclusions render distinctly from conditional options; proceed/wait tasks persist/resume; no effect without existing authority and explicit approval; exact-commit E2E and evidence tiers published."
     }
-  ]
+  ],
+  "closure_policy": "Lanes A/B/C are file-disjoint per ADR-0009 D3 and run concurrently; workers do not commit. The TL verifies each lane (battery + tsc --noEmit), commits per lane, and pushes at acceptance (ADR-0009 D7). P16-D integrates and closes the wave; no implementation or acceptance is claimed by this graph beyond recorded statuses."
 }
