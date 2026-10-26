@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "wave": "P19",
+  "title": "The dispatch act surface (the armed-mission lane)",
+  "source": "The P18 closure carry-forward (spec/dependency/work-orders.md P18 closure); ADR-0012 (the decision record)",
+  "registration_commit_base": "43d6068",
+  "policy": "Register only. No P19 implementation or acceptance is claimed by the graph. The dispatch act crosses the channel ONLY as the lane choice over the host-recomputed eligible set (ADR-0012 D1): the artifact NEVER crosses, not even as an input; the artifact/operation/mode resolve host-side; the eligible lanes are ACTIVE SANDBOX connections only (INV-25 — LIVE excluded with its reason, never hidden); the outcome DTO carries outcome facts only; the honest empty environment is the presented truth (zero ACTIVE connections — the resets destroyed the P13 provider credentials); the golden path is fixture-proven only (the labeled test-tier gate environment + the scripted answering authority); web stays unbound (ADR-0010 D7).",
+  "work_orders": [
+    {
+      "id": "P19-0",
+      "owner": "TL",
+      "status": "COMPLETE",
+      "depends_on": [],
+      "lane_scope": "Source-backed gap matrix (spec/productization/P19-0-GAP-MATRIX-2026-10-26.md — 20 rows verified at 43d6068) + ADR-0012 (D1 the two members with the artifact never crossing; D2 the host-computed SANDBOX-only lane eligibility; D3 the gate's mission-scoped armed lookup; D4 the file-disjoint lanes; D5 web unbound; D6 the reconcile member stays carried) + the canonical work orders + this graph + the current-state registration. Ordering decision recorded: the dispatch act surface composes directly on P18's members; the provider execution lanes and live-provider evidence stay carried (credentials destroyed); the store reconciliation stays a named question."
+    },
+    {
+      "id": "P19-A",
+      "owner": "worker",
+      "status": "PENDING",
+      "depends_on": [
+        "P19-0"
+      ],
+      "lane_scope": "Host lane: the gate growth (artifactsForMission) + the NEW dispatch-lane-resolver + the two channel members (shell/dispatch-members.ts) + the contracts growth + the renderer mirror + the drift lists + the host battery."
+    },
+    {
+      "id": "P19-B",
+      "owner": "worker",
+      "status": "PENDING",
+      "depends_on": [
+        "P19-0"
+      ],
+      "lane_scope": "App lane: the pins growth + the NEW PaymentMissionsArmedCard + the detail-view integration + the barrel + the jsdom battery (the call-order law extended; the scan-clean law)."
+    },
+    {
+      "id": "P19-C",
+      "owner": "TL",
+      "status": "PENDING",
+      "depends_on": [
+        "P19-A",
+        "P19-B"
+      ],
+      "lane_scope": "TL lane: the composition growth (the port gains the two members) + the bridge battery (the honest empty truth; the golden path over the labeled fixtures; the choice-validation law; byte-identical replays)."
+    },
+    {
+      "id": "P19-D",
+      "owner": "TL",
+      "status": "PENDING",
+      "depends_on": [
+        "P19-A",
+        "P19-B",
+        "P19-C"
+      ],
+      "lane_scope": "TL integration: the integrated batteries at the tip; JOURNEY-MAP + FEATURE-MAP reconciliation; the graph closure; the current-state closure; PUSH to GitHub (the PAT recovered); the bundle archive; the honest carry-forward record."
+    }
+  ],
+  "frontier_after_registration": [
+    "P19-A",
+    "P19-B"
+  ],
+  "closure_policy": "P19 closes only when P19-A/B/C/D are all accepted on main with their batteries green at the tip and the honest carry-forward recorded. No live-tier claim is permitted: zero ACTIVE connections is the deployment fact; the dispatch golden path is proven only over clearly-labeled test-tier fixtures.",
+  "closure": null
+}
