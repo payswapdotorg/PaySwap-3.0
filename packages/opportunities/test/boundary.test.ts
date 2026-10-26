@@ -287,8 +287,14 @@ describe("architectural boundary: @payswap/opportunities (the REWRITTEN zero-sib
     }
     expect(offenders.join("\n")).toBe("");
     // The census receipts (the evidence-doc numbers, machine-checked).
-    expect(srcCount).toBe(26);
-    expect(testCount).toBe(16);
+    // DISCLOSED RE-PIN (P16-C, ADR-0009 D9 — the established precedent):
+    // the lane legitimately added five NEW src modules (offer-lifecycle,
+    // consent, matching, wait-criteria, offer-limits) and five NEW test
+    // files, so the exact census moved 26 -> 31 src and 16 -> 21 test. The
+    // pins stay EXACT toBe (never loosened to ranges) — the census law's
+    // strength is unchanged.
+    expect(srcCount).toBe(31);
+    expect(testCount).toBe(21);
     expect(maxLines).toBeLessThanOrEqual(400);
     expect(maxFile.length).toBeGreaterThan(0);
   });
