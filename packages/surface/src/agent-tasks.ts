@@ -73,13 +73,16 @@ export const AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT =
 
 /**
  * The task lifecycle. Terminal statuses (CANCELLED/COMPLETED/EXPIRED/FAILED)
- * are MONOTONIC — no lawful transition leaves them.
+ * are MONOTONIC — no lawful transition leaves them. WAITING_FOR_OPPORTUNITIES
+ * (P16-D) is resumable and NON-terminal: a wait match records
+ * OPPORTUNITY_MATCHED and the task STAYS WAITING.
  */
 export const AGENT_TASK_STATUSES = [
   "DRAFT",
   "ACTIVE",
   "AWAITING_EXTERNAL_RETURN",
   "PAUSED",
+  "WAITING_FOR_OPPORTUNITIES",
   "COMPLETED",
   "FAILED",
   "CANCELLED",
@@ -103,7 +106,8 @@ export function isResumableAgentTaskStatus(status: AgentTaskStatus): boolean {
   return !isTerminalAgentTaskStatus(status);
 }
 
-/** Append-only task event kinds. */
+/** Append-only task event kinds (the P16-D wait kinds are APPENDED after
+ * EXPIRED, never inserted mid-list — the list's append-only spirit). */
 export const AGENT_TASK_EVENT_KINDS = [
   "CREATED",
   "RESUMED",
@@ -122,8 +126,30 @@ export const AGENT_TASK_EVENT_KINDS = [
   "RECONCILED",
   "CANCELLED",
   "EXPIRED",
+  "WAIT_STARTED",
+  "WAIT_CRITERIA_RECORDED",
+  "OPPORTUNITY_MATCHED",
+  "WAIT_EXPIRED",
 ] as const;
 export type AgentTaskEventKind = (typeof AGENT_TASK_EVENT_KINDS)[number];
+
+/**
+ * The wait vocabulary (P16-D, ADR-0009 D8): a wait match records
+ * OPPORTUNITY_MATCHED and the task STAYS WAITING (only cancel/expire/
+ * fresh-approval move it); the app NEVER writes AUTHORIZATION_GRANTED for
+ * a wait match — that event belongs to the real authority surface.
+ * matchAutoDispatches is the LITERAL false, never a derived value.
+ */
+export const AGENT_TASK_WAIT_VOCABULARY = Object.freeze({
+  status: "WAITING_FOR_OPPORTUNITIES",
+  eventKinds: Object.freeze([
+    "WAIT_STARTED",
+    "WAIT_CRITERIA_RECORDED",
+    "OPPORTUNITY_MATCHED",
+    "WAIT_EXPIRED",
+  ] as const),
+  matchAutoDispatches: false,
+} as const);
 
 /**
  * Connection-form literals pinned BY VALUE from

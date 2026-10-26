@@ -24,8 +24,17 @@
  *
  * Every runtime the surface serves records the version it compiled against
  * — drift is detectable at build time, not discovered in production.
+ *
+ * Version history (append-only, newest first):
+ * - 1.4.0 (P16-D): the additive agent-task wait vocabulary — the
+ *   WAITING_FOR_OPPORTUNITIES status (resumable, non-terminal), the
+ *   WAIT_STARTED/WAIT_CRITERIA_RECORDED/OPPORTUNITY_MATCHED/WAIT_EXPIRED
+ *   event kinds and AGENT_TASK_WAIT_VOCABULARY (matchAutoDispatches is the
+ *   literal false). Old consumers keep compiling.
+ * - 1.3.0 (P13-0): the shared agent-task contract (agent-tasks.ts +
+ *   agent-task-validation.ts), additive + experimental.
  */
-export const SURFACE_API_VERSION = "1.3.0" as const;
+export const SURFACE_API_VERSION = "1.4.0" as const;
 
 /** Which parts of the surface are covered by which stability class. */
 export type SurfaceStability =

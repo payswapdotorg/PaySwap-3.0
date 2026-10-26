@@ -28,6 +28,10 @@
  * - HONEST ORIGINS: COMPOSER_VOICE is declared-unsupported; the composer
  *   renders the statement verbatim and never simulates voice capture.
  * - MONOTONIC TERMINAL statuses.
+ * - THE WAIT LAW (P16-D, ADR-0009 D8): a wait match records
+ *   OPPORTUNITY_MATCHED and the task STAYS WAITING; only cancel/expire/
+ *   fresh-approval move it; the app NEVER writes AUTHORIZATION_GRANTED for
+ *   a wait match — that event belongs to the real authority surface.
  */
 
 import type { MissionIntentDirection } from "../console/contracts.js";
@@ -64,12 +68,14 @@ export const SUPPORTED_AGENT_TASK_ORIGINS_PIN: readonly AgentTaskOriginPin[] =
 export const AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT_PIN =
   "Voice input is not supported in this deployment — there is no speech-to-text capability to route. Type your request instead; it reaches the same task system." as const;
 
-/** Mirrors surface AGENT_TASK_STATUSES (terminal statuses are monotonic). */
+/** Mirrors surface AGENT_TASK_STATUSES (terminal statuses are monotonic;
+ * WAITING_FOR_OPPORTUNITIES is resumable and NON-terminal, P16-D). */
 export const AGENT_TASK_STATUSES_PIN = [
   "DRAFT",
   "ACTIVE",
   "AWAITING_EXTERNAL_RETURN",
   "PAUSED",
+  "WAITING_FOR_OPPORTUNITIES",
   "COMPLETED",
   "FAILED",
   "CANCELLED",
@@ -90,7 +96,8 @@ export function isResumableAgentTaskStatusPin(status: AgentTaskStatusPin): boole
   return !isTerminalAgentTaskStatusPin(status);
 }
 
-/** Mirrors surface AGENT_TASK_EVENT_KINDS (append-only event vocabulary). */
+/** Mirrors surface AGENT_TASK_EVENT_KINDS (append-only event vocabulary;
+ * the P16-D wait kinds are APPENDED after EXPIRED). */
 export const AGENT_TASK_EVENT_KINDS_PIN = [
   "CREATED",
   "RESUMED",
@@ -109,8 +116,31 @@ export const AGENT_TASK_EVENT_KINDS_PIN = [
   "RECONCILED",
   "CANCELLED",
   "EXPIRED",
+  "WAIT_STARTED",
+  "WAIT_CRITERIA_RECORDED",
+  "OPPORTUNITY_MATCHED",
+  "WAIT_EXPIRED",
 ] as const;
 export type AgentTaskEventKindPin = (typeof AGENT_TASK_EVENT_KINDS_PIN)[number];
+
+/**
+ * Mirrors surface AGENT_TASK_WAIT_VOCABULARY (P16-D, ADR-0009 D8): a wait
+ * match records OPPORTUNITY_MATCHED and the task STAYS WAITING (only
+ * cancel/expire/fresh-approval move it); the app NEVER writes
+ * AUTHORIZATION_GRANTED for a wait match — that event belongs to the real
+ * authority surface. matchAutoDispatches is the LITERAL false, never a
+ * derived value; drift is caught by the mirror test byte-for-byte.
+ */
+export const AGENT_TASK_WAIT_VOCABULARY_PIN = Object.freeze({
+  status: "WAITING_FOR_OPPORTUNITIES",
+  eventKinds: Object.freeze([
+    "WAIT_STARTED",
+    "WAIT_CRITERIA_RECORDED",
+    "OPPORTUNITY_MATCHED",
+    "WAIT_EXPIRED",
+  ] as const),
+  matchAutoDispatches: false,
+} as const);
 
 /**
  * Mirrors surface AGENT_TASK_CONNECTION_FORMS — the connection-form

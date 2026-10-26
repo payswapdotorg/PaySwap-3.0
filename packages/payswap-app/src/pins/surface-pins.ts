@@ -30,11 +30,12 @@
 
 /**
  * The surface contract version this product compiled against (mirrors
- * packages/surface/src/version.ts SURFACE_API_VERSION — "1.3.0"; bumped by
- * P13-0's publication of the shared agent-task contract, ADR-0007). Drift is
- * detectable by the mirror test, not discovered in production.
+ * packages/surface/src/version.ts SURFACE_API_VERSION — "1.4.0"; bumped by
+ * P16-D's additive agent-task wait vocabulary — WAITING_FOR_OPPORTUNITIES +
+ * the four wait event kinds + AGENT_TASK_WAIT_VOCABULARY, ADR-0009 D8).
+ * Drift is detectable by the mirror test, not discovered in production.
  */
-export const PINNED_SURFACE_API_VERSION = "1.3.0" as const;
+export const PINNED_SURFACE_API_VERSION = "1.4.0" as const;
 
 /** Mirrors surface's SurfaceContractProvenance (version.ts). */
 export interface SurfaceProvenancePin {

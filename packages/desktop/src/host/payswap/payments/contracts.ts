@@ -58,12 +58,14 @@ export const SUPPORTED_PAYMENT_TASK_ORIGINS: readonly PaymentTaskOrigin[] = Obje
 export const PAYMENT_TASK_VOICE_UNSUPPORTED_STATEMENT =
   "Voice input is not supported in this deployment — there is no speech-to-text capability to route. Type your request instead; it reaches the same task system.";
 
-/** Mirrors AGENT_TASK_STATUSES (the task lifecycle; terminal = monotonic). */
+/** Mirrors AGENT_TASK_STATUSES (the task lifecycle; terminal = monotonic;
+ * WAITING_FOR_OPPORTUNITIES is resumable and NON-terminal, P16-D). */
 export const PAYMENT_TASK_STATUSES = [
   "DRAFT",
   "ACTIVE",
   "AWAITING_EXTERNAL_RETURN",
   "PAUSED",
+  "WAITING_FOR_OPPORTUNITIES",
   "COMPLETED",
   "FAILED",
   "CANCELLED",
@@ -83,7 +85,8 @@ export function isTerminalPaymentTaskStatus(status: PaymentTaskStatus): boolean 
   return TERMINAL_PAYMENT_TASK_STATUSES.includes(status);
 }
 
-/** Mirrors AGENT_TASK_EVENT_KINDS (append-only mission event kinds). */
+/** Mirrors AGENT_TASK_EVENT_KINDS (append-only mission event kinds; the
+ * P16-D wait kinds are APPENDED after EXPIRED). */
 export const PAYMENT_TASK_EVENT_KINDS = [
   "CREATED",
   "RESUMED",
@@ -102,8 +105,30 @@ export const PAYMENT_TASK_EVENT_KINDS = [
   "RECONCILED",
   "CANCELLED",
   "EXPIRED",
+  "WAIT_STARTED",
+  "WAIT_CRITERIA_RECORDED",
+  "OPPORTUNITY_MATCHED",
+  "WAIT_EXPIRED",
 ] as const;
 export type PaymentTaskEventKind = (typeof PAYMENT_TASK_EVENT_KINDS)[number];
+
+/**
+ * Mirrors AGENT_TASK_WAIT_VOCABULARY (P16-D, ADR-0009 D8): a wait match
+ * records OPPORTUNITY_MATCHED and the task STAYS WAITING (only cancel/
+ * expire/fresh-approval move it); the app NEVER writes AUTHORIZATION_GRANTED
+ * for a wait match — that event belongs to the real authority surface.
+ * matchAutoDispatches is the LITERAL false, never a derived value.
+ */
+export const PAYMENT_TASK_WAIT_VOCABULARY = Object.freeze({
+  status: "WAITING_FOR_OPPORTUNITIES",
+  eventKinds: Object.freeze([
+    "WAIT_STARTED",
+    "WAIT_CRITERIA_RECORDED",
+    "OPPORTUNITY_MATCHED",
+    "WAIT_EXPIRED",
+  ] as const),
+  matchAutoDispatches: false,
+} as const);
 
 /** Mirrors MissionIntentDirection (console-missions vocabulary). */
 export const PAYMENT_MISSION_DIRECTIONS = ["PAY", "RECEIVE", "MOVE", "CONVERT"] as const;

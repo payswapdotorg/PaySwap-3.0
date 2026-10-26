@@ -22,11 +22,15 @@ import {
   AGENT_TASK_STATUSES,
   AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT,
   SUPPORTED_AGENT_TASK_ORIGINS,
+  TERMINAL_AGENT_TASK_STATUSES,
   agentTaskResumeKey,
   isResumableAgentTaskStatus,
   isTerminalAgentTaskStatus,
   type AgentTask,
 } from "../src/index.ts";
+// The wait vocabulary is imported from its DECLARING module (the index
+// barrel re-export is the TL's integration wiring, outside this change).
+import { AGENT_TASK_WAIT_VOCABULARY } from "../src/agent-tasks.ts";
 import {
   InvalidAgentTaskError,
   resolveAgentTaskSeed,
@@ -88,6 +92,7 @@ describe("vocabulary closure", () => {
       "ACTIVE",
       "AWAITING_EXTERNAL_RETURN",
       "PAUSED",
+      "WAITING_FOR_OPPORTUNITIES",
       "COMPLETED",
       "FAILED",
       "CANCELLED",
@@ -97,7 +102,13 @@ describe("vocabulary closure", () => {
       expect(isTerminalAgentTaskStatus(terminal)).toBe(true);
       expect(isResumableAgentTaskStatus(terminal)).toBe(false);
     }
-    for (const resumable of ["DRAFT", "ACTIVE", "AWAITING_EXTERNAL_RETURN", "PAUSED"] as const) {
+    for (const resumable of [
+      "DRAFT",
+      "ACTIVE",
+      "AWAITING_EXTERNAL_RETURN",
+      "PAUSED",
+      "WAITING_FOR_OPPORTUNITIES",
+    ] as const) {
       expect(isResumableAgentTaskStatus(resumable)).toBe(true);
       expect(isTerminalAgentTaskStatus(resumable)).toBe(false);
     }
@@ -113,6 +124,32 @@ describe("vocabulary closure", () => {
     ]);
   });
 
+  it("pins the event kinds (append-only; the P16-D wait kinds APPENDED after EXPIRED)", () => {
+    expect([...AGENT_TASK_EVENT_KINDS]).toEqual([
+      "CREATED",
+      "RESUMED",
+      "FIELD_CAPTURED",
+      "MISSING_FIELD_ASKED",
+      "VALIDATED",
+      "PREVIEW_PRESENTED",
+      "AUTHORIZATION_GRANTED",
+      "AUTHORIZATION_DECLINED",
+      "EXTERNAL_RETURN_VALIDATED",
+      "EXTERNAL_RETURN_REJECTED",
+      "ATTEMPT_STARTED",
+      "ATTEMPT_CONFIRMED",
+      "ATTEMPT_FAILED",
+      "OUTCOME_UNKNOWN",
+      "RECONCILED",
+      "CANCELLED",
+      "EXPIRED",
+      "WAIT_STARTED",
+      "WAIT_CRITERIA_RECORDED",
+      "OPPORTUNITY_MATCHED",
+      "WAIT_EXPIRED",
+    ]);
+  });
+
   it("carries the UNKNOWN ≠ FAILED reconciliation event kinds (INV-04)", () => {
     expect([...AGENT_TASK_EVENT_KINDS]).toContain("OUTCOME_UNKNOWN");
     expect([...AGENT_TASK_EVENT_KINDS]).toContain("RECONCILED");
@@ -122,6 +159,38 @@ describe("vocabulary closure", () => {
   it("pins the correlation constants (ADR D3/D6)", () => {
     expect(AGENT_TASK_RESUME_WINDOW_SECONDS).toBe(900);
     expect(AGENT_TASK_STATE_LIFETIME_SECONDS).toBe(600);
+  });
+});
+
+describe("the wait vocabulary (P16-D, ADR-0009 D8)", () => {
+  it("WAITING_FOR_OPPORTUNITIES is non-terminal and resumable (never enters a terminal list)", () => {
+    expect([...TERMINAL_AGENT_TASK_STATUSES]).not.toContain("WAITING_FOR_OPPORTUNITIES");
+    expect(isTerminalAgentTaskStatus("WAITING_FOR_OPPORTUNITIES")).toBe(false);
+    expect(isResumableAgentTaskStatus("WAITING_FOR_OPPORTUNITIES")).toBe(true);
+  });
+
+  it("matchAutoDispatches is the pinned LITERAL false (never a derived value)", () => {
+    const never: false = AGENT_TASK_WAIT_VOCABULARY.matchAutoDispatches; // compile-time literal law
+    expect(never).toBe(false);
+  });
+
+  it("the wait vocabulary's status and event kinds are members of the parent vocabularies", () => {
+    expect(AGENT_TASK_WAIT_VOCABULARY.status).toBe("WAITING_FOR_OPPORTUNITIES");
+    expect([...AGENT_TASK_STATUSES]).toContain(AGENT_TASK_WAIT_VOCABULARY.status);
+    expect([...AGENT_TASK_WAIT_VOCABULARY.eventKinds]).toEqual([
+      "WAIT_STARTED",
+      "WAIT_CRITERIA_RECORDED",
+      "OPPORTUNITY_MATCHED",
+      "WAIT_EXPIRED",
+    ]);
+    for (const kind of AGENT_TASK_WAIT_VOCABULARY.eventKinds) {
+      expect([...AGENT_TASK_EVENT_KINDS]).toContain(kind);
+    }
+  });
+
+  it("AGENT_TASK_WAIT_VOCABULARY is frozen (the record and its event-kind list)", () => {
+    expect(Object.isFrozen(AGENT_TASK_WAIT_VOCABULARY)).toBe(true);
+    expect(Object.isFrozen(AGENT_TASK_WAIT_VOCABULARY.eventKinds)).toBe(true);
   });
 });
 

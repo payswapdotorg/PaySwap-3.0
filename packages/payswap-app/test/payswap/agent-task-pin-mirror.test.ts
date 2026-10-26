@@ -32,6 +32,8 @@ import {
   AGENT_TASK_STATUSES,
   AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT,
   SUPPORTED_AGENT_TASK_ORIGINS,
+  TERMINAL_AGENT_TASK_STATUSES,
+  AGENT_TASK_WAIT_VOCABULARY,
   agentTaskResumeKey,
   isResumableAgentTaskStatus,
   isTerminalAgentTaskStatus,
@@ -55,12 +57,15 @@ import {
   AGENT_TASK_STATUSES_PIN,
   AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT_PIN,
   SUPPORTED_AGENT_TASK_ORIGINS_PIN,
+  TERMINAL_AGENT_TASK_STATUSES_PIN,
+  AGENT_TASK_WAIT_VOCABULARY_PIN,
   agentTaskResumeKeyPin,
   isResumableAgentTaskStatusPin,
   isTerminalAgentTaskStatusPin,
   type AgentTaskIntentPin,
   type AgentTaskPin,
 } from "../../src/lib/agent-task-pins.js";
+import { agentTaskStatusView } from "../../src/agent/agentComposerProjection.js";
 import {
   InvalidPinnedAgentTaskError,
   resolvePinnedAgentTaskSeed,
@@ -139,6 +144,60 @@ describe("agent-task pins mirror the shared contract vocabulary", () => {
   it("pins the correlation constants (ADR-0007 D3/D6)", () => {
     expect(AGENT_TASK_RESUME_WINDOW_SECONDS_PIN).toBe(AGENT_TASK_RESUME_WINDOW_SECONDS);
     expect(AGENT_TASK_STATE_LIFETIME_SECONDS_PIN).toBe(AGENT_TASK_STATE_LIFETIME_SECONDS);
+  });
+});
+
+/* --------------- the wait vocabulary mirror (P16-D) --------------- */
+
+describe("the wait vocabulary pin mirrors the surface authority (P16-D, ADR-0009 D8)", () => {
+  it("AGENT_TASK_WAIT_VOCABULARY_PIN matches the surface authority byte-identically", () => {
+    expect(AGENT_TASK_WAIT_VOCABULARY_PIN).toEqual(AGENT_TASK_WAIT_VOCABULARY);
+    expect(JSON.stringify(AGENT_TASK_WAIT_VOCABULARY_PIN)).toBe(
+      JSON.stringify(AGENT_TASK_WAIT_VOCABULARY),
+    );
+  });
+
+  it("matchAutoDispatches is the pinned LITERAL false on both sides (never derived)", () => {
+    const appNever: false = AGENT_TASK_WAIT_VOCABULARY_PIN.matchAutoDispatches;
+    const surfaceNever: false = AGENT_TASK_WAIT_VOCABULARY.matchAutoDispatches;
+    expect(appNever).toBe(false);
+    expect(surfaceNever).toBe(false);
+  });
+
+  it("the wait status is a member of BOTH status vocabularies — non-terminal, resumable", () => {
+    expect(AGENT_TASK_WAIT_VOCABULARY_PIN.status).toBe(AGENT_TASK_WAIT_VOCABULARY.status);
+    expect(AGENT_TASK_WAIT_VOCABULARY_PIN.status).toBe("WAITING_FOR_OPPORTUNITIES");
+    expect([...AGENT_TASK_STATUSES_PIN]).toContain(AGENT_TASK_WAIT_VOCABULARY_PIN.status);
+    expect([...AGENT_TASK_STATUSES]).toContain(AGENT_TASK_WAIT_VOCABULARY.status);
+    expect([...TERMINAL_AGENT_TASK_STATUSES_PIN]).toEqual([...TERMINAL_AGENT_TASK_STATUSES]);
+    expect([...TERMINAL_AGENT_TASK_STATUSES_PIN]).not.toContain("WAITING_FOR_OPPORTUNITIES");
+    expect(isTerminalAgentTaskStatusPin("WAITING_FOR_OPPORTUNITIES")).toBe(false);
+    expect(isResumableAgentTaskStatusPin("WAITING_FOR_OPPORTUNITIES")).toBe(true);
+  });
+
+  it("the four wait event kinds are members of BOTH event vocabularies", () => {
+    expect([...AGENT_TASK_WAIT_VOCABULARY_PIN.eventKinds]).toEqual([
+      "WAIT_STARTED",
+      "WAIT_CRITERIA_RECORDED",
+      "OPPORTUNITY_MATCHED",
+      "WAIT_EXPIRED",
+    ]);
+    for (const kind of AGENT_TASK_WAIT_VOCABULARY_PIN.eventKinds) {
+      expect([...AGENT_TASK_EVENT_KINDS_PIN]).toContain(kind);
+      expect([...AGENT_TASK_EVENT_KINDS]).toContain(kind);
+    }
+  });
+
+  it("the pin is frozen; the composer STATUS_VIEW covers every pinned status with the honest wait label", () => {
+    expect(Object.isFrozen(AGENT_TASK_WAIT_VOCABULARY_PIN)).toBe(true);
+    expect(Object.isFrozen(AGENT_TASK_WAIT_VOCABULARY_PIN.eventKinds)).toBe(true);
+    for (const status of AGENT_TASK_STATUSES_PIN) {
+      expect(agentTaskStatusView(status).label.length).toBeGreaterThan(0);
+    }
+    expect(agentTaskStatusView("WAITING_FOR_OPPORTUNITIES")).toEqual({
+      tone: "attention",
+      label: "Waiting for opportunities — nothing dispatches automatically",
+    });
   });
 });
 
@@ -266,6 +325,17 @@ describe("the pinned fail-closed validators agree with the shared contract", () 
       events: [
         { id: "e1", at: NOW, kind: "CREATED", summary: "created" },
         { id: "e2", at: NOW, kind: "RESUMED", summary: "resumed", correlationRef: "seed:42" },
+      ],
+    }),
+    // P16-D: a WAITING task carrying WAIT_STARTED/OPPORTUNITY_MATCHED events is canonical on BOTH validators.
+    pinnedTask({
+      kind: "PAYMENT_MISSION",
+      intent: paymentIntent("PAY"),
+      status: "WAITING_FOR_OPPORTUNITIES",
+      events: [
+        { id: "e1", at: NOW, kind: "CREATED", summary: "created" },
+        { id: "e2", at: NOW, kind: "WAIT_STARTED", summary: "wait started" },
+        { id: "e3", at: NOW, kind: "OPPORTUNITY_MATCHED", summary: "stays waiting" },
       ],
     }),
   ];

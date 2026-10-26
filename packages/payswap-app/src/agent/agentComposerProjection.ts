@@ -63,6 +63,10 @@ const STATUS_VIEW: Readonly<Record<AgentTaskStatusPin, { readonly tone: AgentCom
     label: "Awaiting an external return — not connected, not confirmed",
   },
   PAUSED: { tone: "attention", label: "Paused — resumable" },
+  WAITING_FOR_OPPORTUNITIES: {
+    tone: "attention",
+    label: "Waiting for opportunities — nothing dispatches automatically",
+  },
   COMPLETED: { tone: "ok", label: "Completed" },
   FAILED: { tone: "disabled", label: "Failed" },
   CANCELLED: { tone: "disabled", label: "Cancelled" },
