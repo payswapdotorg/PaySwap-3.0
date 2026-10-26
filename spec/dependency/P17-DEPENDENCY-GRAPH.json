@@ -16,32 +16,53 @@
     {
       "id": "P17-A",
       "owner": "worker",
-      "status": "BLOCKED",
-      "depends_on": ["P17-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P17-0"
+      ],
       "lane_scope": "packages/desktop/src/host/payswap/** only: the six mission-plane channel members (paymentMissionBoard/Detail/Seed/Capture/PresentPreview/RecordPlanSelection — read/input verbs, zero authority verbs), PaymentMissionRecord.planSelection? + PLAN_SELECTION_RECORDED (event kinds 21->22), the store validator re-pin to the full kind set (fixing the P16-D defect: the four wait kinds were missing and a wait-carrying mission loaded into quarantine), the drift-tested member lists, the host batteries. Runtime composition per the scripts/p14/a1-stripe-execution-real-flow-e2e.ts:135-157 precedent."
     },
     {
       "id": "P17-B",
       "owner": "worker",
-      "status": "BLOCKED",
-      "depends_on": ["P17-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P17-0"
+      ],
       "lane_scope": "packages/payswap-app/src/agent/** + its tests only: the barrel export of bindRoutePlanningEngine, the module-level bindRoutePlanningSession seam (mirroring the engine binder), the mount resolving session ?? sharedRoutePlanningSession(), the honest NO_VALIDATED_INTENT panel state. Product law P2 holds (zero @payswap/* imports in app src, machine-checked)."
     },
     {
       "id": "P17-C",
       "owner": "TL",
-      "status": "BLOCKED",
-      "depends_on": ["P17-A", "P17-B"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P17-A",
+        "P17-B"
+      ],
       "lane_scope": "packages/desktop/src/renderer/** + tsconfig.renderer.json + vite.config.ts + vitest.config.ts + spec/architecture/MODULE-OWNERSHIP.yaml + the regenerated ownership report: the composition-root module binding the REAL engines (route-planning, capability, route-compiler, lab, opportunities) behind RoutePlanningEnginePort with the mission linkage (the compiled 11-key intent, field-mapped with a typed guard, idempotency route:<missionId>), the honest empty-corridor evaluation (zero chains today), the stage-9a decorator (chooseProceed records the REQUEST on the task AND paymentMissionRecordPlanSelection on the mission), the three-site aliases, the ADR-0010 annotations, the bridge-tier composition test (seed->capture->preview->present->proceed->plan-selection, deterministic replays)."
     },
     {
       "id": "P17-D",
       "owner": "TL",
-      "status": "BLOCKED",
-      "depends_on": ["P17-C"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P17-C"
+      ],
       "lane_scope": "TL integration and wave closure: the integrated batteries, JOURNEY-MAP section 7 (the panel promoted to a real journey at the CONTRACT+BRIDGE tier — no live-tier claim), ROUTE-PLANNING.md section 5 amendment, FEATURE-MAP, the P17 graph statuses, current-state, the bundle archive per ADR-0009 D7, the honest carry-forward (the approval/observation UX, live-provider route evidence, the execution lanes)."
     }
   ],
-  "frontier_after_registration": ["P17-A", "P17-B"],
-  "closure_policy": "P17 closes only when the bridge-tier composition test passes on the integrated tree and every battery named in the lane acceptances is green at the tip. No live-tier claim is made while zero connected capability instances exist."
+  "frontier_after_registration": [],
+  "closure_policy": "P17 closes only when the bridge-tier composition test passes on the integrated tree and every battery named in the lane acceptances is green at the tip. No live-tier claim is made while zero connected capability instances exist.",
+  "closure": {
+    "closed_at": "2026-10-26T20:10:00Z",
+    "commits": {
+      "P17-0": "3ec9503",
+      "P17-A": "fe89b6b",
+      "P17-B": "406f698",
+      "P17-C": "9868d24",
+      "P17-D": "TL-CLOSURE"
+    },
+    "batteries": "desktop 25f/247t; payswap-app 38f/410t; route-planning 16f/209t; lab 18f/169t; opportunities 17f/250t; capability 18f/230t; route-compiler 29f/353t; economic 11f/105t; protocol 24f/279t; surface 18f/224t; architecture-check 0/0/0; the module-ownership report honestly regenerated (13 stale -> 35 true: the 4 ADR-0010-annotated composition edges + the previously-unreported test-tier classes the dead-PAT CI never caught)",
+    "carried_forward": "the approval/observation UX over the exposed mission plane (the narrowed P14 renderer-exposure frontier); live-provider route evidence (zero connected capability instances); the P14-carried execution lanes (FLW/Paystack execution, valid MoMo credentials, live webhook delivery, the onchain Stellar plane)"
+  }
 }

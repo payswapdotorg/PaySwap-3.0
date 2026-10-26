@@ -229,7 +229,22 @@ end-to-end:
   corridor+compiler→stage 6 REAL lab→stage 7 REAL opportunities,
   byte-identical receipts, unbound ports fail CLOSED).
 
-EVIDENCE SEPARATION: these are CONTRACT-tier batteries. The next
+EVIDENCE SEPARATION: these are CONTRACT-tier batteries. ~~The next
 frontier (live-app engine binding + stage-9a desktop authority wiring)
 is what would promote the panel to a real journey; nothing here claims
-live-tier evidence.
+live-tier evidence.~~ **P17 PROMOTION (2026-10-26, commits
+`fe89b6b`+`406f698`+`9868d24`)**: the panel is now a REAL COMPOSED
+journey at the CONTRACT+BRIDGE tier — the desktop renderer composition
+root binds the REAL engines behind `RoutePlanningEnginePort` at the
+business-root init (ADR-0010 D1; the bridge-tier battery
+`packages/desktop/test/payswap/route-planning-binding.test.ts` drives
+the REAL channel members end-to-end: seed → nine-field capture →
+presentPreview [BLOCKED typed over the honest empty environment, INV-7]
+→ the engine's honest NO_VALIDATED_INTENT state; and the golden path
+over the DI'd mission source → the REAL presented view → proceed
+records the REQUEST + the stage-9a plan-selection on the mission
+plane → byte-identical replays). Still NO LIVE-TIER claim: zero
+connected capability instances exist, so no user-visible route
+evidence exists in this deployment — the honest empty evaluation IS
+the presented truth. The approval/observation UX over the newly
+exposed mission plane remains the P14-carried frontier.

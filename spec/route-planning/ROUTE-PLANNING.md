@@ -1,6 +1,6 @@
 # @payswap/route-planning — Lane Specification (P16)
 
-Status: DELIVERED (offline/contract tier; lanes A/B/C/D complete — commits `b34fa35`, `047eb62`, `98d1c88`, `fc03434`, `adedf5b`, `2570804`)
+Status: DELIVERED AND BOUND (offline/contract tier + the P17 live binding: lanes A/B/C/D complete — commits `b34fa35`, `047eb62`, `98d1c88`, `fc03434`, `adedf5b`, `2570804`; the P17 composition root `fe89b6b`+`406f698`+`9868d24` binds the REAL engines at the desktop renderer)
 Package: `packages/route-planning` — `@payswap/route-planning` v0.1.0
 Work Order: P16 (the loadable payment route planning routine — issue [#6](https://github.com/payswapdotorg/PaySwap-3.0/issues/6))
 Contracts: `spec/routines/payment-route-planning/ROUTINE-CONTRACT.md` (frozen, incl. Appendix A) + `docs/architecture-governance/adr/ADR-0009-p16-payment-route-planning-routine.md`
@@ -84,13 +84,22 @@ opportunities 17f/250t, surface 18f/224t, payswap-app 37f/403t; repo
 
 ## 5. Known limitations (honest, recorded — never hidden)
 
-- The live-app engine binding is the platform host's composition step:
-  the composer renders the honest unbound note until the
-  `RoutePlanningEnginePort` is bound at a real composition root
-  (ADR-0009 D2).
-- Stage 9a UI wiring to the existing desktop authority chain
-  (Trust/Authorization → Financial Protocol) and live-provider route
-  evidence remain the P14-carried execution lanes; this package is the
-  PLANNING tier only.
+- ~~The live-app engine binding is the platform host's composition step~~
+  **CLOSED by P17** (ADR-0010): the desktop renderer's composition root
+  (`packages/desktop/src/renderer/src/routePlanning{EngineAdapter,Composition,
+  MissionLinkage}.ts`) binds the REAL engines behind `RoutePlanningEnginePort`
+  at the business-root init — the three-site alias pattern, the honest R3
+  annotations, the bridge-tier battery (seed→capture→preview→present→proceed
+  →plan-selection over the REAL channel members).
+- ~~Stage 9a UI wiring to the existing desktop authority chain~~ **CLOSED
+  by P17** at the record tier: the mission-plane channel members + the
+  `planSelection` typed record + `PLAN_SELECTION_RECORDED` — the composer's
+  proceed REQUEST lands on the mission surface (a RECORD, never an
+  authorization; the artifact is still minted later, against the preview,
+  by an explicit PREVIEW_UI_ACT). The approval/observation UX over the
+  exposed plane remains the P14-carried renderer-exposure frontier.
+- Live-provider route evidence and the P14-carried execution lanes remain
+  open frontiers (operator-gated credentials / the separate execution
+  plane); this package is the PLANNING tier only.
 - The pinned skill digest must be re-pinned deliberately if
   `SKILL.md` ever changes (the battery fails closed on drift).
