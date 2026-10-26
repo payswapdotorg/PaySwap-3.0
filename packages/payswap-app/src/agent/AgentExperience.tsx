@@ -8,7 +8,11 @@
  * orchestration (the same controller the composer text path drives —
  * card click and chat text converge on the same task, never a
  * duplicate), and the shared agent composer (dock + panel) rides
- * alongside as the persistent transcript/task surface.
+ * alongside as the persistent transcript/task surface. The P18-B
+ * Missions entry is the observation toggle: it opens the payment-
+ * missions board (./PaymentMissionsMount.tsx) as a SIBLING surface of
+ * the composer — optional chrome that renders the honest not-wired
+ * note until a host binds the mission-plane port (never an error).
  *
  * Mounting law: this component is a SIBLING of the substrate Root (the
  * web/desktop mounts compose it), never a child — the substrate stays
@@ -19,13 +23,16 @@
  *
  * A11y laws (inherited posture):
  * - Every entry action is a real <button> with a visible focus ring.
- * - The rail is a labelled <nav> landmark with a list semantics.
+ * - The rail is a labelled <nav> landmark with a list semantics; the
+ *   Missions toggle carries aria-pressed (a toggle, never a div).
  * - The rail hides while the composer panel is OPEN (the panel is the
- *   entry context then); it never traps focus and adds no dialogs.
+ *   entry context then); the missions surface follows the same hiding
+ *   law. Neither traps focus and neither adds a dialog.
  */
 
-import { useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { AgentComposer } from "./AgentComposer.js";
+import { PaymentMissionsMount } from "./PaymentMissionsMount.js";
 import { sharedAgentComposerController } from "./agentComposerController.js";
 import { AGENT_PAYMENT_DIRECTION_ENTRIES } from "../lib/agent-payment-entries.js";
 import { agentProviderSetupCards } from "../lib/agent-provider-entries.js";
@@ -68,6 +75,10 @@ export function PaySwapAgentExperience({
     controller.getState,
     controller.getState,
   );
+  // The Missions observation toggle (P18-B): local UI state only — the
+  // board surface itself resolves the mission-plane port honestly.
+  const [missionsOpen, setMissionsOpen] = useState(false);
+  const railVisible = state.mode !== "open";
 
   const seedPayment = (entry: (typeof AGENT_PAYMENT_DIRECTION_ENTRIES)[number]): void => {
     void controller.seedFromSurface({
@@ -100,7 +111,7 @@ export function PaySwapAgentExperience({
 
   return (
     <>
-      {state.mode !== "open" ? (
+      {railVisible ? (
         <nav className="ps-agent-entry-rail" aria-label="PaySwap agent entry actions">
           <ul className="ps-agent-entry-rail-list">
             {AGENT_PAYMENT_DIRECTION_ENTRIES.map((entry) => (
@@ -135,12 +146,27 @@ export function PaySwapAgentExperience({
                 </button>
               </li>
             ) : null}
+            <li>
+              <button
+                type="button"
+                className="ps-agent-entry-chip"
+                aria-pressed={missionsOpen}
+                data-testid="ps-agent-entry-missions"
+                onClick={() => setMissionsOpen((open) => !open)}
+              >
+                <span className="ps-agent-entry-chip-glyph" aria-hidden="true">
+                  <EntryGlyph />
+                </span>
+                <span className="ps-agent-entry-chip-label">Missions</span>
+              </button>
+            </li>
           </ul>
           <p className="ps-agent-entry-rail-note">
             Guided intake — the agent drafts, you authorize. Nothing here moves money.
           </p>
         </nav>
       ) : null}
+      {railVisible && missionsOpen ? <PaymentMissionsMount /> : null}
       <AgentComposer area={area} />
     </>
   );

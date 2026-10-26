@@ -1,0 +1,395 @@
+/**
+ * @payswap/app — the PAYMENT-MISSIONS observation surface styles (P18-B,
+ * owned by this lane; the agent-composer.css naming laws).
+ *
+ * The missions board: a fixed sibling surface of the composer (top-right
+ * observation panel), the board rows, the detail sections, the ask form,
+ * the gates list and the scope card. Additive, token-driven (the ps-
+ * design system), no motion (nothing animates — reduced-motion safe by
+ * construction), self-scoped focus rings so the surface is usable inside
+ * BOTH shells. A quiet observation posture throughout: no primary
+ * financial CTA — even the scope card's Confirm is a bordered secondary
+ * action (the approval act is a decision, never a fire-and-forget).
+ */
+
+/* ------------------------------ the surface ---------------------------- */
+
+.ps-agent-missions {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 59;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(76vh, 680px);
+  padding: 14px 14px 12px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 14px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font-size: 13px;
+  line-height: 1.55;
+  box-shadow: 0 18px 48px rgba(19, 18, 17, 0.22);
+  overflow-y: auto;
+}
+
+.ps-agent-missions-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ps-agent-missions-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-missions-headact {
+  padding: 4px 10px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 6px;
+  background: var(--ps-bg);
+  color: var(--ps-fg);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ps-agent-missions-headact:hover {
+  border-color: var(--ps-accent);
+  color: var(--ps-accent);
+}
+
+.ps-agent-missions-headact:focus-visible,
+.ps-agent-missions-act:focus-visible,
+.ps-agent-missions-row-button:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 2px;
+}
+
+/* ------------------------- notes, meta, empty -------------------------- */
+
+.ps-agent-missions-note {
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-missions-note--error {
+  color: var(--ps-danger);
+}
+
+.ps-agent-missions-note--granted {
+  color: var(--ps-ok, var(--ps-fg-muted));
+  font-weight: 600;
+}
+
+.ps-agent-missions-meta {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-missions-empty {
+  margin: 6px 0 0;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--ps-fg-subtle);
+}
+
+/* ------------------------------ the board ------------------------------ */
+
+.ps-agent-missions-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ps-agent-missions-row-button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  background: var(--ps-bg);
+  color: var(--ps-fg);
+  font: inherit;
+  font-size: 11.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ps-agent-missions-row-button:hover {
+  border-color: var(--ps-accent);
+}
+
+.ps-agent-missions-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.ps-agent-missions-direction {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ps-accent);
+}
+
+/* The status badge (the tone semantics of the pill vocabulary: ok /
+ * blocked / unknown — token-driven, dashed for the in-flight unknown). */
+.ps-agent-missions-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--ps-fg-muted);
+  white-space: nowrap;
+}
+
+.ps-agent-missions-status--ok {
+  border-color: var(--ps-ok, var(--ps-accent));
+  color: var(--ps-ok, var(--ps-accent));
+}
+
+.ps-agent-missions-status--blocked {
+  border-color: var(--ps-danger);
+  color: var(--ps-danger);
+}
+
+.ps-agent-missions-status--unknown {
+  border-style: dashed;
+}
+
+.ps-agent-missions-row-goal {
+  font-weight: 600;
+}
+
+.ps-agent-missions-row-meta {
+  font-size: 10.5px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-missions-notfound {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* ------------------------------ the detail ----------------------------- */
+
+.ps-agent-missions-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.ps-agent-missions-detail-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ps-agent-missions-section {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed var(--ps-border);
+}
+
+.ps-agent-missions-section-title {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ps-fg);
+}
+
+.ps-agent-missions-timeline {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-missions-fields {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-missions-fields strong,
+.ps-agent-missions-plainlist strong,
+.ps-agent-missions-gates strong {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ps-fg);
+}
+
+.ps-agent-missions-missing {
+  font-style: italic;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-missions-plainlist {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+/* --------------------------- the ask form ------------------------------ */
+
+.ps-agent-missions-ask {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  background: var(--ps-bg);
+}
+
+.ps-agent-missions-question {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ps-fg);
+}
+
+.ps-agent-missions-answer-label {
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-missions-answer {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 6px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font: inherit;
+  font-size: 12px;
+}
+
+.ps-agent-missions-answer:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 1px;
+}
+
+/* --------------------- the gates + the scope card ---------------------- */
+
+.ps-agent-missions-gates {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-missions-act {
+  margin-top: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 6px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ps-agent-missions-act:hover {
+  border-color: var(--ps-accent);
+  color: var(--ps-accent);
+}
+
+.ps-agent-missions-act--confirm {
+  border-color: var(--ps-accent);
+  color: var(--ps-accent);
+}
+
+.ps-agent-missions-scope {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--ps-accent);
+  border-radius: 10px;
+  background: var(--ps-bg);
+}
+
+.ps-agent-missions-scope-title {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ps-accent);
+}
+
+.ps-agent-missions-scope-summary {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ps-fg);
+}
+
+.ps-agent-missions-scope-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ps-agent-missions-outcome {
+  margin-top: 8px;
+}
+
+/* ------------------------------ small screens -------------------------- */
+
+@media (max-width: 560px) {
+  .ps-agent-missions {
+    top: 12px;
+    right: 12px;
+    width: auto;
+    left: 12px;
+    max-height: 70vh;
+  }
+}

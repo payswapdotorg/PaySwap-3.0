@@ -121,6 +121,55 @@ export {
   type RoutePlanningOpportunityMatchPin,
   type RoutePlanningWaitCriteriaPin,
 } from "./agent/routePlanningPins.js";
+// The payment-missions observation surface (P18-B; ADR-0011 D1): the
+// platform host's composition root binds the mission-plane channel
+// members behind the pinned PaymentMissionsPort through the mount's
+// module-level seam; until a host binds it, the board renders the
+// honest not-wired note (never fabricated missions, never an error).
+// The app src stays pin-only (product law P2 — machine-checked).
+export {
+  bindPaymentMissionsPort,
+  PaymentMissionsMount,
+  resetSharedPaymentMissionsPort,
+  sharedPaymentMissionsPort,
+  type PaymentMissionsMountProps,
+} from "./agent/PaymentMissionsMount.js";
+export {
+  isPaymentMissionsPlaneNotConfigured,
+  PaymentMissionsPlaneNotConfiguredError,
+  PAYMENT_MISSIONS_ATTEMPT_OPERATION_LABELS,
+  PAYMENT_MISSIONS_ATTEMPT_OUTCOME_LABELS,
+  PAYMENT_MISSIONS_ATTEMPT_OUTCOMES_PIN,
+  PAYMENT_MISSIONS_DIRECTIONS_PIN,
+  PAYMENT_MISSIONS_FIELD_IDS_PIN,
+  PAYMENT_MISSIONS_STATUSES_PIN,
+  PAYMENT_MISSIONS_VIEW_KINDS,
+  type PaymentMissionsApprovalRequest,
+  type PaymentMissionsApprovalResolution,
+  type PaymentMissionsApprovalScope,
+  type PaymentMissionsApprovalState,
+  type PaymentMissionsAmount,
+  type PaymentMissionsAttemptOutcome,
+  type PaymentMissionsAttemptState,
+  type PaymentMissionsBoardItem,
+  type PaymentMissionsCompiledIntent,
+  type PaymentMissionsDetail,
+  type PaymentMissionsDetailState,
+  type PaymentMissionsDirection,
+  type PaymentMissionsEvent,
+  type PaymentMissionsFundsLocation,
+  type PaymentMissionsGateDecision,
+  type PaymentMissionsIntakeFieldState,
+  type PaymentMissionsIntakeFields,
+  type PaymentMissionsFieldId,
+  type PaymentMissionsPlanSelection,
+  type PaymentMissionsPort,
+  type PaymentMissionsPreview,
+  type PaymentMissionsPreviewGates,
+  type PaymentMissionsStatus,
+  type PaymentMissionsView,
+  type PaymentMissionsViewKind,
+} from "./agent/paymentMissionsPins.js";
 export {
   AGENT_PAYMENT_DIRECTION_ENTRIES,
   agentPaymentDirectionEntries,
