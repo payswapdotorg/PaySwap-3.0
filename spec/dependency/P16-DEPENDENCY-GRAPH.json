@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "wave": "P16",
+  "title": "Constrained payment route planning, counterfactuals and opportunity search",
+  "source": "GitHub Issue #6; frozen architecture lock + existing route-compiler, capability, Lab, opportunities, agents, economic and protocol packages",
+  "registration_commit_base": "f5a4267dc25c98648ea342594aa12a390da63259",
+  "policy": "Register only. No P16 implementation or acceptance is claimed by the graph. The routine skill is procedural guidance; the typed deterministic planner remains the only route/scenario computation path and has zero authority to commit financial effects.",
+  "work_orders": [
+    {
+      "id": "P16-0",
+      "owner": "TL",
+      "status": "QUEUED",
+      "depends_on": [],
+      "lane_scope": "Source-backed gap matrix, routine/skill loader architecture decision, typed trigger contract, deterministic routine manifest/state-machine and file-disjoint integration agreement; reconcile P15/current-state drift.",
+      "unlocks": [
+        "P16-A",
+        "P16-B",
+        "P16-C"
+      ],
+      "acceptance": "Gap matrix names exact existing source APIs and missing seams; ADR/decision preserves frozen architecture; routine/skill version pin and typed trigger behavior specified; dependencies and owners confirmed."
+    },
+    {
+      "id": "P16-A",
+      "owner": "worker-1",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P16-0"
+      ],
+      "lane_scope": "Independent sender/recipient eligible-rail snapshots, evidence/freshness/exclusion contracts, compose existing route-compiler and exact-ranking APIs. Own route-discovery contracts and integration adapters only; no Lab core, opportunity core or UX files.",
+      "unlocks": [
+        "P16-D"
+      ],
+      "acceptance": "Real connected instances/observations only; independent sender+receiver evidence; every route-shape exclusion stated; hard gates before scoring; exact deterministic metrics/ranking and search-budget disclosure tested."
+    },
+    {
+      "id": "P16-B",
+      "owner": "worker-2",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P16-0"
+      ],
+      "lane_scope": "Routine scenario catalog + Lab-based replay/counterfactual composition and protocol netting/delay/credit/group-payment semantics. Do not change route discovery files, opportunity core or UI files.",
+      "unlocks": [
+        "P16-D"
+      ],
+      "acceptance": "Each required counterfactual varies named assumptions over identical base facts; deterministic bounded deltas; gross-obligation history/currency/deadline/backing/consent invariants tested; simulations have no production authority."
+    },
+    {
+      "id": "P16-C",
+      "owner": "worker-3",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P16-0"
+      ],
+      "lane_scope": "Evidence-backed opportunity/matching proposal model, privacy/minimum-disclosure and consent/expiry/decline/revoke lifecycle, durable WAITING_FOR_OPPORTUNITIES criteria/events. Do not edit route-compiler, Lab core or UI.",
+      "unlocks": [
+        "P16-D"
+      ],
+      "acceptance": "Only evidence-backed opportunities become offers; private party/payment data not disclosed without consent; wait mission resumes/cancels/expires safely; matches never dispatch without fresh preview and explicit scoped approval."
+    },
+    {
+      "id": "P16-D",
+      "owner": "TL",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P16-A",
+        "P16-B",
+        "P16-C"
+      ],
+      "lane_scope": "Integrate typed intent trigger + skill loader + versioned routine manifest and durable mission state machine; expose ranked routes/counterfactuals/proceed-or-wait UX; reconcile maps and deliver end-to-end acceptance.",
+      "unlocks": [],
+      "acceptance": "Validated typed payment intent triggers exactly one pinned routine; routine/skill load failure fails closed; real evidence-backed routes and exclusions render distinctly from conditional options; proceed/wait tasks persist/resume; no effect without existing authority and explicit approval; exact-commit E2E and evidence tiers published."
+    }
+  ]
+}
