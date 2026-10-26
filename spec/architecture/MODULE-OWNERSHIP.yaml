@@ -157,6 +157,7 @@ package_layers:
   packages/onchain-extensions: rails # spec/onchain-extensions/ONCHAIN-EXTENSIONS.md "Layer law (R3-W2)"
   packages/onchain-security: security # spec/onchain-security/ONCHAIN-SECURITY.md (layer security, cannot_downgrade_block)
   packages/route-compiler: intelligence # spec/route-compiler/ROUTE-COMPILER.md §2 (v1 hermetic, zero sibling imports)
+  packages/route-planning: intelligence # ADR-0009 D2 (pin-only src + fail-closed injected ports; discovery never permits execution)
   packages/opportunities: economic # spec/opportunities/OPPORTUNITIES.md economic observation/discovery layer (proposal-seam law: opportunities propose, never commit)
   packages/adversarial: security # spec/adversarial/ADVERSARIAL.md INV-21 block authority + cannot_downgrade_block (escalate-only lattice)
   packages/command: platform # spec/command/COMMAND.md "Layer law" (P7-W3 platform layer)

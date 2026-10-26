@@ -1,0 +1,18 @@
+{
+  "name": "@payswap/route-planning",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "P16 constrained payment route planning routine contracts: typed trigger, fail-closed routine manifest, sender/recipient eligible-rail snapshots, candidate enumeration with typed exclusions, transparent deterministic ranking, bounded search budgets with truncation disclosure. Composes the existing route-compiler, capability, economic, lab and opportunities machinery through injected fail-closed ports (ADR-0009 D2); discovery never permits execution.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.7"
+  }
+}
