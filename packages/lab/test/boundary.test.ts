@@ -23,7 +23,7 @@ import { join, relative } from "node:path";
  *   test/node.d.ts declares process.cwd as a function exactly once;
  * - every file (src AND test) is <= 400 lines (the file law); no TS enum
  *   (plain-Node type-stripping compatibility);
- * - the census receipts: 28 src files, 20 test files, 16 test suites.
+ * - the census receipts: 30 src files, 22 test files, 18 test suites.
  
  * Site classification (this file): 2 old sites REWRITTEN onto the
  * STRICTER law (the old import-scanner and runtime-dependency sites are
@@ -199,10 +199,16 @@ describe("architectural boundary: @payswap/lab (the REWRITTEN zero-sibling guard
       }
     }
     expect(offenders.join("\n")).toBe("");
-    // Census receipts: 28 src files, 20 test files, 16 test suites.
-    expect(sourceFiles.length).toBe(28);
-    expect(allTestFiles.length).toBe(20);
-    expect(testFiles.length).toBe(16);
+    // Census receipts: 30 src files, 22 test files, 18 test suites.
+    // DISCLOSED RE-PIN (P16-B completion, ADR-0009 D9 — the established
+    // precedent, following P16-C): the lane legitimately added two NEW src
+    // modules (interventions, scenario-budget) and two NEW test files, so the
+    // exact census moved 28 -> 30 src, 20 -> 22 test files and 16 -> 18
+    // test suites. The pins stay EXACT toBe (never loosened to ranges) — the
+    // census law's strength is unchanged.
+    expect(sourceFiles.length).toBe(30);
+    expect(allTestFiles.length).toBe(22);
+    expect(testFiles.length).toBe(18);
   });
 
   it("the manifest law: zero runtime deps, devDependencies exactly typescript+vitest, the core barrel export", () => {
@@ -252,8 +258,8 @@ describe("architectural boundary: @payswap/lab (the REWRITTEN zero-sibling guard
 // ---------------------------------------------------------------------------
 // The census law this suite enforces on itself
 // ---------------------------------------------------------------------------
-// 28 src files / 20 test files / 16 vitest suites / 147 tests; every file
-// <= 400 lines with the maxima receipted at domain-packs.ts (379 src) and
+// 30 src files / 22 test files / 18 vitest suites / 169 tests; every file
+// <= 400 lines with the maxima receipted at interventions.ts (386 src) and
 // simulation.test.ts (397 test); devDependencies exactly typescript +
 // vitest; tsconfig without paths; process declared ONCE as a function.
 // The scanner is comment-aware and string-literal-aware: doc prose can
