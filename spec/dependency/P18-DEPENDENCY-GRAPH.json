@@ -16,33 +16,71 @@
     {
       "id": "P18-A",
       "owner": "worker",
-      "status": "PENDING",
-      "depends_on": ["P18-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P18-0"
+      ],
       "lane_scope": "Host lane: packages/desktop/src/host/payswap/shell/** + the renderer client mirror (consoleWorkspaceMount.tsx) + the desktop channel tests. The two approval members (request/resolve with the origin + principalRef pinned at the edge; the artifact never on the wire) + the detail DTO's attempts projection (outcome facts only) + the drift-tested member lists both sides + the host batteries."
     },
     {
       "id": "P18-B",
       "owner": "worker",
-      "status": "PENDING",
-      "depends_on": ["P18-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P18-0"
+      ],
       "lane_scope": "App lane: packages/payswap-app/src/agent/** (NEW paymentMissions* files + AgentExperience.tsx) + the barrel + the app tests. The pinned PaymentMissionsPort + the module-level seam + the panel family (board/detail/intake/preview/approve-two-act) + the honest states + the jsdom battery. Zero @payswap/* imports in src."
     },
     {
       "id": "P18-C",
       "owner": "TL",
-      "status": "PENDING",
-      "depends_on": ["P18-A", "P18-B"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P18-A",
+        "P18-B"
+      ],
       "lane_scope": "TL lane: packages/desktop/src/renderer/** (the NEW paymentMissionsComposition.ts + the main.tsx binding line) + the bridge test. The channel members bound to the port at the business root (honest failure keeps the not-wired default) + the bridge battery over the REAL channel service with deterministic replays."
     },
     {
       "id": "P18-D",
       "owner": "TL",
-      "status": "PENDING",
-      "depends_on": ["P18-A", "P18-B", "P18-C"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P18-A",
+        "P18-B",
+        "P18-C"
+      ],
       "lane_scope": "TL integration: the integrated batteries at the tip; JOURNEY-MAP §7 + FEATURE-MAP reconciliation (CONTRACT+BRIDGE tier, no live-tier claim); the P18 graph closure; the current-state closure; the bundle archive per ADR-0009 D7; the honest carry-forward record (the dispatch act + the execution lanes; live-provider route evidence; the store reconciliation question)."
     }
   ],
-  "frontier_after_registration": ["P18-A", "P18-B"],
+  "frontier_after_registration": [],
   "closure_policy": "P18 closes only when P18-A/B/C/D are all accepted on main with their batteries green at the tip and the honest carry-forward recorded. No live-tier claim is permitted: zero connected capability instances is the deployment fact; the approval machinery is real but unreachable in practice until a real connection observes a funding source (INV-7) — the panel presents that truth honestly.",
-  "closure": null
+  "closure": {
+    "closed_at": "2026-10-26T22:20:00Z",
+    "commits": {
+      "P18-0": "69bd73c",
+      "P18-A": "5127a14",
+      "P18-B": "31b51af",
+      "P18-C": "b67a4b1",
+      "P18-D": "HEAD"
+    },
+    "batteries": {
+      "desktop": "27f/264t",
+      "payswap-app": "40f/431t",
+      "route-planning": "209",
+      "lab": "169",
+      "opportunities": "250",
+      "capability": "230",
+      "route-compiler": "353",
+      "economic": "105",
+      "protocol": "279",
+      "surface": "224",
+      "architecture_check": "0/0/0"
+    },
+    "carry_forward": [
+      "the dispatch act + the P14-carried execution lanes (an approved mission sits ARMED until a host-side dispatch consumes the artifact)",
+      "live-provider route evidence (zero connected capability instances; the station resets destroyed the P13 test credentials)",
+      "the §5 console missions store vs the payment-mission plane reconciliation question (ADR-0011 D6 keeps them disjoint)"
+    ]
+  }
 }

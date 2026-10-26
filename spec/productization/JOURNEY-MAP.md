@@ -248,3 +248,45 @@ connected capability instances exist, so no user-visible route
 evidence exists in this deployment — the honest empty evaluation IS
 the presented truth. The approval/observation UX over the newly
 exposed mission plane remains the P14-carried frontier.
+
+## 8. P18 reconciliation (the approval/observation UX over the exposed mission plane)
+
+The P18 lanes (A: the approval members + the attempt-state projection;
+B: the observation panels; C: the renderer composition + the bridge
+battery) are closed at the CONTRACT+BRIDGE tier. The operator's
+mission-observation journey is REAL over the desktop channel — and the
+approval act crosses the channel lawfully (ADR-0011 D2):
+
+- `packages/desktop/test/payswap/payment-approval-plane.test.ts`
+  (12 laws: the verbatim scope echo, the typed no-preview/blocked
+  failures, the APPROVE golden path + the artifact deep-scan, DECLINE +
+  single-use, the origin-pin proof [a COMPOSER_TEXT decision is REJECTED
+  by the gate with no effect; a grant through the member proves the
+  edge pin], five attempt-outcome derivations, fail-closed).
+- `packages/payswap-app/test/payswap/payment-missions-panel.test.tsx`
+  + `payment-missions-seam.test.tsx` (21 laws: the honest states, the
+  seam laws, the golden path over a fake port, the decline path, the
+  TWO-ACT call-order law [no requestApproval → no resolveApproval],
+  the six BLOCK reasons byte-identical to the real gates, the
+  scan-clean law over 23 machine literals).
+- `packages/desktop/test/payswap/payment-missions-binding.test.ts`
+  (5 bridge laws over the REAL channel service: the honest empty
+  environment [the preview BLOCKS typed through the port, INV-7;
+  requestApproval fails TYPED — the honest unreachability], the golden
+  path over the labeled test-tier gate environment [requestApproval
+  echoes the persisted preview verbatim → resolveApproval grants with
+  the scope echo, the artifact NEVER on the wire], the decline path,
+  byte-identical deterministic replays, the plane-not-configured path
+  [all seven members reject with the app's typed error]).
+
+EVIDENCE SEPARATION: CONTRACT+BRIDGE tier, no LIVE-tier claim. The
+approval machinery is REAL but unreachable in this deployment until a
+real connection observes a funding source (INV-7 blocks the compile in
+the honest empty environment — zero connected capability instances);
+the bridge battery proves the golden path over a clearly-labeled
+test-tier gate environment (the only replaced seam). The dispatch act
+stays host-side by law (ADR-0011 D3): an approved mission sits ARMED
+until a host-side dispatch consumes the single-use artifact — the
+panel says so honestly. Carried forward: the dispatch surface + the
+P14-carried execution lanes; live-provider route evidence; the
+§5/payment-mission store reconciliation question.
