@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from "react";
 import { StatusPill } from "@zcode/ui/payswap";
 import { AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT_PIN } from "../lib/agent-task-pins.js";
 import type { AgentComposerController, AgentComposerState, AgentComposerTranscriptEntry } from "./agentComposerController.js";
+import { RoutePlanningMount } from "./RoutePlanningMount.js";
 import {
   AGENT_COMPOSER_DURABILITY_FACT,
   AGENT_COMPOSER_EMPTY_TRANSCRIPT_NOTE,
@@ -262,6 +263,11 @@ export function AgentComposerPanel({
           </ul>
         )}
       </div>
+
+      {/* The route-planning section (P16-D): its own mount over the same
+       * controller — the proceed-or-wait surface, honestly unbound until
+       * the platform host binds the real engines (ADR-0009 D2). */}
+      <RoutePlanningMount controller={controller} />
 
       <form className="ps-agent-input" onSubmit={handleSubmit}>
         <label htmlFor={inputId} className="ps-sr-only">

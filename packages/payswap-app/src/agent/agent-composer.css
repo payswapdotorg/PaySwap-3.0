@@ -470,3 +470,163 @@
   line-height: 1.4;
   text-align: right;
 }
+
+/* -------------------- the route-planning section (P16-D) -------------------- */
+/* The proceed-or-wait surface inside the composer panel: five distinct
+ * sections, the honest standing notes, and the two choice buttons — a
+ * quiet secondary action in every case (Proceed records a REQUEST, Wait
+ * declares criteria; neither is a financial CTA). Token-driven, no
+ * motion, self-scoped focus — the same posture as the panel. */
+
+.ps-agent-route {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  background: var(--ps-bg);
+  overflow-y: auto;
+  flex: none;
+  max-height: 320px;
+}
+
+.ps-agent-route-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-route-meta {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-route-section {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed var(--ps-border);
+}
+
+.ps-agent-route-section:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.ps-agent-route-section-title {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ps-fg);
+}
+
+.ps-agent-route-subtitle {
+  margin: 6px 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-route-note {
+  margin: 4px 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-route-note--error {
+  color: var(--ps-danger);
+}
+
+.ps-agent-route-empty {
+  margin: 4px 0;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-route-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ps-agent-route-item {
+  padding: 6px 8px;
+  border: 1px solid var(--ps-border);
+  border-radius: 6px;
+  background: var(--ps-surface);
+}
+
+.ps-agent-route-item-head {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ps-agent-route-item-meta {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-route-unknown {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--ps-attention, var(--ps-fg-muted));
+}
+
+.ps-agent-route-pareto {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--ps-fg-subtle);
+}
+
+.ps-agent-route-plainlist {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--ps-fg-muted);
+}
+
+.ps-agent-route-plainlist strong {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ps-fg);
+}
+
+.ps-agent-route-notscored {
+  margin-top: 8px;
+}
+
+.ps-agent-route-choice {
+  margin-top: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 6px;
+  background: var(--ps-surface);
+  color: var(--ps-fg);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ps-agent-route-choice:hover {
+  border-color: var(--ps-accent);
+  color: var(--ps-accent);
+}
+
+.ps-agent-route-choice:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 2px;
+}
