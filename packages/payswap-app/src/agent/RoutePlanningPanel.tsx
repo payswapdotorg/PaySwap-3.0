@@ -11,10 +11,12 @@
  * ZERO AUTHORITY (ADR-0007 D7 / ADR-0009 D8): NO dispatch, execute or
  * authorize button exists anywhere — Proceed records a REQUEST, Wait
  * declares durable criteria, and both say so in their labels. The UNBOUND
- * engine renders the honest unbound note; an ENGINE_ERROR is surfaced,
- * never masked. Rendered by ./RoutePlanningMount.tsx (the mount owns the
- * engine/session wiring); this component is a pure projection of its
- * props (INV-23).
+ * engine renders the honest unbound note; a NO_VALIDATED_INTENT outcome
+ * (no mission carries a compiled intent — the D1 law) renders the honest
+ * no-intent note, an empty state rather than an error mask; an
+ * ENGINE_ERROR is surfaced, never masked. Rendered by
+ * ./RoutePlanningMount.tsx (the mount owns the engine/session wiring);
+ * this component is a pure projection of its props (INV-23).
  */
 
 import { StatusPill } from "@zcode/ui/payswap";
@@ -23,6 +25,7 @@ import {
   ROUTE_PLANNING_AVAILABLE_NOW_NOTE,
   ROUTE_PLANNING_ENGINE_UNBOUND_NOTE,
   ROUTE_PLANNING_EVIDENCE_FRESHNESS_NOTE,
+  ROUTE_PLANNING_NO_INTENT_NOTE,
   ROUTE_PLANNING_TRUNCATION_NOTE,
   ROUTE_PLANNING_WAIT_NOTE,
   type RoutePlanningEngineView,
@@ -33,7 +36,7 @@ import {
 } from "./routePlanningPins.js";
 
 export interface RoutePlanningPanelProps {
-  /** The pinned view model (UNBOUND_ENGINE | PRESENTED_PLAN | ENGINE_ERROR). */
+  /** The pinned view model (UNBOUND_ENGINE | NO_VALIDATED_INTENT | PRESENTED_PLAN | ENGINE_ERROR). */
   readonly view: RoutePlanningPanelView;
   /** The task's projected waiting state (null when no task is planned). */
   readonly waiting: RoutePlanningWaitingState | null;
@@ -273,6 +276,8 @@ export function RoutePlanningPanel({
       </p>
       {view.kind === "UNBOUND_ENGINE" ? (
         <p className="ps-agent-route-note">{ROUTE_PLANNING_ENGINE_UNBOUND_NOTE}</p>
+      ) : view.kind === "NO_VALIDATED_INTENT" ? (
+        <p className="ps-agent-route-note">{ROUTE_PLANNING_NO_INTENT_NOTE}</p>
       ) : view.kind === "ENGINE_ERROR" ? (
         <p className="ps-agent-route-note" role="alert">
           The route-planning engine failed: {view.message} — nothing is fabricated; the failure is surfaced, never masked.

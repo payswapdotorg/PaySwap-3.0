@@ -1,5 +1,6 @@
 /**
- * @payswap/app — the ROUTE-PLANNING MOUNT (P16-D part 3; gap-matrix D5).
+ * @payswap/app — the ROUTE-PLANNING MOUNT (P16-D part 3; gap-matrix D5;
+ * the P17-B composition seams — ADR-0010 D5).
  *
  * The route-planning section inside the composer panel: reads the ONE
  * shared composer controller (the same discipline as the embed mount),
@@ -9,9 +10,16 @@
  * engine — the live-app truth until the platform host binds the REAL
  * route-planning engines at its composition root (ADR-0009 D2): the
  * mount then renders the honest unbound note, never fabricated data.
+ * The composition root (the platform host / the acceptance tests) binds
+ * BOTH the engine (bindRoutePlanningEngine) and the session
+ * (bindRoutePlanningSession — P17-B, mirroring the engine seam); the
+ * defaults remain the honest UNBOUND engine and NO session → the
+ * unbound note + the not-wired choice notes.
  *
  * HONESTY LAWS: no engine → the unbound note; a failed engine → the
- * surfaced error; no payment mission → the honest empty note (route
+ * surfaced error; no validated intent → the honest NO_VALIDATED_INTENT
+ * note (the engine's typed no-mission outcome is an EMPTY state, never
+ * an error mask); no payment mission → the honest empty note (route
  * planning starts only from a validated typed intent, never from the
  * composer opening); no session → the choices render as not-wired notes,
  * never as silent no-op buttons. Proceed records a REQUEST and Wait
@@ -24,6 +32,7 @@ import { RoutePlanningPanel } from "./RoutePlanningPanel.js";
 import { createRoutePlanningSession, projectRoutePlanningWaiting, type RoutePlanningSession } from "./routePlanningSession.js";
 import {
   isRoutePlanningEngineUnbound,
+  isRoutePlanningNoIntentError,
   unboundRoutePlanningEngine,
   type RoutePlanningEnginePort,
   type RoutePlanningPanelView,
@@ -52,6 +61,25 @@ export function resetSharedRoutePlanningEngine(): void {
   sharedEngine = undefined;
 }
 
+/* ------------- the shared session binding (the composition seam) ------------- */
+
+let sharedSession: RoutePlanningSession | undefined;
+
+/** The ONE shared route-planning session per document (default: undefined — the honest not-wired notes). */
+export function sharedRoutePlanningSession(): RoutePlanningSession | undefined {
+  return sharedSession;
+}
+
+/** The composition-root session binding (the platform host / the acceptance tests bind BOTH seams). */
+export function bindRoutePlanningSession(session: RoutePlanningSession): void {
+  sharedSession = session;
+}
+
+/** Test/inspection helper: drop the shared session binding (never used in src). */
+export function resetSharedRoutePlanningSession(): void {
+  sharedSession = undefined;
+}
+
 /* --------------------------------- the mount --------------------------------- */
 
 export interface RoutePlanningMountProps {
@@ -59,7 +87,7 @@ export interface RoutePlanningMountProps {
   readonly controller?: AgentComposerController;
   /** Injectable engine; default: the shared binding (the honest UNBOUND engine). */
   readonly engine?: RoutePlanningEnginePort;
-  /** Injectable session; when absent the choices render as not-wired notes. */
+  /** Injectable session; default: the shared binding (absent → the honest not-wired notes). */
   readonly session?: RoutePlanningSession;
 }
 
@@ -80,6 +108,7 @@ export function RoutePlanningMount({
     resolvedController.getState,
   );
   const resolvedEngine = engine ?? sharedRoutePlanningEngine();
+  const resolvedSession = session ?? sharedRoutePlanningSession();
   const [view, setView] = useState<RoutePlanningPanelView | null>(null);
   const [choiceError, setChoiceError] = useState<string | null>(null);
   const recordedDigest = useRef<string | null>(null);
@@ -89,7 +118,8 @@ export function RoutePlanningMount({
 
   // Ask the engine for the presentable view; record the preview exactly
   // once per view digest. The unbound engine fails closed → the honest
-  // unbound note; a failed engine → the surfaced error, never masked.
+  // unbound note; a typed no-validated-intent outcome → the honest empty
+  // state (never an error mask); a failed engine → the surfaced error.
   useEffect(() => {
     if (taskId === undefined) {
       setView(null);
@@ -97,9 +127,9 @@ export function RoutePlanningMount({
     }
     try {
       const engineView = resolvedEngine.presentableView({ taskRef: taskId });
-      if (session !== undefined && recordedDigest.current !== engineView.viewDigest) {
+      if (resolvedSession !== undefined && recordedDigest.current !== engineView.viewDigest) {
         recordedDigest.current = engineView.viewDigest;
-        void session
+        void resolvedSession
           .presentChoices(taskId, engineView)
           .then(() => resolvedController.refresh())
           .catch(() => {
@@ -109,12 +139,14 @@ export function RoutePlanningMount({
       setView({ kind: "PRESENTED_PLAN", view: engineView });
     } catch (thrown: unknown) {
       setView(
-        isRoutePlanningEngineUnbound(thrown)
-          ? { kind: "UNBOUND_ENGINE" }
-          : { kind: "ENGINE_ERROR", message: thrown instanceof Error ? thrown.message : String(thrown) },
+        isRoutePlanningNoIntentError(thrown)
+          ? { kind: "NO_VALIDATED_INTENT" }
+          : isRoutePlanningEngineUnbound(thrown)
+            ? { kind: "UNBOUND_ENGINE" }
+            : { kind: "ENGINE_ERROR", message: thrown instanceof Error ? thrown.message : String(thrown) },
       );
     }
-  }, [taskId, resolvedEngine, session, resolvedController]);
+  }, [taskId, resolvedEngine, resolvedSession, resolvedController]);
 
   if (state.tasksPhase === "loading") {
     return (
@@ -148,16 +180,16 @@ export function RoutePlanningMount({
       });
   };
   const onProceed =
-    session !== undefined && taskId !== undefined
-      ? (planId: string) => runChoice(() => session.chooseProceed(taskId, planId))
+    resolvedSession !== undefined && taskId !== undefined
+      ? (planId: string) => runChoice(() => resolvedSession.chooseProceed(taskId, planId))
       : undefined;
   const onChooseWait =
-    session !== undefined && taskId !== undefined
-      ? (criteria: RoutePlanningWaitCriteriaPin) => runChoice(() => session.chooseWait(taskId, criteria))
+    resolvedSession !== undefined && taskId !== undefined
+      ? (criteria: RoutePlanningWaitCriteriaPin) => runChoice(() => resolvedSession.chooseWait(taskId, criteria))
       : undefined;
   const onCancelWait =
-    session !== undefined && taskId !== undefined && waiting.status === "WAITING_FOR_OPPORTUNITIES"
-      ? () => runChoice(() => session.cancelWait(taskId))
+    resolvedSession !== undefined && taskId !== undefined && waiting.status === "WAITING_FOR_OPPORTUNITIES"
+      ? () => runChoice(() => resolvedSession.cancelWait(taskId))
       : undefined;
 
   return (

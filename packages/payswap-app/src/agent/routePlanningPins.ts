@@ -3,30 +3,32 @@
  * UX vocabulary (P16-D part 3, ADR-0009 D2/D8; gap-matrix row D5).
  *
  * MIRROR DISCIPLINE (the established src/lib/agent-task-pins.ts pattern):
- * @payswap/app src NEVER imports a @payswap/* workspace package (product
- * law P2, machine-checked) — every cross-package surface is pinned
- * STRUCTURALLY here (same literals, same frozen vocabularies, byte-
- * identical value pins), and the mirror is verified against the REAL
- * sources by test/payswap/route-planning-acceptance.test.ts (test-only
- * relative imports). The platform host binds the REAL engines at its
- * composition root (ADR-0009 D2).
+ * @payswap/app src NEVER imports a @payswap/* workspace package (product law
+ * P2, machine-checked) — every cross-package surface is pinned STRUCTURALLY here
+ * (same literals, same frozen vocabularies, byte-identical value pins), and the
+ * mirror is verified against the REAL sources by test/payswap/
+ * route-planning-acceptance.test.ts (test-only relative imports). The platform
+ * host binds the REAL engines at its composition root (ADR-0009 D2).
  *
- * Pins in this file (source modules named per pin): routine identity +
- * skill digest .... packages/route-planning/src/manifest.ts (ROUTINE_ID /
- * ROUTINE_VERSION / PINNED_SKILL_CONTENT_DIGEST); the wait vocabularies
- * .... packages/opportunities/src/wait-criteria.ts (WAIT_CATEGORIES /
- * WAIT_FALLBACK_KINDS) + src/model.ts (OPPORTUNITY_FAMILIES); the wait
- * no-dispatch law .... packages/surface/src/agent-tasks.ts
- * (AGENT_TASK_WAIT_VOCABULARY — mirrored in ../lib/agent-task-pins.ts).
+ * Pins in this file (source modules named per pin): routine identity + skill
+ * digest .... packages/route-planning/src/manifest.ts (ROUTINE_ID /
+ * ROUTINE_VERSION / PINNED_SKILL_CONTENT_DIGEST); the wait vocabularies ....
+ * packages/opportunities/src/wait-criteria.ts (WAIT_CATEGORIES / WAIT_FALLBACK_KINDS)
+ * + src/model.ts (OPPORTUNITY_FAMILIES); the wait no-dispatch law ....
+ * packages/surface/src/agent-tasks.ts (AGENT_TASK_WAIT_VOCABULARY — mirrored
+ * in ../lib/agent-task-pins.ts).
  *
  * LAWS (ADR-0009 D8 + ROUTINE-CONTRACT stage table): the app NEVER writes
- * AUTHORIZATION_GRANTED (that event belongs to the real authority
- * surface); a wait match records OPPORTUNITY_MATCHED and the task STAYS
- * WAITING (matchAutoDispatches is the pinned literal false); the engine
- * port FAILS CLOSED — an unbound engine is an honest typed error naming
- * the exact missing binding, never a fallback, never fabricated routes.
- * ZERO FINANCIAL AUTHORITY: this vocabulary names choices (PROCEED /
- * WAIT), never effects.
+ * AUTHORIZATION_GRANTED (that event belongs to the real authority surface); a
+ * wait match records OPPORTUNITY_MATCHED and the task STAYS WAITING
+ * (matchAutoDispatches is the pinned literal false); the engine port FAILS
+ * CLOSED — an unbound engine is an honest typed error naming the exact missing
+ * binding, never a fallback, never fabricated routes. THE NO-INTENT LAW (P17-B):
+ * when the engine's mission linkage resolves no mission carrying a compiled
+ * intent, the panel renders the honest NO_VALIDATED_INTENT state — prose cannot
+ * construct an intent (the D1 trigger law), never an error mask.
+ * ZERO FINANCIAL AUTHORITY: this vocabulary names choices (PROCEED / WAIT),
+ * never effects.
  */
 
 import type { AgentTaskStatusPin } from "../lib/agent-task-pins.js";
@@ -38,10 +40,9 @@ export const PINNED_ROUTE_PLANNING_ROUTINE_ID = "payment-route-planning" as cons
 /** Mirrors route-planning ROUTINE_VERSION (the version every mission pins append-only). */
 export const PINNED_ROUTE_PLANNING_ROUTINE_VERSION = "1.0.0" as const;
 /**
- * Mirrors route-planning PINNED_SKILL_CONTENT_DIGEST — the fnv1a64 of the
- * REAL skills/payment-route-planning/SKILL.md bytes. Pinned
- * byte-identically; the acceptance test asserts equality with the REAL
- * manifest value (drift fails closed in CI).
+ * Mirrors route-planning PINNED_SKILL_CONTENT_DIGEST — the fnv1a64 of the REAL
+ * skills/payment-route-planning/SKILL.md bytes. Pinned byte-identically; the
+ * acceptance test asserts equality with the REAL manifest value (drift fails closed in CI).
  */
 export const PINNED_ROUTE_PLANNING_SKILL_DIGEST = "fnv1a64:1abba70f0107d1b2" as const;
 
@@ -74,12 +75,12 @@ export type RoutePlanningSectionId = (typeof ROUTE_PLANNING_SECTION_IDS)[number]
 export const ROUTE_PLANNING_CHOICE_KINDS = Object.freeze(["PROCEED", "WAIT"] as const);
 export type RoutePlanningChoiceKind = (typeof ROUTE_PLANNING_CHOICE_KINDS)[number];
 
-/** The panel's view-model kinds: the honest UNBOUND engine state (the
- * live-app truth until the platform host binds the real engines), the
- * PRESENTED plan (a validated engine view), and the honest ENGINE_ERROR
- * state (a failed engine is surfaced, never masked, never fabricated). */
+/** The panel's view-model kinds: the honest UNBOUND engine state (the live-app truth until
+ * the platform host binds the real engines), the PRESENTED plan (a validated engine view),
+ * the honest NO_VALIDATED_INTENT state (no mission carries a compiled intent — the D1 law),
+ * and the honest ENGINE_ERROR state (a failed engine is surfaced, never masked, never fabricated). */
 export const ROUTE_PLANNING_PANEL_VIEW_KINDS = Object.freeze([
-  "UNBOUND_ENGINE", "PRESENTED_PLAN", "ENGINE_ERROR",
+  "UNBOUND_ENGINE", "PRESENTED_PLAN", "ENGINE_ERROR", "NO_VALIDATED_INTENT",
 ] as const);
 export type RoutePlanningPanelViewKind = (typeof ROUTE_PLANNING_PANEL_VIEW_KINDS)[number];
 
@@ -104,12 +105,11 @@ export const ROUTE_PLANNING_WAIT_FALLBACK_KINDS_PIN = Object.freeze([
 ] as const);
 export type RoutePlanningWaitFallbackKindPin = (typeof ROUTE_PLANNING_WAIT_FALLBACK_KINDS_PIN)[number];
 
-/** The durable wait criteria the Wait choice declares (SUBSET structural
- * pin of opportunities WaitMatchCriteria: the app-side choice never
- * constructs the optional exact-rational bounds — those stay in the
- * opportunities authority; the serialized record is what the task event
- * carries). maxSettlementMs is VALIDATED but NEVER APPLIED here — the
- * route-compiler owns settlement-timing law. */
+/** The durable wait criteria the Wait choice declares (SUBSET structural pin of
+ * opportunities WaitMatchCriteria: the app-side choice never constructs the
+ * optional exact-rational bounds — those stay in the opportunities authority;
+ * the serialized record is what the task event carries). maxSettlementMs is
+ * VALIDATED but NEVER APPLIED here — the route-compiler owns settlement-timing law. */
 export interface RoutePlanningWaitCriteriaPin {
   readonly waitId: string;
   readonly families: readonly RoutePlanningOpportunityFamilyPin[];
@@ -123,10 +123,10 @@ export interface RoutePlanningWaitCriteriaPin {
 
 /* ============ the opportunity-match pin (the five pure facts) ============ */
 
-/** Mirrors the opportunities WaitEvaluation result (EXACTLY the five pure
- * fact keys): a wait match is a RECORD, never an action — no
- * action/command/dispatch/execute/authorize key at any name, and
- * waitingNeverDispatches is the pinned LITERAL false (ADR-0009 D8). */
+/** Mirrors the opportunities WaitEvaluation result (EXACTLY the five pure fact
+ * keys): a wait match is a RECORD, never an action — no action/command/dispatch/
+ * execute/authorize key at any name, and waitingNeverDispatches is the pinned
+ * LITERAL false (ADR-0009 D8). */
 export interface RoutePlanningOpportunityMatchPin {
   readonly matchedOpportunityIds: readonly string[];
   readonly categoryAttribution: Readonly<Record<string, readonly RoutePlanningWaitCategoryPin[]>>;
@@ -172,11 +172,10 @@ export interface RoutePlanningScenarioPin {
   readonly counterfactualId: string; readonly counterfactualDigest: string;
 }
 
-/** The engine view: stage 8's presentable projection. The sections are
- * SEPARATED by construction (available-now ranked routes never mix with
- * exclusions, truncation, advisory scenarios or the waiting surface) and
- * the whole view digests deterministically (identical engines + inputs →
- * identical viewDigest — the determinism law). */
+/** The engine view: stage 8's presentable projection. The sections are SEPARATED
+ * by construction (available-now ranked routes never mix with exclusions, truncation,
+ * advisory scenarios or the waiting surface) and the view digests deterministically
+ * (identical engines + inputs → identical viewDigest — the determinism law). */
 export interface RoutePlanningEngineView {
   readonly kind: "PRESENTED_PLAN";
   readonly routine: RoutePlanningRoutinePin;
@@ -204,11 +203,10 @@ export interface RoutePlanningEngineView {
   readonly viewDigest: string;
 }
 
-/** The waiting surface's view state (projected from the task record): the
- * task's current status, the LAST recorded criteria (parsed back from
- * the event record — null when not recorded), the honest truncation fact
- * when the serialized criteria exceeded the transcript bound, and every
- * matched opportunity id (in match order). */
+/** The waiting surface's view state (projected from the task record): the task's
+ * current status, the LAST recorded criteria (parsed back from the event record —
+ * null when not recorded), the honest truncation fact when the serialized criteria
+ * exceeded the transcript bound, and every matched opportunity id (in match order). */
 export interface RoutePlanningWaitingState {
   readonly status: AgentTaskStatusPin;
   readonly criteria: RoutePlanningWaitCriteriaPin | null;
@@ -219,6 +217,7 @@ export interface RoutePlanningWaitingState {
 /** The panel's view model (the pinned kinds; see ROUTE_PLANNING_PANEL_VIEW_KINDS). */
 export type RoutePlanningPanelView =
   | { readonly kind: "UNBOUND_ENGINE" }
+  | { readonly kind: "NO_VALIDATED_INTENT" }
   | { readonly kind: "PRESENTED_PLAN"; readonly view: RoutePlanningEngineView }
   | { readonly kind: "ENGINE_ERROR"; readonly message: string };
 
@@ -237,29 +236,26 @@ export class RoutePlanningUxError extends Error {
   }
 }
 
-/** One engine request: the agent task reference ONLY. The composer's
- * people-language intent is never the financial input contract
- * (ROUTINE-CONTRACT trigger semantics: the composer opening is not a
- * trigger) — the engine resolves the validated typed intent through its
- * own mission linkage and fails closed when none exists. */
+/** One engine request: the agent task reference ONLY. The composer's people-language
+ * intent is never the financial input contract (ROUTINE-CONTRACT trigger semantics:
+ * the composer opening is not a trigger) — the engine resolves the validated typed
+ * intent through its own mission linkage and fails closed when none exists. */
 export interface RoutePlanningEngineRequest {
   readonly taskRef: string;
 }
 
-/** THE ROUTE-PLANNING ENGINE PORT (the console-injected composition seam,
- * ADR-0009 D2): runs the REAL routine engines (stages 2-7 — corridor
- * projection, route compilation, hard gates + ranking, bounded scenario
- * exploration, opportunity matching) and returns the presentable view.
- * The platform host binds the real adapter; the app ships the UNBOUND
- * default below. */
+/** THE ROUTE-PLANNING ENGINE PORT (the console-injected composition seam, ADR-0009
+ * D2): runs the REAL routine engines (stages 2-7 — corridor projection, route
+ * compilation, hard gates + ranking, bounded scenario exploration, opportunity
+ * matching) and returns the presentable view. The platform host binds the real
+ * adapter; the app ships the UNBOUND default below. */
 export interface RoutePlanningEnginePort {
   presentableView(request: RoutePlanningEngineRequest): RoutePlanningEngineView;
 }
 
-/** The UNBOUND engine (fail closed): every call throws the typed
- * RoutePlanningUxError naming the EXACT missing binding. Never fabricates
- * a route, never fabricates an exclusion, never falls back to LLM-only
- * routing (the ROUTINE-CONTRACT acceptance law). */
+/** The UNBOUND engine (fail closed): every call throws the typed RoutePlanningUxError
+ * naming the EXACT missing binding. Never fabricates a route, never fabricates an
+ * exclusion, never falls back to LLM-only routing (the ROUTINE-CONTRACT acceptance law). */
 export function unboundRoutePlanningEngine(): RoutePlanningEnginePort {
   return {
     presentableView(request: RoutePlanningEngineRequest): RoutePlanningEngineView {
@@ -288,6 +284,22 @@ export function isRoutePlanningEngineUnbound(thrown: unknown): thrown is RoutePl
   return thrown instanceof RoutePlanningUxError && thrown.code === "ENGINE_UNBOUND";
 }
 
+/** The typed no-validated-intent outcome: the engine's mission linkage resolved no
+ * mission carrying a compiled intent, and prose cannot construct one (the D1 trigger
+ * law) — the honest result is the empty NO_VALIDATED_INTENT panel state, never an error mask. */
+export class RoutePlanningNoIntentError extends Error {
+  readonly kind = "NO_VALIDATED_INTENT" as const;
+  constructor(message: string) {
+    super(message);
+    this.name = "RoutePlanningNoIntentError";
+  }
+}
+
+/** True iff the thrown value is the typed no-validated-intent outcome. */
+export function isRoutePlanningNoIntentError(thrown: unknown): thrown is RoutePlanningNoIntentError {
+  return thrown instanceof RoutePlanningNoIntentError;
+}
+
 /* ============ the honest standing notes (rendered VERBATIM) ============ */
 
 /** The available-now vs conditional separation law (stage 8's first honesty). */
@@ -310,10 +322,12 @@ export const ROUTE_PLANNING_WAIT_NOTE =
 export const ROUTE_PLANNING_ENGINE_UNBOUND_NOTE =
   "The route-planning engines are not wired in this deployment — no routes are shown because none can be honestly computed here. The composition root binds the real corridor, compiler and opportunities engines; until then this section states the gap instead of inventing routes." as const;
 
-/* ============ the deterministic view digest (the route-planning canonical
- * flavor, re-declared locally — zero sibling imports, ADR-0009 D4 fidelity;
- * flavor fidelity is asserted against the REAL package by the acceptance
- * test) ============ */
+/** The honest no-validated-intent note (the D1 law in people language — rendered VERBATIM). */
+export const ROUTE_PLANNING_NO_INTENT_NOTE = "No validated payment intent yet — route planning starts only from a validated typed intent (a mission whose intake compiled one). Complete the mission preview on the authority surface; this composer never fabricates an intent." as const;
+
+/* ============ the deterministic view digest (the route-planning canonical flavor,
+ * re-declared locally — zero sibling imports, ADR-0009 D4 fidelity; flavor fidelity
+ * is asserted against the REAL package by the acceptance test) ============ */
 
 /** Canonical, sort-stable JSON text (bigint-aware) — the b:/n: value forms. */
 export function routePlanningCanonicalJson(value: unknown): string {

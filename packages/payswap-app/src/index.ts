@@ -86,6 +86,41 @@ export {
   routeAgentText,
   AGENT_INTENT_UNKNOWN_REPLY,
 } from "./agent/intentRouter.js";
+// The route-planning composition surface (P17-B; ADR-0010 D5): the
+// platform host's composition root binds the REAL route-planning engines
+// behind the fail-closed engine port AND the session that records the
+// choices — both through module-level seams on the mount. Until a host
+// binds them, the app's defaults stay honest (the unbound-engine note +
+// the not-wired choice notes). The app src itself stays pin-only
+// (product law P2 — zero @payswap/* imports, machine-checked).
+export {
+  bindRoutePlanningEngine,
+  bindRoutePlanningSession,
+  resetSharedRoutePlanningEngine,
+  resetSharedRoutePlanningSession,
+  sharedRoutePlanningEngine,
+  sharedRoutePlanningSession,
+} from "./agent/RoutePlanningMount.js";
+export {
+  createBrowserAgentTaskSessionPort,
+  type AgentTaskSessionStorage,
+} from "./agent/taskSessionAdapter.js";
+export type { AgentTaskSessionPort } from "./agent/taskSessionPort.js";
+export {
+  createRoutePlanningSession,
+  type RoutePlanningSession,
+  type RoutePlanningSessionOptions,
+} from "./agent/routePlanningSession.js";
+export {
+  isRoutePlanningNoIntentError,
+  RoutePlanningNoIntentError,
+  routePlanningViewDigestOf,
+  type RoutePlanningEnginePort,
+  type RoutePlanningEngineRequest,
+  type RoutePlanningEngineView,
+  type RoutePlanningOpportunityMatchPin,
+  type RoutePlanningWaitCriteriaPin,
+} from "./agent/routePlanningPins.js";
 export {
   AGENT_PAYMENT_DIRECTION_ENTRIES,
   agentPaymentDirectionEntries,

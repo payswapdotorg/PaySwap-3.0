@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 /**
  * @payswap/app — the ROUTE-PLANNING PANEL render laws (P16-D part 3,
- * gap-matrix D5; ADR-0009 D8; ROUTINE-CONTRACT stage 8).
+ * gap-matrix D5; ADR-0009 D8; ROUTINE-CONTRACT stage 8) + the P17-B
+ * NO_VALIDATED_INTENT laws (ADR-0010 D5).
  *
  * The proceed-or-wait presentation surface, machine-checked against the
  * REAL component with a FIXED validated engine view (deterministic —
@@ -17,20 +18,30 @@
  * - Exclusions render with their typed reasons (code + message).
  * - The waiting section renders the never-dispatches note, and the
  *   waiting state renders the recorded criteria + matches.
+ * - The NO_VALIDATED_INTENT state renders the honest no-intent note — an
+ *   EMPTY state, never an error mask (no role=alert, no sections, no
+ *   fabricated plans) — and a mounted engine throwing the typed
+ *   RoutePlanningNoIntentError lands in that state, NOT ENGINE_ERROR.
  */
 import { afterEach, describe, expect, it } from "vitest";
-import { cleanup, render } from "@testing-library/react";
+import { act, cleanup, render } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { RoutePlanningPanel } from "../../src/agent/RoutePlanningPanel.js";
+import { RoutePlanningMount } from "../../src/agent/RoutePlanningMount.js";
+import { createAgentComposerController } from "../../src/agent/agentComposerController.js";
+import type { AgentTaskSessionStorage } from "../../src/agent/taskSessionAdapter.js";
 import {
   ROUTE_PLANNING_AVAILABLE_NOW_NOTE,
   ROUTE_PLANNING_ENGINE_UNBOUND_NOTE,
   ROUTE_PLANNING_EVIDENCE_FRESHNESS_NOTE,
+  ROUTE_PLANNING_NO_INTENT_NOTE,
   ROUTE_PLANNING_TRUNCATION_NOTE,
   ROUTE_PLANNING_WAIT_NOTE,
   ROUTE_PLANNING_SECTION_IDS,
+  RoutePlanningNoIntentError,
   routePlanningViewDigestOf,
+  type RoutePlanningEnginePort,
   type RoutePlanningEngineView,
   type RoutePlanningWaitingState,
 } from "../../src/agent/routePlanningPins.js";
@@ -100,6 +111,15 @@ function fixedEngineView(): RoutePlanningEngineView {
 }
 
 const noop = (): void => {};
+
+/** The in-memory storage seam (deterministic; localStorage-shaped). */
+function fakeStorage(): AgentTaskSessionStorage {
+  const data = new Map<string, string>();
+  return {
+    getItem: (key) => (data.has(key) ? data.get(key)! : null),
+    setItem: (key, value) => void data.set(key, value),
+  };
+}
 
 afterEach(() => {
   cleanup();
@@ -202,5 +222,47 @@ describe("the panel render laws (a fixed engine view)", () => {
     expect(section.textContent).toContain("REPLAN_FROM_FRESH_EVIDENCE");
     expect(section.textContent).toContain("op:liq:001");
     expect(section.textContent).toContain("the task stays waiting");
+  });
+});
+
+describe("the NO_VALIDATED_INTENT laws (P17-B — the honest empty state, never an error mask)", () => {
+  it("renders the honest no-intent note — no sections, no fabricated plans, no error alert", () => {
+    const markup = renderToStaticMarkup(
+      <RoutePlanningPanel view={{ kind: "NO_VALIDATED_INTENT" }} waiting={null} />,
+    );
+    expect(markup).toContain(ROUTE_PLANNING_NO_INTENT_NOTE);
+    expect(markup).not.toContain("ps-agent-route-section-available-now");
+    expect(markup).not.toContain("plan:");
+    // An EMPTY state, not an engine failure: the error alert never renders.
+    expect(markup).not.toContain("role=\"alert\"");
+    expect(markup).not.toContain("The route-planning engine failed");
+  });
+
+  it("a mounted engine throwing the typed RoutePlanningNoIntentError lands in the honest empty state — NOT ENGINE_ERROR", async () => {
+    const controller = createAgentComposerController({ storage: fakeStorage(), clock: () => T0 });
+    await act(async () => {
+      await controller.seedFromSurface({
+        intent: { kind: "PAYMENT_MISSION", direction: "PAY", goalStatement: "pay the supplier" },
+        originNote: "pay the supplier",
+        area: "payments",
+      });
+    });
+    // The engine's mission linkage: no mission carries a compiled intent →
+    // the typed outcome (prose cannot construct an intent — the D1 law).
+    const noIntentEngine: RoutePlanningEnginePort = {
+      presentableView(request) {
+        throw new RoutePlanningNoIntentError(
+          `no mission carrying a compiled intent exists for task '${request.taskRef}'`,
+        );
+      },
+    };
+    const { container } = render(
+      <RoutePlanningMount controller={controller} engine={noIntentEngine} />,
+    );
+    const section = container.querySelector(".ps-agent-route")!;
+    expect(section.textContent).toContain(ROUTE_PLANNING_NO_INTENT_NOTE);
+    expect(container.querySelector("[role='alert']")).toBeNull();
+    expect(section.textContent).not.toContain("The route-planning engine failed");
+    expect(container.querySelector("#ps-agent-route-section-available-now")).toBeNull();
   });
 });
