@@ -22,7 +22,10 @@
     "src/host/payswap",
     "src/renderer/src/consoleWorkspaceMount.tsx",
     "src/renderer/src/consolePaymentMissionWire.ts",
+    "src/renderer/src/paymentMissionsComposition.ts",
     "../payswap-app/src",
-    "test/payswap/desktop-console-client.test.ts"
+    "test/payswap/desktop-console-client.test.ts",
+    "test/payswap/payment-approval-plane-harness.ts",
+    "test/payswap/payment-missions-binding.test.ts"
   ]
 }

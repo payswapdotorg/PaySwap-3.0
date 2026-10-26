@@ -3,6 +3,7 @@ import { initializeDesktopLocalTtft } from "./localTtftBootstrap.js";
 // P17-C（ADR-0010 D1）：THE 组合根 —— 唯一允许消费 @payswap/route-planning 等
 // REAL 引擎源码包的 renderer 模块（三处别名同步；其余 renderer 文件不得跟随）。
 import { composeRoutePlanningBinding } from "./routePlanningComposition.js";
+import { composePaymentMissionsBinding } from "./paymentMissionsComposition.js";
 import { createRoot } from "react-dom/client";
 import { useEffect } from "react";
 import {
@@ -331,6 +332,14 @@ function initializeBusinessRoot(port: MessagePort): void {
   void composeRoutePlanningBinding({ services }).refresh().catch(() => {
     // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定说明 + 未接线选择。
   });
+  // P18-C（ADR-0011 D1）：绑定 payment-missions 观察面 —— 组合根把通道的
+  // mission-plane 成员（P17-A 读取/输入 + P18-A 边缘钉死的审批成员）适配到
+  // 面板的固定端口；失败时保持诚实默认（未绑定说明，绝不掩盖）。
+  try {
+    composePaymentMissionsBinding({ services });
+  } catch {
+    // 组合失败的诚实姿态：共享缝隙保持默认值 —— Missions 面板如实呈现未接线说明。
+  }
   const settingService = supportsSettings ? services.settingService : undefined;
 
   syncAppTelemetryContext({
