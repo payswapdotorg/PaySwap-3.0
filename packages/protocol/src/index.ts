@@ -47,6 +47,13 @@ export * from './reservation.ts';
 export * from './netting.ts';
 export * from './netting-delay.ts';
 
+// Record-only protocol semantics (P16-B, B7/B9/B10 — wired into the
+// barrel by the P16-D TL lane; ADR-0009 D5: record-only, gross ledger
+// never rewritten, credit kernel stays deferred).
+export * from './credit-instrument.ts';
+export * from './group-payment.ts';
+export * from './netting-proposal.ts';
+
 // Persistence contract types (adapters deferred).
 export * from './persistence.ts';
 

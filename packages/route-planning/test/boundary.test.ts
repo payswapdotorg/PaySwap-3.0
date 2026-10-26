@@ -26,16 +26,20 @@ import { join, relative } from "node:path";
  * - the manifest exposes the core barrel with devDependencies EXACTLY
  *   typescript + vitest;
  * - every file (src AND test) is <= 400 lines; no TS enum;
- * - the exact census pins below (12 src / 12 test-suite / 15 all-test
+ * - the exact census pins below (15 src / 16 test-suite / 19 all-test
  *   .ts files): the route-planning core lane's own file set — canonical
  *   backbone, error taxonomy, three pin modules, fail-closed ports,
  *   search budget, rail snapshots, candidate enumeration, hard gates,
- *   ranking, barrel; the twelve test suites (boundary, canonical, errors,
- *   pins-fidelity, ports, rail-snapshot, search-budget, candidates,
- *   hard-gates, ranking, determinism, pipeline) plus the three non-suite
- *   test-tier helpers (fixtures, compiler-evidence, node.d.ts). The
- *   trigger/manifest/lab-adapter trio is TL-owned P16-D territory and
- *   deliberately absent from this census.
+ *   ranking, barrel — PLUS the P16-D part-1 trio (trigger, manifest,
+ *   lab-adapter) landed by the TL-delegated Lane D continuation (137-D1:
+ *   the typed trigger + fail-closed manifest + stage-6 lab seam; ADR-0009
+ *   D3 gave the trio to the TL lane, which delegated this part); the
+ *   sixteen test suites (boundary, canonical, errors, pins-fidelity,
+ *   ports, rail-snapshot, search-budget, candidates, hard-gates, ranking,
+ *   determinism, pipeline, trigger, manifest, lab-adapter,
+ *   routine-composition) plus the three non-suite test-tier helpers
+ *   (fixtures, compiler-evidence, node.d.ts). Census re-pin = disclosed
+ *   deviation per the ADR-0009 D9 precedent (exact toBe pins kept).
  */
 
 const packageRoot = process.cwd();
@@ -95,7 +99,7 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
       }
     }
     expect(offenders.join("\n")).toBe("");
-    expect(sourceFiles.length).toBe(12);
+    expect(sourceFiles.length).toBe(15);
   });
 
   it("no @payswap/* or @zcode/* import appears ANYWHERE in src (the pin-only law)", () => {
@@ -154,8 +158,8 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
       }
     }
     expect(offenders.join("\n")).toBe("");
-    expect(testFiles.length).toBe(12);
-    expect(allTestFiles.length).toBe(15);
+    expect(testFiles.length).toBe(16);
+    expect(allTestFiles.length).toBe(19);
   });
 
   it("the manifest law + tsconfig carries EXACTLY the one documented type-only paths mapping + a single node.d.ts process declaration", () => {

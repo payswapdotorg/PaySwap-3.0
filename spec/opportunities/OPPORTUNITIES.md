@@ -97,7 +97,7 @@ capabilities (test-layer composition; searchable, never executable).
 cd packages/opportunities && rm -rf node_modules package-lock.json
 npm install --no-workspaces    # exit 0
 npx tsc --noEmit               # 0 diagnostics
-npx vitest run                 # 12 files / 181 tests, ALL PASS, ~3s, fully offline
+npx vitest run                 # 17 files / 250 tests, ALL PASS, ~3s, fully offline
 node -e "import('./src/index.ts')..."   # 113 exports (76 functions + 37 consts)
 ```
 

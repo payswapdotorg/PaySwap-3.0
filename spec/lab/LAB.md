@@ -90,7 +90,7 @@ program's intelligence layer references for advisory evidence
 cd packages/lab && rm -rf node_modules package-lock.json
 npm install --no-workspaces    # exit 0
 npx tsc --noEmit               # 0 diagnostics
-npx vitest run                 # 16 files / 147 tests, ALL PASS, ~8s, fully offline
+npx vitest run                 # 18 files / 169 tests, ALL PASS, ~8s, fully offline
 ```
 
 ## 5. Known limitations (honest, recorded — never hidden)

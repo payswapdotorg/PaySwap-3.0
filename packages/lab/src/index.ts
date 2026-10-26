@@ -180,6 +180,46 @@ export type {
   CounterfactualResult,
 } from "./counterfactual.ts";
 
+// Named single interventions over frozen recorded facts + the bounded
+// scenario suite plan (P16-B, B4/B5 — wired into the barrel by the P16-D
+// TL lane; ADR-0009 D3/D5/D6).
+export {
+  INTERVENTION_KINDS,
+  THIRD_PARTY_NODE_ROLES,
+  InterventionError,
+  validateIntervention,
+  applyIntervention,
+  runInterventionCounterfactual,
+} from "./interventions.ts";
+export type {
+  InterventionKind,
+  ThirdPartyNodeRole,
+  RailAddedIntervention,
+  RailRemovedIntervention,
+  PoolFundedIntervention,
+  ThirdPartyNodeJoinsIntervention,
+  InterventionDemand,
+  GroupDemandAddedIntervention,
+  IncidentAppliedIntervention,
+  CreditCommitmentIntervention,
+  ScenarioIntervention,
+  VariantFacts,
+  InterventionCounterfactualInput,
+  InterventionCounterfactualResult,
+} from "./interventions.ts";
+export {
+  BUDGET_DIMENSIONS,
+  ScenarioBudgetError,
+  planScenarioSuite,
+} from "./scenario-budget.ts";
+export type {
+  BudgetDimension,
+  ScenarioSearchBudget,
+  TruncationReceipt,
+  ScenarioCoverage,
+  ScenarioSuitePlan,
+} from "./scenario-budget.ts";
+
 // Executable search + replaceable plug-ins.
 export {
   buildLabSearchIndex,

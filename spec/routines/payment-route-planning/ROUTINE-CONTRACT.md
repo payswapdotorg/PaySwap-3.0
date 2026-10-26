@@ -99,3 +99,30 @@ Validate manifest shape, schema version, digest, handler allowlist and capabilit
 - User is shown available-now routes separately from conditional opportunities and may choose Proceed or Wait; waiting can be cancelled/resumed and never dispatches itself.
 - Revalidation invalidates stale plans. Material route/amount/destination/policy change requires a new preview and fresh explicit scoped authorization.
 - Every effect is created by existing PaySwap authorities with lineage, idempotency and authoritative reconciliation. Offline/contract/sandbox/live proof tiers are separate.
+
+## Appendix A — the typed trigger and the routine manifest (the P16-D implementation contract)
+
+**Status:** frozen implementation contract for `packages/route-planning` Lane D (ADR-0009 D1–D3). The trigger and manifest below are the ONLY construction paths into the routine; everything else in this contract describes what they orchestrate.
+
+### A.1 The typed routine trigger (`src/trigger.ts`)
+
+- `buildRoutePlanningTrigger` accepts the ALREADY-VALIDATED pin — the exact-10-key `MoneyMovementIntentPin` or the exact-11-key `PaymentIntentPin` — plus the caller-supplied `acceptedAt` instant and one idempotency/correlation key. Prose is UNCONSTRUCTIBLE: a string is not assignable to the pin parameter, and the builder re-validates the closed key set fail-closed (typed `TriggerIntentError` — a payment intent carrying `commerceRef` is NOT a valid bare movement record, and vice versa).
+- The builder re-derives TWO value-form digests (ADR-0009 D4 flavor): `intentDigest` over the full intent VALUE, and `hardConstraintsDigest` over the hard-constraint projection `{ constraints, expiresAt }`. A trigger carries the digests, the intent kind (`MONEY_MOVEMENT | PAYMENT`), the intent id and the acceptance instant — never prose, never a re-serialized blob.
+- `RoutePlanningTriggerRegistry.recordStart(trigger)`: idempotent by the idempotency key — the FIRST record starts the routine (`started: true`, the caller-supplied `acceptedAt` becomes `startedAt`); an IDENTICAL re-record (same digests + kind + intentId) REPLAYS (`started: false`, the original `startedAt` returned); a DIVERGENT re-record under the same key is a typed `TriggerConflictError`. `startedFor(key)` is the honest lookup.
+- The trigger establishes NO authorization, NO execution right and NO rail eligibility — it only opens the planning routine (the trigger-semantics section above is the governing law).
+
+### A.2 The fail-closed routine manifest (`src/manifest.ts`)
+
+`PAYMENT_ROUTE_PLANNING_MANIFEST_V1` is the canonical, frozen, versioned routine definition: `routineId` (`payment-route-planning`), `schemaVersion`, `routineVersion`, the TWELVE stages (0 match+load; 1 validate/clarify; 2 discover sender rails; 3 discover recipient rails; 4 compile routes; 5 hard gates + rank; 6 bounded counterfactuals — ADVISORY alternative; 7 discover opportunities; 8 present choices; 9a proceed — the ONLY effect-bearing stage, precondition fresh scoped authorization; 9b wait — ADVISORY alternative that can never dispatch; 10 reconcile+close), the bounded count-based search policy, the trigger event types, the skill identifier + content digest, and the permitted tool/service scopes.
+
+`loadRoutineManifest(candidate)` enforces the ORDERED fail-closed gates, each a DISTINCT machine code on `RoutineManifestError`:
+
+1. `MANIFEST_SHAPE` — an object carrying the required top-level fields;
+2. `MANIFEST_SCHEMA_VERSION` — `schemaVersion` equals the pinned expected value;
+3. `MANIFEST_DIGEST` — the re-derived value-form digest over the manifest VALUE (the canonical b:/n: projection — NEVER a `JSON.stringify` round-trip of parsed text) equals the self-declared `routineDigest`;
+4. `MANIFEST_HANDLER_ALLOWLIST` — every stage handler id is in the pinned first-party allowlist (no shell/script/code bundled from a skill is executable as a handler);
+5. `MANIFEST_AUTHORITY_CLASS` — no discovery/advisory/LLM stage declares an effect class; stage 9a is the only effect-bearing stage and must carry the fresh-authorization precondition; stage 9b is checked BEFORE the generic execute law and can NEVER declare execute;
+6. `MANIFEST_CAPABILITY_BINDINGS` — every engine-requiring stage names its required port binding (the ADR-0009 D2 injected-port law);
+7. `MANIFEST_MISSION_VERSION_PIN` — `pinRoutineVersion(missionId, routineVersion)` is APPEND-ONLY: a mission pinned to a version is never silently re-targeted (a re-pin of the same version replays; a divergent re-pin is a typed error).
+
+`PINNED_SKILL_CONTENT_DIGEST` is the fnv1a64 of the REAL `skills/payment-route-planning/SKILL.md` bytes; the battery re-reads the file and asserts the pin (a drifted skill content is a load failure — fail closed, never a silent mismatch).
