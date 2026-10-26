@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "wave": "P18",
+  "title": "The approval/observation UX over the exposed mission plane",
+  "source": "The P17 closure carry-forward (spec/dependency/work-orders.md P17 closure); the P14-carry-forward renderer exposure narrowed by P17; ADR-0011 (the decision record)",
+  "registration_commit_base": "46cb8850e822dc662ea9966c9b6eb2431d500b64",
+  "policy": "Register only. No P18 implementation or acceptance is claimed by the graph. The approval act crosses the channel ONLY as the two edge-pinned members (ADR-0011 D2): the origin is pinned to PREVIEW_UI_ACT at the channel edge and the renderer can never supply or forge one; the single-use artifact NEVER crosses the channel; the dispatch act stays host-side (D3); the attempt projection carries outcome facts only (no lineage); the panel prose carries no authority-surface machine literals; the honest empty environment is the presented truth (zero connected capability instances; INV-7 blocks the compile without observations); web stays unbound (ADR-0010 D7).",
+  "work_orders": [
+    {
+      "id": "P18-0",
+      "owner": "TL",
+      "status": "COMPLETE",
+      "depends_on": [],
+      "lane_scope": "Source-backed gap matrix (spec/productization/P18-0-GAP-MATRIX-2026-10-26.md — 20 rows verified at 46cb885) + ADR-0011 (docs/architecture-governance/adr/ADR-0011-p18-approval-observation-ux.md — D1 the observation surface; D2 the edge-pinned approval members; D3 the dispatch stays host-side + the attempt-state projection; D4 the file-disjoint lane map; D5 the web boundary; D6 the store disjointness) + the canonical work orders + this graph + the current-state registration. Ordering decision recorded: the approval/observation UX composes directly on P17's exposed members with no external dependency; live-provider route evidence stays operator-gated (the station resets destroyed the P13 test credentials — the honest empty environment is real again); the execution lanes compose on an approval UX that exists."
+    },
+    {
+      "id": "P18-A",
+      "owner": "worker",
+      "status": "PENDING",
+      "depends_on": ["P18-0"],
+      "lane_scope": "Host lane: packages/desktop/src/host/payswap/shell/** + the renderer client mirror (consoleWorkspaceMount.tsx) + the desktop channel tests. The two approval members (request/resolve with the origin + principalRef pinned at the edge; the artifact never on the wire) + the detail DTO's attempts projection (outcome facts only) + the drift-tested member lists both sides + the host batteries."
+    },
+    {
+      "id": "P18-B",
+      "owner": "worker",
+      "status": "PENDING",
+      "depends_on": ["P18-0"],
+      "lane_scope": "App lane: packages/payswap-app/src/agent/** (NEW paymentMissions* files + AgentExperience.tsx) + the barrel + the app tests. The pinned PaymentMissionsPort + the module-level seam + the panel family (board/detail/intake/preview/approve-two-act) + the honest states + the jsdom battery. Zero @payswap/* imports in src."
+    },
+    {
+      "id": "P18-C",
+      "owner": "TL",
+      "status": "PENDING",
+      "depends_on": ["P18-A", "P18-B"],
+      "lane_scope": "TL lane: packages/desktop/src/renderer/** (the NEW paymentMissionsComposition.ts + the main.tsx binding line) + the bridge test. The channel members bound to the port at the business root (honest failure keeps the not-wired default) + the bridge battery over the REAL channel service with deterministic replays."
+    },
+    {
+      "id": "P18-D",
+      "owner": "TL",
+      "status": "PENDING",
+      "depends_on": ["P18-A", "P18-B", "P18-C"],
+      "lane_scope": "TL integration: the integrated batteries at the tip; JOURNEY-MAP §7 + FEATURE-MAP reconciliation (CONTRACT+BRIDGE tier, no live-tier claim); the P18 graph closure; the current-state closure; the bundle archive per ADR-0009 D7; the honest carry-forward record (the dispatch act + the execution lanes; live-provider route evidence; the store reconciliation question)."
+    }
+  ],
+  "frontier_after_registration": ["P18-A", "P18-B"],
+  "closure_policy": "P18 closes only when P18-A/B/C/D are all accepted on main with their batteries green at the tip and the honest carry-forward recorded. No live-tier claim is permitted: zero connected capability instances is the deployment fact; the approval machinery is real but unreachable in practice until a real connection observes a funding source (INV-7) — the panel presents that truth honestly.",
+  "closure": null
+}
