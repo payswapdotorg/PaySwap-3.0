@@ -26,6 +26,8 @@
     "../payswap-app/src",
     "test/payswap/desktop-console-client.test.ts",
     "test/payswap/payment-approval-plane-harness.ts",
-    "test/payswap/payment-missions-binding.test.ts"
+    "test/payswap/payment-missions-binding.test.ts",
+    "test/payswap/payment-missions-dispatch-binding.test.ts",
+    "test/payswap/payment-dispatch-plane-fixtures.ts"
   ]
 }

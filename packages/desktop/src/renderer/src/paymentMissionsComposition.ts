@@ -34,11 +34,14 @@ import {
   resetSharedPaymentMissionsPort,
   type PaymentMissionsApprovalResolution,
   type PaymentMissionsPort,
+  type PaymentMissionsPortWithDispatch,
 } from "@payswap/app";
 import type { DesktopConsoleChannelServices } from "./consoleWorkspaceMount.js";
 import type {
   PaySwapPaymentAuthorizationRequestDto,
   PaySwapPaymentAuthorizationResolutionDto,
+  PaySwapPaymentDispatchOutcomeDto,
+  PaySwapPaymentMissionArmedEffectDto,
   PaySwapPaymentMissionBoardItemDto,
   PaySwapPaymentMissionDetailDto,
   PaySwapPaymentPreviewDto,
@@ -67,6 +70,11 @@ export interface MissionPlaneApprovalChannelClient {
     requestId: string,
     decision: "APPROVE" | "DECLINE",
   ): Promise<PaySwapPaymentAuthorizationResolutionDto>;
+  paymentMissionArmedEffect(missionId: string): Promise<PaySwapPaymentMissionArmedEffectDto>;
+  paymentMissionDispatch(
+    missionId: string,
+    connectionRef: string,
+  ): Promise<PaySwapPaymentDispatchOutcomeDto>;
 }
 
 /** The wire shapes are the pin shapes structurally (the mirror pins both sides). */
@@ -106,7 +114,7 @@ function isHostPlaneNotConfigured(thrown: unknown): boolean {
  */
 export function channelPaymentMissionsPort(
   services: DesktopConsoleChannelServices,
-): PaymentMissionsPort {
+): PaymentMissionsPortWithDispatch {
   const client = services.payswapDesktopService as unknown as MissionPlaneApprovalChannelClient;
   const guard = async <T>(call: () => Promise<T>): Promise<T> => {
     try {
@@ -130,14 +138,17 @@ export function channelPaymentMissionsPort(
     requestApproval: (missionId) => guard(() => client.paymentMissionRequestApproval(missionId)),
     resolveApproval: (requestId, decision) =>
       guard(async () => mapResolution(await client.paymentMissionResolveApproval(requestId, decision))),
+    armedEffect: (missionId) => guard(() => client.paymentMissionArmedEffect(missionId)),
+    dispatch: (missionId, connectionRef) =>
+      guard(() => client.paymentMissionDispatch(missionId, connectionRef)),
   };
 }
 
 /* ------------------------------ the composition ------------------------------ */
 
-/** The composed binding handle (the port + the reset for the bridge-tier battery). */
+/** The composed binding handle (the dispatch-capable port + the reset for the bridge-tier battery). */
 export interface PaymentMissionsComposition {
-  readonly port: PaymentMissionsPort;
+  readonly port: PaymentMissionsPortWithDispatch;
   /** Restore the seam's honest default (unbound — the not-wired note). */
   readonly reset: () => void;
 }
@@ -151,7 +162,7 @@ export interface PaymentMissionsComposition {
  */
 export function composePaymentMissionsBinding(options: {
   readonly services?: DesktopConsoleChannelServices;
-  readonly port?: PaymentMissionsPort;
+  readonly port?: PaymentMissionsPortWithDispatch;
 }): PaymentMissionsComposition {
   const port =
     options.port ?? (options.services !== undefined ? channelPaymentMissionsPort(options.services) : null);
