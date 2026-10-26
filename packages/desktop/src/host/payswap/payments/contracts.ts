@@ -85,30 +85,24 @@ export function isTerminalPaymentTaskStatus(status: PaymentTaskStatus): boolean 
   return TERMINAL_PAYMENT_TASK_STATUSES.includes(status);
 }
 
-/** Mirrors AGENT_TASK_EVENT_KINDS (append-only mission event kinds; the
- * P16-D wait kinds are APPENDED after EXPIRED). */
+/**
+ * Mirrors AGENT_TASK_EVENT_KINDS (append-only mission event kinds; the
+ * P16-D wait kinds are APPENDED after EXPIRED) PLUS the payment plane's
+ * own PLAN_SELECTION_RECORDED (P17-A, ADR-0010 D3), appended after the
+ * shared 21 — the payment-mission event vocabulary is a strict superset
+ * of the shared agent-task one (22 kinds), and the mirror test pins
+ * both sides of that split.
+ */
 export const PAYMENT_TASK_EVENT_KINDS = [
-  "CREATED",
-  "RESUMED",
-  "FIELD_CAPTURED",
-  "MISSING_FIELD_ASKED",
-  "VALIDATED",
-  "PREVIEW_PRESENTED",
-  "AUTHORIZATION_GRANTED",
-  "AUTHORIZATION_DECLINED",
-  "EXTERNAL_RETURN_VALIDATED",
-  "EXTERNAL_RETURN_REJECTED",
-  "ATTEMPT_STARTED",
-  "ATTEMPT_CONFIRMED",
-  "ATTEMPT_FAILED",
-  "OUTCOME_UNKNOWN",
-  "RECONCILED",
-  "CANCELLED",
-  "EXPIRED",
-  "WAIT_STARTED",
-  "WAIT_CRITERIA_RECORDED",
-  "OPPORTUNITY_MATCHED",
-  "WAIT_EXPIRED",
+  "CREATED", "RESUMED", "FIELD_CAPTURED", "MISSING_FIELD_ASKED", "VALIDATED",
+  "PREVIEW_PRESENTED", "AUTHORIZATION_GRANTED", "AUTHORIZATION_DECLINED",
+  "EXTERNAL_RETURN_VALIDATED", "EXTERNAL_RETURN_REJECTED", "ATTEMPT_STARTED",
+  "ATTEMPT_CONFIRMED", "ATTEMPT_FAILED", "OUTCOME_UNKNOWN", "RECONCILED",
+  "CANCELLED", "EXPIRED",
+  // The P16-D wait kinds (appended after EXPIRED — the shared vocabulary's own append).
+  "WAIT_STARTED", "WAIT_CRITERIA_RECORDED", "OPPORTUNITY_MATCHED", "WAIT_EXPIRED",
+  // The payment plane's own kind (P17-A, ADR-0010 D3 — the stage-9a landing site).
+  "PLAN_SELECTION_RECORDED",
 ] as const;
 export type PaymentTaskEventKind = (typeof PAYMENT_TASK_EVENT_KINDS)[number];
 
@@ -296,6 +290,53 @@ export interface PaymentAttemptRecord {
 }
 
 // ---------------------------------------------------------------------------
+// The stage-9a plan-selection record (P17-A, ADR-0010 D3)
+// ---------------------------------------------------------------------------
+
+/**
+ * The mission's latest selected route-planning plan (P17-A, ADR-0010
+ * D3 — the stage-9a landing site). IT IS A RECORD, NEVER AN
+ * AUTHORIZATION: the composer still NEVER writes AUTHORIZATION_GRANTED
+ * (ADR-0009 D8), the scoped approval artifact is still minted LATER,
+ * against the presented preview (the origin law in
+ * authorization-gate.ts — only a PREVIEW_UI_ACT approves), and the
+ * dispatch command is unchanged. This record only names the plan the
+ * demand-side mission intends to pursue; the events stay append-only
+ * while the field carries the LATEST selection (re-selection replaces
+ * the field, never the history). Fields: the plan id (opaque; the
+ * intelligence layer owns its format), the digest of the exact route
+ * view the selection was made against (tamper-evident lineage), the
+ * producing routine, its pinned version, and the selection instant.
+ */
+export interface PaymentMissionPlanSelection {
+  readonly planId: string;
+  readonly viewDigest: string;
+  readonly routineId: string;
+  readonly routineVersion: string;
+  readonly selectedAt: string;
+}
+
+/**
+ * The honest field maxima for a plan selection (bounded strings, never
+ * trimmed — an over-limit value is a typed refusal, not a haircut),
+ * derived from the REAL authority formats (see the field docs above).
+ */
+export const PAYMENT_PLAN_SELECTION_LIMITS = Object.freeze({
+  planId: 160,
+  viewDigest: 64,
+  routineId: 96,
+  routineVersion: 32,
+} as const);
+
+/** The pinned, bounded input a plan selection is recorded from (the service stamps selectedAt). */
+export interface PaymentMissionPlanSelectionInput {
+  readonly planId: string;
+  readonly viewDigest: string;
+  readonly routineId: string;
+  readonly routineVersion: string;
+}
+
+// ---------------------------------------------------------------------------
 // The durable mission record
 // ---------------------------------------------------------------------------
 
@@ -323,6 +364,11 @@ export interface PaymentMissionRecord {
   readonly intent?: CompiledPaymentIntent;
   /** The presented preview id, once a preview passed the gate chain. */
   readonly previewId?: string;
+  /**
+   * The latest stage-9a plan selection (P17-A, ADR-0010 D3) — a RECORD,
+   * never an authorization (see PaymentMissionPlanSelection).
+   */
+  readonly planSelection?: PaymentMissionPlanSelection;
   /** The consumed authorization artifact id, once dispatch was armed. */
   readonly authorizationArtifactId?: string;
   /** Consequential attempts (execution + compensation), in start order. */
@@ -344,46 +390,11 @@ export type CompiledPaymentIntent = CanonicalPaymentIntent;
 export type { CanonicalFundsLocationRef };
 
 // ---------------------------------------------------------------------------
-// Typed errors (fail-closed; never stringly-typed control flow)
+// Typed errors (fail-closed; never stringly-typed control flow) — the
+// family lives in ./payment-mission-errors.ts (the ≤400-line file law
+// split) and is re-exported here so the contracts module stays the
+// payments tree's single import surface.
 // ---------------------------------------------------------------------------
 
-export type PaymentMissionErrorKind =
-  | "MISSION_NOT_FOUND"
-  | "INVALID_TRANSITION"
-  | "FIELD_ALREADY_CAPTURED"
-  | "INVALID_FIELD_VALUE"
-  | "INTAKE_INCOMPLETE"
-  | "GATES_BLOCKED"
-  | "PREVIEW_REQUIRED"
-  | "PREVIEW_EXPIRED"
-  | "AUTHORIZATION_REQUIRED"
-  | "AUTHORIZATION_ORIGIN_REJECTED"
-  | "AUTHORIZATION_EXPIRED"
-  | "AUTHORIZATION_CONSUMED"
-  | "AUTHORIZATION_MISMATCH"
-  | "IDEMPOTENCY_CONFLICT"
-  | "RETRY_BLOCKED_UNKNOWN"
-  | "RECONCILIATION_NOT_PENDING"
-  | "RECONCILIATION_EVIDENCE_INVALID"
-  | "MISSION_TERMINAL"
-  | "STORE_NOT_CONFIGURED"
-  | "PERSISTENCE_FAILED";
-
-/** The one typed error family of the payment-mission runtime. */
-export class PaymentMissionError extends Error {
-  readonly kind: PaymentMissionErrorKind;
-  readonly missionId?: string;
-  readonly reasons?: readonly string[];
-
-  constructor(
-    kind: PaymentMissionErrorKind,
-    message: string,
-    details: { readonly missionId?: string; readonly reasons?: readonly string[] } = {},
-  ) {
-    super(message);
-    this.name = "PaymentMissionError";
-    this.kind = kind;
-    if (details.missionId !== undefined) this.missionId = details.missionId;
-    if (details.reasons !== undefined) this.reasons = details.reasons;
-  }
-}
+export { PaymentMissionError } from "./payment-mission-errors.js";
+export type { PaymentMissionErrorKind } from "./payment-mission-errors.js";

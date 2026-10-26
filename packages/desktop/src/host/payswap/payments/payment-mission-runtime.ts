@@ -39,9 +39,12 @@
 import { createMissionLifecycleService } from "./mission-lifecycle.js";
 import { createMissionAuthorizationService } from "./mission-authorization.js";
 import {
+  PAYMENT_PLAN_SELECTION_LIMITS,
   PaymentMissionError,
   type PaymentMissionDirection,
   type PaymentMissionEvent,
+  type PaymentMissionPlanSelection,
+  type PaymentMissionPlanSelectionInput,
   type PaymentMissionRecord,
   type PaymentTaskOrigin,
 } from "./contracts.js";
@@ -138,6 +141,19 @@ export interface PaymentMissionRuntime {
     missionId: string,
     fieldId: Parameters<typeof captureIntakeField>[1],
     value: unknown,
+    now: string,
+  ): Promise<PaymentMissionRecord>;
+  /**
+   * Record the stage-9a plan selection (P17-A, ADR-0010 D3): a RECORD,
+   * never an authorization — the PLAN_SELECTION_RECORDED event appends
+   * (the timeline is append-only) while the record's planSelection
+   * field carries the LATEST selection (re-selection replaces the
+   * field, never the history). The approval artifact is still minted
+   * later, against the presented preview, by an explicit user UI act.
+   */
+  recordPlanSelection(
+    missionId: string,
+    input: PaymentMissionPlanSelectionInput,
     now: string,
   ): Promise<PaymentMissionRecord>;
   /** Run the six gates (pure read — no mutation; surfaces may render the aggregate). */
@@ -312,6 +328,42 @@ export function createPaymentMissionRuntime(
         updated = captureIntakeField(mission, fieldId, value as never, now);
         return { ...state, missions: replaceMission(state.missions, updated) };
       });
+      return updated;
+    },
+
+    async recordPlanSelection(missionId, input, now) {
+      if (typeof now !== "string" || Number.isNaN(Date.parse(now))) {
+        throw new PaymentMissionError("INVALID_FIELD_VALUE", "now must be an ISO-8601 UTC instant");
+      }
+      const limits = PAYMENT_PLAN_SELECTION_LIMITS;
+      for (const field of ["planId", "viewDigest", "routineId", "routineVersion"] as const) {
+        const value = input[field];
+        const limit = limits[field];
+        if (typeof value !== "string" || value.trim().length === 0 || value.length > limit) {
+          throw new PaymentMissionError(
+            "INVALID_FIELD_VALUE",
+            `plan selection ${field} must be a non-empty string of at most ${String(limit)} characters (bounded, never trimmed)`,
+            { missionId },
+          );
+        }
+      }
+      let updated!: PaymentMissionRecord;
+      await options.store.commit((state) => {
+        const mission = requireActive(core.requireMission(state, missionId));
+        const selection: PaymentMissionPlanSelection = { ...input, selectedAt: now };
+        const withEvent = core.appendEvent(
+          mission,
+          "PLAN_SELECTION_RECORDED",
+          `Plan ${input.planId} selected from the ${input.routineId} routine (v${input.routineVersion}, view digest ${input.viewDigest}) — a RECORD only, never an authorization: the scoped approval artifact is minted later, against the presented preview, by an explicit user UI act.`,
+          now,
+        );
+        updated = { ...withEvent, planSelection: selection };
+        return { ...state, missions: replaceMission(state.missions, updated) };
+      });
+      core.log(
+        "info",
+        `payswap-payments: plan selection recorded for mission ${missionId} (${input.planId}) — record only, never an authorization`,
+      );
       return updated;
     },
 

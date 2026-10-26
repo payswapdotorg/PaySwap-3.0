@@ -41,6 +41,18 @@ import type {
   PinnedMissionSummary,
 } from "../pins/index.js";
 import type { WorkspaceStoreHealthReport } from "../product/workspace-store-persistence.js";
+import type { IPaySwapDesktopPaymentMissionMembers } from "./payment-mission-contracts.js";
+export type {
+  IPaySwapDesktopPaymentMissionMembers,
+  PaymentMissionBoardItemDto,
+  PaymentMissionDetailDto,
+  PaymentMissionEventDto,
+  PaymentMissionSeedInputDto,
+  PaymentMissionSeedOutcomeDto,
+  PaymentPreviewDto,
+  PaymentPreviewGateDecisionDto,
+  PaymentPreviewGatesDto,
+} from "./payment-mission-contracts.js";
 
 // ---------------------------------------------------------------------------
 // Channel identity (substrate ServiceChannels convention: kebab-case)
@@ -136,9 +148,13 @@ export interface PaySwapDesktopTransportSeam {
  * workspace members (deploymentFacts + the workspace store surface) carry
  * the same law: the workspace store holds DEMAND-SIDE MISSION INTENT
  * ONLY (§5 of spec/surface/CONSOLE-WORKSPACE.md) — never financial
- * truth, never authorization, never capability state.
+ * truth, never authorization, never capability state. The P17-A
+ * payment-mission members (read/input verbs only — see
+ * ./payment-mission-contracts.ts) expose the mission plane with the
+ * same discipline: no authorization member, no artifact plane, no
+ * authority verb (ADR-0010 D2).
  */
-export interface IPaySwapDesktopService {
+export interface IPaySwapDesktopService extends IPaySwapDesktopPaymentMissionMembers {
   /** The session this service instance serves (window/session seam). */
   readonly session: PaySwapDesktopSession;
 
@@ -257,6 +273,13 @@ export interface IPaySwapDesktopService {
 
   /** Revoke a connection (principal act — deletes the sealed credential). */
   connectionRevoke(connectionId: string): Promise<import("../connections/contracts.js").DesktopConnectionStatusView>;
+
+  // -------------------------------------------------------------------------
+  // The payment-mission plane (P17-A, ADR-0010 D2) — read/input members
+  // declared in ./payment-mission-contracts.ts (the no-authority-verb
+  // law holds; authorization stays minted host-side behind the origin
+  // law — no approval member is exposed on this channel).
+  // -------------------------------------------------------------------------
 }
 
 // ---------------------------------------------------------------------------
@@ -286,6 +309,16 @@ export interface PaySwapDesktopHostSeam {
    * to be persistent.
    */
   readonly storeDirectory?: string;
+  /**
+   * (P17-A, optional) The directory the payment-mission store persists
+   * its JSON snapshot under — a sibling "payments" directory under the
+   * same user-data root as the workspace store (derived by the host
+   * bootstrap from PAYSWAP_WORKSPACE_STORE_DIR). When ABSENT, the
+   * payment-mission runtime is NOT composed and every paymentMission*
+   * member fails closed with the typed PAYMENT_PLANE_NOT_CONFIGURED
+   * error on first use — the same honest posture as the workspace store.
+   */
+  readonly paymentsStoreDirectory?: string;
 }
 
 /** Composition diagnostics returned by the host registration helper. */

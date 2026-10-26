@@ -25,7 +25,13 @@ export {
   registerPaySwapDesktopService,
   PAYSWAP_DESKTOP_TRANSPORT_SEAM,
   WORKSPACE_STORE_NODE_FILE_SYSTEM,
+  PAYMENTS_STORE_NODE_FILE_SYSTEM,
+  composePaymentMissionRuntime,
+  derivePaymentsStoreDirectory,
 } from "./composition.js";
 
 export { createPaySwapDesktopService } from "./service.js";
 export type { PaySwapDesktopServiceOptions } from "./service.js";
+export { ConnectionPlaneNotConfiguredError, PaymentPlaneNotConfiguredError } from "./service.js";
+export { createPaymentMissionChannelMembers } from "./payment-mission-members.js";
+export type { PaymentMissionChannelDeps } from "./payment-mission-members.js";

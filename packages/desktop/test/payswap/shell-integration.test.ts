@@ -82,10 +82,10 @@ describe("shell session laws (P7-W2)", () => {
 });
 
 describe("host composition laws (P7-W2)", () => {
-  it("registerPaySwapDesktopService registers the product into the substrate ServiceCollection under its channel", () => {
+  it("registerPaySwapDesktopService registers the product into the substrate ServiceCollection under its channel", async () => {
     const { seam, lines } = recordingSeam();
     const services = new ServiceCollection();
-    const record = registerPaySwapDesktopService(services, seam, {
+    const record = await registerPaySwapDesktopService(services, seam, {
       createSessionId: () => "session-9",
     });
     const resolved = services.get(IPaySwapDesktopServiceDescriptor);
@@ -103,10 +103,10 @@ describe("host composition laws (P7-W2)", () => {
     );
   });
 
-  it("the registered service is retrievable through the collection's getOptional (exposure path precondition)", () => {
+  it("the registered service is retrievable through the collection's getOptional (exposure path precondition)", async () => {
     const { seam } = recordingSeam();
     const services = new ServiceCollection();
-    registerPaySwapDesktopService(services, seam);
+    await registerPaySwapDesktopService(services, seam);
     expect(services.getOptional(IPaySwapDesktopServiceDescriptor)).toBeDefined();
   });
 });
@@ -218,7 +218,7 @@ describe("console workspace service members (P10-B)", () => {
   it("the workspace members are registered + callable through the channel descriptor (full lifecycle)", async () => {
     const { seam } = recordingSeam();
     const services = new ServiceCollection();
-    registerPaySwapDesktopService(services, { ...seam, storeDirectory: "/memory/workspace" }, {
+    await registerPaySwapDesktopService(services, { ...seam, storeDirectory: "/memory/workspace" }, {
       workspaceStoreFileSystem: memoryFileSystem(new Map()),
     });
     const resolved = services.get(IPaySwapDesktopServiceDescriptor);
@@ -263,7 +263,7 @@ describe("console workspace service members (P10-B)", () => {
     const directory = await mkdtemp(join(tmpdir(), "payswap-shell-"));
     try {
       const services = new ServiceCollection();
-      registerPaySwapDesktopService(services, { ...seam, storeDirectory: directory });
+      await registerPaySwapDesktopService(services, { ...seam, storeDirectory: directory });
       const resolved = services.get(IPaySwapDesktopServiceDescriptor);
       const draft = await resolved.workspaceRecordMissionDraft(VALID_INTAKE, NOW);
       // The snapshot exists on disk after the mutation (save-after-each-mutation).

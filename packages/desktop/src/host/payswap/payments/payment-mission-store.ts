@@ -38,6 +38,7 @@ import {
 } from "./payments-snapshot-format.js";
 import {
   PAYMENT_MISSION_DIRECTIONS,
+  PAYMENT_PLAN_SELECTION_LIMITS,
   PAYMENT_TASK_ORIGINS,
   PAYMENT_TASK_STATUSES,
 } from "./contracts.js";
@@ -82,12 +83,24 @@ export type StoredPaymentPreview = PaymentPreviewRecord;
 
 const MISSION_ID_PATTERN = /^task:PAYMENT_MISSION:[0-9a-f]{32}$/;
 const ISO_UTC_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
-const PAYMENT_EVENT_KINDS: readonly string[] = [
+const PLAN_SELECTION_KEYS = ["planId", "viewDigest", "routineId", "routineVersion", "selectedAt"] as const;
+/**
+ * The store's own RE-PINNED event-kind list (P17-A, ADR-0010 D3): the
+ * full 22-kind payment-mission vocabulary, re-pinned deliberately —
+ * NOT imported from contracts.ts — so the persisted-record validator
+ * drifts only through a conscious two-step change caught by the mirror
+ * test. The P16-D defect (this list pinned only 17 kinds, missing the
+ * four wait kinds, so a mission persisting a wait event loaded into
+ * QUARANTINE) is the reason this list is pinned EXACTLY to the full
+ * contracts set and drift-tested against it.
+ */
+export const PAYMENT_EVENT_KINDS: readonly string[] = [
   "CREATED", "RESUMED", "FIELD_CAPTURED", "MISSING_FIELD_ASKED", "VALIDATED",
   "PREVIEW_PRESENTED", "AUTHORIZATION_GRANTED", "AUTHORIZATION_DECLINED",
   "EXTERNAL_RETURN_VALIDATED", "EXTERNAL_RETURN_REJECTED", "ATTEMPT_STARTED",
   "ATTEMPT_CONFIRMED", "ATTEMPT_FAILED", "OUTCOME_UNKNOWN", "RECONCILED",
-  "CANCELLED", "EXPIRED",
+  "CANCELLED", "EXPIRED", "WAIT_STARTED", "WAIT_CRITERIA_RECORDED",
+  "OPPORTUNITY_MATCHED", "WAIT_EXPIRED", "PLAN_SELECTION_RECORDED",
 ];
 const INTAKE_FIELD_IDS: readonly string[] = [
   "amountAndCurrency", "fundingSource", "recipient", "countryCorridor",
@@ -167,6 +180,39 @@ export function paymentMissionRecordStructureFinding(candidate: unknown): string
   }
   if (record["attempts"] !== undefined && !Array.isArray(record["attempts"])) {
     return "mission attempts must be an array";
+  }
+  if (record["planSelection"] !== undefined) {
+    const finding = planSelectionStructureFinding(record["planSelection"]);
+    if (finding !== null) {
+      return finding;
+    }
+  }
+  return null;
+}
+
+/**
+ * Fail-closed structural validation of a persisted plan selection (the
+ * stage-9a record, P17-A): malformed → finding, NEVER coerced — a
+ * tampered or partial selection never loads as mission state.
+ */
+function planSelectionStructureFinding(candidate: unknown): string | null {
+  if (candidate === null || typeof candidate !== "object" || Array.isArray(candidate)) {
+    return "mission planSelection must be an object";
+  }
+  const selection = candidate as Readonly<Record<string, unknown>>;
+  const keys = Object.keys(selection).sort().join(",");
+  if (keys !== [...PLAN_SELECTION_KEYS].sort().join(",")) {
+    return "mission planSelection must carry exactly planId, viewDigest, routineId, routineVersion and selectedAt";
+  }
+  const limits = PAYMENT_PLAN_SELECTION_LIMITS;
+  for (const field of ["planId", "viewDigest", "routineId", "routineVersion"] as const) {
+    const value = selection[field];
+    if (typeof value !== "string" || value.trim().length === 0 || value.length > limits[field]) {
+      return `mission planSelection.${field} must be a non-empty string of at most ${String(limits[field])} characters`;
+    }
+  }
+  if (typeof selection["selectedAt"] !== "string" || !ISO_UTC_PATTERN.test(selection["selectedAt"])) {
+    return "mission planSelection.selectedAt must be an ISO-8601 UTC instant";
   }
   return null;
 }

@@ -94,6 +94,14 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       "deploymentFacts",
       "journeyState",
       "missionBoard",
+      // P17-A payment-mission members (read/input verbs only).
+      "paymentMissionAskNextField",
+      "paymentMissionBoard",
+      "paymentMissionCapture",
+      "paymentMissionDetail",
+      "paymentMissionPresentPreview",
+      "paymentMissionRecordPlanSelection",
+      "paymentMissionSeed",
       "progressTimeline",
       "quoteDisclosure",
       "securityDecision",
@@ -111,6 +119,29 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
   it("no authority-verb member may appear on the channel (the no-parallel-engine law)", () => {
     for (const member of PAYSWAP_DESKTOP_CLIENT_MEMBERS) {
       expect(member).not.toMatch(/^(execute|retry|cancel|confirm|settle|payout|approve)/);
+    }
+    // The P17-A mission-plane names all pass the law (ADR-0010 D2).
+    for (const member of [
+      "paymentMissionBoard",
+      "paymentMissionDetail",
+      "paymentMissionSeed",
+      "paymentMissionAskNextField",
+      "paymentMissionCapture",
+      "paymentMissionPresentPreview",
+      "paymentMissionRecordPlanSelection",
+    ]) {
+      expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).toContain(member);
+    }
+    // The authorization/dispatch plane stays HOST-SIDE: none of its
+    // verbs is exposed on the channel (ADR-0010 D2 — the D7 chain).
+    for (const forbidden of [
+      "requestAuthorization",
+      "resolveAuthorization",
+      "dispatch",
+      "approveAuthorization",
+      "executePayment",
+    ]) {
+      expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).not.toContain(forbidden);
     }
   });
 });

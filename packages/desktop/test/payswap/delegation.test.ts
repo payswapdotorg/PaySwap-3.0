@@ -118,6 +118,16 @@ describe("delegated money movement laws (P7-W2)", () => {
       "deploymentFacts",
       "journeyState",
       "missionBoard",
+      // P17-A payment-mission members (ADR-0010 D2): read/input verbs
+      // ONLY — the authorization/dispatch plane stays host-side behind
+      // the origin law (no approval member exists on the service).
+      "paymentMissionAskNextField",
+      "paymentMissionBoard",
+      "paymentMissionCapture",
+      "paymentMissionDetail",
+      "paymentMissionPresentPreview",
+      "paymentMissionRecordPlanSelection",
+      "paymentMissionSeed",
       "progressTimeline",
       "quoteDisclosure",
       "securityDecision",

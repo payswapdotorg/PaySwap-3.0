@@ -65,7 +65,7 @@ import {
   type HostApiNetworkTransport,
   type OffPeakRequestAuthBuilder,
 } from "@zcode/services/node";
-import { registerPaySwapDesktopService } from "./payswap/index.js";
+import { derivePaymentsStoreDirectory, registerPaySwapDesktopService } from "./payswap/index.js";
 import { createHostResourceUsageResponder } from "./hostResourceUsage.js";
 import {
   assertBoundSessionDispatchable,
@@ -2909,12 +2909,23 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
         // lives in @zcode/shared so the message path is not lane-editable).
         // The composition edge injects the node:fs binding; an absent
         // directory fails closed with a typed error on first use.
-        registerPaySwapDesktopService(services, {
+        // P17-A: the seam ALSO carries the sibling payments directory
+        // (derived from the same env root: <userData>/payments) — the
+        // composition edge composes the payment-mission runtime over it
+        // (store + honest-unwired authority + recoverInterruptions once)
+        // and registers the read/input channel members; an absent env
+        // leaves the runtime un-injected and the members fail closed
+        // with the typed PaymentPlaneNotConfiguredError.
+        const payswapWorkspaceStoreDir = process.env.PAYSWAP_WORKSPACE_STORE_DIR?.trim() || undefined;
+        await registerPaySwapDesktopService(services, {
           scope: { kind: "local" },
           log: (level, message, ...args) => {
             writeHostLog(level, message, ...args);
           },
-          storeDirectory: process.env.PAYSWAP_WORKSPACE_STORE_DIR?.trim() || undefined,
+          storeDirectory: payswapWorkspaceStoreDir,
+          ...(payswapWorkspaceStoreDir !== undefined
+            ? { paymentsStoreDirectory: derivePaymentsStoreDirectory(payswapWorkspaceStoreDir) }
+            : {}),
         });
         hasDisposedHostResources = false;
         disposeHostResourcesInFlight = null;

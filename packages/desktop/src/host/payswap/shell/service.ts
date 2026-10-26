@@ -58,6 +58,18 @@ import type {
   PinnedMissionRecord,
   PinnedMissionSummary,
 } from "../pins/index.js";
+import type { PaymentMissionRuntime } from "../payments/payment-mission-runtime.js";
+import {
+  createPaymentMissionChannelMembers,
+  createPaymentMissionRuntimeResolver,
+} from "./payment-mission-members.js";
+import { ConnectionPlaneNotConfiguredError } from "./plane-errors.js";
+
+/** The typed fail-closed plane errors live in ./plane-errors.ts (the ≤400-line file-law split); re-exported for the established import surface. */
+export {
+  ConnectionPlaneNotConfiguredError,
+  PaymentPlaneNotConfiguredError,
+} from "./plane-errors.js";
 
 /** Options for constructing the service (id generation injectable — deterministic tests). */
 export interface PaySwapDesktopServiceOptions {
@@ -81,17 +93,15 @@ export interface PaySwapDesktopServiceOptions {
    * pretending to be durable.
    */
   readonly connectionAuthority?: ConnectionSessionAuthority;
-}
-
-/** The typed fail-closed error for an unconfigured connection plane (the workspace-store precedent). */
-export class ConnectionPlaneNotConfiguredError extends Error {
-  readonly kind = "CONNECTION_PLANE_NOT_CONFIGURED" as const;
-  constructor() {
-    super(
-      "The provider connection plane is not configured in this host (no connection session authority on the seam) — connection calls fail closed",
-    );
-    this.name = "ConnectionPlaneNotConfiguredError";
-  }
+  /**
+   * (P17-A) The payment-mission runtime, composed at the composition
+   * edge over the payments store directory (store → runtime →
+   * recoverInterruptions once). When ABSENT, every paymentMission*
+   * member fails closed with the typed PaymentPlaneNotConfiguredError.
+   */
+  readonly paymentMissionRuntime?: PaymentMissionRuntime;
+  /** (P17-A) The host clock for the payment-mission members — instants are stamped at the channel edge, never renderer-supplied. */
+  readonly paymentMissionClock?: () => string;
 }
 
 function defaultSessionId(): string {
@@ -189,6 +199,14 @@ export function createPaySwapDesktopService(
     }
     return connectionAuthority;
   }
+
+  // (P17-A) The payment-mission plane: read/input members over the
+  // composed runtime, failing closed per-call when it is absent; the
+  // instants are stamped at the channel edge from the injected clock.
+  const seamLog = (level: "info" | "warn" | "error", message: string) => {
+    seam.log(level, message);
+  };
+  const paymentMissionClock = options.paymentMissionClock ?? (() => new Date().toISOString());
 
   const service: IPaySwapDesktopService = {
     session,
@@ -367,6 +385,15 @@ export function createPaySwapDesktopService(
     async connectionRevoke(connectionId: string): Promise<DesktopConnectionStatusView> {
       return resolveConnectionAuthority().revokeConnection(connectionId);
     },
+
+    // (P17-A, ADR-0010 D2) The payment-mission plane — read/input
+    // members over the composed runtime (instants are stamped at the
+    // channel edge from the host clock, never renderer-supplied).
+    ...createPaymentMissionChannelMembers({
+      resolveRuntime: createPaymentMissionRuntimeResolver(options.paymentMissionRuntime, seamLog),
+      now: paymentMissionClock,
+      log: seamLog,
+    }),
   };
   return service;
 }
