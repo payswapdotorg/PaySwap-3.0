@@ -200,3 +200,36 @@ evidence exists in this wave: no Stripe credentials exist in this
 station, so the U1 real-flow E2E gate stays operator-gated (ADR-0007
 D1/D8) and P13 stays OPEN at close (the work-order law) — the sandbox
 gate is NOT marked passed.
+
+## 7. P16 reconciliation (Issue #6 — the loadable payment route planning routine)
+
+The P16 lanes (A: route discovery contracts; B: counterfactual +
+protocol semantics; C: opportunities + wait lifecycle; D: TL
+integration) are closed at the CONTRACT tier. No new web journey is
+claimed — the composer's route-planning panel is an honest PROJECTION
+until the platform host binds the engine port — but the panel's own
+laws are browser-tested, and the routine's engines are contract-tested
+end-to-end:
+
+- `packages/payswap-app/test/payswap/route-planning-session.test.ts`
+  (12 laws: proceed is a REQUEST that never writes AUTHORIZATION_GRANTED;
+  a match records OPPORTUNITY_MATCHED and the task STAYS WAITING;
+  cancel/expire return to ACTIVE; determinism).
+- `packages/payswap-app/test/payswap/route-planning-panel.test.tsx`
+  (6 render laws: the separated sections, the honest notes verbatim,
+  NO dispatch/execute/authorize button anywhere, the unbound engine's
+  honest note).
+- `packages/payswap-app/test/payswap/route-planning-acceptance.test.ts`
+  (4 laws: pin fidelity REAL→PIN; the golden path present→proceed→wait→
+  match STAYS WAITING with the REAL engines bound through the engine
+  port — REAL trigger/manifest/corridor/compiler/scoring/lab/
+  opportunities; byte-identical deterministic replays).
+- `packages/route-planning/test/routine-composition.test.ts` (5 laws:
+  the full offline/contract E2E — trigger→manifest→stages 2–5 REAL
+  corridor+compiler→stage 6 REAL lab→stage 7 REAL opportunities,
+  byte-identical receipts, unbound ports fail CLOSED).
+
+EVIDENCE SEPARATION: these are CONTRACT-tier batteries. The next
+frontier (live-app engine binding + stage-9a desktop authority wiring)
+is what would promote the panel to a real journey; nothing here claims
+live-tier evidence.

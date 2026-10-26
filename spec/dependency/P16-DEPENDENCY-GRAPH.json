@@ -27,7 +27,7 @@
     {
       "id": "P16-A",
       "owner": "worker-1",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETE",
       "depends_on": [
         "P16-0"
       ],
@@ -35,12 +35,15 @@
       "unlocks": [
         "P16-D"
       ],
-      "acceptance": "Real connected instances/observations only; independent sender+receiver evidence; every route-shape exclusion stated; hard gates before scoring; exact deterministic metrics/ranking and search-budget disclosure tested."
+      "acceptance": "Real connected instances/observations only; independent sender+receiver evidence; every route-shape exclusion stated; hard gates before scoring; exact deterministic metrics/ranking and search-budget disclosure tested.",
+      "acceptance_evidence": [
+        "commit b34fa35 (packages/route-planning 12 files/172 tests green + tsc 0, verified at acceptance; route-compiler 353 / capability 230 / economic 105 re-proven; architecture-check 0/0/0)"
+      ]
     },
     {
       "id": "P16-B",
       "owner": "worker-2",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETE",
       "depends_on": [
         "P16-0"
       ],
@@ -48,12 +51,15 @@
       "unlocks": [
         "P16-D"
       ],
-      "acceptance": "Each required counterfactual varies named assumptions over identical base facts; deterministic bounded deltas; gross-obligation history/currency/deadline/backing/consent invariants tested; simulations have no production authority."
+      "acceptance": "Each required counterfactual varies named assumptions over identical base facts; deterministic bounded deltas; gross-obligation history/currency/deadline/backing/consent invariants tested; simulations have no production authority.",
+      "acceptance_evidence": [
+        "commit 047eb62 (lab 18 files/169 tests + protocol 24 files/279 tests green + tsc 0 in both, verified at acceptance)"
+      ]
     },
     {
       "id": "P16-C",
       "owner": "worker-3",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETE",
       "depends_on": [
         "P16-0"
       ],
@@ -61,12 +67,15 @@
       "unlocks": [
         "P16-D"
       ],
-      "acceptance": "Only evidence-backed opportunities become offers; private party/payment data not disclosed without consent; wait mission resumes/cancels/expires safely; matches never dispatch without fresh preview and explicit scoped approval."
+      "acceptance": "Only evidence-backed opportunities become offers; private party/payment data not disclosed without consent; wait mission resumes/cancels/expires safely; matches never dispatch without fresh preview and explicit scoped approval.",
+      "acceptance_evidence": [
+        "commit 98d1c88 (opportunities 17 files/250 tests green + tsc 0, verified at acceptance)"
+      ]
     },
     {
       "id": "P16-D",
       "owner": "TL",
-      "status": "BLOCKED",
+      "status": "COMPLETE",
       "depends_on": [
         "P16-A",
         "P16-B",
@@ -74,8 +83,14 @@
       ],
       "lane_scope": "Integrate typed intent trigger + skill loader + versioned routine manifest and durable mission state machine; expose ranked routes/counterfactuals/proceed-or-wait UX; reconcile maps and deliver end-to-end acceptance.",
       "unlocks": [],
-      "acceptance": "Validated typed payment intent triggers exactly one pinned routine; routine/skill load failure fails closed; real evidence-backed routes and exclusions render distinctly from conditional options; proceed/wait tasks persist/resume; no effect without existing authority and explicit approval; exact-commit E2E and evidence tiers published."
+      "acceptance": "Validated typed payment intent triggers exactly one pinned routine; routine/skill load failure fails closed; real evidence-backed routes and exclusions render distinctly from conditional options; proceed/wait tasks persist/resume; no effect without existing authority and explicit approval; exact-commit E2E and evidence tiers published.",
+      "acceptance_evidence": [
+        "commit fc03434 (Appendix A + trigger/manifest/lab-adapter; route-planning 16 files/209 tests)",
+        "commit adedf5b (wait vocabulary two-step v1.4.0; surface 18f/224t + payswap-app mirrors + desktop mirror 9/9)",
+        "commit 2570804 (proceed-or-wait composer UX + acceptance battery binding REAL engines; payswap-app 37 files/403 tests)",
+        "spec/route-planning/ROUTE-PLANNING.md discipline doc; LAB.md/OPPORTUNITIES.md census receipts"
+      ]
     }
   ],
-  "closure_policy": "Lanes A/B/C are file-disjoint per ADR-0009 D3 and run concurrently; workers do not commit. The TL verifies each lane (battery + tsc --noEmit), commits per lane, and pushes at acceptance (ADR-0009 D7). P16-D integrates and closes the wave; no implementation or acceptance is claimed by this graph beyond recorded statuses."
+  "closure_policy": "Lanes A/B/C are file-disjoint per ADR-0009 D3 and run concurrently; workers do not commit. The TL verifies each lane (battery + tsc --noEmit), commits per lane, and pushes at acceptance (ADR-0009 D7). P16-D integrates and closes the wave; no implementation or acceptance is claimed by this graph beyond recorded statuses. Closed 2026-10-26: all four lanes COMPLETE at the offline/contract tier; frontier emptied; the live-app engine binding, stage-9a desktop authority wiring and live-provider evidence carried forward as named limitations (never claimed)."
 }
