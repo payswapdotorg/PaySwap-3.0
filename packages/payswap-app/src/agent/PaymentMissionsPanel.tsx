@@ -8,17 +8,22 @@
  * the mission-not-found truth and the surfaced ERROR (never a mask).
  * The detail view is ./PaymentMissionsDetail.tsx (a pure projection of
  * its state); the preview + two-act approve flow is
- * ./PaymentMissionsPreviewCard.tsx.
+ * ./PaymentMissionsPreviewCard.tsx; the armed card + the two-act
+ * dispatch flow is ./PaymentMissionsArmedCard.tsx (P19-B — the panel
+ * forwards the dispatch wiring the mount owns).
  *
- * ZERO AUTHORITY (ADR-0011 D3): no control here fires anything — Refresh
- * re-reads, a row opens the detail, Back returns to the board. The
- * approve flow's acts live on the scope card (Confirm / Decline — the
- * ADR-0011 D2 act vocabulary); no dispatch/execute verb exists anywhere.
+ * ZERO AUTHORITY ON THE BOARD (ADR-0011 D3): no control here fires
+ * anything — Refresh re-reads, a row opens the detail, Back returns to
+ * the board. The approve flow's acts live on the scope card (Confirm /
+ * Decline — the ADR-0011 D2 act vocabulary); the dispatch act (the
+ * ADR-0012 D1 narrowing, P19-B) lives on the armed card as a lane
+ * choice + the send confirm — the artifact never crosses.
  * The panel prose is scan-clean: no authority-surface machine literal
  * ever renders (the timeline shows people-language summaries only).
  */
 
 import { PaymentMissionsDetail } from "./PaymentMissionsDetail.js";
+import type { PaymentMissionsDispatchWiring } from "./paymentMissionsDispatchPins.js";
 import {
   PAYMENT_MISSIONS_EMPTY_NOTE,
   PAYMENT_MISSIONS_NOT_WIRED_NOTE,
@@ -48,6 +53,8 @@ export interface PaymentMissionsPanelProps {
   readonly onEngageApproval?: (missionId: string) => void;
   /** Wired only by a host that can resolve the approval on the scope card (act two). */
   readonly onResolveApproval?: (requestId: string, decision: "APPROVE" | "DECLINE") => void;
+  /** The dispatch-flow wiring (null/absent when the bound port lacks the dispatch members — P19-B). */
+  readonly dispatch?: PaymentMissionsDispatchWiring | null;
 }
 
 /** The status badge tone per lifecycle status (terminal failure vs done vs in flight).
@@ -114,6 +121,7 @@ export function PaymentMissionsPanel({
   onPresentPreview,
   onEngageApproval,
   onResolveApproval,
+  dispatch,
 }: PaymentMissionsPanelProps): React.ReactNode {
   const onBoard = view.kind === "BOARD" || view.kind === "BOARD_EMPTY";
   return (
@@ -179,6 +187,7 @@ export function PaymentMissionsPanel({
           onPresentPreview={onPresentPreview}
           onEngageApproval={onEngageApproval}
           onResolveApproval={onResolveApproval}
+          dispatch={dispatch}
         />
       ) : (
         <ol className="ps-agent-missions-list">

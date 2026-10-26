@@ -170,6 +170,30 @@ export {
   type PaymentMissionsView,
   type PaymentMissionsViewKind,
 } from "./agent/paymentMissionsPins.js";
+// The payment-missions dispatch surface (P19-B; ADR-0012 D1): the armed
+// card + the two-act dispatch flow over the composed dispatch-capable
+// port — the lane choice and the send confirm fire dispatch with
+// EXACTLY (missionId, connectionRef); the authorization artifact never
+// crosses onto any shape. The structural guard keeps the P18 seam law:
+// a P18-only port renders the honest dispatch-unavailable note.
+export {
+  isPaymentMissionsDispatchPort,
+  PAYMENT_MISSIONS_DISPATCH_OUTCOME_KINDS,
+  PAYMENT_MISSIONS_DISPATCH_OUTCOME_LABELS,
+  PAYMENT_MISSIONS_DISPATCH_PHASES,
+  type PaymentMissionsArmedEffect,
+  type PaymentMissionsDispatchOutcome,
+  type PaymentMissionsDispatchOutcomeKind,
+  type PaymentMissionsDispatchPhase,
+  type PaymentMissionsDispatchState,
+  type PaymentMissionsDispatchWiring,
+  type PaymentMissionsExecLane,
+  type PaymentMissionsPortWithDispatch,
+} from "./agent/paymentMissionsDispatchPins.js";
+export {
+  PaymentMissionsArmedCard,
+  type PaymentMissionsArmedCardProps,
+} from "./agent/PaymentMissionsArmedCard.js";
 export {
   AGENT_PAYMENT_DIRECTION_ENTRIES,
   agentPaymentDirectionEntries,

@@ -7,8 +7,9 @@
  * fields with the ask-next-field capture UX (askNextField → the question
  * renders → a text answer → capture → the detail refreshes), the compiled
  * 11-key intent (read-only), the presented preview + the two-act approve
- * flow (./PaymentMissionsPreviewCard.tsx), the plan-selection record and
- * the attempt states (people-language outcomes — ADR-0011 D3).
+ * flow (./PaymentMissionsPreviewCard.tsx), the armed card + the two-act
+ * dispatch flow (./PaymentMissionsArmedCard.tsx, P19-B), the plan-selection
+ * record and the attempt states (people-language outcomes — ADR-0011 D3).
  *
  * The captured intake values render DEFENSIVELY: the per-field typed
  * shapes stay host-side, so this surface formats what it recognizes and
@@ -16,7 +17,9 @@
  * defaults a value (no money arithmetic ever happens here — INV-01).
  */
 
+import { PaymentMissionsArmedCard } from "./PaymentMissionsArmedCard.js";
 import { PaymentMissionsPreviewCard } from "./PaymentMissionsPreviewCard.js";
+import type { PaymentMissionsDispatchWiring } from "./paymentMissionsDispatchPins.js";
 import {
   PAYMENT_MISSIONS_ATTEMPT_OPERATION_LABELS,
   PAYMENT_MISSIONS_ATTEMPT_OUTCOME_LABELS,
@@ -38,6 +41,8 @@ export interface PaymentMissionsDetailProps {
   readonly onPresentPreview?: (missionId: string) => void;
   readonly onEngageApproval?: (missionId: string) => void;
   readonly onResolveApproval?: (requestId: string, decision: "APPROVE" | "DECLINE") => void;
+  /** The dispatch-flow wiring (null/absent when the bound port lacks the dispatch members — P19-B). */
+  readonly dispatch?: PaymentMissionsDispatchWiring | null;
 }
 
 /** The people-language names of the nine intake fields (string-keyed: the
@@ -125,6 +130,7 @@ export function PaymentMissionsDetail({
   onPresentPreview,
   onEngageApproval,
   onResolveApproval,
+  dispatch,
 }: PaymentMissionsDetailProps): React.ReactNode {
   const { detail, ask } = state;
   const answerInputId = `ps-agent-missions-answer-${detail.id}`;
@@ -288,6 +294,14 @@ export function PaymentMissionsDetail({
         onPresentPreview={onPresentPreview}
         onEngageApproval={onEngageApproval}
         onResolveApproval={onResolveApproval}
+      />
+
+      <PaymentMissionsArmedCard
+        missionId={detail.id}
+        approvalGranted={
+          state.approval.phase === "RESOLVED" && state.approval.resolution?.outcome === "GRANTED"
+        }
+        dispatch={dispatch}
       />
 
       {detail.planSelection !== undefined ? (

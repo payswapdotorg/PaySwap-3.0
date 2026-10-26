@@ -6,9 +6,12 @@
  * P17-B session-seam pattern exactly), loads the board, opens mission
  * details, drives the intake capture UX (askNextField → capture), the
  * preview presentation and the TWO-ACT approve flow (requestApproval →
- * the scope card → resolveApproval). The panel family is a PURE
- * projection of the view model; every port call and every honest
- * failure lands here.
+ * the scope card → resolveApproval), and the TWO-ACT DISPATCH flow
+ * (P19-B: armedEffect when the detail is selected → the armed card →
+ * the lane choice → the send confirm — ./paymentMissionsDispatchFlow.ts
+ * owns the slice so this file keeps the line law). The panel family is
+ * a PURE projection of the view model; every port call and every
+ * honest failure lands here.
  *
  * HONESTY LAWS: no port → the not-wired note (never fabricated
  * missions); the typed plane-not-configured rejection → its pinned note
@@ -32,6 +35,8 @@ import {
   type PaymentMissionsPort,
   type PaymentMissionsView,
 } from "./paymentMissionsPins.js";
+import { usePaymentMissionsDispatchFlow } from "./paymentMissionsDispatchFlow.js";
+import { isPaymentMissionsDispatchPort } from "./paymentMissionsDispatchPins.js";
 
 /* ------------- the shared port binding (the composition seam) ------------- */
 
@@ -156,6 +161,16 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
     [resolvedPort, updateDetail],
   );
 
+  // The dispatch-capable seam resolution (P19-B): a P18-only port keeps
+  // the honest dispatch-unavailable note on the armed section — never an
+  // error. The flow hook owns the armed card's state machine (the line law).
+  const dispatchPort =
+    resolvedPort !== undefined && isPaymentMissionsDispatchPort(resolvedPort)
+      ? resolvedPort
+      : undefined;
+  const { wiring: dispatchWiring, loadArmedEffect, onApprovalGranted } =
+    usePaymentMissionsDispatchFlow(dispatchPort, setFlowError, refreshDetail);
+
   const openMission = useCallback(
     (missionId: string): void => {
       if (resolvedPort === undefined) {
@@ -172,10 +187,15 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
               ? { kind: "MISSION_NOT_FOUND", missionId }
               : { kind: "DETAIL", state: freshDetailState(detail) },
           );
+          // The armed card's own read (P19-B): the dispatch-capable port
+          // loads the armed effect when the detail is selected.
+          if (detail !== null) {
+            loadArmedEffect(missionId);
+          }
         })
         .catch((thrown: unknown) => setView(failureView(thrown)));
     },
-    [resolvedPort],
+    [resolvedPort, loadArmedEffect],
   );
 
   const askNextField = useCallback(
@@ -306,6 +326,11 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
           // The outcome lands on the timeline — re-read the detail honestly.
           if (missionId !== null) {
             refreshDetail(missionId);
+            // A granted approval arms the mission — re-read the armed truth
+            // (the stale pre-approval effect is cleared first, never shown).
+            if (resolution.outcome === "GRANTED") {
+              onApprovalGranted(missionId);
+            }
           }
         })
         .catch((thrown: unknown) => {
@@ -317,7 +342,7 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
           setFlowError(messageOf(thrown));
         });
     },
-    [resolvedPort, updateDetail, refreshDetail],
+    [resolvedPort, updateDetail, refreshDetail, onApprovalGranted],
   );
 
   if (resolvedPort === undefined) {
@@ -336,6 +361,7 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
       onPresentPreview={presentPreview}
       onEngageApproval={engageApproval}
       onResolveApproval={resolveApproval}
+      dispatch={dispatchWiring}
     />
   );
 }

@@ -1,0 +1,99 @@
+/**
+ * @payswap/app — the PAYMENT-MISSIONS DISPATCH surface styles (P19-B,
+ * owned by this lane; the payment-missions.css naming laws — that file
+ * is at its line limit, so the armed card's styles live HERE and are
+ * imported by PaymentMissionsArmedCard.tsx).
+ *
+ * The armed card: the scope echo, the execution-lane radio group and
+ * the two-act send control. Additive, token-driven (the ps- design
+ * system), no motion (nothing animates — reduced-motion safe by
+ * construction), self-scoped focus rings so the surface is usable
+ * inside BOTH shells. The same quiet posture as the scope card: the
+ * send is a bordered secondary action — a deliberate act, never a
+ * fire-and-forget.
+ */
+
+/* --------------------------- the armed card ----------------------------- */
+
+.ps-agent-missions-armed {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--ps-accent);
+  border-radius: 10px;
+  background: var(--ps-bg);
+}
+
+.ps-agent-missions-armed-title {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ps-accent);
+}
+
+/* --------------- the execution-lane radio group (fieldset) -------------- */
+
+.ps-agent-missions-lanes {
+  margin: 8px 0 0;
+  padding: 6px 10px 10px;
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+}
+
+.ps-agent-missions-lanes-legend {
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ps-fg);
+}
+
+.ps-agent-missions-lane {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--ps-border);
+  border-radius: 8px;
+  background: var(--ps-surface);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.ps-agent-missions-lane:hover {
+  border-color: var(--ps-accent);
+}
+
+/* An ineligible lane: a visible disabled row — dashed, muted, never hidden. */
+.ps-agent-missions-lane--ineligible {
+  border-style: dashed;
+  color: var(--ps-fg-muted);
+  cursor: not-allowed;
+}
+
+.ps-agent-missions-lane--ineligible:hover {
+  border-color: var(--ps-border);
+}
+
+.ps-agent-missions-lane input[type="radio"] {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin: 2px 0 0;
+  accent-color: var(--ps-accent);
+}
+
+.ps-agent-missions-lane input[type="radio"]:focus-visible {
+  outline: 2px solid var(--ps-focus);
+  outline-offset: 2px;
+}
+
+.ps-agent-missions-lane-text {
+  line-height: 1.5;
+}
+
+.ps-agent-missions-lane-text strong {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ps-fg);
+}
