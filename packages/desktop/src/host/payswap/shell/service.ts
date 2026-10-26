@@ -38,13 +38,8 @@ import { foldDesktopQuoteTerms } from "../product/quote-terms.js";
 import { foldDesktopSecurityDecision } from "../product/security-gate.js";
 import { foldDesktopProgressTimeline } from "../product/progress-timeline.js";
 import { delegateDesktopMoneyMovement } from "../product/delegation.js";
-import {
-  openPersistentWorkspaceStore,
-  type PersistentWorkspaceStore,
-  type WorkspaceStoreFileSystem,
-} from "../product/workspace-store-persistence.js";
-import { WorkspaceStoreError } from "../product/workspace-store.js";
 import type { ConnectionSessionAuthority } from "../connections/session-authority.js";
+import type { WorkspaceStoreFileSystem } from "../product/workspace-store-persistence.js";
 import type {
   DesktopConnectionSetupOutcome,
   DesktopConnectionStatusView,
@@ -52,17 +47,13 @@ import type {
   DesktopProviderCallbackView,
   DesktopProviderRegistryView,
 } from "../connections/contracts.js";
-import type {
-  PinnedMissionDetail,
-  PinnedMissionIntakeInput,
-  PinnedMissionRecord,
-  PinnedMissionSummary,
-} from "../pins/index.js";
 import type { PaymentMissionRuntime } from "../payments/payment-mission-runtime.js";
 import {
   createPaymentMissionChannelMembers,
   createPaymentMissionRuntimeResolver,
 } from "./payment-mission-members.js";
+import { createPaymentApprovalChannelMembers } from "./approval-members.js";
+import { createWorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 import { ConnectionPlaneNotConfiguredError } from "./plane-errors.js";
 
 /** The typed fail-closed plane errors live in ./plane-errors.ts (the ≤400-line file-law split); re-exported for the established import surface. */
@@ -145,51 +136,6 @@ export function createPaySwapDesktopService(
     JSON.stringify({ sessionId: session.sessionId, scopeKind: seam.scope.kind }),
   );
 
-  // The DESKTOP_PROFILE workspace store opens lazily on FIRST USE (the
-  // store must never delay service composition, and unconfigured seams
-  // must compose fine — they fail closed per-call, not at construction).
-  let storePromise: Promise<PersistentWorkspaceStore> | null = null;
-  let storeMissingLogged = false;
-  function resolveWorkspaceStore(): Promise<PersistentWorkspaceStore> {
-    if (storePromise === null) {
-      if (seam.storeDirectory === undefined || options.workspaceStoreFileSystem === undefined) {
-        if (!storeMissingLogged) {
-          storeMissingLogged = true;
-          seam.log(
-            "warn",
-            "payswap-desktop: workspace store NOT configured (no store directory on the seam or no file system injected at the composition edge) — workspace-store calls fail closed",
-          );
-        }
-        return Promise.reject(
-          new WorkspaceStoreError(
-            "STORE_NOT_CONFIGURED",
-            "The DESKTOP_PROFILE workspace store is not configured in this host (no store directory on the seam) — the console workspace cannot persist mission intent here",
-          ),
-        );
-      }
-      const open = openPersistentWorkspaceStore({
-        fileSystem: options.workspaceStoreFileSystem,
-        directory: seam.storeDirectory,
-      });
-      // A failed open is not cached: the next call retries (the typed
-      // error surfaces every time; transient fs failures can recover).
-      storePromise = open.catch((error: unknown) => {
-        storePromise = null;
-        throw error;
-      });
-      storePromise
-        .then(() => {
-          seam.log(
-            "info",
-            "payswap-desktop: workspace store opened",
-            JSON.stringify({ directory: seam.storeDirectory }),
-          );
-        })
-        .catch(() => {});
-    }
-    return storePromise;
-  }
-
   // (P13-B) The connection session authority — optional at construction
   // (unconfigured seams compose fine) and fail-closed per-call.
   const connectionAuthority = options.connectionAuthority;
@@ -200,13 +146,19 @@ export function createPaySwapDesktopService(
     return connectionAuthority;
   }
 
-  // (P17-A) The payment-mission plane: read/input members over the
-  // composed runtime, failing closed per-call when it is absent; the
-  // instants are stamped at the channel edge from the injected clock.
+  // (P17-A + P18-A) The payment-mission plane: the read/input members
+  // and the edge-pinned approval members over the composed runtime —
+  // ONE fail-closed resolver shared by both member families (the
+  // not-configured warning logs ONCE), instants stamped at the channel
+  // edge from the injected clock.
   const seamLog = (level: "info" | "warn" | "error", message: string) => {
     seam.log(level, message);
   };
   const paymentMissionClock = options.paymentMissionClock ?? (() => new Date().toISOString());
+  const resolvePaymentMissionRuntime = createPaymentMissionRuntimeResolver(
+    options.paymentMissionRuntime,
+    seamLog,
+  );
 
   const service: IPaySwapDesktopService = {
     session,
@@ -262,67 +214,14 @@ export function createPaySwapDesktopService(
       return receipt;
     },
 
-    async workspaceListMissions(): Promise<readonly PinnedMissionSummary[]> {
-      const store = await resolveWorkspaceStore();
-      return store.listMissions();
-    },
-
-    async workspaceRecordMissionDraft(
-      input: PinnedMissionIntakeInput,
-      now: string,
-    ): Promise<PinnedMissionRecord> {
-      const store = await resolveWorkspaceStore();
-      const record = await store.recordMissionDraft(input, now);
-      seam.log(
-        "info",
-        "payswap-desktop: mission draft recorded (demand-side intent only)",
-        JSON.stringify({ missionId: record.id, ok: record.structuralValidation.ok }),
-      );
-      return record;
-    },
-
-    async workspaceRecordMissionIntent(id: string, now: string): Promise<PinnedMissionRecord> {
-      const store = await resolveWorkspaceStore();
-      const record = await store.recordMissionIntent(id, now);
-      seam.log(
-        "info",
-        "payswap-desktop: mission intent recorded (structural validation passed)",
-        JSON.stringify({ missionId: record.id }),
-      );
-      return record;
-    },
-
-    async workspaceMissionDetail(id: string): Promise<PinnedMissionDetail | null> {
-      const store = await resolveWorkspaceStore();
-      return store.missionDetail(id);
-    },
-
-    async workspaceReviseMissionDraft(
-      id: string,
-      input: PinnedMissionIntakeInput,
-      now: string,
-    ): Promise<PinnedMissionRecord> {
-      const store = await resolveWorkspaceStore();
-      return store.reviseMissionDraft(id, input, now);
-    },
-
-    async workspaceArchiveMissionDraft(id: string, now: string): Promise<PinnedMissionRecord> {
-      const store = await resolveWorkspaceStore();
-      return store.archiveMissionDraft(id, now);
-    },
-
-    async workspaceStoreHealth() {
-      const store = await resolveWorkspaceStore();
-      const health = await store.health();
-      if (health.quarantinedCount > 0) {
-        seam.log(
-          "warn",
-          "payswap-desktop: workspace store loaded with quarantined records (never rendered as missions)",
-          JSON.stringify({ quarantinedCount: health.quarantinedCount }),
-        );
-      }
-      return health;
-    },
+    // (P10-B) The §5 workspace-store surface (split to
+    // ./workspace-store-members.ts at P18-A for the file law — the
+    // same member names, the same lazy fail-closed store posture).
+    ...createWorkspaceStoreChannelMembers({
+      storeDirectory: seam.storeDirectory,
+      fileSystem: options.workspaceStoreFileSystem,
+      log: (level, message, ...args) => seam.log(level, message, ...args),
+    }),
 
     // -----------------------------------------------------------------------
     // Provider connections (P13-B — ADR-0007 D3/D4/D5)
@@ -390,7 +289,16 @@ export function createPaySwapDesktopService(
     // members over the composed runtime (instants are stamped at the
     // channel edge from the host clock, never renderer-supplied).
     ...createPaymentMissionChannelMembers({
-      resolveRuntime: createPaymentMissionRuntimeResolver(options.paymentMissionRuntime, seamLog),
+      resolveRuntime: resolvePaymentMissionRuntime,
+      now: paymentMissionClock,
+      log: seamLog,
+    }),
+
+    // (P18-A, ADR-0011 D2) The approval members — the SAME resolver
+    // and host clock, with the decision origin + principal PINNED at
+    // the channel edge and the artifact never on the wire.
+    ...createPaymentApprovalChannelMembers({
+      resolveRuntime: resolvePaymentMissionRuntime,
       now: paymentMissionClock,
       log: seamLog,
     }),

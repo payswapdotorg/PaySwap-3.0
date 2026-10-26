@@ -1,28 +1,44 @@
 /**
- * PaySwap Desktop (P17-A, ADR-0010 D2/D3) — the payment-mission channel
- * members' contracts: the read/input surface the renderer consumes over
- * the payswap-desktop channel, and its JSON-safe DTOs.
+ * PaySwap Desktop (P17-A, ADR-0010 D2/D3; P18-A, ADR-0011 D2/D3) — the
+ * payment-mission channel members' contracts: the read/input surface
+ * the renderer consumes over the payswap-desktop channel, and its
+ * JSON-safe DTOs.
  *
  * THE CHANNEL LAW (the no-parallel-engine discipline, extended):
  * - every member is a READ or an INTAKE-PLANE INPUT verb — all names
  *   pass the no-authority-verb law (never execute/retry/cancel/
  *   confirm/settle/payout/approve — desktop-console-client.test.ts);
- * - NO authorization member is exposed: requestAuthorization /
- *   resolveAuthorization / dispatch stay HOST-SIDE (ADR-0010 D2 — the
- *   D7 chain is preserved; approval is minted only by a PREVIEW_UI_ACT
- *   behind the origin law, and the channel never sees it);
+ * - THE APPROVAL ACT (P18-A, ADR-0011 D2 — the lawful amendment of
+ *   the ADR-0010 D2 boundary): the authorization round-trip crosses
+ *   as TWO edge-pinned members (paymentMissionRequestApproval /
+ *   paymentMissionResolveApproval) mirroring the runtime's
+ *   requestAuthorization / resolveAuthorization 1:1. The ORIGIN LAW
+ *   is preserved AT THE EDGE: the resolve member PINS the decision
+ *   origin to PREVIEW_UI_ACT and the principal to the host operator
+ *   ref — the renderer supplies ONLY requestId + APPROVE|DECLINE and
+ *   can never supply, forge or see an origin or principal, so the
+ *   approval act IS a preview UI act by construction. THE ARTIFACT
+ *   NEVER CROSSES: no artifactId or artifact field exists on any
+ *   wire shape here — the single-use artifact is minted and consumed
+ *   host-side; the observable truth is the mission state + the
+ *   AUTHORIZATION_GRANTED / AUTHORIZATION_DECLINED timeline events;
+ * - THE DISPATCH ACT STAYS HOST-SIDE (ADR-0011 D3): no member fires
+ *   a dispatch. The detail DTO projects attempt STATES — outcome
+ *   facts only, derived host-side — never the attempt records
+ *   themselves (they carry the consumed-authorization lineage);
  * - the DTOs carry NO credentials, NO secrets and NO authorization
  *   artifacts: the detail projects the mission's demand-side record
  *   (timeline, intake fields, compiled intent, preview id, plan
- *   selection) and a COUNT of attempts — never the attempt records
- *   themselves (they carry the consumed-artifact lineage);
- * - the seed member PINS the origin to COMPOSER_TEXT: the channel seed
- *   comes from the composer text plane; PREVIEW_UI_ACT is reserved for
- *   the authority act and can never arrive through this channel.
+ *   selection, attempt states) and a COUNT of attempts;
+ * - the seed member PINS the origin to COMPOSER_TEXT: the channel
+ *   seed comes from the composer text plane; PREVIEW_UI_ACT is
+ *   reserved for the authority act, which arrives only through the
+ *   approval member's edge pin above.
  */
 
 import type {
   CompiledPaymentIntent,
+  PaymentExecutionMode,
   PaymentIntakeFieldStates,
   PaymentMissionDirection,
   PaymentMissionPlanSelection,
@@ -50,9 +66,11 @@ export interface PaymentMissionEventDto {
 /**
  * The full mission record, JSON-safe: the append-only timeline, the nine
  * intake captures, the compiled 11-key canonical intent (pinned shape),
- * the presented preview id and the stage-9a plan selection — plus the
- * attempt COUNT (the attempt records themselves stay host-side: they
- * carry the consumed-authorization lineage this channel never exposes).
+ * the presented preview id, the stage-9a plan selection and the
+ * attempt-state projection (P18-A, ADR-0011 D3 — outcome facts only;
+ * the attempt records themselves stay host-side: they carry the
+ * consumed-authorization lineage this channel never exposes) — plus
+ * the attempt COUNT (kept for the P17 read model).
  */
 export interface PaymentMissionDetailDto {
   readonly id: string;
@@ -67,6 +85,8 @@ export interface PaymentMissionDetailDto {
   readonly intent?: CompiledPaymentIntent;
   readonly previewId?: string;
   readonly planSelection?: PaymentMissionPlanSelection;
+  /** The attempt states, in start order (ADR-0011 D3 — no lineage). */
+  readonly attempts: readonly PaymentMissionAttemptStateDto[];
   readonly attemptCount: number;
 }
 
@@ -124,6 +144,105 @@ export interface PaymentMissionSeedInputDto {
 export interface PaymentMissionSeedOutcomeDto {
   readonly missionId: string;
   readonly action: "CREATED" | "RESUMED";
+}
+
+// ---------------------------------------------------------------------------
+// The approval wire shapes (P18-A, ADR-0011 D2) — the scoped request, the
+// typed resolution, and NOTHING from the artifact plane
+// ---------------------------------------------------------------------------
+
+/**
+ * The authorization scope on the wire (P18-A, ADR-0011 D2): mirrors the
+ * host PaymentAuthorizationScope shape verbatim — the exact terms an
+ * approval would cover. The material-change intentDigest binding stays
+ * host-side (the digest crosses as an opaque value; the compiler of it
+ * does not).
+ */
+export interface PaymentAuthorizationScopeDto {
+  readonly missionId: string;
+  readonly direction: PaymentMissionDirection;
+  readonly amount: { readonly currency: string; readonly minorUnits: string };
+  readonly destinationSummary: string;
+  readonly intentDigest: string;
+}
+
+/**
+ * A pending authorization request on the wire (P18-A, ADR-0011 D2):
+ * the scoped request over the mission's PERSISTED preview — the scope
+ * copies the preview verbatim and the request carries the
+ * scopeSummary + expiry the operator decides against. NO artifact
+ * fields: the single-use artifact a grant mints stays host-side and
+ * NEVER crosses the channel.
+ */
+export interface PaymentAuthorizationRequestDto {
+  readonly requestId: string;
+  readonly previewId: string;
+  readonly missionId: string;
+  readonly createdAt: string;
+  readonly expiresAt: string;
+  readonly scope: PaymentAuthorizationScopeDto;
+  readonly scopeSummary: string;
+}
+
+/**
+ * The typed resolution outcome on the wire (P18-A, ADR-0011 D2) —
+ * mirrors the runtime's AuthorizationResolution outcome kinds
+ * honestly:
+ * - GRANTED echoes the approved scope + expiry and NEVER the
+ *   artifactId (the artifact stays host-side);
+ * - DECLINED carries the people-language reason;
+ * - REJECTED mirrors the runtime's non-UI-origin rejection —
+ *   UNREACHABLE through this member, because the channel edge pins
+ *   origin := PREVIEW_UI_ACT (a non-UI origin can never arrive); the
+ *   kind exists so the wire type mirrors the runtime's resolution
+ *   type without lying about the channel's reach.
+ * Failures beyond these outcomes (unknown / expired / already-resolved
+ * request, absent mission or preview) are THROWN typed
+ * PaymentMissionError — the channel's established fail-closed
+ * discipline, identical to every other mission-plane member.
+ */
+export type PaymentAuthorizationResolutionDto = {
+  readonly outcome:
+    | { readonly kind: "GRANTED"; readonly scope: PaymentAuthorizationScopeDto; readonly expiresAt: string }
+    | { readonly kind: "DECLINED"; readonly reason: string }
+    | { readonly kind: "REJECTED"; readonly reason: string };
+  readonly missionId: string;
+  readonly previewId: string;
+};
+
+// ---------------------------------------------------------------------------
+// The attempt-state projection (P18-A, ADR-0011 D3) — outcome facts only
+// ---------------------------------------------------------------------------
+
+/** The attempt outcome vocabulary (P18-A, ADR-0011 D3 — derived host-side). */
+export const PAYMENT_ATTEMPT_OUTCOMES = [
+  "STARTED",
+  "CONFIRMED",
+  "FAILED",
+  "OUTCOME_UNKNOWN",
+  "RECONCILED",
+  "REFUSED",
+] as const;
+export type PaymentAttemptOutcome = (typeof PAYMENT_ATTEMPT_OUTCOMES)[number];
+
+/**
+ * One consequential attempt's STATE on the wire (P18-A, ADR-0011 D3):
+ * outcome facts only, derived host-side from the attempt record —
+ * STARTED (no answer recorded yet), CONFIRMED / FAILED / OUTCOME_UNKNOWN
+ * (the envelope's three-valued outcome), RECONCILED (provider evidence
+ * closed an unknown), REFUSED (the authority refused before any
+ * effect). The projection carries NO idempotency keys, NO
+ * command/correlation ids, NO connection refs and NO authorization
+ * artifact ids — the consumed-artifact lineage stays host-side.
+ */
+export interface PaymentMissionAttemptStateDto {
+  readonly attemptId: string;
+  readonly startedAt: string;
+  readonly operation: "CREATE_EXTERNAL_EFFECT" | "CANCEL_OR_REVERSE_EFFECT";
+  readonly executionMode: PaymentExecutionMode;
+  readonly outcome: PaymentAttemptOutcome;
+  /** People language (the outcome fact, phrased for the operator). */
+  readonly summary: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -187,4 +306,31 @@ export interface IPaySwapDesktopPaymentMissionMembers {
     missionId: string,
     input: PaymentMissionPlanSelectionInput,
   ): Promise<PaymentMissionDetailDto>;
+
+  /**
+   * Mint a pending authorization request over the mission's PERSISTED
+   * preview (P18-A, ADR-0011 D2): the scope copies the preview verbatim
+   * and the request carries the scopeSummary + expiry the operator
+   * decides against. NO artifact fields exist on the request or any
+   * successor shape. Fails typed (the runtime's PaymentMissionError)
+   * when the mission does not exist, has no presented preview, or the
+   * persisted preview is not dispatchable — a blocked preview can
+   * never arm authorization.
+   */
+  paymentMissionRequestApproval(missionId: string): Promise<PaymentAuthorizationRequestDto>;
+
+  /**
+   * Resolve a pending request with the operator's decision (P18-A,
+   * ADR-0011 D2). The renderer supplies ONLY the requestId and
+   * "APPROVE" | "DECLINE" — the channel edge PINS the decision origin
+   * to PREVIEW_UI_ACT and the principal to the host operator ref (the
+   * renderer can never supply, forge or see either). The single-use
+   * artifact a grant mints NEVER crosses the channel: the observable
+   * truth is the resolution outcome + the mission timeline's
+   * AUTHORIZATION_GRANTED / AUTHORIZATION_DECLINED event.
+   */
+  paymentMissionResolveApproval(
+    requestId: string,
+    decision: "APPROVE" | "DECLINE",
+  ): Promise<PaymentAuthorizationResolutionDto>;
 }

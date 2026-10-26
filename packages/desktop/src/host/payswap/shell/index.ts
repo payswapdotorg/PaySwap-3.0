@@ -34,4 +34,16 @@ export { createPaySwapDesktopService } from "./service.js";
 export type { PaySwapDesktopServiceOptions } from "./service.js";
 export { ConnectionPlaneNotConfiguredError, PaymentPlaneNotConfiguredError } from "./service.js";
 export { createPaymentMissionChannelMembers } from "./payment-mission-members.js";
-export type { PaymentMissionChannelDeps } from "./payment-mission-members.js";
+export type { PaymentMissionChannelDeps, PaymentMissionChannelMemberSurface } from "./payment-mission-members.js";
+// (P18-A, ADR-0011 D2/D3) The approval members + the attempt-state projection.
+export { createPaymentApprovalChannelMembers, projectAttemptStates } from "./approval-members.js";
+export { createWorkspaceStoreChannelMembers } from "./workspace-store-members.js";
+export type { WorkspaceStoreChannelDeps, WorkspaceStoreChannelMembers } from "./workspace-store-members.js";
+export {
+  PAYMENT_ATTEMPT_OUTCOMES,
+  type PaymentAttemptOutcome,
+  type PaymentAuthorizationRequestDto,
+  type PaymentAuthorizationResolutionDto,
+  type PaymentAuthorizationScopeDto,
+  type PaymentMissionAttemptStateDto,
+} from "./payment-mission-contracts.js";

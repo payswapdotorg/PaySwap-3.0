@@ -1,23 +1,26 @@
 /**
- * PaySwap Desktop (P17-A, ADR-0010 D2) — the payment-mission channel
- * members, implemented over the REAL PaymentMissionRuntime and split
- * from ./service.ts for the ≤400-line file law.
+ * PaySwap Desktop (P17-A, ADR-0010 D2; P18-A, ADR-0011 D2/D3) — the
+ * payment-mission channel members, implemented over the REAL
+ * PaymentMissionRuntime and split from ./service.ts for the
+ * ≤400-line file law.
  *
  * CHANNEL DISCIPLINE (see ./payment-mission-contracts.ts for the DTO
  * laws): read/input verbs only; the DTO projections carry NO
  * credentials, NO secrets and NO authorization artifacts (the detail
- * carries the attempt COUNT — the attempt records, which carry the
- * consumed-artifact lineage, never cross this channel). Instants are
- * stamped HERE, at the channel edge, from the injected host clock —
- * never renderer-supplied. Every member fails closed when the runtime
- * was not composed (the typed PaymentPlaneNotConfiguredError, thrown
- * by the resolver the service injects).
+ * carries the attempt STATES per ADR-0011 D3 and the attempt COUNT —
+ * the attempt records, which carry the consumed-artifact lineage,
+ * never cross this channel). Instants are stamped HERE, at the
+ * channel edge, from the injected host clock — never
+ * renderer-supplied. Every member fails closed when the runtime was
+ * not composed (the typed PaymentPlaneNotConfiguredError, thrown by
+ * the resolver the service injects).
  */
 
 import {
   PAYMENT_INTAKE_FIELD_IDS,
   PaymentMissionError,
   type PaymentIntakeFieldId,
+  type PaymentMissionEvent,
   type PaymentMissionPlanSelection,
   type PaymentMissionRecord,
 } from "../payments/contracts.js";
@@ -25,10 +28,12 @@ import type { PaymentMissionRuntime } from "../payments/payment-mission-runtime.
 import type { StoredPaymentPreview } from "../payments/payment-mission-store.js";
 import { createHonestEmptyGateEnvironment } from "../payments/validation-gates.js";
 import { PaymentPlaneNotConfiguredError } from "./plane-errors.js";
+import { projectAttemptStates } from "./approval-members.js";
 import type {
   IPaySwapDesktopPaymentMissionMembers,
   PaymentMissionBoardItemDto,
   PaymentMissionDetailDto,
+  PaymentMissionEventDto,
   PaymentMissionSeedInputDto,
   PaymentMissionSeedOutcomeDto,
   PaymentPreviewDto,
@@ -43,6 +48,22 @@ export interface PaymentMissionChannelDeps {
   /** The host seam log (never console; no secret material is ever logged). */
   readonly log: (level: "info" | "warn" | "error", message: string) => void;
 }
+
+/**
+ * The P17-A member subset this factory produces (read/input verbs
+ * only); the P18-A approval members live in ./approval-members.ts over
+ * the SAME deps shape — the service spreads both families.
+ */
+export type PaymentMissionChannelMemberSurface = Pick<
+  IPaySwapDesktopPaymentMissionMembers,
+  | "paymentMissionBoard"
+  | "paymentMissionDetail"
+  | "paymentMissionSeed"
+  | "paymentMissionAskNextField"
+  | "paymentMissionCapture"
+  | "paymentMissionPresentPreview"
+  | "paymentMissionRecordPlanSelection"
+>;
 
 /**
  * The fail-closed runtime resolver the service injects: throws the
@@ -71,6 +92,41 @@ export function createPaymentMissionRuntimeResolver(
   };
 }
 
+/**
+ * The channel-edge event projection (P18-A, ADR-0011 D2): the
+ * timeline crosses with people-language summaries, EXCEPT the two
+ * event kinds whose host-side summaries embed consumed-artifact
+ * lineage — AUTHORIZATION_GRANTED (the minted artifact id) and
+ * ATTEMPT_STARTED (the connection ref, the consumed artifact id and
+ * the idempotency key). Those two carry a channel-edge
+ * people-language line instead, and their lineage-bearing
+ * correlationRef (the artifact id / the idempotency key) is
+ * suppressed: NO artifact id and NO consumed-artifact lineage exists
+ * on any wire shape. The host record is never rewritten (the
+ * append-only law holds host-side); the redaction lives at this
+ * boundary only, and every other event kind crosses verbatim.
+ */
+const GRANTED_EVENT_CHANNEL_SUMMARY =
+  "Scoped approval granted on the presented preview by an explicit user act — the mission is armed until a host-side dispatch consumes the approval; the approval key itself never leaves the host.";
+const STARTED_EVENT_CHANNEL_SUMMARY =
+  "A consequential attempt started — a host-side dispatch consumed the mission's approval and sent the command onward; the execution details stay host-side.";
+
+function toEventDto(event: PaymentMissionEvent): PaymentMissionEventDto {
+  if (event.kind === "AUTHORIZATION_GRANTED") {
+    return { id: event.id, at: event.at, kind: event.kind, summary: GRANTED_EVENT_CHANNEL_SUMMARY };
+  }
+  if (event.kind === "ATTEMPT_STARTED") {
+    return { id: event.id, at: event.at, kind: event.kind, summary: STARTED_EVENT_CHANNEL_SUMMARY };
+  }
+  return {
+    id: event.id,
+    at: event.at,
+    kind: event.kind,
+    summary: event.summary,
+    ...(event.correlationRef !== undefined ? { correlationRef: event.correlationRef } : {}),
+  };
+}
+
 /** Project a mission record to the JSON-safe detail DTO (NO artifact plane). */
 function toDetailDto(record: PaymentMissionRecord): PaymentMissionDetailDto {
   return {
@@ -81,17 +137,12 @@ function toDetailDto(record: PaymentMissionRecord): PaymentMissionDetailDto {
     status: record.status,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
-    events: record.events.map((event) => ({
-      id: event.id,
-      at: event.at,
-      kind: event.kind,
-      summary: event.summary,
-      ...(event.correlationRef !== undefined ? { correlationRef: event.correlationRef } : {}),
-    })),
+    events: record.events.map((event) => toEventDto(event)),
     fields: record.fields,
     ...(record.intent !== undefined ? { intent: record.intent } : {}),
     ...(record.previewId !== undefined ? { previewId: record.previewId } : {}),
     ...(record.planSelection !== undefined ? { planSelection: record.planSelection } : {}),
+    attempts: projectAttemptStates(record.attempts),
     attemptCount: record.attempts.length,
   };
 }
@@ -136,7 +187,7 @@ function toPreviewDto(
 /** Create the payment-mission channel members over the injected runtime. */
 export function createPaymentMissionChannelMembers(
   deps: PaymentMissionChannelDeps,
-): IPaySwapDesktopPaymentMissionMembers {
+): PaymentMissionChannelMemberSurface {
   return {
     async paymentMissionBoard() {
       const runtime = deps.resolveRuntime();

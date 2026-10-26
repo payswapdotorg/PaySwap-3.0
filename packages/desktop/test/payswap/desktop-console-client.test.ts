@@ -28,8 +28,17 @@ import {
   createPaySwapDesktopService,
 } from "../../src/host/payswap/index.js";
 import type { IPaySwapDesktopClientService } from "../../src/renderer/src/consoleWorkspaceMount.js";
+import type { MissionIntakeInput, MissionRecord } from "@payswap/app";
+import type { MessagePort as NodeMessagePort } from "node:worker_threads";
 
-/** A channel service double for the port-adapter laws (recorded calls). */
+/**
+ * A channel service double for the port-adapter laws (recorded calls).
+ * PARTIAL by design — only the §5 workspace-store members the port-adapter
+ * laws exercise are implemented; the full member surface (including the
+ * payment-mission + approval members) is pinned STRUCTURALLY by the
+ * drift test above, so the double casts through unknown, never lying
+ * about implementing members it does not carry.
+ */
 function fakeChannelService(): IPaySwapDesktopClientService & {
   readonly calls: readonly string[];
 } {
@@ -38,7 +47,10 @@ function fakeChannelService(): IPaySwapDesktopClientService & {
     calls.push(name);
     return value;
   };
-  return {
+  // The typed PARTIAL double first (every implemented member contextually
+  // typed against the REAL client interface), then the one honest widening
+  // cast — the drift test above pins the FULL member set structurally.
+  const partial: Partial<IPaySwapDesktopClientService> & { readonly calls: readonly string[] } = {
     deploymentFacts: () => record("deploymentFacts", Promise.resolve({
       economicIntakeConfigured: false,
       capabilityObservationsAvailable: false,
@@ -48,14 +60,14 @@ function fakeChannelService(): IPaySwapDesktopClientService & {
     })),
     workspaceListMissions: () => record("workspaceListMissions", Promise.resolve([])),
     workspaceRecordMissionDraft: (input, now) =>
-      record("workspaceRecordMissionDraft", Promise.resolve({ id: "mission-1", intake: input, now })),
+      record("workspaceRecordMissionDraft", Promise.resolve(recordedMissionRecord("mission-1", input, now))),
     workspaceRecordMissionIntent: (id, now) =>
-      record("workspaceRecordMissionIntent", Promise.resolve({ id, now })),
+      record("workspaceRecordMissionIntent", Promise.resolve(recordedMissionRecord(id, { goalStatement: "Pay the spring invoice", direction: "PAY" }, now))),
     workspaceMissionDetail: (_id) => record("workspaceMissionDetail", Promise.resolve(null)),
     workspaceReviseMissionDraft: (id, input, now) =>
-      record("workspaceReviseMissionDraft", Promise.resolve({ id, intake: input, now })),
+      record("workspaceReviseMissionDraft", Promise.resolve(recordedMissionRecord(id, input, now))),
     workspaceArchiveMissionDraft: (id, now) =>
-      record("workspaceArchiveMissionDraft", Promise.resolve({ id, now })),
+      record("workspaceArchiveMissionDraft", Promise.resolve(recordedMissionRecord(id, { goalStatement: "Pay the spring invoice", direction: "PAY" }, now))),
     workspaceStoreHealth: () =>
       record("workspaceStoreHealth", Promise.resolve({
         durability: "DESKTOP_PROFILE",
@@ -68,7 +80,29 @@ function fakeChannelService(): IPaySwapDesktopClientService & {
         quarantine: [],
       })),
     calls,
-  } as IPaySwapDesktopClientService & { readonly calls: readonly string[] };
+  };
+  return partial as unknown as IPaySwapDesktopClientService & { readonly calls: readonly string[] };
+}
+
+/**
+ * A recorded-call stand-in record (the double's RESOLVED VALUES are never
+ * consumed — only the recorded calls are asserted — but the members stay
+ * honestly typed against the REAL app record shape).
+ */
+function recordedMissionRecord(
+  id: string,
+  intake: MissionIntakeInput,
+  now: string,
+): MissionRecord {
+  return {
+    id,
+    createdAt: now,
+    updatedAt: now,
+    status: "DRAFT",
+    intake,
+    structuralValidation: { ok: true, findings: [] },
+    events: [],
+  };
 }
 
 describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", () => {
@@ -101,6 +135,10 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       "paymentMissionDetail",
       "paymentMissionPresentPreview",
       "paymentMissionRecordPlanSelection",
+      // P18-A approval members (ADR-0011 D2 — edge-pinned: the origin +
+      // principal are pinned host-side; the artifact never crosses).
+      "paymentMissionRequestApproval",
+      "paymentMissionResolveApproval",
       "paymentMissionSeed",
       "progressTimeline",
       "quoteDisclosure",
@@ -132,14 +170,25 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
     ]) {
       expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).toContain(member);
     }
+    // The P18-A approval members pass the law too (ADR-0011 D2 — the
+    // names carry the paymentMission prefix; the APPROVE decision is a
+    // VALUE the renderer supplies to the pinned member, never a verb
+    // the channel exposes).
+    for (const member of ["paymentMissionRequestApproval", "paymentMissionResolveApproval"]) {
+      expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).toContain(member);
+      expect(member).not.toMatch(/^(execute|retry|cancel|confirm|settle|payout|approve)/);
+    }
     // The authorization/dispatch plane stays HOST-SIDE: none of its
-    // verbs is exposed on the channel (ADR-0010 D2 — the D7 chain).
+    // verbs is exposed on the channel (ADR-0011 D2 narrows ADR-0010 D2
+    // to the two edge-pinned members above — the raw runtime verbs,
+    // the artifact getter and the dispatch slice never cross).
     for (const forbidden of [
       "requestAuthorization",
       "resolveAuthorization",
       "dispatch",
       "approveAuthorization",
       "executePayment",
+      "artifact",
     ]) {
       expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).not.toContain(forbidden);
     }
@@ -190,7 +239,10 @@ describe("the DESKTOP_PROFILE store port adapter (§5 over the channel)", () => 
     // accessor whose console channel proxy is present.
     const { port1, port2 } = await openMessagePortPair();
     try {
-      const services = connectDesktopConsoleServices(port1);
+      // node:worker_threads ports ARE the Electron seam's MessagePorts at
+      // runtime; the DOM lib's MessagePort type differs only in listener
+      // variance — cast once at this boundary, never inside the mount.
+      const services = connectDesktopConsoleServices(port1 as unknown as MessagePort);
       // The base workspace-service proxies are present (the substrate
       // RemoteServiceAccess surface, untouched)...
       expect(typeof services.settingService).toBe("object");
@@ -205,8 +257,17 @@ describe("the DESKTOP_PROFILE store port adapter (§5 over the channel)", () => 
   });
 });
 
-/** A real MessagePort pair (node:worker_threads), like the Electron seam. */
-async function openMessagePortPair(): Promise<{ port1: MessagePort; port2: MessagePort }> {
+/**
+ * A real MessagePort pair (node:worker_threads), like the Electron seam.
+ * Typed as the NODE flavor (what MessageChannel actually mints); the one
+ * DOM-flavor widening happens at the mount call site above, where the
+ * substrate's MessagePortProtocol expects the DOM lib's shape — the two
+ * differ only in listener variance, never at runtime.
+ */
+async function openMessagePortPair(): Promise<{
+  readonly port1: NodeMessagePort;
+  readonly port2: NodeMessagePort;
+}> {
   const { MessageChannel } = await import("node:worker_threads");
   const { port1, port2 } = new MessageChannel();
   return { port1, port2 };

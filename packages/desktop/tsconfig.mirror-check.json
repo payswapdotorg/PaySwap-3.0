@@ -1,0 +1,28 @@
+{
+  // (P18-A) The renderer-mirror + drift-law program: the two renderer
+  // files this lane owns, the payswap-app source surface they import,
+  // the payswap host shell the drift law asserts against, and the
+  // desktop-console-client drift test itself — under the RENDERER
+  // settings (dom + jsx + the @payswap/app paths mapping, mirroring
+  // tsconfig.renderer.json). Scoped because the full renderer project
+  // (five sibling engine sources) exceeds this station's memory.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["es2025", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+    "types": ["node"],
+    "paths": {
+      "@payswap/app/routes": ["../payswap-app/src/routes.ts"],
+      "@payswap/app": ["../payswap-app/src/index.ts"]
+    }
+  },
+  "include": [
+    "src/host/payswap",
+    "src/renderer/src/consoleWorkspaceMount.tsx",
+    "src/renderer/src/consolePaymentMissionWire.ts",
+    "../payswap-app/src",
+    "test/payswap/desktop-console-client.test.ts"
+  ]
+}
