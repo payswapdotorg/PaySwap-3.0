@@ -380,6 +380,12 @@ export function createAgentComposerController(
       await reloadTasks();
       emit();
     },
+
+    // P17-C (ADR-0010 D5): the ONE composition seam for hosts binding a
+    // route-planning session over the SAME store (never a second adapter).
+    sessionPort(): AgentTaskSessionPort {
+      return resolveSession();
+    },
   };
 }
 

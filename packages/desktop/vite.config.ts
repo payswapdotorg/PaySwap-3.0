@@ -183,6 +183,12 @@ export default defineConfig(({ mode }) => {
         // @payswap/app 源码，无第二实现。
         "@payswap/app/routes": resolve(__dirname, "../payswap-app/src/routes.ts"),
         "@payswap/app": resolve(__dirname, "../payswap-app/src/index.ts"),
+        // P17-C（ADR-0010 D1）：REAL 引擎源码包直连（与 tsconfig.renderer/vitest
+        // 两处别名同步）—— 只供 routePlanning* 组合根模块消费。
+        "@payswap/route-planning": resolve(__dirname, "../route-planning/src/index.ts"),
+        "@payswap/capability": resolve(__dirname, "../capability/src/index.ts"),
+        "@payswap/route-compiler": resolve(__dirname, "../route-compiler/src/index.ts"),
+        "@payswap/lab": resolve(__dirname, "../lab/src/index.ts"),
         ...desktopRendererDependencyAliases,
         // Recharts 通过 d3-shape 读取 d3-path 的 Path 导出；hoisted node_modules
         // 里可能残留 d3-shape/node_modules/d3-path@1.x，Vite 预构建会优先命中旧包并报 Missing export。

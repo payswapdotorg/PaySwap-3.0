@@ -101,7 +101,7 @@ package_layers:
   packages/ui: platform
   packages/payswap-app: platform
   packages/web: platform
-  packages/desktop: platform
+  packages/desktop: platform # ADR-0010 D1 (2026-10-26): the desktop RENDERER's one composition-root module (src/renderer/src/routePlanning*.ts) imports @payswap/route-planning + capability + route-compiler + lab (the P16 live-app engine binding ADR-0009 D2 planned); the platform→intelligence/capability R3s are honest, annotation-documented (the packages/agents ADR-0004 precedent). No other desktop src file may import @payswap/* beyond @payswap/app.
   packages/formal-proof: platform
   packages/zcode-cua: platform
   apps/zcode-cli: platform

@@ -83,4 +83,13 @@ export interface AgentComposerController {
   cancelTask(taskId: string): Promise<void>;
   /** Reload the task list from the session port (honest phases). */
   refresh(): Promise<void>;
+  /**
+   * The controller's ONE task-session port (P17-C, ADR-0010 D5): the
+   * composition seam a platform host uses to bind a route-planning
+   * session over the SAME store the composer reads and writes — two
+   * adapters over the one storage key would race on the monotonic
+   * counters (whole-snapshot writes), so the host MUST share this
+   * instance, never construct a second one.
+   */
+  sessionPort(): AgentTaskSessionPort;
 }

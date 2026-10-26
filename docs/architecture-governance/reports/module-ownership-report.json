@@ -5,21 +5,21 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 56,
-    "packages_mapped": 56,
+    "packages_checked": 57,
+    "packages_mapped": 57,
     "packages_unmapped": 0,
-    "import_edges": 90,
+    "import_edges": 105,
     "layer_rules": 10,
-    "violations_total": 13,
+    "violations_total": 35,
     "violations_by_severity": {
-      "error": 13,
+      "error": 35,
       "warn": 0
     },
     "violations_by_rule": {
-      "R3-not-in-may-depend-on": 8,
-      "R6-cross-package-relative": 5
+      "R3-not-in-may-depend-on": 19,
+      "R6-cross-package-relative": 16
     },
-    "unresolved_external_specifiers": 279
+    "unresolved_external_specifiers": 290
   },
   "packages": [
     {
@@ -556,8 +556,16 @@
       ],
       "dependents": [
         {
+          "source": "packages/desktop",
+          "occurrences": 1
+        },
+        {
           "source": "packages/execution-graph",
           "occurrences": 16
+        },
+        {
+          "source": "packages/route-planning",
+          "occurrences": 9
         }
       ],
       "dependency_layers": [
@@ -624,15 +632,39 @@
       "dir": "packages/desktop",
       "name": "@payswap/desktop",
       "declared_layer": "platform",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [
+        {
+          "target": "packages/capability",
+          "occurrences": 1
+        },
         {
           "target": "packages/client",
           "occurrences": 2
         },
         {
+          "target": "packages/economic",
+          "occurrences": 1
+        },
+        {
+          "target": "packages/lab",
+          "occurrences": 1
+        },
+        {
           "target": "packages/payswap-app",
           "occurrences": 6
+        },
+        {
+          "target": "packages/provider-runtime",
+          "occurrences": 4
+        },
+        {
+          "target": "packages/route-compiler",
+          "occurrences": 1
+        },
+        {
+          "target": "packages/route-planning",
+          "occurrences": 1
         },
         {
           "target": "packages/rpc",
@@ -644,15 +676,19 @@
         },
         {
           "target": "packages/services",
-          "occurrences": 62
+          "occurrences": 65
         },
         {
           "target": "packages/shared",
           "occurrences": 203
         },
         {
+          "target": "packages/surface",
+          "occurrences": 1
+        },
+        {
           "target": "packages/ui",
-          "occurrences": 9
+          "occurrences": 11
         },
         {
           "target": "packages/zcode-cua",
@@ -661,7 +697,11 @@
       ],
       "dependents": [],
       "dependency_layers": [
+        "capability",
         "platform",
+        "economic",
+        "intelligence",
+        "rails",
         "contracts"
       ]
     },
@@ -673,8 +713,16 @@
       "dependencies": [],
       "dependents": [
         {
+          "source": "packages/desktop",
+          "occurrences": 1
+        },
+        {
           "source": "packages/execution-graph",
           "occurrences": 2
+        },
+        {
+          "source": "packages/route-planning",
+          "occurrences": 3
         }
       ],
       "dependency_layers": []
@@ -736,9 +784,22 @@
       "dir": "packages/lab",
       "name": "@payswap/lab",
       "declared_layer": "intelligence",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/desktop",
+          "occurrences": 1
+        },
+        {
+          "source": "packages/payswap-app",
+          "occurrences": 10
+        },
+        {
+          "source": "packages/route-planning",
+          "occurrences": 13
+        }
+      ],
       "dependency_layers": []
     },
     {
@@ -832,9 +893,18 @@
       "dir": "packages/opportunities",
       "name": "@payswap/opportunities",
       "declared_layer": "economic",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/payswap-app",
+          "occurrences": 4
+        },
+        {
+          "source": "packages/route-planning",
+          "occurrences": 6
+        }
+      ],
       "dependency_layers": []
     },
     {
@@ -843,6 +913,10 @@
       "declared_layer": "platform",
       "status": "FAIL",
       "dependencies": [
+        {
+          "target": "packages/lab",
+          "occurrences": 10
+        },
         {
           "target": "packages/onchain-adapters",
           "occurrences": 1
@@ -856,16 +930,24 @@
           "occurrences": 7
         },
         {
+          "target": "packages/opportunities",
+          "occurrences": 4
+        },
+        {
           "target": "packages/provider-runtime",
           "occurrences": 4
         },
         {
+          "target": "packages/route-planning",
+          "occurrences": 19
+        },
+        {
           "target": "packages/surface",
-          "occurrences": 9
+          "occurrences": 12
         },
         {
           "target": "packages/ui",
-          "occurrences": 25
+          "occurrences": 30
         }
       ],
       "dependents": [
@@ -875,11 +957,13 @@
         },
         {
           "source": "packages/web",
-          "occurrences": 9
+          "occurrences": 1
         }
       ],
       "dependency_layers": [
+        "intelligence",
         "rails",
+        "economic",
         "contracts",
         "platform"
       ]
@@ -984,6 +1068,10 @@
       "dependencies": [],
       "dependents": [
         {
+          "source": "packages/desktop",
+          "occurrences": 4
+        },
+        {
           "source": "packages/payswap-app",
           "occurrences": 4
         }
@@ -994,10 +1082,62 @@
       "dir": "packages/route-compiler",
       "name": "@payswap/route-compiler",
       "declared_layer": "intelligence",
-      "status": "PASS",
+      "status": "FAIL",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        {
+          "source": "packages/desktop",
+          "occurrences": 1
+        },
+        {
+          "source": "packages/route-planning",
+          "occurrences": 5
+        }
+      ],
       "dependency_layers": []
+    },
+    {
+      "dir": "packages/route-planning",
+      "name": "@payswap/route-planning",
+      "declared_layer": "intelligence",
+      "status": "FAIL",
+      "dependencies": [
+        {
+          "target": "packages/capability",
+          "occurrences": 9
+        },
+        {
+          "target": "packages/economic",
+          "occurrences": 3
+        },
+        {
+          "target": "packages/lab",
+          "occurrences": 13
+        },
+        {
+          "target": "packages/opportunities",
+          "occurrences": 6
+        },
+        {
+          "target": "packages/route-compiler",
+          "occurrences": 5
+        }
+      ],
+      "dependents": [
+        {
+          "source": "packages/desktop",
+          "occurrences": 1
+        },
+        {
+          "source": "packages/payswap-app",
+          "occurrences": 19
+        }
+      ],
+      "dependency_layers": [
+        "capability",
+        "economic",
+        "intelligence"
+      ]
     },
     {
       "dir": "packages/rpc",
@@ -1101,7 +1241,7 @@
         },
         {
           "source": "packages/desktop",
-          "occurrences": 62
+          "occurrences": 65
         },
         {
           "source": "packages/server",
@@ -1210,8 +1350,12 @@
       "dependencies": [],
       "dependents": [
         {
+          "source": "packages/desktop",
+          "occurrences": 1
+        },
+        {
           "source": "packages/payswap-app",
-          "occurrences": 9
+          "occurrences": 12
         }
       ],
       "dependency_layers": []
@@ -1264,15 +1408,15 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 9
+          "occurrences": 11
         },
         {
           "source": "packages/payswap-app",
-          "occurrences": 25
+          "occurrences": 30
         },
         {
           "source": "packages/web",
-          "occurrences": 7
+          "occurrences": 9
         }
       ],
       "dependency_layers": [
@@ -1292,7 +1436,7 @@
         },
         {
           "target": "packages/payswap-app",
-          "occurrences": 9
+          "occurrences": 1
         },
         {
           "target": "packages/shared",
@@ -1300,7 +1444,7 @@
         },
         {
           "target": "packages/ui",
-          "occurrences": 7
+          "occurrences": 9
         }
       ],
       "dependents": [],
@@ -1518,6 +1662,192 @@
           "typeOnly": true,
           "classification": "workspace",
           "targetFile": "packages/trust/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/capability",
+      "detail": "layer \"platform\" -> layer \"capability\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/desktop/src/renderer/src/routePlanningEngineAdapter.ts",
+          "line": 60,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/economic",
+      "detail": "layer \"platform\" -> layer \"economic\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/economic",
+          "specifier": "../../../economic/src/payment-intent.ts",
+          "file": "packages/desktop/test/payswap/payments-contract-mirrors.test.ts",
+          "line": 24,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/economic/src/payment-intent.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/lab",
+      "detail": "layer \"platform\" -> layer \"intelligence\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/lab",
+          "specifier": "@payswap/lab",
+          "file": "packages/desktop/src/renderer/src/routePlanningEngineAdapter.ts",
+          "line": 62,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/lab/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/provider-runtime",
+      "detail": "layer \"platform\" -> layer \"rails\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/index.js",
+          "file": "packages/desktop/test/payswap/payment-execution-kernel.test.ts",
+          "line": 54,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/index.js",
+          "file": "packages/desktop/test/payswap/payment-webhook-feed.test.ts",
+          "line": 13,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/adapters/stripe/webhook-verification.ts",
+          "file": "packages/desktop/test/payswap/payment-webhook-feed.test.ts",
+          "line": 17,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/webhook-verification.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/adapters/payment-provider-registry.ts",
+          "file": "packages/desktop/test/payswap/provider-registry-mirror.test.ts",
+          "line": 3,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/payment-provider-registry.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/route-compiler",
+      "detail": "layer \"platform\" -> layer \"intelligence\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "@payswap/route-compiler",
+          "file": "packages/desktop/src/renderer/src/routePlanningEngineAdapter.ts",
+          "line": 61,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/route-compiler/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/route-planning",
+      "detail": "layer \"platform\" -> layer \"intelligence\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-planning",
+          "specifier": "@payswap/route-planning",
+          "file": "packages/desktop/src/renderer/src/routePlanningEngineAdapter.ts",
+          "line": 59,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/route-planning/src/index.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": false
@@ -2063,6 +2393,156 @@
       "rule": "R3-not-in-may-depend-on",
       "severity": "error",
       "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/lab",
+      "detail": "layer \"platform\" -> layer \"intelligence\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/replay.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 51,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/replay.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/scenario-budget.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 52,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/interventions.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 53,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/index.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 54,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/interventions.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 55,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/replay.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 60,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/replay.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/scenario-budget.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 61,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/interventions.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 62,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/index.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 63,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/interventions.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 64,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
       "targetPkg": "packages/onchain-adapters",
       "detail": "layer \"platform\" -> layer \"rails\" is not in may_depend_on [contracts, platform]",
       "occurrences": [
@@ -2289,6 +2769,72 @@
       "rule": "R3-not-in-may-depend-on",
       "severity": "error",
       "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/opportunities",
+      "detail": "layer \"platform\" -> layer \"economic\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../../opportunities/src/discovery.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 56,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/discovery.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../../opportunities/src/wait-criteria.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 57,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/wait-criteria.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../../opportunities/src/model.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 58,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/model.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../../opportunities/src/discovery.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 59,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/discovery.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
       "targetPkg": "packages/provider-runtime",
       "detail": "layer \"platform\" -> layer \"rails\" is not in may_depend_on [contracts, platform]",
       "occurrences": [
@@ -2344,6 +2890,818 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/provider-runtime/src/connection-lifecycle.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/route-planning",
+      "detail": "layer \"platform\" -> layer \"intelligence\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/manifest.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 39,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/manifest.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/trigger.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 40,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/trigger.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/rail-snapshot.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/rail-snapshot.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/candidates.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/candidates.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/hard-gates.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 43,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/hard-gates.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/ranking.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 44,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/ranking.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/lab-adapter.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 45,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/lab-adapter.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/canonical.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 46,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/canonical.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/fixtures.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 48,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/fixtures.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/compiler-evidence.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 49,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/compiler-evidence.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/manifest.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 36,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/manifest.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/trigger.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 37,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/trigger.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/rail-snapshot.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 38,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/rail-snapshot.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/candidates.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 39,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/candidates.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/hard-gates.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 40,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/hard-gates.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/ranking.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/ranking.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/lab-adapter.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 47,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/lab-adapter.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/fixtures.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 57,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/fixtures.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/compiler-evidence.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 58,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/compiler-evidence.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/lab",
+      "detail": "layer \"intelligence\" -> layer \"intelligence\" is not in may_depend_on [economic, capability, contracts]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 21,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/scenario-budget.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 22,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/simulation-plan.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/simulation-plan.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/replay.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 24,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/replay.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 25,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/scenario-budget.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 26,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/index.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 27,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 28,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/replay.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 35,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/replay.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/scenario-budget.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 36,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 37,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/index.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 38,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 39,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/route-compiler",
+      "detail": "layer \"intelligence\" -> layer \"intelligence\" is not in may_depend_on [economic, capability, contracts]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/canonical.ts",
+          "file": "packages/route-planning/test/canonical.test.ts",
+          "line": 13,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/canonical.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/compiler.ts",
+          "file": "packages/route-planning/test/compiler-evidence.ts",
+          "line": 12,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/compiler.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/compiler-input.ts",
+          "file": "packages/route-planning/test/compiler-evidence.ts",
+          "line": 13,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/compiler-input.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/venue-port.ts",
+          "file": "packages/route-planning/test/compiler-evidence.ts",
+          "line": 14,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/venue-port.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/shapes.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 8,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/shapes.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/economic",
+      "detail": "1 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/economic",
+          "specifier": "../../../economic/src/payment-intent.ts",
+          "file": "packages/desktop/test/payswap/payments-contract-mirrors.test.ts",
+          "line": 24,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/economic/src/payment-intent.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/provider-runtime",
+      "detail": "4 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/index.js",
+          "file": "packages/desktop/test/payswap/payment-execution-kernel.test.ts",
+          "line": 54,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/index.js",
+          "file": "packages/desktop/test/payswap/payment-webhook-feed.test.ts",
+          "line": 13,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/adapters/stripe/webhook-verification.ts",
+          "file": "packages/desktop/test/payswap/payment-webhook-feed.test.ts",
+          "line": 17,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/webhook-verification.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../provider-runtime/src/adapters/payment-provider-registry.ts",
+          "file": "packages/desktop/test/payswap/provider-registry-mirror.test.ts",
+          "line": 3,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/payment-provider-registry.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/surface",
+      "detail": "1 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/agent-tasks.ts",
+          "file": "packages/desktop/test/payswap/payments-contract-mirrors.test.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/agent-tasks.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/lab",
+      "detail": "10 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/replay.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 51,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/replay.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/scenario-budget.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 52,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/interventions.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 53,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/index.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 54,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/interventions.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 55,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/replay.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 60,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/replay.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/scenario-budget.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 61,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/interventions.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 62,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/index.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 63,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/lab",
+          "specifier": "../../../lab/src/interventions.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 64,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -2581,6 +3939,72 @@
       "rule": "R6-cross-package-relative",
       "severity": "error",
       "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/opportunities",
+      "detail": "4 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../../opportunities/src/discovery.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 56,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/discovery.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../../opportunities/src/wait-criteria.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 57,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/wait-criteria.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../../opportunities/src/model.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 58,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/model.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../../opportunities/src/discovery.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 59,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/discovery.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
       "targetPkg": "packages/provider-runtime",
       "detail": "4 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
@@ -2647,9 +4071,327 @@
       "rule": "R6-cross-package-relative",
       "severity": "error",
       "sourcePkg": "packages/payswap-app",
-      "targetPkg": "packages/surface",
-      "detail": "9 relative/alias import(s) cross the package boundary instead of using the package name",
+      "targetPkg": "packages/route-planning",
+      "detail": "19 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/manifest.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 39,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/manifest.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/trigger.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 40,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/trigger.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/rail-snapshot.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/rail-snapshot.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/candidates.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/candidates.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/hard-gates.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 43,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/hard-gates.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/ranking.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 44,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/ranking.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/lab-adapter.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 45,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/lab-adapter.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/canonical.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 46,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/canonical.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/fixtures.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 48,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/fixtures.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/compiler-evidence.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-acceptance.test.ts",
+          "line": 49,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/compiler-evidence.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/manifest.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 36,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/manifest.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/trigger.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 37,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/trigger.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/rail-snapshot.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 38,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/rail-snapshot.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/candidates.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 39,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/candidates.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/hard-gates.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 40,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/hard-gates.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/ranking.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/ranking.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/src/lab-adapter.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 47,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/src/lab-adapter.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/fixtures.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 57,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/fixtures.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/compiler-evidence.ts",
+          "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+          "line": 58,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/compiler-evidence.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/payswap-app",
+      "targetPkg": "packages/surface",
+      "detail": "12 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/agent-tasks.ts",
+          "file": "packages/payswap-app/test/payswap/agent-task-pin-mirror.test.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/agent-tasks.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/agent-task-validation.ts",
+          "file": "packages/payswap-app/test/payswap/agent-task-pin-mirror.test.ts",
+          "line": 48,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/agent-task-validation.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/surface",
+          "specifier": "../../../surface/src/agent-task-validation.ts",
+          "file": "packages/payswap-app/test/payswap/agent-task-session.test.ts",
+          "line": 22,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/surface/src/agent-task-validation.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
         {
           "sourcePkg": "packages/payswap-app",
           "targetPkg": "packages/surface",
@@ -2778,6 +4520,560 @@
         }
       ],
       "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/capability",
+      "detail": "9 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/observation.ts",
+          "file": "packages/route-planning/test/fixtures.ts",
+          "line": 15,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/observation.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/corridor.ts",
+          "file": "packages/route-planning/test/fixtures.ts",
+          "line": 16,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/corridor.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/corridor-evaluation.ts",
+          "file": "packages/route-planning/test/fixtures.ts",
+          "line": 17,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/corridor-evaluation.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/index.ts",
+          "file": "packages/route-planning/test/fixtures.ts",
+          "line": 26,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/execution-modes.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 5,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/execution-modes.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/availability.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 6,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/availability.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/corridor-types.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 7,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/corridor-types.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/corridor.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 9,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/corridor.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/corridor-types.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 10,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/corridor-types.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/economic",
+      "detail": "3 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/economic",
+          "specifier": "../../economic/src/intent.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 2,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/economic/src/intent.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/economic",
+          "specifier": "../../economic/src/payment-intent.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 3,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/economic/src/payment-intent.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/economic",
+          "specifier": "../../economic/src/validate.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 4,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/economic/src/validate.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/lab",
+      "detail": "13 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 21,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/scenario-budget.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 22,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/simulation-plan.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/simulation-plan.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/replay.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 24,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/replay.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 25,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/scenario-budget.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 26,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/index.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 27,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/lab-adapter.test.ts",
+          "line": 28,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/replay.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 35,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/replay.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/scenario-budget.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 36,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/scenario-budget.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 37,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/index.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 38,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/lab",
+          "specifier": "../../lab/src/interventions.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 39,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/opportunities",
+      "detail": "6 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../opportunities/src/discovery.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 40,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/discovery.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../opportunities/src/matching.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/matching.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../opportunities/src/wait-criteria.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/wait-criteria.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../opportunities/src/consent.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 43,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/consent.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../opportunities/src/matching.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 44,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/matching.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/opportunities",
+          "specifier": "../../opportunities/src/discovery.ts",
+          "file": "packages/route-planning/test/routine-composition.test.ts",
+          "line": 45,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/opportunities/src/discovery.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/route-compiler",
+      "detail": "5 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/canonical.ts",
+          "file": "packages/route-planning/test/canonical.test.ts",
+          "line": 13,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/canonical.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/compiler.ts",
+          "file": "packages/route-planning/test/compiler-evidence.ts",
+          "line": 12,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/compiler.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/compiler-input.ts",
+          "file": "packages/route-planning/test/compiler-evidence.ts",
+          "line": 13,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/compiler-input.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/venue-port.ts",
+          "file": "packages/route-planning/test/compiler-evidence.ts",
+          "line": 14,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/venue-port.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/route-compiler",
+          "specifier": "../../route-compiler/src/shapes.ts",
+          "file": "packages/route-planning/test/pins-fidelity.test.ts",
+          "line": 8,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-compiler/src/shapes.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
     }
   ],
   "unresolved_specifiers": [
@@ -2832,6 +5128,11 @@
       "line": 2
     },
     {
+      "file": "packages/desktop/test/payswap/connections-plane.test.ts",
+      "specifier": "vitest",
+      "line": 27
+    },
+    {
       "file": "packages/desktop/test/payswap/delegation.test.ts",
       "specifier": "vitest",
       "line": 8
@@ -2840,11 +5141,6 @@
       "file": "packages/desktop/test/payswap/desktop-console-client.test.ts",
       "specifier": "vitest",
       "line": 16
-    },
-    {
-      "file": "packages/desktop/test/payswap/desktop-product-surface.test.ts",
-      "specifier": "vitest",
-      "line": 17
     },
     {
       "file": "packages/desktop/test/payswap/honest-states.test.ts",
@@ -2867,6 +5163,31 @@
       "line": 18
     },
     {
+      "file": "packages/desktop/test/payswap/payment-execution-kernel.test.ts",
+      "specifier": "vitest",
+      "line": 30
+    },
+    {
+      "file": "packages/desktop/test/payswap/payment-webhook-feed.test.ts",
+      "specifier": "vitest",
+      "line": 2
+    },
+    {
+      "file": "packages/desktop/test/payswap/payments-contract-mirrors.test.ts",
+      "specifier": "vitest",
+      "line": 13
+    },
+    {
+      "file": "packages/desktop/test/payswap/payments-mission-plane.test.ts",
+      "specifier": "vitest",
+      "line": 28
+    },
+    {
+      "file": "packages/desktop/test/payswap/payments-mission-runtime.test.ts",
+      "specifier": "vitest",
+      "line": 35
+    },
+    {
       "file": "packages/desktop/test/payswap/pin-fidelity.test.ts",
       "specifier": "vitest",
       "line": 8
@@ -2882,14 +5203,24 @@
       "line": 7
     },
     {
+      "file": "packages/desktop/test/payswap/provider-registry-mirror.test.ts",
+      "specifier": "vitest",
+      "line": 1
+    },
+    {
       "file": "packages/desktop/test/payswap/quote-terms.test.ts",
       "specifier": "vitest",
       "line": 7
     },
     {
-      "file": "packages/desktop/test/payswap/scroll-contract.test.ts",
+      "file": "packages/desktop/test/payswap/renderer-strip.test.ts",
       "specifier": "vitest",
-      "line": 18
+      "line": 14
+    },
+    {
+      "file": "packages/desktop/test/payswap/route-planning-binding.test.ts",
+      "specifier": "vitest",
+      "line": 31
     },
     {
       "file": "packages/desktop/test/payswap/security-gate.test.ts",
@@ -2942,6 +5273,21 @@
       "line": 61
     },
     {
+      "file": "packages/payswap-app/test/payswap/agent-composer.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 24
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/agent-experience.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 22
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/console-sections-bridge.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 31
+    },
+    {
       "file": "packages/payswap-app/test/payswap/console-sections.test.tsx",
       "specifier": "@testing-library/react",
       "line": 28
@@ -2962,6 +5308,16 @@
       "line": 16
     },
     {
+      "file": "packages/payswap-app/test/payswap/route-planning-composition-seam.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 27
+    },
+    {
+      "file": "packages/payswap-app/test/payswap/route-planning-panel.test.tsx",
+      "specifier": "@testing-library/react",
+      "line": 27
+    },
+    {
       "file": "packages/payswap-app/test/payswap/routes.test.tsx",
       "specifier": "@testing-library/react",
       "line": 18
@@ -2970,66 +5326,6 @@
       "file": "packages/provider-runtime/test/idempotency.test.ts",
       "specifier": "psp.create_transfer",
       "line": 47
-    },
-    {
-      "file": "packages/provider-runtime/test/idempotency.test.ts",
-      "specifier": "psp.other_operation",
-      "line": 48
-    },
-    {
-      "file": "packages/provider-runtime/test/idempotency.test.ts",
-      "specifier": "psp.create_payout",
-      "line": 59
-    },
-    {
-      "file": "packages/services/src/bigmodel/codingPlanEntitlement.ts",
-      "specifier": "#src/providers/api/apiJson.js",
-      "line": 3
-    },
-    {
-      "file": "packages/services/src/bigmodel/codingPlanEntitlement.ts",
-      "specifier": "#src/bigmodel/teamPlanApiKey.js",
-      "line": 4
-    },
-    {
-      "file": "packages/services/src/bigmodel/teamPlanApiKey.ts",
-      "specifier": "#src/providers/api/apiJson.js",
-      "line": 2
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
-      "specifier": "#src/session/zcodeTaskService.js",
-      "line": 11
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
-      "specifier": "#src/zcode-agent/zcodeAgent.js",
-      "line": 15
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
-      "specifier": "#src/zcode-session/zcodeSession.js",
-      "line": 19
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteRuntimeServices.ts",
-      "specifier": "#src/model-provider/providerFacadeServices.js",
-      "line": 23
-    },
-    {
-      "file": "packages/services/src/bots/botRemoteWorkspaceBridge.ts",
-      "specifier": "#src/bots/botRemoteRuntimeServices.js",
-      "line": 16
-    },
-    {
-      "file": "packages/services/src/bots/botsService.ts",
-      "specifier": "#src/session/sessionModeOptions.js",
-      "line": 59
-    },
-    {
-      "file": "packages/services/src/bots/botsService.ts",
-      "specifier": "#src/session/sessionTitle.js",
-      "line": 60
     }
   ],
   "example_hints_without_packages": [

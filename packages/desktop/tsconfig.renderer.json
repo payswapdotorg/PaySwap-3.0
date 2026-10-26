@@ -2,18 +2,41 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "out/renderer",
-    "rootDir": "src/renderer",
     "lib": ["es2025", "dom", "dom.iterable"],
     "jsx": "react-jsx",
     "noEmit": true,
+    // P17-C: noEmit 项目 —— rootDir 仅承担 TS6059 边界检查；组合根把
+    // sibling 源码包纳入程序后，公共根即 packages/ 目录。
+    "rootDir": "../",
+    // P17-C: the composition-root module pulls sibling workspace sources (route-planning/capability/route-compiler/lab) whose own tsconfigs allow .ts import extensions and map the type-only @payswap/trust pin — the same two settings here (each package's own tsconfig precedent).
+    "allowImportingTsExtensions": true,
     // @payswap/app（P9-A）：desktop package.json 归 Lane B（打包身份）管，
     // renderer 以 tsconfig paths 直连 workspace 源码 —— 与 vite 别名一致。
+    // P17-C（ADR-0010 D1）：route-planning/capability/route-compiler/lab
+    // 四个 REAL 引擎源码包同样以 paths 直连 —— 只供
+    // src/renderer/src/routePlanning*.ts 这一个组合根模块消费，
+    // 与 vite/vitest 别名三处同步。
     "paths": {
       "@payswap/app/routes": ["../payswap-app/src/routes.ts"],
-      "@payswap/app": ["../payswap-app/src/index.ts"]
+      "@payswap/app": ["../payswap-app/src/index.ts"],
+      "@payswap/route-planning": ["../route-planning/src/index.ts"],
+      "@payswap/capability": ["../capability/src/index.ts"],
+      "@payswap/route-compiler": ["../route-compiler/src/index.ts"],
+      "@payswap/lab": ["../lab/src/index.ts"],
+      "@payswap/trust": ["../trust/src/index.ts"]
     }
   },
-  "include": ["src/renderer"],
+  "include": [
+    "src/renderer",
+    // P17-C (ADR-0010 D1)：组合根以 paths 直连的四个 REAL 引擎源码包
+    // 也列入本项目的文件清单（TS6307/TS6059 的结构性修复 —— 这些源码
+    // 本就随 renderer 打包，理应进入类型检查程序）。
+    "../route-planning/src",
+    "../capability/src",
+    "../route-compiler/src",
+    "../lab/src",
+    "../trust/src"
+  ],
   // renderer 直接 import 了 shared；把它补进 references，避免 renderer 单独检查时再走源码回退路径。
   "references": [
     { "path": "../shared" },

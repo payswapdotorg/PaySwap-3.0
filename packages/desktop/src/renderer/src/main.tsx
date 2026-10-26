@@ -1,5 +1,8 @@
 import { DatabaseStartupAdmission } from "./databaseStartupAdmission.js";
 import { initializeDesktopLocalTtft } from "./localTtftBootstrap.js";
+// P17-C（ADR-0010 D1）：THE 组合根 —— 唯一允许消费 @payswap/route-planning 等
+// REAL 引擎源码包的 renderer 模块（三处别名同步；其余 renderer 文件不得跟随）。
+import { composeRoutePlanningBinding } from "./routePlanningComposition.js";
 import { createRoot } from "react-dom/client";
 import { useEffect } from "react";
 import {
@@ -322,6 +325,12 @@ function initializeBusinessRoot(port: MessagePort): void {
   baseServicesForRemoteSessions = services;
   registerBaseWorkspaceServices(services);
   flushPendingRemoteWorkspaceServicePorts();
+  // P17-C（ADR-0010 D1/D5）：在业务根初始化时绑定 REAL 路由规划引擎与会话 ——
+  // 组合根消费 payswap-desktop 的 mission-plane 成员（P17-A）；失败时保持诚实
+  // 默认（未绑定引擎 + 未接线选择），面板如实呈现，绝不掩盖。
+  void composeRoutePlanningBinding({ services }).refresh().catch(() => {
+    // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定说明 + 未接线选择。
+  });
   const settingService = supportsSettings ? services.settingService : undefined;
 
   syncAppTelemetryContext({
