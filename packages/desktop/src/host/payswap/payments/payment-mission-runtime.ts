@@ -56,6 +56,7 @@ import { runValidationGates, type PaymentGateAggregate, type PaymentGateEnvironm
 import {
   createAuthorizationGate,
   type AuthorizationResolution,
+  type MissionAuthorizationArtifactSnapshot,
   type PaymentAuthorizationArtifact,
   type PaymentAuthorizationGate,
   type PaymentAuthorizationGateState,
@@ -177,6 +178,16 @@ export interface PaymentMissionRuntime {
   /** Resolve a request (ONLY a PREVIEW_UI_ACT origin can decide). */
   resolveAuthorization(decision: PaymentAuthorizationDecision, now: string): Promise<AuthorizationResolution>;
   artifact(artifactId: string): Promise<PaymentAuthorizationArtifact | undefined>;
+  /**
+   * (P19-A, ADR-0012 D3) The mission-scoped armed lookup (mint-ordered
+   * snapshots with the consumed/expired derivation) — the read surface
+   * the armed-effect channel member derives over. A pure read: the
+   * dispatch path's own enforcing checks stay UNCHANGED.
+   */
+  artifactsForMission(
+    missionId: string,
+    now: string,
+  ): Promise<readonly MissionAuthorizationArtifactSnapshot[]>;
   pause(missionId: string, now: string): Promise<PaymentMissionRecord>;
   resume(missionId: string, now: string): Promise<PaymentMissionRecord>;
   /** Clean cancel — only when NO confirmed effect exists (compensation is the completed-mission path). */
@@ -298,6 +309,7 @@ export function createPaymentMissionRuntime(
     requestAuthorization: (missionId, now) => authorization.requestAuthorization(missionId, now),
     resolveAuthorization: (decision, now) => authorization.resolveAuthorization(decision, now),
     artifact: (artifactId) => authorization.artifact(artifactId),
+    artifactsForMission: (missionId, now) => authorization.artifactsForMission(missionId, now),
     dispatch: createPaymentDispatchSlice(core),
 
     async getMission(missionId) {

@@ -48,11 +48,13 @@ import type {
   DesktopProviderRegistryView,
 } from "../connections/contracts.js";
 import type { PaymentMissionRuntime } from "../payments/payment-mission-runtime.js";
+import type { DispatchLaneCandidateRecord } from "../payments/dispatch-lane-resolver.js";
 import {
   createPaymentMissionChannelMembers,
   createPaymentMissionRuntimeResolver,
 } from "./payment-mission-members.js";
 import { createPaymentApprovalChannelMembers } from "./approval-members.js";
+import { createPaymentDispatchChannelMembers } from "./dispatch-members.js";
 import { createWorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 import { ConnectionPlaneNotConfiguredError } from "./plane-errors.js";
 
@@ -159,6 +161,17 @@ export function createPaySwapDesktopService(
     options.paymentMissionRuntime,
     seamLog,
   );
+
+  // (P19-A, ADR-0012 D2) The dispatch members' lane-candidate port —
+  // the connections registry's own read model (the status views are a
+  // structural superset of the resolver's candidate records). Fail-
+  // closed PER CALL with the typed error when the connections plane
+  // was not composed — the lane set is never fabricated to mask a
+  // missing plane; a composed plane with zero records is the honest
+  // empty lane.
+  const listLaneCandidateRecords = async (): Promise<readonly DispatchLaneCandidateRecord[]> => {
+    return await resolveConnectionAuthority().connectionStatuses();
+  };
 
   const service: IPaySwapDesktopService = {
     session,
@@ -301,6 +314,18 @@ export function createPaySwapDesktopService(
       resolveRuntime: resolvePaymentMissionRuntime,
       now: paymentMissionClock,
       log: seamLog,
+    }),
+
+    // (P19-A, ADR-0012 D1/D2) The dispatch members — the armed-effect
+    // READ + the lane-choice ACT over the SAME resolver and host clock:
+    // the eligible set recomputes host-side at act time, the artifact /
+    // operation / INV-25 mode resolve host-side, and the lane-candidate
+    // port fails closed typed when the connections plane is absent.
+    ...createPaymentDispatchChannelMembers({
+      resolveRuntime: resolvePaymentMissionRuntime,
+      now: paymentMissionClock,
+      log: seamLog,
+      listLaneCandidateRecords,
     }),
   };
   return service;

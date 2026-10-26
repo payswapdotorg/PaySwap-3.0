@@ -9,6 +9,8 @@
     "src/host/payswap",
     "test/payswap/payment-approval-plane.test.ts",
     "test/payswap/payment-approval-plane-harness.ts",
+    "test/payswap/payment-dispatch-plane.test.ts",
+    "test/payswap/payment-dispatch-plane-fixtures.ts",
     "test/payswap/payments-mission-plane.test.ts",
     "test/payswap/delegation.test.ts"
   ]

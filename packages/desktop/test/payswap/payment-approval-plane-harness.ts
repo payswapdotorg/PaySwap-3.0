@@ -1,13 +1,16 @@
 /**
- * PaySwap Desktop (P18-A) — the approval-plane battery's shared harness,
- * split from ./payment-approval-plane.test.ts for the ≤400-line file
- * law. Everything here is the P17-A battery / runtime-battery fixture
- * pattern: an in-memory fs seam, a pinned host clock, clearly-labeled
- * FAKE authorities (scripted / never-settling), the scripted PASSING
- * gate environment (fixture-only — the channel's own preview member
- * composes the HONEST EMPTY environment by law), the channel intake
- * driver, the host-side approval seeding (the artifact exists ONLY
- * host-side) and the artifact/lineage deep scanner.
+ * PaySwap Desktop (P18-A; P19-A) — the approval/dispatch-plane
+ * batteries' shared harness, split from ./payment-approval-plane.test.ts
+ * for the ≤400-line file law. Everything here is the P17-A battery /
+ * runtime-battery fixture pattern: an in-memory fs seam, a pinned host
+ * clock, clearly-labeled FAKE authorities (scripted / never-settling),
+ * the scripted PASSING gate environment (fixture-only — the channel's
+ * own preview member composes the HONEST EMPTY environment by law),
+ * the channel intake driver, the host-side approval seeding (the
+ * artifact exists ONLY host-side), the REAL connections-plane fixture
+ * world (P19-A — the lane-candidate records through the REAL
+ * ConnectionSessionAuthority, the connections-plane battery pattern)
+ * and the artifact/lineage deep scanner.
  */
 
 import { expect } from "vitest";
@@ -28,9 +31,12 @@ import { compiledIntentDigest } from "../../src/host/payswap/payments/mission-ex
 import type { PaymentAuthorizationDecision } from "../../src/host/payswap/payments/authorization-gate.js";
 import type { PaymentGateEnvironment } from "../../src/host/payswap/payments/validation-gates.js";
 import type { IPaySwapDesktopService } from "../../src/host/payswap/shell/contracts.js";
+import type { ConnectionSessionAuthority } from "../../src/host/payswap/connections/index.js";
 
 export const T0 = "2026-10-22T12:00:00Z";
 export const T1 = "2026-10-22T12:05:00Z";
+/** Past the +600s artifact lifetime minted at T0 (the P19-A expiry fixture). */
+export const T_PAST_ARTIFACT = "2026-10-22T12:11:00Z";
 export const UNKNOWN_MISSION = "task:PAYMENT_MISSION:ffffffffffffffffffffffffffffffff";
 
 /** The in-memory fs seam (the p14 script + runtime-battery precedent). */
@@ -141,6 +147,8 @@ export interface Harness {
 /** Compose the REAL service over the REAL runtime (in-memory fs; pinned clock). */
 export async function harness(
   authority: ExecutionAuthorityPort = createUnwiredExecutionAuthority(),
+  connectionAuthority?: ConnectionSessionAuthority,
+  now: () => string = () => T0,
 ): Promise<Harness> {
   const world = memoryFs();
   const store = await openPaymentMissionStore({ fileSystem: world.fs, directory: "/mem/payments" });
@@ -163,11 +171,21 @@ export async function harness(
     {
       createSessionId: () => "session-p18a",
       paymentMissionRuntime: runtime,
-      paymentMissionClock: () => T0,
+      paymentMissionClock: now,
+      ...(connectionAuthority !== undefined ? { connectionAuthority } : {}),
     },
   );
   return { service, runtime };
 }
+
+// ---------------------------------------------------------------------------
+// The P19-A connections-plane fixtures live in
+// ./payment-dispatch-plane-fixtures.ts (the file-law split): the REAL
+// ConnectionSessionAuthority over an in-memory world + the ACTIVE
+// SANDBOX / PROPOSED / fixture-LIVE record seeders, so the dispatch
+// battery's lane-candidate records arrive through the REAL registry
+// read path.
+// ---------------------------------------------------------------------------
 
 /** The nine intake fixture values (the runtime battery's own fixtures). */
 function intakeValueFor(fieldId: string): unknown {

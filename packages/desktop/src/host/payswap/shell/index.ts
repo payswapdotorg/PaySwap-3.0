@@ -37,6 +37,9 @@ export { createPaymentMissionChannelMembers } from "./payment-mission-members.js
 export type { PaymentMissionChannelDeps, PaymentMissionChannelMemberSurface } from "./payment-mission-members.js";
 // (P18-A, ADR-0011 D2/D3) The approval members + the attempt-state projection.
 export { createPaymentApprovalChannelMembers, projectAttemptStates } from "./approval-members.js";
+// (P19-A, ADR-0012 D1/D2) The dispatch members (the armed-effect read + the lane-choice act).
+export { createPaymentDispatchChannelMembers } from "./dispatch-members.js";
+export type { PaymentDispatchChannelDeps } from "./dispatch-members.js";
 export { createWorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 export type { WorkspaceStoreChannelDeps, WorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 export {
@@ -46,4 +49,15 @@ export {
   type PaymentAuthorizationResolutionDto,
   type PaymentAuthorizationScopeDto,
   type PaymentMissionAttemptStateDto,
+  type PaymentDispatchLaneDto,
+  type PaymentMissionArmedEffectDto,
+  type PaymentMissionDispatchOutcomeDto,
 } from "./payment-mission-contracts.js";
+export {
+  resolveDispatchLanes,
+  eligibleLanesOf,
+  LIVE_LANE_INELIGIBLE_REASON,
+  type DispatchLane,
+  type DispatchLaneCandidateRecord,
+  type DispatchLaneCandidateRecordsPort,
+} from "../payments/dispatch-lane-resolver.js";

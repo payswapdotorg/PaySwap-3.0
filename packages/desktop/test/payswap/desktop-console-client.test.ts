@@ -129,10 +129,12 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       "journeyState",
       "missionBoard",
       // P17-A payment-mission members (read/input verbs only).
+      "paymentMissionArmedEffect",
       "paymentMissionAskNextField",
       "paymentMissionBoard",
       "paymentMissionCapture",
       "paymentMissionDetail",
+      "paymentMissionDispatch",
       "paymentMissionPresentPreview",
       "paymentMissionRecordPlanSelection",
       // P18-A approval members (ADR-0011 D2 — edge-pinned: the origin +
@@ -178,10 +180,19 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).toContain(member);
       expect(member).not.toMatch(/^(execute|retry|cancel|confirm|settle|payout|approve)/);
     }
-    // The authorization/dispatch plane stays HOST-SIDE: none of its
-    // verbs is exposed on the channel (ADR-0011 D2 narrows ADR-0010 D2
-    // to the two edge-pinned members above — the raw runtime verbs,
-    // the artifact getter and the dispatch slice never cross).
+    // The P19-A dispatch members pass the law too (ADR-0012 D1 — the
+    // names carry the paymentMission prefix; the dispatch act is a
+    // LANE CHOICE over the host-recomputed eligible set, never a
+    // grant-bearing verb).
+    for (const member of ["paymentMissionArmedEffect", "paymentMissionDispatch"]) {
+      expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).toContain(member);
+      expect(member).not.toMatch(/^(execute|retry|cancel|confirm|settle|payout|approve)/);
+    }
+    // The authorization/dispatch plane's raw verbs stay HOST-SIDE: none
+    // of them is exposed on the channel (ADR-0012 D1 narrows the
+    // ADR-0011 D3 boundary to the two lane-choice members above — the
+    // raw runtime verbs, the artifact getters and the artifact-id
+    // input surface never cross).
     for (const forbidden of [
       "requestAuthorization",
       "resolveAuthorization",
@@ -189,6 +200,7 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       "approveAuthorization",
       "executePayment",
       "artifact",
+      "artifactsForMission",
     ]) {
       expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).not.toContain(forbidden);
     }

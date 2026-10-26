@@ -1,8 +1,8 @@
 /**
- * PaySwap Desktop (P17-A, ADR-0010 D2/D3; P18-A, ADR-0011 D2/D3) — the
- * payment-mission channel members' contracts: the read/input surface
- * the renderer consumes over the payswap-desktop channel, and its
- * JSON-safe DTOs.
+ * PaySwap Desktop (P17-A, ADR-0010 D2/D3; P18-A, ADR-0011 D2/D3; P19-A,
+ * ADR-0012 D1) — the payment-mission channel members' contracts: the
+ * read/input surface the renderer consumes over the payswap-desktop
+ * channel, and its JSON-safe DTOs.
  *
  * THE CHANNEL LAW (the no-parallel-engine discipline, extended):
  * - every member is a READ or an INTAKE-PLANE INPUT verb — all names
@@ -22,10 +22,18 @@
  *   wire shape here — the single-use artifact is minted and consumed
  *   host-side; the observable truth is the mission state + the
  *   AUTHORIZATION_GRANTED / AUTHORIZATION_DECLINED timeline events;
- * - THE DISPATCH ACT STAYS HOST-SIDE (ADR-0011 D3): no member fires
- *   a dispatch. The detail DTO projects attempt STATES — outcome
- *   facts only, derived host-side — never the attempt records
- *   themselves (they carry the consumed-authorization lineage);
+ * - THE DISPATCH ACT (P19-A, ADR-0012 D1 — the lawful narrowing of
+ *   the ADR-0011 D3 boundary, the same pattern as the approval
+ *   amendment above): the dispatch crosses as TWO members — the
+ *   armed-effect READ + the lane-choice ACT (see
+ *   ./dispatch-contracts.ts, split for the ≤400-line file law). The
+ *   wire carries a CHOICE, never a grant: the eligible lane set is
+ *   recomputed host-side at act time, and the artifact, the
+ *   operation and the INV-25 mode resolve HOST-SIDE — the artifact
+ *   never crosses, NOT EVEN AS AN INPUT. The detail DTO projects
+ *   attempt STATES — outcome facts only, derived host-side — never
+ *   the attempt records themselves (they carry the
+ *   consumed-authorization lineage);
  * - the DTOs carry NO credentials, NO secrets and NO authorization
  *   artifacts: the detail projects the mission's demand-side record
  *   (timeline, intake fields, compiled intent, preview id, plan
@@ -48,6 +56,13 @@ import type {
   PaymentTaskStatus,
 } from "../payments/contracts.js";
 import type { PaymentGateId } from "../payments/validation-gates.js";
+import type { IPaySwapDesktopDispatchMembers } from "./dispatch-contracts.js";
+export type {
+  IPaySwapDesktopDispatchMembers,
+  PaymentDispatchLaneDto,
+  PaymentMissionArmedEffectDto,
+  PaymentMissionDispatchOutcomeDto,
+} from "./dispatch-contracts.js";
 
 // ---------------------------------------------------------------------------
 // The DTOs (JSON-safe channel shapes — projections of host records)
@@ -250,12 +265,13 @@ export interface PaymentMissionAttemptStateDto {
 // ---------------------------------------------------------------------------
 
 /**
- * The payment-mission channel members (P17-A, ADR-0010 D2). Every
- * member fails closed with PaymentPlaneNotConfiguredError when the
- * host composed no payment-mission runtime (the workspace-store
- * posture — never a silent no-op).
+ * The payment-mission channel members (P17-A, ADR-0010 D2; P19-A,
+ * ADR-0012 D1 for the dispatch members). Every member fails closed
+ * with PaymentPlaneNotConfiguredError when the host composed no
+ * payment-mission runtime (the workspace-store posture — never a
+ * silent no-op).
  */
-export interface IPaySwapDesktopPaymentMissionMembers {
+export interface IPaySwapDesktopPaymentMissionMembers extends IPaySwapDesktopDispatchMembers {
   /**
    * The mission board, newest-updated-first: the read model for the
    * payments surface (status, compiled-intent/preview presence and the

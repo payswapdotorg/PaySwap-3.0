@@ -1,16 +1,18 @@
 /**
- * PaySwap Desktop (P13-C) — the preview + AUTHORIZATION service, split
- * from ./payment-mission-runtime.ts for the ≤400-line file law: the
- * structured preview presentation (gate chain + compile + persistence)
- * and the explicit scoped authorization round-trip (the ONLY key that
- * arms dispatch — a PREVIEW_UI_ACT decision mints a single-use
- * artifact; text/voice/NLP never authorizes).
+ * PaySwap Desktop (P13-C; P19-A, ADR-0012 D3) — the preview +
+ * AUTHORIZATION service, split from ./payment-mission-runtime.ts for the
+ * ≤400-line file law: the structured preview presentation (gate chain +
+ * compile + persistence) and the explicit scoped authorization round-trip
+ * (the ONLY key that arms dispatch — a PREVIEW_UI_ACT decision mints a
+ * single-use artifact; text/voice/NLP never authorizes), plus the
+ * mission-scoped armed lookup (the gate's pure read).
  */
 
 import { PaymentMissionError } from "./contracts.js";
 import type { PaymentMissionRecord, PaymentIntakeCaptures } from "./contracts.js";
 import type {
   AuthorizationResolution,
+  MissionAuthorizationArtifactSnapshot,
   PaymentAuthorizationArtifact,
   PaymentAuthorizationDecision,
   PaymentAuthorizationRequest,
@@ -44,6 +46,15 @@ export interface MissionAuthorizationService {
   requestAuthorization(missionId: string, now: string): Promise<PaymentAuthorizationRequest>;
   resolveAuthorization(decision: PaymentAuthorizationDecision, now: string): Promise<AuthorizationResolution>;
   artifact(artifactId: string): Promise<PaymentAuthorizationArtifact | undefined>;
+  /**
+   * (P19-A, ADR-0012 D3) The mission-scoped armed lookup — the gate's
+   * pure read (mint-ordered snapshots with the consumed/expired
+   * derivation), for the armed-effect channel member's derivation.
+   */
+  artifactsForMission(
+    missionId: string,
+    now: string,
+  ): Promise<readonly MissionAuthorizationArtifactSnapshot[]>;
 }
 
 export function createMissionAuthorizationService(core: PaymentMissionCore): MissionAuthorizationService {
@@ -240,6 +251,10 @@ export function createMissionAuthorizationService(core: PaymentMissionCore): Mis
 
     async artifact(artifactId) {
       return core.getGate().artifact(artifactId);
+    },
+
+    async artifactsForMission(missionId, now) {
+      return core.getGate().artifactsForMission(missionId, now);
     },
   };
 }

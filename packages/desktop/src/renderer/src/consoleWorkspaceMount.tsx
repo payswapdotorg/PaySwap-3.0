@@ -38,9 +38,11 @@ import type {
 import type {
   PaySwapPaymentAuthorizationRequestDto,
   PaySwapPaymentAuthorizationResolutionDto,
+  PaySwapPaymentMissionArmedEffectDto,
   PaySwapPaymentMissionBoardItemDto,
   PaySwapPaymentMissionDetailDto,
   PaySwapPaymentMissionSeedInputDto,
+  PaySwapPaymentDispatchOutcomeDto,
   PaySwapPaymentPlanSelectionInputDto,
   PaySwapPaymentPreviewDto,
 } from "./consolePaymentMissionWire.js";
@@ -69,6 +71,9 @@ export type {
   PaySwapPaymentAuthorizationResolutionDto,
   PaySwapPaymentAttemptOutcome,
   PaySwapPaymentMissionAttemptStateDto,
+  PaySwapPaymentDispatchLaneDto,
+  PaySwapPaymentMissionArmedEffectDto,
+  PaySwapPaymentDispatchOutcomeDto,
 } from "./consolePaymentMissionWire.js";
 
 // ---------------------------------------------------------------------------
@@ -130,6 +135,12 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   // authorization artifact NEVER crosses the channel).
   "paymentMissionRequestApproval",
   "paymentMissionResolveApproval",
+  // P19-A dispatch members (ADR-0012 D1 — the dispatch act crosses as
+  // the armed-effect READ + the lane-choice ACT: the eligible set
+  // recomputes HOST-SIDE at act time, the artifact/operation/mode
+  // resolve HOST-SIDE, the outcome carries facts only).
+  "paymentMissionArmedEffect",
+  "paymentMissionDispatch",
 ] as const;
 
 /**
@@ -230,6 +241,24 @@ export interface IPaySwapDesktopClientService {
     requestId: string,
     decision: "APPROVE" | "DECLINE",
   ): Promise<PaySwapPaymentAuthorizationResolutionDto>;
+  /**
+   * The armed-effect READ (P19-A, ADR-0012 D1): the armed card — the
+   * armed truth, the scope + expiry echo when armed, the verbatim
+   * not-armed reason when not, and the resolved executing lanes. No
+   * artifactId exists on the card (the artifact never crosses).
+   */
+  paymentMissionArmedEffect(missionId: string): Promise<PaySwapPaymentMissionArmedEffectDto>;
+  /**
+   * The dispatch ACT (P19-A, ADR-0012 D1): the operator-picked lane —
+   * a CHOICE, never a grant. The eligible set recomputes HOST-SIDE at
+   * act time (an outside connectionRef is a typed refusal); the
+   * artifact, the operation and the INV-25 mode resolve HOST-SIDE; the
+   * outcome carries facts only (kind, attemptId, summary).
+   */
+  paymentMissionDispatch(
+    missionId: string,
+    connectionRef: string,
+  ): Promise<PaySwapPaymentDispatchOutcomeDto>;
 }
 
 /** What the renderer needs from its service connection for the console. */

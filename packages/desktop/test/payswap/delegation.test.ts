@@ -121,17 +121,26 @@ describe("delegated money movement laws (P7-W2)", () => {
       // P17-A payment-mission members (ADR-0010 D2): read/input verbs
       // ONLY — the authorization/dispatch plane stays host-side behind
       // the origin law.
+      "paymentMissionArmedEffect",
       "paymentMissionAskNextField",
       "paymentMissionBoard",
       "paymentMissionCapture",
       "paymentMissionDetail",
+      "paymentMissionDispatch",
       "paymentMissionPresentPreview",
       "paymentMissionRecordPlanSelection",
+      // (P19-A dispatch members — paymentMissionArmedEffect +
+      // paymentMissionDispatch above, ADR-0012 D1 — the lawful
+      // narrowing of ADR-0011 D3: the dispatch act crosses as the
+      // armed-effect READ + the lane-choice ACT; the eligible set
+      // recomputes host-side at act time [a CHOICE, never a grant],
+      // the artifact/operation/mode resolve host-side, the outcome
+      // carries facts only.)
       // P18-A approval members (ADR-0011 D2 — the lawful narrowing of
       // ADR-0010 D2): the approval act crosses as edge-pinned members —
       // the origin + principal are pinned HOST-SIDE (only a
       // PREVIEW_UI_ACT decides) and the single-use artifact NEVER
-      // crosses; the dispatch act stays host-side (D3).
+      // crosses.
       "paymentMissionRequestApproval",
       "paymentMissionResolveApproval",
       "paymentMissionSeed",

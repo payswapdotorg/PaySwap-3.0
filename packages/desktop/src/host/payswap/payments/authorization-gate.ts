@@ -1,5 +1,6 @@
 /**
- * PaySwap Desktop (P13-C) — the authorization gate (ADR-0007 D7 core).
+ * PaySwap Desktop (P13-C; P19-A, ADR-0012 D3) — the authorization gate
+ * (ADR-0007 D7 core).
  *
  * THE LAW: a scoped approval artifact is minted ONLY by an explicit user
  * UI act on the presented preview. The runtime exposes
@@ -138,6 +139,25 @@ export type AuthorizationResolution = {
   readonly previewId: string;
 };
 
+/**
+ * One mission-scoped artifact snapshot (P19-A, ADR-0012 D3 — the
+ * armed-effect READ view): the artifact's id + scope + lifetime facts
+ * with the consumed/expired derivation computed against the read's
+ * `now`. HOST-SIDE ONLY — the channel member projects this into the
+ * armed card and NEVER lets the artifactId cross (the read never
+ * bypasses the dispatch path's own enforcing checks; the expiry here
+ * is the artifact's own mint+600s `expiresAt`, derived for display).
+ */
+export interface MissionAuthorizationArtifactSnapshot {
+  readonly artifactId: string;
+  readonly scope: PaymentAuthorizationScope;
+  readonly createdAt: string;
+  readonly expiresAt: string;
+  readonly consumedAt: string | null;
+  /** Derived at read time: true when `now` reached the artifact's expiresAt. */
+  readonly expired: boolean;
+}
+
 /** The pure authorization gate (the LAW lives here). */
 export interface PaymentAuthorizationGate {
   requestAuthorization(
@@ -147,6 +167,15 @@ export interface PaymentAuthorizationGate {
   ): PaymentAuthorizationRequest;
   resolveAuthorization(decision: PaymentAuthorizationDecision, now: string): AuthorizationResolution;
   artifact(artifactId: string): PaymentAuthorizationArtifact | undefined;
+  /**
+   * (P19-A, ADR-0012 D3) The mission-scoped armed lookup: the artifacts
+   * bound to the mission's taskRef (`pmt-mission:<missionId>`), in mint
+   * order, each with its consumed/expired derivation computed against
+   * the read's `now`. A pure READ — it never consumes, never validates
+   * the preview/digest binding (the dispatch path's own enforcing
+   * checks stay UNCHANGED) and never mutates gate state.
+   */
+  artifactsForMission(missionId: string, now: string): readonly MissionAuthorizationArtifactSnapshot[];
   consumeArtifact(artifactId: string, now: string): PaymentAuthorizationArtifact;
   exportState(): PaymentAuthorizationGateState;
 }
@@ -292,6 +321,32 @@ export function createAuthorizationGate(
 
     artifact(artifactId) {
       return artifacts.get(artifactId);
+    },
+
+    artifactsForMission(missionId, now) {
+      // MINT ORDER, derived from the id the gate itself mints
+      // (`pmt-auth-<n>` — the counter is monotonic); the string
+      // tiebreak keeps the order total even for restored state.
+      const mintIndex = (artifactId: string): number => {
+        const match = /^pmt-auth-(\d+)$/.exec(artifactId);
+        return match === null ? Number.MAX_SAFE_INTEGER : Number(match[1]);
+      };
+      const taskRef = `pmt-mission:${missionId}`;
+      return [...artifacts.values()]
+        .filter((artifact) => artifact.taskRef === taskRef)
+        .sort((a, b) =>
+          mintIndex(a.artifactId) === mintIndex(b.artifactId)
+            ? (a.artifactId < b.artifactId ? -1 : 1)
+            : mintIndex(a.artifactId) - mintIndex(b.artifactId),
+        )
+        .map((artifact) => ({
+          artifactId: artifact.artifactId,
+          scope: { ...artifact.scope, amount: { ...artifact.scope.amount } },
+          createdAt: artifact.createdAt,
+          expiresAt: artifact.expiresAt,
+          consumedAt: artifact.consumedAt,
+          expired: now >= artifact.expiresAt,
+        }));
     },
 
     consumeArtifact(artifactId, now) {

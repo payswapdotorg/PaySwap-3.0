@@ -9,19 +9,25 @@
  * .ts asserts the MEMBER sets cannot drift; the shapes are pinned by
  * structural mirroring, the RoutePlanningPanel precedent).
  *
- * THE WIRE LAWS (P17-A ADR-0010 D2; P18-A ADR-0011 D2/D3):
+ * THE WIRE LAWS (P17-A ADR-0010 D2; P18-A ADR-0011 D2/D3; P19-A
+ * ADR-0012 D1/D2):
  * - read/input verbs only on the member surface; the approval act
  *   crosses as TWO edge-pinned members whose origin + principal are
  *   pinned HOST-SIDE (the renderer supplies ONLY requestId + APPROVE
  *   | DECLINE — it can never supply, forge or see an origin);
  * - NO authorization artifact, NO artifactId and NO consumed-artifact
- *   lineage (idempotency keys, command/correlation ids, connection
- *   refs) exists on any wire shape here: the detail carries the
- *   attempt STATES (outcome facts only) and a COUNT — the attempt
- *   records stay host-side;
- * - the dispatch act stays HOST-SIDE (ADR-0011 D3): an approved
- *   mission sits armed until a host-side dispatch consumes the
- *   artifact — nothing on this surface fires a dispatch.
+ *   lineage (idempotency keys, command/correlation ids) exists on any
+ *   wire shape here: the detail carries the attempt STATES (outcome
+ *   facts only) and a COUNT — the attempt records stay host-side;
+ * - the dispatch act crosses as TWO members (P19-A, ADR-0012 D1 — the
+ *   lawful narrowing of the ADR-0011 D3 boundary): the armed-effect
+ *   READ + the lane-choice ACT. The wire carries a CHOICE, never a
+ *   grant — the eligible lane set recomputes HOST-SIDE at act time,
+ *   and the artifact, the operation and the INV-25 mode resolve
+ *   HOST-SIDE (the artifact never crosses, not even as an input; the
+ *   outcome carries facts only: kind, attemptId, summary). The lanes
+ *   carry the registry's own ids + people-language labels ONLY — no
+ *   credentials, no credential handles, no secrets.
  */
 
 // ---------------------------------------------------------------------------
@@ -265,3 +271,58 @@ export interface PaySwapPaymentMissionDetailDto {
   readonly attempts: readonly PaySwapPaymentMissionAttemptStateDto[];
   readonly attemptCount: number;
 }
+
+// ---------------------------------------------------------------------------
+// The P19-A dispatch wire types (ADR-0012 D1/D2 — the lane choice, never
+// a grant; the artifact never crosses, not even as an input)
+// ---------------------------------------------------------------------------
+
+/**
+ * One executing lane on the wire (ADR-0012 D2): the registry's own ids
+ * + a people-language label. An ineligible lane carries its reason (LIVE
+ * per INV-25, or the non-ACTIVE state); NO credentials, NO credential
+ * handles and NO secrets ever appear on this shape.
+ */
+export interface PaySwapPaymentDispatchLaneDto {
+  /** The operator's choice key (the registry's connection id). */
+  readonly connectionRef: string;
+  /** People language (the registry's own display names — never guessed). */
+  readonly label: string;
+  readonly providerId: string;
+  /** Present exactly when the lane is not dispatchable, with its reason. */
+  readonly ineligible?: { readonly reason: string };
+}
+
+/**
+ * The armed card (ADR-0012 D1 — the READ): the armed truth, the approved
+ * scope + expiry echo when armed, the verbatim people-language
+ * not-armed reason when not (no artifact exists / expired at <instant> /
+ * was consumed at <instant> — each naming the path back), and the
+ * resolved executing lanes. NO artifactId exists on this shape.
+ */
+export interface PaySwapPaymentMissionArmedEffectDto {
+  readonly armed: boolean;
+  /** The verbatim not-armed reason (present iff armed is false). */
+  readonly reason?: string;
+  /** The approved scope echo (present iff armed is true). */
+  readonly scope?: PaySwapPaymentAuthorizationScopeDto;
+  /** The artifact's expiry instant (present iff armed is true). */
+  readonly expiresAt?: string;
+  /** The resolved executing lanes (eligible + ineligible-with-reason). */
+  readonly lanes: readonly PaySwapPaymentDispatchLaneDto[];
+}
+
+/**
+ * The typed dispatch outcome on the wire (ADR-0012 D1): outcome facts
+ * only — the kind, the attempt id and a people-language summary. NO
+ * artifactId, NO connectionRef echo, NO envelope internals beyond the
+ * summary. REPLAYED mirrors the runtime's idempotent-replay kind
+ * (unreachable through this member in practice — a confirmed
+ * create-effect completes the mission; the kind exists so the wire type
+ * mirrors the runtime's outcome union without lying about the channel's
+ * reach). Failures beyond these outcomes are thrown typed.
+ */
+export type PaySwapPaymentDispatchOutcomeDto =
+  | { readonly kind: "DISPATCHED"; readonly attemptId: string; readonly summary: string }
+  | { readonly kind: "REPLAYED"; readonly attemptId: string; readonly summary: string }
+  | { readonly kind: "REFUSED"; readonly attemptId: string; readonly summary: string };
