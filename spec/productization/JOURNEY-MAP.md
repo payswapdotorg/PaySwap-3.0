@@ -290,3 +290,28 @@ until a host-side dispatch consumes the single-use artifact — the
 panel says so honestly. Carried forward: the dispatch surface + the
 P14-carried execution lanes; live-provider route evidence; the
 §5/payment-mission store reconciliation question.
+
+**P19 DISPATCH LEG (2026-10-26, commits `7e79167`+`d493503`+`6d508e2`)**:
+the authority chain's surface is now COMPLETE end-to-end — the armed
+card (the scope echo, the absolute expiry instant, the lane radio
+choices with ineligible lanes visible-with-reason, never hidden), the
+TWO-ACT send (the send control stays disabled until a lane is chosen;
+confirming fires dispatch with EXACTLY (missionId, connectionRef)),
+and the honest states (NOT-ARMED with the verbatim reason + the path
+back; NO-LANE — the typed prerequisite, never a fabricated lane; the
+REFUSED/DISPATCHED outcome notes through the label map). The artifact
+NEVER crosses the channel — not even as an input (the lane choice is a
+CHOICE, the eligible set recomputed host-side at act time; an outside
+connectionRef is a typed refusal with no attempt recorded and the
+artifact intact). Bridge evidence
+(`packages/desktop/test/payswap/payment-missions-dispatch-binding.test.ts`,
+5 laws over the REAL channel): the honest empty truth (armed:true with
+ZERO lanes over the empty registry; the typed act-time refusal), the
+golden path over the labeled fixtures (the REAL connection session
+authority with a seeded ACTIVE SANDBOX lane + the scriptedAuthority
+CONFIRMED), the REFUSED unwired path, byte-identical replays, and the
+artifact-never-on-the-wire scan. Still NO LIVE-TIER claim: zero ACTIVE
+connections exist in this deployment (the resets destroyed the P13
+provider credentials) — the golden path is fixture-proven only; the
+provider execution lanes and the reconcile-with-evidence member stay
+carried forward.

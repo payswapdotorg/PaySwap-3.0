@@ -16,7 +16,7 @@
     {
       "id": "P19-A",
       "owner": "worker",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P19-0"
       ],
@@ -25,7 +25,7 @@
     {
       "id": "P19-B",
       "owner": "worker",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P19-0"
       ],
@@ -34,7 +34,7 @@
     {
       "id": "P19-C",
       "owner": "TL",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P19-A",
         "P19-B"
@@ -44,7 +44,7 @@
     {
       "id": "P19-D",
       "owner": "TL",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P19-A",
         "P19-B",
@@ -53,10 +53,36 @@
       "lane_scope": "TL integration: the integrated batteries at the tip; JOURNEY-MAP + FEATURE-MAP reconciliation; the graph closure; the current-state closure; PUSH to GitHub (the PAT recovered); the bundle archive; the honest carry-forward record."
     }
   ],
-  "frontier_after_registration": [
-    "P19-A",
-    "P19-B"
-  ],
+  "frontier_after_registration": [],
   "closure_policy": "P19 closes only when P19-A/B/C/D are all accepted on main with their batteries green at the tip and the honest carry-forward recorded. No live-tier claim is permitted: zero ACTIVE connections is the deployment fact; the dispatch golden path is proven only over clearly-labeled test-tier fixtures.",
-  "closure": null
+  "closure": {
+    "closed_at": "2026-10-26T23:10:00Z",
+    "commits": {
+      "P19-0": "a013e8e",
+      "P19-A": "7e79167",
+      "P19-B": "d493503",
+      "P19-C": "6d508e2",
+      "P19-D": "HEAD"
+    },
+    "batteries": {
+      "desktop": "29f/281t",
+      "payswap-app": "41f/443t",
+      "route-planning": "209",
+      "lab": "169",
+      "opportunities": "250",
+      "capability": "230",
+      "route-compiler": "353",
+      "economic": "105",
+      "protocol": "279",
+      "surface": "224",
+      "architecture_check": "0/0/0"
+    },
+    "push": "PUSHED to GitHub (the PAT recovered from the surviving secrets store; push-at-acceptance live again)",
+    "carry_forward": [
+      "the provider execution lanes (FLW/Paystack adapters + the live-grant D2-style amendments — operator credentials required; the P13 credentials were destroyed by the resets)",
+      "the reconcile-with-evidence member (ADR-0012 D6 — composes with the execution lanes operator evidence flows)",
+      "live-provider route evidence (zero connected capability instances)",
+      "the §5/payment-mission store reconciliation question (ADR-0011 D6)"
+    ]
+  }
 }
