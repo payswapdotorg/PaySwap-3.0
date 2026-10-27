@@ -20,6 +20,7 @@
       "@payswap/route-planning": ["../route-planning/src/index.ts"],
       "@payswap/route-compiler": ["../route-compiler/src/index.ts"],
       "@payswap/lab": ["../lab/src/index.ts"],
+      "@payswap/opportunities": ["../opportunities/src/index.ts"],
       "@payswap/capability": ["../capability/src/index.ts"]
     }
   },
@@ -35,6 +36,7 @@
     "src/renderer/src/routePlanningMissionLinkage.ts",
     "src/renderer/src/routePlanningComposition.ts",
     "src/renderer/src/modelCatalogComposition.ts",
+    "src/renderer/src/waitRecheckComposition.ts",
     "../payswap-app/src",
     "../route-planning/src",
     "../route-compiler/src",
@@ -51,6 +53,15 @@
     "test/payswap/mission-intake-composition.test.ts",
     "test/payswap/connections-activation-composition.test.ts",
     "test/payswap/model-catalog-budget-binding.test.ts",
+    "test/payswap/connections-probe-plane-fixtures.ts",
+    "test/payswap/p21-journey-bridge-fixtures.ts",
+    "test/payswap/p21-journey-bridge-planning.ts",
+    "test/payswap/p21-journey-bridge-conversation.ts",
+    "test/payswap/p21-journey-bridge.test.ts",
+    "../opportunities/src",
+    "../opportunities/test/fixtures-catalog.ts",
+    "../opportunities/test/fixtures.ts",
+    "../route-planning/test/no-route-fixtures.ts",
     "../capability/src",
     "../provider-runtime/src",
     "../trust/src"
