@@ -17,8 +17,7 @@
     "worker-3": "migration-experience-and-integrations"
   },
   "frontier": [
-    "P21-A",
-    "P21-C"
+    "P21-B"
   ],
   "active_work_orders": [],
   "completed_work_orders": [
@@ -1031,6 +1030,24 @@
       "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
       "acceptance_evidence": "commit (this registration)",
       "summary": "the cross-provider journey wave registered (the operator's P20-order): the source-backed gap matrix (three Explore lanes 144-a/b/c; six requirement families + the six truth facts verified at 28d8b79f) + ADR-0014 (D1-D12: the composer↔mission binding, the stage-progress projection, the model/difficulty law, the connection-activation members + host-side probe runner, the connection→capability bridge + the TEST_DATA merchant directory, the no-route truth decision, the revise-path REAL kernel composition, the conditional opportunity + wait lifecycle completion, the E2E law incl. the Electron CDP desktop tier, the secret law, the file-disjoint lanes) + the work orders + the graph + this state registration (normalizing the P18/P19/P20 completed-entries drift). The operator supplied fresh test-mode credentials (station-secret-store only) — the P20-closure carry-forward 'the provider execution lanes' is unblocked at the evidence tier. Baseline batteries re-run at registration."
+    },
+    {
+      "id": "P21-A",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "payswap3-p21",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit c2047fe0",
+      "summary": "the provider-evidence lane (host): the connection-activation members + the host-side REAL probe runner (the caller-trust fix), the connection→capability bridge (INV-13 battery-proven; F3 held), the TEST_DATA merchant directory (merchant:stripe-only-test), the lane-aware REAL Stripe kernel composition, the scripts/p21 rail-evidence harness — REAL receipts: all three providers probed CONFIRMED + the revise-path dispatch PaymentIntent pi_3UV6EIAkPdhgtN6I1K5b99pa CONFIRMED with the authoritative read-back. Desktop 36f/351t; the three scoped tsc gates 0; lint 0 errors"
+    },
+    {
+      "id": "P21-C",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "payswap3-p21",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 2bc3ecaf",
+      "summary": "the counterfactual/opportunity lane (domain): the ConditionalOpportunity (party-change preconditions + assumptions + the distinct platformPrerequisites + evidence lineage + opt-in/expiry laws, advisory-only), the wait re-check evaluator (pure; reuses the existing matchers; neverAutoDispatches), the STALE_OBSERVATION incident through the one-change law, the stage-7 deriveConditionalOpportunities (deterministic, fail-closed). opportunities 19f/273t · lab 19f/176t · route-planning 17f/219t; per-package tsc 0/0/0"
     }
   ],
   "policies": {
@@ -1470,7 +1487,13 @@
       "actor": "resident-TL",
       "action": "P21_REGISTERED",
       "detail": "The operator's P20-order journey (Flutterwave-only sender → Stripe-only merchant) registers as wave P21 (the repo's P20 is closed; 'e.g.' is not a mandate; P14-P20 history untouched). The follow-on provider-combination redo (Stellar testnet wallet + Paystack; GHS→USDC(Stellar)→KES) is P22, registered only after P21 closes. Fresh operator test-mode credentials stored station-secret-store-only (Stripe/FLW/Paystack + the Stellar keypair held for P22). Three Explore survey lanes (144-a task/routine; 144-b provider/route/authority; 144-c lab/opportunities/E2E) → the gap matrix + ADR-0014 + the work orders + the graph. Frontier: [P21-A (host/provider lane), P21-C (domain lane)] — concurrent, file-disjoint; P21-B (journey lane) follows P21-A's accepted contracts; P21-D (TL) closes. The honest outcome for the ordered FLW→Stripe intent is NO_ROUTE (ADR-0014 D7); the revise path exercises the complete §7 path over the REAL Stripe kernel (D8). The six truth facts stay machine-enforced."
+    },
+    {
+      "ts": "2026-10-27T10:05:00Z",
+      "actor": "resident-TL",
+      "action": "P21_A_AND_C_ACCEPTED",
+      "detail": "P21-A (c2047fe0) + P21-C (2bc3ecaf) verified from source and accepted; both PUSHED. The station-timeout-lost P21-A dispatch was recovered: the worker's landed tree was fully present; the TL ran the gates it never returned to run (desktop 36f/351t; test-check/mirror-check/host all 0 after the TL's boundary fixes; lint 0 errors after the script split) and re-ran the REAL rail-evidence harness — ALL GATES HELD with a fresh secret-free receipt. Frontier recomputed to [P21-B]."
     }
   ],
-  "last_tl_action_at": "2026-10-27T08:30:00Z"
+  "last_tl_action_at": "2026-10-27T10:05:00Z"
 }
