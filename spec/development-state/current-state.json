@@ -16,7 +16,10 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [],
+  "frontier": [
+    "P21-A",
+    "P21-C"
+  ],
   "active_work_orders": [],
   "completed_work_orders": [
     {
@@ -911,6 +914,123 @@
       "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
       "acceptance_evidence": "commit 9868d24+closure",
       "summary": "TL integration + closure: the integrated batteries green at the tip (2,476 tests across 10 packages; architecture-check 0/0/0), ROUTE-PLANNING section 5 both P16 limitations closed, JOURNEY-MAP section 7 promotion (CONTRACT+BRIDGE tier, no live-tier claim), FEATURE-MAP updated, the graph + work-orders + this state closed, the bundle archived."
+    },
+    {
+      "id": "P18-A",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 5127a14",
+      "summary": "the approval members + the attempt-state projection on the mission plane (ADR-0011): the two-act approval over the single-use scoped artifact, the edge-pinned origin/principal, the attempt states crossing with correlation intact"
+    },
+    {
+      "id": "P18-B",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 31b51af",
+      "summary": "the payment-missions observation panels over the pinned port: the missions board/detail timeline, the preview card, the approval flow (two-act, disabled-until-valid), the honest empty states"
+    },
+    {
+      "id": "P18-C",
+      "owner": "tech-lead",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit b67a4b1",
+      "summary": "the payment-missions renderer composition + the bridge battery over the REAL channel (the golden path byte-identical replays; the honest empty truths)"
+    },
+    {
+      "id": "P18-D",
+      "owner": "tech-lead",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 43d6068",
+      "summary": "TL integration + closure: the approval/observation UX registered, promoted and reconciled; maps/state closed; PUSHED; bundle archived"
+    },
+    {
+      "id": "P19-A",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 7e79167",
+      "summary": "the armed lookup + the lane resolver + the dispatch members (ADR-0012): the dispatch act with the artifact never crossing even as input, the lane choice validated at act time, SANDBOX-only lanes"
+    },
+    {
+      "id": "P19-B",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit d493503",
+      "summary": "the armed card + the two-act dispatch flow in the detail view: the lane choice with ineligible rows never hidden, the outcome note, the call-order law"
+    },
+    {
+      "id": "P19-C",
+      "owner": "tech-lead",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 6d508e2",
+      "summary": "the dispatch leg of the renderer composition + the bridge battery (the golden path over the labeled scripted authority; the no-eligible-lane typed refusal; byte-identical replays)"
+    },
+    {
+      "id": "P19-D",
+      "owner": "tech-lead",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 72a6dd7",
+      "summary": "TL integration + closure: the dispatch act surface registered, promoted and reconciled; maps/state closed; PUSHED; bundle archived"
+    },
+    {
+      "id": "P20-A",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 02ea493",
+      "summary": "the reconciliation members (ADR-0013): the pending read over the runtime's own attemptIsUnresolved + the evidence-submission act with the act-time pending recomputation, the edge evidence bounds, the typed refusals before any runtime call"
+    },
+    {
+      "id": "P20-B",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit a421162",
+      "summary": "the reconcile card + the two-act evidence entry: the direction/source/refs entry disabled-until-valid, the NOTHING-PENDING designed empty card, the typed-failure notes surfaced honestly"
+    },
+    {
+      "id": "P20-C",
+      "owner": "tech-lead",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit e8e03de",
+      "summary": "the reconciliation leg of the renderer composition + the bridge battery (UNKNOWN dispatch → pending card → evidence submission → RECONCILED with the mission state side effects)"
+    },
+    {
+      "id": "P20-D",
+      "owner": "tech-lead",
+      "status": "COMPLETE",
+      "session": "payswap3-p18-p20",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 28d8b79",
+      "summary": "TL integration + closure: the reconcile-with-evidence surface registered, promoted and reconciled; the frontier emptied; maps/state closed; PUSHED; bundle archived"
+    },
+    {
+      "id": "P21-0",
+      "owner": "tech-lead",
+      "status": "COMPLETE",
+      "session": "payswap3-p21",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit (this registration)",
+      "summary": "the cross-provider journey wave registered (the operator's P20-order): the source-backed gap matrix (three Explore lanes 144-a/b/c; six requirement families + the six truth facts verified at 28d8b79f) + ADR-0014 (D1-D12: the composer↔mission binding, the stage-progress projection, the model/difficulty law, the connection-activation members + host-side probe runner, the connection→capability bridge + the TEST_DATA merchant directory, the no-route truth decision, the revise-path REAL kernel composition, the conditional opportunity + wait lifecycle completion, the E2E law incl. the Electron CDP desktop tier, the secret law, the file-disjoint lanes) + the work orders + the graph + this state registration (normalizing the P18/P19/P20 completed-entries drift). The operator supplied fresh test-mode credentials (station-secret-store only) — the P20-closure carry-forward 'the provider execution lanes' is unblocked at the evidence tier. Baseline batteries re-run at registration."
     }
   ],
   "policies": {
@@ -1344,7 +1464,13 @@
       "actor": "resident-TL",
       "action": "P20_CLOSED",
       "detail": "The reconcile-with-evidence surface is REAL at the CONTRACT+BRIDGE tier — the journey's final honest state is closable: an UNKNOWN attempt renders the pending-reconciliation card and the operator closes it with provider evidence through the two-act entry (the direction + the source from the frozen two-kind vocabulary + the bounded refs; disabled-until-valid, never a guess). Commits 5ade061 (P20-0) + 02ea493 (P20-A: the two members — the pending read over the runtime's own unresolved rule + the evidence-submission act with the act-time pending recomputation, the edge evidence bounds, the origin OPERATOR_EVIDENCE_ACT + principal pinned at the channel edge; the act-time split: outside-mission attemptIds refused at the edge, existing-but-closed delegated to the runtime's honest typed refusal — 11 laws) + a421162 (P20-B: the reconcile card + the two-act evidence entry + the NEW pins file [the 400-line law] + the mount-owned flow — 10 laws) + e8e03de (P20-C: the composition growth [the dispatch + reconciliation interfaces intersected, both structural guards proven] + the bridge battery 7 laws over the REAL channel: the honest empty truth, the golden path [UNKNOWN dispatch → pending card → reconcile → RECONCILED + mission COMPLETED; the FAILED variant open], the act-time refusal, the double-reconcile refusal, the scanner law) + this closure. Integrated batteries green at the tip: desktop 31f/299t, app 42f/453t, route-planning 209, lab 169, opportunities 250, capability 230, route-compiler 353, economic 105, protocol 279, surface 224 (2,561 tests); architecture-check 0/0/0. PUSHED to GitHub. The runtime, the gate, mission-execution and the idempotency registrar UNTOUCHED. Carry-forward: the provider execution lanes + the automatic evidence feeds; live-provider route evidence; the §5 store question; the protocol-plane evidence bridge."
+    },
+    {
+      "ts": "2026-10-27T08:30:00Z",
+      "actor": "resident-TL",
+      "action": "P21_REGISTERED",
+      "detail": "The operator's P20-order journey (Flutterwave-only sender → Stripe-only merchant) registers as wave P21 (the repo's P20 is closed; 'e.g.' is not a mandate; P14-P20 history untouched). The follow-on provider-combination redo (Stellar testnet wallet + Paystack; GHS→USDC(Stellar)→KES) is P22, registered only after P21 closes. Fresh operator test-mode credentials stored station-secret-store-only (Stripe/FLW/Paystack + the Stellar keypair held for P22). Three Explore survey lanes (144-a task/routine; 144-b provider/route/authority; 144-c lab/opportunities/E2E) → the gap matrix + ADR-0014 + the work orders + the graph. Frontier: [P21-A (host/provider lane), P21-C (domain lane)] — concurrent, file-disjoint; P21-B (journey lane) follows P21-A's accepted contracts; P21-D (TL) closes. The honest outcome for the ordered FLW→Stripe intent is NO_ROUTE (ADR-0014 D7); the revise path exercises the complete §7 path over the REAL Stripe kernel (D8). The six truth facts stay machine-enforced."
     }
   ],
-  "last_tl_action_at": "2026-10-27T07:10:00Z"
+  "last_tl_action_at": "2026-10-27T08:30:00Z"
 }
