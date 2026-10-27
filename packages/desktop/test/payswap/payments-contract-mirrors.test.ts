@@ -50,14 +50,20 @@ describe("the agent-task vocabulary pin (surface agent-tasks.ts, TL-frozen)", ()
     expect([...TERMINAL_PAYMENT_TASK_STATUSES]).toEqual([...TERMINAL_AGENT_TASK_STATUSES]);
   });
 
-  it("event kinds: the shared 21 mirror the surface EXACTLY, and the payment plane appends its own 22nd (P17-A, ADR-0010 D3)", () => {
+  it("event kinds: the shared 21 mirror the surface's first 21 EXACTLY; ROUTINE_PINNED is app-store-only; the payment plane appends its own 22nd (P17-A, ADR-0010 D3 + P21-B, ADR-0014 D3)", () => {
     // The first 21 kinds are the shared agent-task vocabulary, mirrored
     // exactly; the 22nd is the payment plane's own PLAN_SELECTION_RECORDED
     // (the stage-9a landing site — a strict superset, pinned on both sides).
+    // (P21-B run 1 appended ROUTINE_PINNED as the SURFACE's 22nd shared
+    // kind — stage 0's pin lands on the APP task store only, never the
+    // mission timeline, so the payment plane never carries it.)
     expect(PAYMENT_TASK_EVENT_KINDS).toHaveLength(22);
-    expect([...PAYMENT_TASK_EVENT_KINDS].slice(0, 21)).toEqual([...AGENT_TASK_EVENT_KINDS]);
+    expect([...PAYMENT_TASK_EVENT_KINDS].slice(0, 21)).toEqual([...AGENT_TASK_EVENT_KINDS].slice(0, 21));
     expect(PAYMENT_TASK_EVENT_KINDS[21]).toBe("PLAN_SELECTION_RECORDED");
     expect([...AGENT_TASK_EVENT_KINDS]).not.toContain("PLAN_SELECTION_RECORDED");
+    expect(AGENT_TASK_EVENT_KINDS).toHaveLength(22);
+    expect(AGENT_TASK_EVENT_KINDS[21]).toBe("ROUTINE_PINNED");
+    expect([...PAYMENT_TASK_EVENT_KINDS]).not.toContain("ROUTINE_PINNED");
     expect(PAYMENT_TASK_EVENT_KINDS).toContain("OUTCOME_UNKNOWN");
     expect(PAYMENT_TASK_EVENT_KINDS).toContain("RECONCILED");
   });

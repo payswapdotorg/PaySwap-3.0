@@ -45,7 +45,7 @@ import { rankRoutes } from "../../../route-planning/src/ranking.ts";
 import { exploreBoundedScenarios, type ScenarioExplorationPort, type PinnedScenarioExploration, type ScenarioExplorationRequest } from "../../../route-planning/src/lab-adapter.ts";
 import { contentDigest as realContentDigest } from "../../../route-planning/src/canonical.ts";
 // The REAL four-layer corridor chains + the REAL compiler evidence (route-planning's own fixtures).
-import { movementCorridorQuery, movementIntentFixture, NOW, NOW_ISO, realCorridorProjectionPort, recipientChain, senderChain } from "../../../route-planning/test/fixtures.ts";
+import { movementCorridorQuery, movementIntentFixture, NOW, NOW_ISO, paymentIntentFixture, realCorridorProjectionPort, recipientChain, senderChain } from "../../../route-planning/test/fixtures.ts";
 import { planningBestExecutionPolicy, planningEvidenceBundle, realRouteCompilationPort } from "../../../route-planning/test/compiler-evidence.ts";
 // The REAL lab machinery (stage 6) + the REAL opportunities machinery (stage 7 / 9b).
 import { recordProductionFacts } from "../../../lab/src/replay.ts";
@@ -68,6 +68,7 @@ import {
   ROUTE_PLANNING_WAIT_FALLBACK_KINDS_PIN,
   routePlanningContentDigest,
   routePlanningViewDigestOf,
+  type PaymentIntentPin,
   type RoutePlanningEnginePort,
   type RoutePlanningEngineView,
 } from "../../src/agent/routePlanningPins.js";
@@ -353,6 +354,18 @@ describe("(a) PIN FIDELITY — the app's pins equal the REAL authorities", () =>
     expect([...ROUTE_PLANNING_WAIT_FALLBACK_KINDS_PIN]).toEqual([...WAIT_FALLBACK_KINDS]);
     const probe = { z: "text", a: 42, big: 9007199254740993n, nested: { y: [1, "two", null], b: true } };
     expect(routePlanningContentDigest(probe)).toBe(realContentDigest(probe));
+  });
+
+  it("the typed-intent pins structurally match the REAL route-planning economic pins (P21-B gate fix)", () => {
+    // The REAL authority's PaymentIntentPin (route-planning src/pins/economic.ts)
+    // and the app's structural mirror are MUTUALLY assignable — the mirror
+    // discipline for type-only pins (field-for-field, no drift possible).
+    const realIntent = paymentIntentFixture();
+    const appIntent: PaymentIntentPin = realIntent;
+    const roundTrip: import("../../../route-planning/src/pins/economic.ts").PaymentIntentPin = appIntent;
+    // The 11-key specialization: the app pin carries commerceRef.
+    expect(roundTrip.commerceRef).toBe("checkout:planning-order-1");
+    expect(Object.keys(realIntent).sort().join(",")).toContain("commerceRef");
   });
 });
 

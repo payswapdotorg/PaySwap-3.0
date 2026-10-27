@@ -26,6 +26,12 @@
  * — drift is detectable at build time, not discovered in production.
  *
  * Version history (append-only, newest first):
+ * - 1.5.0 (P21-B): the additive routine-stage contract — the ROUTINE_PINNED
+ *   event kind (stage 0), the optional AgentTask.modelSelection field +
+ *   validation (the model/difficulty law), and the agent-routine-stages
+ *   module (the twelve-stage vocabulary pinned BY VALUE from the routine
+ *   manifest + the plan-status projection vocabulary). Old consumers keep
+ *   compiling.
  * - 1.4.0 (P16-D): the additive agent-task wait vocabulary — the
  *   WAITING_FOR_OPPORTUNITIES status (resumable, non-terminal), the
  *   WAIT_STARTED/WAIT_CRITERIA_RECORDED/OPPORTUNITY_MATCHED/WAIT_EXPIRED
@@ -34,7 +40,7 @@
  * - 1.3.0 (P13-0): the shared agent-task contract (agent-tasks.ts +
  *   agent-task-validation.ts), additive + experimental.
  */
-export const SURFACE_API_VERSION = "1.4.0" as const;
+export const SURFACE_API_VERSION = "1.5.0" as const;
 
 /** Which parts of the surface are covered by which stability class. */
 export type SurfaceStability =

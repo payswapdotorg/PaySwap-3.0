@@ -13,6 +13,7 @@ import type { AgentTaskSessionStorage } from "./taskSessionAdapter.js";
 import type { AgentTaskSessionPort } from "./taskSessionPort.js";
 import type { AgentComposerTaskView } from "./agentComposerProjection.js";
 import type { AgentComposerTranscriptEntry } from "./agentComposerUiState.js";
+import type { MissionIntakePlanePort, MissionIntakeState } from "./missionIntakePins.js";
 
 /* ------------------------------ the state --------------------------- */
 
@@ -33,6 +34,8 @@ export interface AgentComposerState {
   readonly sendPhase: "idle" | "sending";
   /** The honest UI-state persistence fact. */
   readonly uiPersistence: "browser-profile" | "memory-only";
+  /** (P21-B, D2) The mission-intake binding's projected state (UNBOUND without a plane). */
+  readonly missionIntake: MissionIntakeState;
 }
 
 /** A surface-action seed request (card clicks and area entries). */
@@ -63,6 +66,13 @@ export interface AgentComposerControllerOptions {
   readonly route?: (text: string) => RoutedAgentIntent;
   /** The transcript bound (default 60 — the persisted conversation cap). */
   readonly entryCap?: number;
+  /**
+   * (P21-B, ADR-0014 D2) The mission-plane port: when bound, the
+   * composer's PAYMENT_MISSION intents seed REAL missions and the
+   * deterministic ask/capture loop surfaces in the conversation. Absent
+   * (the web tier) — the honest unbound note, never a faked mission.
+   */
+  readonly missionIntakePlane?: MissionIntakePlanePort;
 }
 
 export interface AgentComposerController {

@@ -255,8 +255,24 @@ export {
   type AgentTaskId,
   type AgentTaskEvent,
   type AgentTask,
+  type AgentTaskModelSelection,
+  AGENT_TASK_MODEL_DISCLOSURE_NOTE,
   type AgentTaskStateBinding,
 } from "./agent-tasks.ts";
+
+export {
+  AGENT_ROUTINE_STAGE_IDS,
+  AGENT_ROUTINE_STAGES,
+  AGENT_TASK_STAGE_STATUSES,
+  ROUTINE_STAGE_STATUS_LABELS,
+  AGENT_ROUTINE_STAGES_PROVENANCE,
+  type AgentRoutineStageDeclaration,
+  type AgentRoutineStageId,
+  type AgentRoutineStageBranch,
+  type AgentRoutineStageAuthorityClass,
+  type AgentTaskStageStatus,
+  type AgentTaskStageProgress,
+} from "./agent-routine-stages.ts";
 
 export {
   InvalidAgentTaskError,

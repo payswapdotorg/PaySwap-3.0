@@ -82,6 +82,28 @@ export {
   sharedAgentComposerController,
   type AgentComposerController,
 } from "./agent/agentComposerController.js";
+// (P21-B, ADR-0014 D2) The shared mission-intake plane seam: the desktop
+// renderer's composition root binds the channel-backed plane BEFORE the
+// first shared-controller construction; the web tier binds nothing — the
+// honest unbound mission tier (the ADR-0010 D7 analogue).
+export {
+  MISSION_INTAKE_ASK_NOTE,
+  MISSION_INTAKE_COMPLETE_NOTE,
+  MISSION_INTAKE_PHASES,
+  MISSION_INTAKE_UNBOUND_NOTE,
+  MISSION_INTAKE_UNBOUND_STATE,
+  type MissionIntakeAsk,
+  type MissionIntakePhase,
+  type MissionIntakePlanePort,
+  type MissionIntakeSeedInput,
+  type MissionIntakeSeedOutcome,
+  type MissionIntakeState,
+} from "./agent/missionIntakePins.js";
+export {
+  bindSharedMissionIntakePlane,
+  resetSharedMissionIntakePlane,
+  sharedMissionIntakePlane,
+} from "./agent/agentComposerShared.js";
 export {
   routeAgentText,
   AGENT_INTENT_UNKNOWN_REPLY,
@@ -111,6 +133,39 @@ export {
   type RoutePlanningSession,
   type RoutePlanningSessionOptions,
 } from "./agent/routePlanningSession.js";
+// The stage-progress projection surface (P21-B, ADR-0014 D3): the pure
+// twelve-stage checklist derived from persisted typed events + the engine
+// view (never a parallel state model), the ROUTINE_PINNED recorder (stage
+// 0's typed result), and the structural pins of the surface's routine-
+// stage contract (the ONE workflow vocabulary — mirror-verified).
+export {
+  projectRoutineStageProgress,
+  type RoutineStageMissionEventPin,
+  type RoutineStageMissionFacts,
+  type RoutineStageProjectionInput,
+  type RoutineStageTaskEventPin,
+  type RoutePlanningMissionFactsSource,
+} from "./agent/routineStageProjection.js";
+export {
+  parseRoutinePinSummary,
+  recordRoutinePin,
+  routinePinSummary,
+  RoutinePinDriftError,
+  ROUTINE_PIN_SUMMARY_PREFIX,
+  type RoutinePinOutcome,
+} from "./agent/routineStagePinning.js";
+export {
+  AGENT_ROUTINE_STAGE_IDS_PIN,
+  AGENT_ROUTINE_STAGES_PIN,
+  AGENT_TASK_STAGE_STATUSES_PIN,
+  ROUTINE_STAGE_PANEL_UNBOUND_NOTE,
+  ROUTINE_STAGE_STATUS_LABELS_PIN,
+  type AgentRoutineStageDeclarationPin,
+  type AgentRoutineStageIdPin,
+  type AgentTaskStageProgressPin,
+  type AgentTaskStageStatusPin,
+} from "./agent/routineStagePins.js";
+export { RoutineStagePanel } from "./agent/RoutineStagePanel.js";
 export {
   isRoutePlanningNoIntentError,
   RoutePlanningNoIntentError,
@@ -120,6 +175,11 @@ export {
   type RoutePlanningEngineView,
   type RoutePlanningOpportunityMatchPin,
   type RoutePlanningWaitCriteriaPin,
+  type AmountSpecPin,
+  type FundsLocationRefPin,
+  type IntentConstraintsPin,
+  type MoneyMovementIntentPin,
+  type PaymentIntentPin,
 } from "./agent/routePlanningPins.js";
 // The payment-missions observation surface (P18-B; ADR-0011 D1): the
 // platform host's composition root binds the mission-plane channel

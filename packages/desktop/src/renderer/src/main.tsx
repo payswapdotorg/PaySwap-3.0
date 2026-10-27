@@ -4,6 +4,7 @@ import { initializeDesktopLocalTtft } from "./localTtftBootstrap.js";
 // REAL 引擎源码包的 renderer 模块（三处别名同步；其余 renderer 文件不得跟随）。
 import { composeRoutePlanningBinding } from "./routePlanningComposition.js";
 import { composePaymentMissionsBinding } from "./paymentMissionsComposition.js";
+import { composeMissionIntakeBinding } from "./missionIntakeComposition.js";
 import { createRoot } from "react-dom/client";
 import { useEffect } from "react";
 import {
@@ -339,6 +340,15 @@ function initializeBusinessRoot(port: MessagePort): void {
     composePaymentMissionsBinding({ services });
   } catch {
     // 组合失败的诚实姿态：共享缝隙保持默认值 —— Missions 面板如实呈现未接线说明。
+  }
+  // P21-B（ADR-0014 D2）：绑定 composer↔mission 摄入面 —— 组合根把通道的
+  // paymentMissionSeed/AskNextField/Capture 成员适配到应用侧钉死的
+  // MissionIntakePlanePort 并绑上共享缝隙（首个共享 controller 构造之前）；
+  // 失败时保持诚实默认（未绑定摄入面 —— 作曲家如实呈现未接线说明）。
+  try {
+    composeMissionIntakeBinding({ services });
+  } catch {
+    // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定摄入说明。
   }
   const settingService = supportsSettings ? services.settingService : undefined;
 

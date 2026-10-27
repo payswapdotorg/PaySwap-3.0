@@ -29,7 +29,14 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { sharedAgentComposerController, type AgentComposerController } from "./agentComposerController.js";
 import { RoutePlanningPanel } from "./RoutePlanningPanel.js";
-import { createRoutePlanningSession, projectRoutePlanningWaiting, type RoutePlanningSession } from "./routePlanningSession.js";
+import { RoutineStagePanel } from "./RoutineStagePanel.js";
+import {
+  projectRoutineStageProgress,
+  type RoutineStageMissionFacts,
+  type RoutePlanningMissionFactsSource,
+} from "./routineStageProjection.js";
+import { recordRoutinePin } from "./routineStagePinning.js";
+import { projectRoutePlanningWaiting, type RoutePlanningSession } from "./routePlanningSession.js";
 import {
   isRoutePlanningEngineUnbound,
   isRoutePlanningNoIntentError,
@@ -96,6 +103,21 @@ function latestPaymentMissionTask(tasks: readonly AgentComposerTaskView[]): Agen
   return tasks.find((task) => task.resumable && task.intentLine.startsWith("Payment mission"));
 }
 
+/** The task↔mission link re-derived from the PROJECTED task view's events
+ * (the persisted link — correlationRef on the link-bearing kinds). */
+function missionLinkOfView(task: AgentComposerTaskView | undefined): string | undefined {
+  if (task === undefined) {
+    return undefined;
+  }
+  let missionId: string | undefined;
+  for (const event of task.events) {
+    if ((event.kind === "MISSING_FIELD_ASKED" || event.kind === "FIELD_CAPTURED") && event.correlationRef !== undefined) {
+      missionId = event.correlationRef;
+    }
+  }
+  return missionId;
+}
+
 export function RoutePlanningMount({
   controller,
   engine,
@@ -127,6 +149,16 @@ export function RoutePlanningMount({
     }
     try {
       const engineView = resolvedEngine.presentableView({ taskRef: taskId });
+      // (P21-B, D3) Stage 0's typed result: the ROUTINE_PINNED event lands
+      // in the app task store when the routine loads (the pinned facts the
+      // engine view carries — routineId + version + skill digest). The pin
+      // instant is the engine's OWN evaluation instant (DATA — never an
+      // ambient clock read).
+      void recordRoutinePin(resolvedController.sessionPort(), taskId, engineView.routine, engineView.presentedAt)
+        .then(() => resolvedController.refresh())
+        .catch(() => {
+          /* the pin's typed drift/refusal surfaces through the task record, never masked */
+        });
       if (resolvedSession !== undefined && recordedDigest.current !== engineView.viewDigest) {
         recordedDigest.current = engineView.viewDigest;
         void resolvedSession
@@ -171,6 +203,24 @@ export function RoutePlanningMount({
   }
 
   const waiting = projectRoutePlanningWaiting(missionTask.status, missionTask.events);
+
+  // (P21-B, D3) The stage-checklist projection inputs: the mission
+  // timeline (the engine's mission-facts read — bound only where a real
+  // mission plane exists) + the task's persisted events + the engine
+  // view. NO mission timeline → the honest unbound note, never a fake.
+  const factsSource = resolvedEngine as Partial<RoutePlanningMissionFactsSource>;
+  const missionId = missionLinkOfView(missionTask) ?? state.missionIntake.missionId;
+  const missionFacts: RoutineStageMissionFacts | null =
+    missionId !== undefined && typeof factsSource.missionFacts === "function"
+      ? factsSource.missionFacts(missionId)
+      : null;
+  const stageProgress = projectRoutineStageProgress({
+    taskEvents: missionTask.events,
+    mission: missionFacts,
+    engineView: view?.kind === "PRESENTED_PLAN" ? view.view : null,
+    taskStatus: missionTask.status,
+  });
+
   const runChoice = (call: () => Promise<unknown>): void => {
     setChoiceError(null);
     call()
@@ -194,6 +244,7 @@ export function RoutePlanningMount({
 
   return (
     <>
+      <RoutineStagePanel progress={missionFacts === null ? null : stageProgress} />
       <RoutePlanningPanel
         view={view ?? { kind: "UNBOUND_ENGINE" }}
         waiting={waiting}

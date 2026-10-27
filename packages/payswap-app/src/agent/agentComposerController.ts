@@ -19,7 +19,7 @@
  * reopen) · DETERMINISM (`now` is an explicit input, never displayed).
  */
 
-import type { AgentTaskIntentPin, AgentTaskPin } from "../lib/agent-task-pins.js";
+import type { AgentTaskIntentPin } from "../lib/agent-task-pins.js";
 import { ambientMutationClock } from "../console/useWorkspaceStore.js";
 import { routeAgentText } from "./intentRouter.js";
 import {
@@ -27,7 +27,14 @@ import {
   scanAgentTranscriptText,
 } from "./taskSessionAdapter.js";
 import type { AgentTaskSessionPort } from "./taskSessionPort.js";
-import { projectAgentComposerTasks } from "./agentComposerProjection.js";
+import {
+  createAgentComposerIntakeWiring,
+  resolveControllerIntakePlane,
+  type AgentComposerIntakeWiring,
+} from "./agentComposerIntake.js";
+import { createAgentComposerSeedPath } from "./agentComposerSeedPath.js";
+import { cancelAgentComposerTask } from "./agentComposerTaskClose.js";
+import { MISSION_INTAKE_UNBOUND_STATE } from "./missionIntakePins.js";
 import {
   bindUiStorage,
   readUiSnapshot,
@@ -92,6 +99,29 @@ export function createAgentComposerController(
     return sessionPort;
   };
 
+  // The composer↔mission binding (P21-B, ADR-0014 D2): the wiring module
+  // owns the lazy binding over the composer's ONE task-session port (the
+  // injected plane for tests; the shared host binding for platform
+  // hosts); the unbound tier keeps the honest UNBOUND projection.
+  const intake: AgentComposerIntakeWiring = createAgentComposerIntakeWiring(
+    resolveControllerIntakePlane(options?.missionIntakePlane),
+    {
+      session: () => resolveSession(),
+      clock: () => clock(),
+      appendEntries: (entries, at) => {
+        appendEntries(
+          entries.map((entry) => ({ kind: entry.kind, text: entry.text, ...(entry.taskId !== undefined ? { taskId: entry.taskId } : {}) })),
+          at,
+        );
+      },
+      persistUi: () => persistUi(),
+      emit: () => emit(),
+      setMissionIntake: (next) => {
+        state = { ...state, missionIntake: next };
+      },
+    },
+  );
+
   const persisted = readUiSnapshot(uiStore);
   let uiPersistence: "browser-profile" | "memory-only" = uiStore === null ? "memory-only" : "browser-profile";
 
@@ -106,6 +136,7 @@ export function createAgentComposerController(
     tasksError: null,
     sendPhase: "idle",
     uiPersistence,
+    missionIntake: MISSION_INTAKE_UNBOUND_STATE,
   };
 
   const listeners = new Set<() => void>();
@@ -157,45 +188,21 @@ export function createAgentComposerController(
     state = { ...state, entries: capped };
   };
 
-  /** The shared seed path — every entrypoint converges here. */
-  const seed = async (
-    intent: AgentTaskIntentPin,
-    origin: "COMPOSER_TEXT" | "SURFACE_ACTION",
-    originNote: string,
-  ): Promise<{ action: "CREATED" | "RESUMED"; task: AgentTaskPin } | { action: "REFUSED"; message: string }> => {
-    try {
-      return await resolveSession().seedOrResume({
-        intent,
-        origin,
-        now: clock(),
-        originNote,
-      });
-    } catch (thrown: unknown) {
-      const message =
-        thrown instanceof Error ? thrown.message : String(thrown ?? "the task store refused the request");
-      return { action: "REFUSED", message };
-    }
-  };
-
-  const taskOutcomeLine = (task: AgentTaskPin, action: "CREATED" | "RESUMED"): string => {
-    const lines = projectAgentComposerTasks([task])[0]!;
-    const verb = action === "CREATED" ? "Task created" : "Task resumed — the same one, not a duplicate";
-    return `${verb}: ${lines.title}. Status: ${lines.statusView.label}. This is a request record, not a payment or a connection.`;
-  };
-
-  const reloadTasks = async (): Promise<void> => {
-    try {
-      const tasks = await resolveSession().listTasks();
-      state = { ...state, tasks: projectAgentComposerTasks(tasks), tasksPhase: "ready", tasksError: null };
-    } catch (thrown: unknown) {
-      state = {
-        ...state,
-        tasksPhase: "error",
-        tasksError:
-          thrown instanceof Error ? thrown.message : String(thrown ?? "the task store could not be read"),
-      };
-    }
-  };
+  /** The shared seed path (split to ./agentComposerSeedPath.ts for the
+   * ≤400-line file law): the convergence fold + the outcome line + the
+   * honest reload, over the controller's seams. */
+  const seedPath = createAgentComposerSeedPath({
+    session: () => resolveSession(),
+    clock: () => clock(),
+    setTasks: (tasks, phase, error) => {
+      state = phase === "ready"
+        ? { ...state, tasks, tasksPhase: "ready", tasksError: null }
+        : { ...state, tasksPhase: "error", tasksError: error };
+    },
+  });
+  const seed = seedPath.seed;
+  const taskOutcomeLine = seedPath.taskOutcomeLine;
+  const reloadTasks = seedPath.reloadTasks;
 
   return {
     getState: () => state,
@@ -243,6 +250,16 @@ export function createAgentComposerController(
       appendEntries([{ kind: "USER_TEXT", text }], clock());
       setState({ draftText: "", sendPhase: "sending" });
 
+      // (P21-B, D2) The pending intake ask OWNS this text: the user's
+      // reply is captured through the mission plane (fail-closed) and
+      // the conversation stays in the ask loop — NEEDS_INPUT gates the
+      // journey until the intent compiles.
+      if (await intake.handleSendText(text)) {
+        await reloadTasks();
+        setState({ sendPhase: "idle" });
+        return;
+      }
+
       const routed = route(text);
       if (routed.kind === "UNKNOWN") {
         appendEntries([{ kind: "AGENT_REPLY", text: routed.reply }], clock());
@@ -274,6 +291,7 @@ export function createAgentComposerController(
           ],
           clock(),
         );
+        await intake.attachForSeed(outcome.task);
       }
       await reloadTasks();
       setState({ sendPhase: "idle" });
@@ -318,59 +336,27 @@ export function createAgentComposerController(
           ],
           clock(),
         );
+        await intake.attachForSeed(outcome.task);
       }
       await reloadTasks();
       setState({ sendPhase: "idle" });
     },
 
     async cancelTask(taskId: string): Promise<void> {
-      const task = state.tasks.find((entry) => entry.id === taskId);
-      if (task === undefined) {
-        return;
-      }
-      if (!task.resumable) {
-        appendEntries(
-          [
-            {
-              kind: "COMPOSER_ERROR",
-              text: `Task ${taskId} is ${task.status} — a terminal status has no lawful exit (the monotonic-terminal law).`,
-            },
-          ],
-          clock(),
-        );
-        persistUi();
-        emit();
-        return;
-      }
-      try {
-        await resolveSession().updateTaskStatus(
-          taskId,
-          "CANCELLED",
-          "CANCELLED",
-          clock(),
-          "Cancelled from the composer — the task record is closed. Nothing was dispatched: the composer holds no financial authority.",
-        );
-        appendEntries(
-          [
-            {
-              kind: "TASK_CANCELLED",
-              text: `Task cancelled: ${task.title}. The record is closed — nothing was dispatched and nothing needs unwinding.`,
-              taskId,
-            },
-          ],
-          clock(),
-        );
-      } catch (thrown: unknown) {
-        appendEntries(
-          [
-            {
-              kind: "COMPOSER_ERROR",
-              text: thrown instanceof Error ? thrown.message : String(thrown),
-            },
-          ],
-          clock(),
-        );
-      }
+      // The close path (split to ./agentComposerTaskClose.ts for the
+      // ≤400-line file law): zero financial authority — an orchestration
+      // record close with the monotonic-terminal law surfaced honestly.
+      await cancelAgentComposerTask(
+        {
+          session: () => resolveSession(),
+          clock: () => clock(),
+          appendEntries,
+          persistUi: () => persistUi(),
+          emit: () => emit(),
+        },
+        taskId,
+        state.tasks,
+      );
       await reloadTasks();
       persistUi();
       emit();
@@ -378,6 +364,20 @@ export function createAgentComposerController(
 
     async refresh(): Promise<void> {
       await reloadTasks();
+      // (P21-B, D2) The reload path: when a mission plane is bound, a
+      // FRESH binding re-derives the task↔mission link from the task's
+      // persisted events and re-surfaces the pending ask (idempotent —
+      // a binding that already holds its mission never re-asks).
+      const intakeBinding = intake.resolve();
+      if (intakeBinding !== undefined) {
+        const latest = state.tasks.find(
+          (task) => task.resumable && task.intentLine.startsWith("Payment mission"),
+        );
+        const record = latest !== undefined ? await resolveSession().taskDetail(latest.id) : null;
+        if (record !== null) {
+          await intake.resume(record);
+        }
+      }
       emit();
     },
 
@@ -389,23 +389,12 @@ export function createAgentComposerController(
   };
 }
 
-/* ------------------------- the shared singleton ---------------------- */
+/* ------- the shared seams (split to ./agentComposerShared.ts) ------- */
 
-let sharedController: AgentComposerController | undefined;
-
-/**
- * The ONE shared composer controller per document: every entrypoint
- * (product areas, app overview, Agent Workspace overview) drives the
- * same controller, so the composer's identity, draft, progress and
- * history are shared by construction — including across product ↔
- * console surface switches in the same document.
- */
-export function sharedAgentComposerController(): AgentComposerController {
-  sharedController ??= createAgentComposerController();
-  return sharedController;
-}
-
-/** Test/inspection helper: drop the shared singleton (never used in src). */
-export function resetSharedAgentComposerController(): void {
-  sharedController = undefined;
-}
+export {
+  bindSharedMissionIntakePlane,
+  resetSharedAgentComposerController,
+  resetSharedMissionIntakePlane,
+  sharedAgentComposerController,
+  sharedMissionIntakePlane,
+} from "./agentComposerShared.js";

@@ -30,6 +30,8 @@ export interface RoutePlanningMissionDetail {
   readonly status: string;
   readonly intent?: RoutePlanningMissionIntentDto;
   readonly fields?: Readonly<Record<string, unknown>>;
+  /** (P21-B, D3) The mission's typed timeline (the channel DTO carries it; the stage projection reads it). */
+  readonly events?: readonly { readonly kind: string; readonly summary: string; readonly at: string }[];
 }
 
 /** The compiled 11-key canonical intent DTO (the channel wire shape). */

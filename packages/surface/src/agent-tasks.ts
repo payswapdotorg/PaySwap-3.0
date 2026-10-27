@@ -130,6 +130,10 @@ export const AGENT_TASK_EVENT_KINDS = [
   "WAIT_CRITERIA_RECORDED",
   "OPPORTUNITY_MATCHED",
   "WAIT_EXPIRED",
+  // P21-B (ADR-0014 D3): stage 0's pin event — routineId + version + skill
+  // digest land in the app task store when the routine loads (appended
+  // after WAIT_EXPIRED, never inserted mid-list — the append-only spirit).
+  "ROUTINE_PINNED",
 ] as const;
 export type AgentTaskEventKind = (typeof AGENT_TASK_EVENT_KINDS)[number];
 
@@ -211,6 +215,37 @@ export interface AgentTaskEvent {
   readonly correlationRef?: string;
 }
 
+/* ====================================================================
+ * The model/difficulty selection (P21-B, ADR-0014 D4 — additive)
+ * ==================================================================== */
+
+/**
+ * The model + difficulty (reasoning level) selection a task record
+ * carries (D4): hydrated from the substrate's REAL model-selection
+ * service (never a fabricated list), persisted on the task record and
+ * restored on resume. The selection NEVER confers eligibility,
+ * authorization or security rights — the financial computation stays
+ * deterministic and model-independent (the honest no-narration-tier
+ * law; see AGENT_TASK_MODEL_DISCLOSURE_NOTE).
+ */
+export interface AgentTaskModelSelection {
+  /** The substrate provider id (e.g. "zai") — opaque here. */
+  readonly providerId: string;
+  /** The substrate model id (e.g. "glm-5.2") — opaque here. */
+  readonly modelId: string;
+  /** The model's OWN reasoning-level value (the difficulty; provider-pinned vocabulary). */
+  readonly reasoningLevel: string;
+}
+
+/**
+ * The honest no-narration-tier disclosure (D4, rendered VERBATIM): the
+ * selected model is RECORDED and drives real budget knobs — it never
+ * authors the financial facts, routes or scores, and no LLM narration
+ * tier is composed in this wave.
+ */
+export const AGENT_TASK_MODEL_DISCLOSURE_NOTE =
+  "The model and difficulty you pick are recorded with this task and drive the routine's real budget knobs (search, scenarios, explanation detail). The financial computation stays deterministic and model-independent: no model authored the amounts, routes, scores or provider facts shown here, and no model narration tier is composed in this deployment — every financial fact comes from the deterministic engines and provider evidence." as const;
+
 /** The shared task envelope. */
 export interface AgentTask {
   readonly id: AgentTaskId;
@@ -222,6 +257,8 @@ export interface AgentTask {
   readonly status: AgentTaskStatus;
   /** Append-only history (structural law: the writer appends, never rewrites). */
   readonly events: readonly AgentTaskEvent[];
+  /** (P21-B, D4) The persisted model + difficulty selection (absent = never selected). */
+  readonly modelSelection?: AgentTaskModelSelection;
 }
 
 /* ====================================================================

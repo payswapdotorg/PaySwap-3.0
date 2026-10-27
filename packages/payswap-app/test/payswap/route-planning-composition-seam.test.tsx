@@ -345,9 +345,12 @@ describe("the composition root (bindRoutePlanningEngine + bindRoutePlanningSessi
       fireEvent.click(container.querySelector("[data-ps-route-choice='PROCEED']")!);
     });
     const task = await harness.port.taskDetail(taskId);
-    expect(task!.events.map((event) => event.kind)).toEqual(["CREATED", "PREVIEW_PRESENTED", "ATTEMPT_STARTED"]);
-    expect(task!.events[2]!.summary).toContain("Proceed request recorded for plan '");
-    expect(task!.events[2]!.summary).toContain("a REQUEST record, never an authorization");
+    // (P21-B, D3) Stage 0's ROUTINE_PINNED lands when the routine loads —
+    // between the task creation and the first presentation.
+    expect(task!.events.map((event) => event.kind)).toEqual(["CREATED", "ROUTINE_PINNED", "PREVIEW_PRESENTED", "ATTEMPT_STARTED"]);
+    expect(task!.events[1]!.summary).toContain("Routine pinned: payment-route-planning");
+    expect(task!.events[3]!.summary).toContain("Proceed request recorded for plan '");
+    expect(task!.events[3]!.summary).toContain("a REQUEST record, never an authorization");
     // THE STRUCTURAL LAW: no AUTHORIZATION_GRANTED anywhere in the record.
     expect(JSON.stringify(task)).not.toContain("AUTHORIZATION_GRANTED");
   });

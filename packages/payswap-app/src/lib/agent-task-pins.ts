@@ -120,6 +120,10 @@ export const AGENT_TASK_EVENT_KINDS_PIN = [
   "WAIT_CRITERIA_RECORDED",
   "OPPORTUNITY_MATCHED",
   "WAIT_EXPIRED",
+  // P21-B (ADR-0014 D3): stage 0's pin event — routineId + version + skill
+  // digest land in the app task store when the routine loads (appended
+  // after WAIT_EXPIRED, never inserted mid-list — the append-only spirit).
+  "ROUTINE_PINNED",
 ] as const;
 export type AgentTaskEventKindPin = (typeof AGENT_TASK_EVENT_KINDS_PIN)[number];
 

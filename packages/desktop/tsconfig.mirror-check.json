@@ -16,7 +16,11 @@
     "paths": {
       "@payswap/app/routes": ["../payswap-app/src/routes.ts"],
       "@payswap/app": ["../payswap-app/src/index.ts"],
-      "@payswap/trust": ["../trust/src/index.ts"]
+      "@payswap/trust": ["../trust/src/index.ts"],
+      "@payswap/route-planning": ["../route-planning/src/index.ts"],
+      "@payswap/route-compiler": ["../route-compiler/src/index.ts"],
+      "@payswap/lab": ["../lab/src/index.ts"],
+      "@payswap/capability": ["../capability/src/index.ts"]
     }
   },
   "include": [
@@ -25,7 +29,13 @@
     "src/renderer/src/consolePaymentMissionWire.ts",
     "src/renderer/src/consoleConnectionsWire.ts",
     "src/renderer/src/paymentMissionsComposition.ts",
+    "src/renderer/src/missionIntakeComposition.ts",
+    "src/renderer/src/routePlanningEngineAdapter.ts",
+    "src/renderer/src/routePlanningMissionLinkage.ts",
     "../payswap-app/src",
+    "../route-planning/src",
+    "../route-compiler/src",
+    "../lab/src",
     "test/payswap/desktop-console-client.test.ts",
     "test/payswap/payment-approval-plane-harness.ts",
     "test/payswap/payment-missions-binding.test.ts",
@@ -35,6 +45,7 @@
     "test/payswap/payment-reconcile-plane-fixtures.ts",
     "test/payswap/p21-transport-probe-mirrors.test.ts",
     "test/payswap/connections-bridge.test.ts",
+    "test/payswap/mission-intake-composition.test.ts",
     "../capability/src",
     "../provider-runtime/src",
     "../trust/src"

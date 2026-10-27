@@ -65,6 +65,8 @@ import {
   routePlanningViewDigestOf,
   type RoutePlanningEnginePort,
   type RoutePlanningEngineView,
+  type RoutePlanningMissionFactsSource,
+  type RoutineStageMissionFacts,
 } from "@payswap/app";
 import {
   mapMissionIntentToPin,
@@ -212,11 +214,11 @@ export function createRealRoutePlanningEngine(
   source: RoutePlanningMissionSource,
   state: { missions: readonly RoutePlanningMissionBoardItem[]; details: ReadonlyMap<string, RoutePlanningMissionDetail> },
   engineState: { lastPresented: RoutePlanningEngineState["lastPresented"] },
-): RoutePlanningEnginePort {
+): RoutePlanningEnginePort & RoutePlanningMissionFactsSource {
   const registry = new RoutePlanningTriggerRegistry();
   const pins = new RoutineVersionPinLedger();
   return {
-    presentableView(request: { readonly taskRef: string }): RoutePlanningEngineView {
+    presentableView(_request: { readonly taskRef: string }): RoutePlanningEngineView {
       // The mission linkage (D4): the latest mission carrying a compiled intent.
       const target = [...state.details.values()]
         .filter((detail) => detail.intent !== undefined && detail.status !== "COMPLETED" && detail.status !== "CANCELLED" && detail.status !== "EXPIRED")
@@ -352,6 +354,21 @@ export function createRealRoutePlanningEngine(
       const view = { ...value, viewDigest: routePlanningViewDigestOf(value) } as RoutePlanningEngineView;
       engineState.lastPresented = { missionId: target.id, viewDigest: view.viewDigest, routineId: manifest.routineId, routineVersion: manifest.routineVersion };
       return view;
+    },
+
+    // (P21-B, ADR-0014 D3) The stage-projection input: the mission's
+    // typed timeline + status over the SAME mission cache the engine
+    // plans over (the channel's own read model — never a parallel one).
+    missionFacts(missionId: string): RoutineStageMissionFacts | null {
+      const detail = state.details.get(missionId);
+      if (detail === undefined) {
+        return null;
+      }
+      return {
+        missionId: detail.id,
+        missionStatus: detail.status,
+        events: [...(detail.events ?? [])],
+      };
     },
   };
 }

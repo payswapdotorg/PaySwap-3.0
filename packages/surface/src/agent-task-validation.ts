@@ -138,9 +138,14 @@ export function validateAgentTask(task: unknown): AgentTask {
   const record = task as Readonly<Record<string, unknown>>;
   requireExactKeys(
     record,
-    ["createdAt", "events", "id", "intent", "kind", "origin", "status", "updatedAt"],
+    record["modelSelection"] === undefined
+      ? ["createdAt", "events", "id", "intent", "kind", "origin", "status", "updatedAt"]
+      : ["createdAt", "events", "id", "intent", "kind", "modelSelection", "origin", "status", "updatedAt"],
     "AgentTask",
   );
+  if (record["modelSelection"] !== undefined) {
+    requireValidModelSelection(record["modelSelection"]);
+  }
   if (typeof record["id"] !== "string" || !ID_RE.test(record["id"])) {
     throw new InvalidAgentTaskError("id must be a non-empty task id (1-128 chars)");
   }
@@ -211,6 +216,18 @@ export function validateAgentTask(task: unknown): AgentTask {
 /* ====================================================================
  * The seed-decision fold (the convergence law, executable)
  * ==================================================================== */
+
+/** Fail-closed validation of the optional model/difficulty selection (P21-B, D4). */
+function requireValidModelSelection(value: unknown): void {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw new InvalidAgentTaskError("modelSelection must be an object { providerId, modelId, reasoningLevel }");
+  }
+  const selection = value as Readonly<Record<string, unknown>>;
+  requireExactKeys(selection, ["modelId", "providerId", "reasoningLevel"], "modelSelection");
+  requireString(selection["providerId"], "modelSelection.providerId");
+  requireString(selection["modelId"], "modelSelection.modelId");
+  requireString(selection["reasoningLevel"], "modelSelection.reasoningLevel");
+}
 
 /** The outcome of the seed fold (defined here to keep agent-tasks.ts lean). */
 export interface AgentTaskSeedDecision {

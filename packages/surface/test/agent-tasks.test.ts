@@ -147,6 +147,7 @@ describe("vocabulary closure", () => {
       "WAIT_CRITERIA_RECORDED",
       "OPPORTUNITY_MATCHED",
       "WAIT_EXPIRED",
+      "ROUTINE_PINNED",
     ]);
   });
 

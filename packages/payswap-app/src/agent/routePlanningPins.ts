@@ -59,6 +59,88 @@ export const PINNED_ROUTE_PLANNING_ROUTINE: RoutePlanningRoutinePin = Object.fre
   skillContentDigest: PINNED_ROUTE_PLANNING_SKILL_DIGEST,
 });
 
+/* ===== the typed-intent pins (P21-B gate fix; authority: @payswap/route-planning src/pins/economic.ts — the mirror discipline, verified by test/payswap/route-planning-acceptance.test.ts) ===== */
+
+/**
+ * STRUCTURAL PIN — authority: @payswap/economic src/intent.ts
+ * `FundsLocationRef` (mirrored through route-planning's pins/economic.ts):
+ * an OBSERVATION-GROUNDED reference to an external funds location (a
+ * reference — never a balance, never custody, INV-7).
+ */
+export interface FundsLocationRefPin {
+  /** Opaque external funds-location reference (e.g. `fundsloc:<...>`). */
+  readonly locationRef: string;
+  /** The currency/symbol observed at that location (AmountSpec law shape). */
+  readonly currency: string;
+  /** Opaque reference to the canonical observation grounding this location. */
+  readonly observationRef: string;
+}
+
+/**
+ * STRUCTURAL PIN — authority: @payswap/economic src/intent.ts
+ * `AmountSpec`: an exact money amount as a currency + integer minor
+ * units string (never a float — the exact-money law).
+ */
+export interface AmountSpecPin {
+  readonly currency: string;
+  readonly minorUnits: string;
+}
+
+/**
+ * STRUCTURAL PIN — authority: @payswap/economic src/intent.ts
+ * `IntentConstraints`: the bounded structural constraints carried by
+ * every intent, propagated from the goal.
+ */
+export interface IntentConstraintsPin {
+  /** Upper bound on wall-clock settlement duration (ms, positive). */
+  readonly maxSettlementMs: number;
+  /** Upper bound on intermediate hops (integer in [1, 8]). */
+  readonly maxRouteHops: number;
+}
+
+/**
+ * STRUCTURAL PIN — authority: @payswap/economic src/intent.ts
+ * `MoneyMovementIntent`: ONE executable value-transfer demand,
+ * rail/provider-neutral. ADVISORY DEMAND ONLY — establishes NO
+ * authorization and NO financial finality; `intentAuthorizationRef` is an
+ * opaque LINEAGE reference.
+ */
+export interface MoneyMovementIntentPin {
+  /** Deterministic intent identity (e.g. `intent:<...>`). */
+  readonly intentId: string;
+  /** Principal reference (opaque; the trust plane owns principal identity). */
+  readonly principalRef: string;
+  /** Observation-grounded origin: WHERE value leaves (a reference, never a balance). */
+  readonly origin: FundsLocationRefPin;
+  /** Observation-grounded destination: WHERE value must arrive. */
+  readonly destination: FundsLocationRefPin;
+  /** The exact amount leaving the origin (positive; currency matches the origin). */
+  readonly originAmount: AmountSpecPin;
+  /** The currency/symbol the movement must arrive in (matches the destination). */
+  readonly arrivalCurrency: string;
+  /** Timing/structure constraints (propagated from the goal; bounded). */
+  readonly constraints: IntentConstraintsPin;
+  /** Authorization LINEAGE reference (opaque; establishes NO authorization). */
+  readonly intentAuthorizationRef: string;
+  /** Declared-at instant (ms, caller-supplied; no ambient clock). */
+  readonly declaredAt: number;
+  /** Absolute expiry (ms): strictly after declaredAt. */
+  readonly expiresAt: number;
+}
+
+/**
+ * STRUCTURAL PIN — authority: @payswap/economic src/payment-intent.ts
+ * `PaymentIntent`: a MoneyMovementIntent whose purpose is value exchange
+ * with a commerce counterparty, plus ONE opaque commerce lineage reference
+ * — nothing else (the type-level specialization law). The trigger's
+ * compiled intent (the D1 law — the mission linkage field-maps the
+ * channel DTO onto this exact key set).
+ */
+export interface PaymentIntentPin extends MoneyMovementIntentPin {
+  /** Opaque commerce-context lineage reference (e.g. `checkout:<...>`). */
+  readonly commerceRef: string;
+}
+
 /* ============ the routine's UX vocabulary (sections, choices, views) ============ */
 
 /** The DISTINCT panel sections (stage 8: "distinct current routes vs

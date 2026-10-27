@@ -94,7 +94,7 @@ export interface AgentComposerTaskView {
   /** Is the task still resumable (non-terminal)? */
   readonly resumable: boolean;
   /** The append-only event timeline, oldest first (as recorded). */
-  readonly events: readonly { readonly id: string; readonly at: string; readonly kind: string; readonly summary: string }[];
+  readonly events: readonly { readonly id: string; readonly at: string; readonly kind: string; readonly summary: string; readonly correlationRef?: string }[];
 }
 
 /** The people-language direction labels (the pinned mission vocabulary). */
@@ -168,6 +168,7 @@ export function projectAgentComposerTasks(
           at: event.at,
           kind: event.kind,
           summary: event.summary,
+          ...(event.correlationRef !== undefined ? { correlationRef: event.correlationRef } : {}),
         })),
       };
     });
