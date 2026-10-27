@@ -40,6 +40,12 @@ export { createPaymentApprovalChannelMembers, projectAttemptStates } from "./app
 // (P19-A, ADR-0012 D1/D2) The dispatch members (the armed-effect read + the lane-choice act).
 export { createPaymentDispatchChannelMembers } from "./dispatch-members.js";
 export type { PaymentDispatchChannelDeps } from "./dispatch-members.js";
+// (P20-A, ADR-0013 D1/D2/D3) The reconciliation members (the pending read + the evidence act).
+export {
+  CHANNEL_RECONCILIATION_ORIGIN,
+  CHANNEL_RECONCILIATION_PRINCIPAL,
+  createPaymentReconciliationChannelMembers,
+} from "./reconcile-members.js";
 export { createWorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 export type { WorkspaceStoreChannelDeps, WorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 export {
@@ -52,7 +58,14 @@ export {
   type PaymentDispatchLaneDto,
   type PaymentMissionArmedEffectDto,
   type PaymentMissionDispatchOutcomeDto,
+  type PaymentMissionPendingAttemptDto,
+  type PaymentMissionPendingReconciliationDto,
+  type PaymentMissionReconcileEvidenceDto,
+  type PaymentMissionReconcileInputDto,
+  type PaymentMissionReconciliationOutcomeDto,
+  type PaymentReconciliationSourceKind,
 } from "./payment-mission-contracts.js";
+export { PAYMENT_RECONCILIATION_SOURCE_KINDS } from "./payment-mission-contracts.js";
 export {
   resolveDispatchLanes,
   eligibleLanesOf,

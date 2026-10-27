@@ -41,10 +41,13 @@ import type {
   PaySwapPaymentMissionArmedEffectDto,
   PaySwapPaymentMissionBoardItemDto,
   PaySwapPaymentMissionDetailDto,
+  PaySwapPaymentMissionPendingReconciliationDto,
+  PaySwapPaymentMissionReconciliationOutcomeDto,
   PaySwapPaymentMissionSeedInputDto,
   PaySwapPaymentDispatchOutcomeDto,
   PaySwapPaymentPlanSelectionInputDto,
   PaySwapPaymentPreviewDto,
+  PaySwapPaymentReconcileEvidenceDto,
 } from "./consolePaymentMissionWire.js";
 
 // The payment-mission wire types (the pinned host DTO mirrors, split to
@@ -74,6 +77,12 @@ export type {
   PaySwapPaymentDispatchLaneDto,
   PaySwapPaymentMissionArmedEffectDto,
   PaySwapPaymentDispatchOutcomeDto,
+  PaySwapPaymentReconciliationSourceKind,
+  PaySwapPaymentMissionPendingAttemptDto,
+  PaySwapPaymentMissionPendingReconciliationDto,
+  PaySwapPaymentReconcileEvidenceDto,
+  PaySwapPaymentReconcileInputDto,
+  PaySwapPaymentMissionReconciliationOutcomeDto,
 } from "./consolePaymentMissionWire.js";
 
 // ---------------------------------------------------------------------------
@@ -141,6 +150,13 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   // resolve HOST-SIDE, the outcome carries facts only).
   "paymentMissionArmedEffect",
   "paymentMissionDispatch",
+  // P20-A reconciliation members (ADR-0013 D1 — the reconcile act
+  // crosses as the pending-reconciliation READ + the evidence-
+  // submission ACT: the pending set derives/recomputes HOST-SIDE by
+  // the runtime's own rule, the evidence bounds validate at the edge,
+  // and the runtime verb stays the ONLY closer of an UNKNOWN).
+  "paymentMissionPendingReconciliation",
+  "paymentMissionReconcile",
 ] as const;
 
 /**
@@ -259,6 +275,29 @@ export interface IPaySwapDesktopClientService {
     missionId: string,
     connectionRef: string,
   ): Promise<PaySwapPaymentDispatchOutcomeDto>;
+  /**
+   * The pending-reconciliation READ (P20-A, ADR-0013 D1): the pending
+   * card — the unresolved attempts by the runtime's own rule, the
+   * accepted-sources echo (the frozen vocabulary) and the honest
+   * people-language note. Nothing on the card closes anything.
+   */
+  paymentMissionPendingReconciliation(
+    missionId: string,
+  ): Promise<PaySwapPaymentMissionPendingReconciliationDto>;
+  /**
+   * The evidence-submission ACT (P20-A, ADR-0013 D1): the operator's
+   * transcription of provider evidence — the renderer supplies ONLY
+   * the mission id, the attempt id and the evidence (direction,
+   * source kind, provider reference strings); the pending set
+   * recomputes HOST-SIDE at act time and the RUNTIME VERB stays the
+   * only closer (its typed refusals rethrow through). The outcome
+   * carries facts only; the evidence refs never echo as structure.
+   */
+  paymentMissionReconcile(
+    missionId: string,
+    attemptId: string,
+    evidence: PaySwapPaymentReconcileEvidenceDto,
+  ): Promise<PaySwapPaymentMissionReconciliationOutcomeDto>;
 }
 
 /** What the renderer needs from its service connection for the console. */

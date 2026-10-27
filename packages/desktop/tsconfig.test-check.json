@@ -11,6 +11,8 @@
     "test/payswap/payment-approval-plane-harness.ts",
     "test/payswap/payment-dispatch-plane.test.ts",
     "test/payswap/payment-dispatch-plane-fixtures.ts",
+    "test/payswap/payment-reconcile-plane.test.ts",
+    "test/payswap/payment-reconcile-plane-fixtures.ts",
     "test/payswap/payments-mission-plane.test.ts",
     "test/payswap/delegation.test.ts"
   ]

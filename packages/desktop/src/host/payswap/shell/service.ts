@@ -55,6 +55,7 @@ import {
 } from "./payment-mission-members.js";
 import { createPaymentApprovalChannelMembers } from "./approval-members.js";
 import { createPaymentDispatchChannelMembers } from "./dispatch-members.js";
+import { createPaymentReconciliationChannelMembers } from "./reconcile-members.js";
 import { createWorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 import { ConnectionPlaneNotConfiguredError } from "./plane-errors.js";
 
@@ -326,6 +327,18 @@ export function createPaySwapDesktopService(
       now: paymentMissionClock,
       log: seamLog,
       listLaneCandidateRecords,
+    }),
+
+    // (P20-A, ADR-0013 D1) The reconciliation members — the pending
+    // READ + the evidence-submission ACT over the SAME resolver and
+    // host clock (the member-family pattern): the pending set derives
+    // and recomputes host-side by the runtime's own unresolved rule,
+    // the evidence bounds validate at the edge, and the runtime's
+    // reconcile verb stays the ONLY closer of an UNKNOWN.
+    ...createPaymentReconciliationChannelMembers({
+      resolveRuntime: resolvePaymentMissionRuntime,
+      now: paymentMissionClock,
+      log: seamLog,
     }),
   };
   return service;

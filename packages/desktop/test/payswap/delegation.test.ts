@@ -127,7 +127,18 @@ describe("delegated money movement laws (P7-W2)", () => {
       "paymentMissionCapture",
       "paymentMissionDetail",
       "paymentMissionDispatch",
+      // (P20-A reconciliation members — paymentMissionPendingReconciliation
+      // + paymentMissionReconcile below, ADR-0013 D1 — the ADR-0011 D3
+      // boundary narrowed a THIRD time: the reconcile act crosses ONLY
+      // as an evidence submission over the host-recomputed pending set
+      // [the runtime's own unresolved rule — never a parallel
+      // derivation], the evidence bounds validate at the edge by the
+      // runtime's own bounds, and the RUNTIME VERB stays the ONLY
+      // closer of an UNKNOWN; the outcome carries facts only, the
+      // evidence refs never echoing as structure.)
+      "paymentMissionPendingReconciliation",
       "paymentMissionPresentPreview",
+      "paymentMissionReconcile",
       "paymentMissionRecordPlanSelection",
       // (P19-A dispatch members — paymentMissionArmedEffect +
       // paymentMissionDispatch above, ADR-0012 D1 — the lawful

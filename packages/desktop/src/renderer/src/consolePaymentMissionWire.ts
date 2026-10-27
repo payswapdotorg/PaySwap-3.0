@@ -10,7 +10,7 @@
  * structural mirroring, the RoutePlanningPanel precedent).
  *
  * THE WIRE LAWS (P17-A ADR-0010 D2; P18-A ADR-0011 D2/D3; P19-A
- * ADR-0012 D1/D2):
+ * ADR-0012 D1/D2; P20-A ADR-0013 D1/D2/D3):
  * - read/input verbs only on the member surface; the approval act
  *   crosses as TWO edge-pinned members whose origin + principal are
  *   pinned HOST-SIDE (the renderer supplies ONLY requestId + APPROVE
@@ -27,7 +27,16 @@
  *   HOST-SIDE (the artifact never crosses, not even as an input; the
  *   outcome carries facts only: kind, attemptId, summary). The lanes
  *   carry the registry's own ids + people-language labels ONLY — no
- *   credentials, no credential handles, no secrets.
+ *   credentials, no credential handles, no secrets;
+ * - the reconcile act crosses as TWO members (P20-A, ADR-0013 D1 —
+ *   the boundary narrowed a THIRD time): the pending-reconciliation
+ *   READ + the evidence-submission ACT. The pending set derives and
+ *   recomputes HOST-SIDE by the runtime's own unresolved rule (no
+ *   parallel derivation); the acceptedSources echo the frozen
+ *   two-kind vocabulary verbatim (the operator is the COURIER of
+ *   provider evidence, never its source); the RUNTIME VERB stays the
+ *   ONLY closer of an UNKNOWN; the evidence refs NEVER echo as
+ *   structure on any wire shape (timeline-event prose only).
  */
 
 // ---------------------------------------------------------------------------
@@ -326,3 +335,48 @@ export type PaySwapPaymentDispatchOutcomeDto =
   | { readonly kind: "DISPATCHED"; readonly attemptId: string; readonly summary: string }
   | { readonly kind: "REPLAYED"; readonly attemptId: string; readonly summary: string }
   | { readonly kind: "REFUSED"; readonly attemptId: string; readonly summary: string };
+
+// ---------------------------------------------------------------------------
+// The P20-A reconciliation wire types (ADR-0013 — the evidence submission;
+// the runtime verb stays the only closer, the refs never echo as structure)
+// ---------------------------------------------------------------------------
+
+/** The frozen provider-evidence source vocabulary (mirrors the host pin VERBATIM). */
+export type PaySwapPaymentReconciliationSourceKind =
+  | "EXTERNAL_PROVIDER_STATEMENT"
+  | "EXTERNAL_PROVIDER_RETRIEVAL";
+
+/** One attempt pending reconciliation (people-language facts only — no envelope internals, no lineage). */
+export interface PaySwapPaymentMissionPendingAttemptDto {
+  readonly attemptId: string;
+  readonly startedAt: string;
+  readonly operation: "CREATE_EXTERNAL_EFFECT" | "CANCEL_OR_REVERSE_EFFECT";
+  readonly executionMode: "SANDBOX" | "LIVE";
+  readonly summary: string;
+}
+
+/** The pending-reconciliation card (the READ): the derived pending list + the accepted-sources echo + the honest note. */
+export interface PaySwapPaymentMissionPendingReconciliationDto {
+  readonly pending: readonly PaySwapPaymentMissionPendingAttemptDto[];
+  readonly acceptedSources: readonly PaySwapPaymentReconciliationSourceKind[];
+  readonly note: string;
+}
+
+/** The evidence triple the reconcile act submits (mirrors the runtime's evidence shape 1:1). */
+export interface PaySwapPaymentReconcileEvidenceDto {
+  readonly resolvedTo: "CONFIRMED" | "FAILED";
+  readonly source: PaySwapPaymentReconciliationSourceKind;
+  readonly evidenceRefs: readonly string[];
+}
+
+/** The full evidence-submission input: the addressing key + the evidence triple (what the evidence entry composes). */
+export interface PaySwapPaymentReconcileInputDto extends PaySwapPaymentReconcileEvidenceDto {
+  readonly attemptId: string;
+}
+
+/** The typed reconciliation outcome (facts only — the evidence refs never echo as structure). */
+export interface PaySwapPaymentMissionReconciliationOutcomeDto {
+  readonly attemptId: string;
+  readonly resolvedTo: "CONFIRMED" | "FAILED";
+  readonly summary: string;
+}

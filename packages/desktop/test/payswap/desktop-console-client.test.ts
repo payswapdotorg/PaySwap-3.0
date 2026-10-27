@@ -135,7 +135,11 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       "paymentMissionCapture",
       "paymentMissionDetail",
       "paymentMissionDispatch",
+      // P20-A reconciliation members (ADR-0013 D1 — the pending read +
+      // the evidence act; the runtime verb stays the only closer).
+      "paymentMissionPendingReconciliation",
       "paymentMissionPresentPreview",
+      "paymentMissionReconcile",
       "paymentMissionRecordPlanSelection",
       // P18-A approval members (ADR-0011 D2 — edge-pinned: the origin +
       // principal are pinned host-side; the artifact never crosses).
@@ -188,15 +192,27 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).toContain(member);
       expect(member).not.toMatch(/^(execute|retry|cancel|confirm|settle|payout|approve)/);
     }
+    // The P20-A reconciliation members pass the law too (ADR-0013 D1 —
+    // the names carry the paymentMission prefix; the reconcile act is
+    // an EVIDENCE SUBMISSION over the host-recomputed pending set, and
+    // the runtime's reconcile verb — not this channel — closes the
+    // UNKNOWN).
+    for (const member of ["paymentMissionPendingReconciliation", "paymentMissionReconcile"]) {
+      expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).toContain(member);
+      expect(member).not.toMatch(/^(execute|retry|cancel|confirm|settle|payout|approve)/);
+    }
     // The authorization/dispatch plane's raw verbs stay HOST-SIDE: none
     // of them is exposed on the channel (ADR-0012 D1 narrows the
     // ADR-0011 D3 boundary to the two lane-choice members above — the
     // raw runtime verbs, the artifact getters and the artifact-id
-    // input surface never cross).
+    // input surface never cross; ADR-0013 D1 repeats the law for the
+    // runtime's reconcile verb — the channel exposes the evidence
+    // submission, never the raw closer).
     for (const forbidden of [
       "requestAuthorization",
       "resolveAuthorization",
       "dispatch",
+      "reconcile",
       "approveAuthorization",
       "executePayment",
       "artifact",

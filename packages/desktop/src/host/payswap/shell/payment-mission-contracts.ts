@@ -1,8 +1,8 @@
 /**
  * PaySwap Desktop (P17-A, ADR-0010 D2/D3; P18-A, ADR-0011 D2/D3; P19-A,
- * ADR-0012 D1) — the payment-mission channel members' contracts: the
- * read/input surface the renderer consumes over the payswap-desktop
- * channel, and its JSON-safe DTOs.
+ * ADR-0012 D1; P20-A, ADR-0013 D1/D2/D3) — the payment-mission channel
+ * members' contracts: the read/input surface the renderer consumes over
+ * the payswap-desktop channel, and its JSON-safe DTOs.
  *
  * THE CHANNEL LAW (the no-parallel-engine discipline, extended):
  * - every member is a READ or an INTAKE-PLANE INPUT verb — all names
@@ -34,6 +34,18 @@
  *   attempt STATES — outcome facts only, derived host-side — never
  *   the attempt records themselves (they carry the
  *   consumed-authorization lineage);
+ * - THE RECONCILIATION ACT (P20-A, ADR-0013 D1 — the ADR-0011 D3
+ *   boundary narrowed a THIRD time, the same pattern again): the
+ *   reconcile act crosses ONLY as an evidence submission over the
+ *   host-recomputed pending set, with the RUNTIME VERB REMAINING THE
+ *   ONLY CLOSER of an UNKNOWN (see ./reconcile-contracts.ts, split
+ *   for the ≤400-line file law): the pending READ derives by the
+ *   runtime's own unresolved rule (D3 — no parallel derivation), the
+ *   acceptedSources echo the frozen two-kind vocabulary verbatim
+ *   (D2 — the operator is the COURIER of provider evidence, never
+ *   its source), the evidence bounds validate at the edge by the
+ *   runtime's own bounds BEFORE any runtime call, and the outcome
+ *   carries facts only — the evidence refs NEVER echo as structure;
  * - the DTOs carry NO credentials, NO secrets and NO authorization
  *   artifacts: the detail projects the mission's demand-side record
  *   (timeline, intake fields, compiled intent, preview id, plan
@@ -57,12 +69,23 @@ import type {
 } from "../payments/contracts.js";
 import type { PaymentGateId } from "../payments/validation-gates.js";
 import type { IPaySwapDesktopDispatchMembers } from "./dispatch-contracts.js";
+import type { IPaySwapDesktopReconcileMembers } from "./reconcile-contracts.js";
 export type {
   IPaySwapDesktopDispatchMembers,
   PaymentDispatchLaneDto,
   PaymentMissionArmedEffectDto,
   PaymentMissionDispatchOutcomeDto,
 } from "./dispatch-contracts.js";
+export type {
+  IPaySwapDesktopReconcileMembers,
+  PaymentMissionPendingAttemptDto,
+  PaymentMissionPendingReconciliationDto,
+  PaymentMissionReconcileEvidenceDto,
+  PaymentMissionReconcileInputDto,
+  PaymentMissionReconciliationOutcomeDto,
+  PaymentReconciliationSourceKind,
+} from "./reconcile-contracts.js";
+export { PAYMENT_RECONCILIATION_SOURCE_KINDS } from "./reconcile-contracts.js";
 
 // ---------------------------------------------------------------------------
 // The DTOs (JSON-safe channel shapes — projections of host records)
@@ -266,12 +289,16 @@ export interface PaymentMissionAttemptStateDto {
 
 /**
  * The payment-mission channel members (P17-A, ADR-0010 D2; P19-A,
- * ADR-0012 D1 for the dispatch members). Every member fails closed
+ * ADR-0012 D1 for the dispatch members; P20-A, ADR-0013 D1 for the
+ * reconciliation members). Every member fails closed
  * with PaymentPlaneNotConfiguredError when the host composed no
  * payment-mission runtime (the workspace-store posture — never a
  * silent no-op).
  */
-export interface IPaySwapDesktopPaymentMissionMembers extends IPaySwapDesktopDispatchMembers {
+export interface IPaySwapDesktopPaymentMissionMembers
+  extends IPaySwapDesktopDispatchMembers,
+    IPaySwapDesktopReconcileMembers
+{
   /**
    * The mission board, newest-updated-first: the read model for the
    * payments surface (status, compiled-intent/preview presence and the
