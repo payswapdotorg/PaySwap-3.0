@@ -396,3 +396,41 @@ describe("the pinned fail-closed validators agree with the shared contract", () 
     expect(validation).toContain("packages/surface/src/agent-task-validation.ts");
   });
 });
+
+describe("the model-selection pin mirrors the surface authority (P21-B, D4)", () => {
+  it("AGENT_TASK_MODEL_DISCLOSURE_NOTE_PIN matches the surface constant byte-identically", async () => {
+    const { AGENT_TASK_MODEL_DISCLOSURE_NOTE } = await import("../../../surface/src/agent-tasks.ts");
+    const { AGENT_TASK_MODEL_DISCLOSURE_NOTE_PIN } = await import("../../src/lib/agent-task-pins.js");
+    expect(AGENT_TASK_MODEL_DISCLOSURE_NOTE_PIN).toBe(AGENT_TASK_MODEL_DISCLOSURE_NOTE);
+  });
+
+  it("the optional modelSelection field validates case-for-case like the source", () => {
+    const good = { providerId: "zai", modelId: "glm-5.2", reasoningLevel: "high" };
+    const bad = [
+      { ...good, extra: 1 },
+      { providerId: "zai", modelId: "glm-5.2" },
+      "prose",
+    ];
+    const base = {
+      id: "task:PAYMENT_MISSION:1",
+      kind: "PAYMENT_MISSION",
+      intent: { kind: "PAYMENT_MISSION", direction: "PAY", goalStatement: "pay the supplier" },
+      origin: "COMPOSER_TEXT",
+      createdAt: NOW,
+      updatedAt: NOW,
+      status: "DRAFT",
+      events: [],
+    } as const;
+    expect(() => validateAgentTask({ ...base, modelSelection: good })).not.toThrow();
+    expect(() => validatePinnedAgentTask({ ...base, modelSelection: good })).not.toThrow();
+    for (const selection of bad) {
+      expect(() => validateAgentTask({ ...base, modelSelection: selection })).toThrow(InvalidAgentTaskError);
+      expect(() => validatePinnedAgentTask({ ...base, modelSelection: selection })).toThrow(
+        InvalidPinnedAgentTaskError,
+      );
+    }
+    // Absent stays canonical (the 1.4.0 records keep validating).
+    expect(() => validateAgentTask({ ...base })).not.toThrow();
+    expect(() => validatePinnedAgentTask({ ...base })).not.toThrow();
+  });
+});

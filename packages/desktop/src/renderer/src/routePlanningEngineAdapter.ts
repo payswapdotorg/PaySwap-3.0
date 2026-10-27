@@ -62,8 +62,11 @@ import { compileMoneyMovementRoute } from "@payswap/route-compiler";
 import { recordProductionFacts, planScenarioSuite, runInterventionCounterfactual, type SimulationProgram } from "@payswap/lab";
 import {
   RoutePlanningNoIntentError,
+  modelBudgetOf,
   routePlanningViewDigestOf,
+  type ReasoningLevelBudget,
   type RoutePlanningEnginePort,
+  type RoutePlanningEngineRequest,
   type RoutePlanningEngineView,
   type RoutePlanningMissionFactsSource,
   type RoutineStageMissionFacts,
@@ -194,6 +197,12 @@ function realScenarioPort(): ScenarioExplorationPort {
   };
 }
 
+/** The composition root's pinned default budgets when NO difficulty is selected
+ * (equal to the app's "medium" mapping — the documented default tier). */
+export function compositionDefaultBudgets(): ReasoningLevelBudget {
+  return modelBudgetOf("medium");
+}
+
 /* ---------------- the engine (stages 0-7 over the REAL machinery) ---------------- */
 
 /** The per-document engine state (the trigger registry + pin ledger + the latest linkage). */
@@ -218,7 +227,7 @@ export function createRealRoutePlanningEngine(
   const registry = new RoutePlanningTriggerRegistry();
   const pins = new RoutineVersionPinLedger();
   return {
-    presentableView(_request: { readonly taskRef: string }): RoutePlanningEngineView {
+    presentableView(request: RoutePlanningEngineRequest): RoutePlanningEngineView {
       // The mission linkage (D4): the latest mission carrying a compiled intent.
       const target = [...state.details.values()]
         .filter((detail) => detail.intent !== undefined && detail.status !== "COMPLETED" && detail.status !== "CANCELLED" && detail.status !== "EXPIRED")
@@ -258,6 +267,16 @@ export function createRealRoutePlanningEngine(
         asOf: new Date(intent.declaredAt).toISOString(),
       };
       const at = intent.declaredAt;
+      // (P21-B, ADR-0014 D4) The difficulty→budget wiring: the task's
+      // persisted modelSelection derives the REAL count-based budgets
+      // through the app's pinned PURE mapping (a foreign level fails
+      // closed through the typed error — never a coerced default); with
+      // NO selection the composition's pinned defaults stand (medium).
+      // The budgets feed ONLY the bounded search + scenario exploration
+      // — never eligibility, authorization or security gates.
+      const budgets = request.modelSelection !== undefined
+        ? modelBudgetOf(request.modelSelection.reasoningLevel)
+        : compositionDefaultBudgets();
       // Stages 2/3 — the per-side snapshots over the REAL corridor projection, ZERO chains (the deployment fact).
       const corridorPort = realCorridorPort();
       const freshnessPolicy = { maxAgeSeconds: 3600 };
@@ -273,7 +292,7 @@ export function createRealRoutePlanningEngine(
         recipientSnapshot: pair.recipient,
         corridorQuery: query,
         evidence: emptyEvidenceBundle(),
-        budget: { maxCandidates: 10, maxShapes: 9, maxCandidatesPerShape: 10 },
+        budget: budgets.searchBudget,
         compilationPort: realCompilationPort(),
       });
       // Stage 5 — the typed hard gates BEFORE the transparent ranking.
@@ -286,7 +305,7 @@ export function createRealRoutePlanningEngine(
         port: realScenarioPort(),
         baseFacts: recordProductionFacts({ factsId: `composition:${target.id}`, rails: [], pools: [], stepLatencyMs: 250, demands: [], incidents: [] }),
         interventions: [],
-        budget: { maxScenarios: 5, maxInterventionsPerRun: 5, maxDemands: 5, maxPools: 5, maxRails: 5 },
+        budget: budgets.scenarioBudget,
         baseProgram,
         variantProgram,
         seed: `composition:${target.id}`,
@@ -350,6 +369,10 @@ export function createRealRoutePlanningEngine(
             declaredAt: at,
           },
         },
+        // (P21-B, D4) The MODEL STAMP — provenance only; the digest
+        // projection deliberately excludes it (the digest pins the
+        // model-independent computation).
+        ...(request.modelSelection !== undefined ? { modelSelection: request.modelSelection } : {}),
       };
       const view = { ...value, viewDigest: routePlanningViewDigestOf(value) } as RoutePlanningEngineView;
       engineState.lastPresented = { missionId: target.id, viewDigest: view.viewDigest, routineId: manifest.routineId, routineVersion: manifest.routineVersion };

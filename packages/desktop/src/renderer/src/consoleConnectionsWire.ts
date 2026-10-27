@@ -64,3 +64,23 @@ export interface PaySwapConnectionProbeOutcomeDto {
   readonly evidenceTier: PaySwapConnectionProbeEvidenceTier;
   readonly note: string;
 }
+
+/** One connection's status view (mirrors DesktopConnectionStatusView — the fields the renderer consumes). */
+export interface PaySwapConnectionStatusViewDto {
+  readonly connectionId: string;
+  readonly providerId: string;
+  readonly useCaseRef: string;
+  readonly form: string;
+  readonly credentialKind: string;
+  readonly executionMode: string;
+  readonly state: string;
+  readonly credentialHandleRef: string;
+  readonly createdAt: string;
+  readonly lastTransitionAt: string;
+}
+
+/** The typed outcome of a setup seed (mirrors DesktopConnectionSetupOutcome — create or resume, honestly). */
+export type PaySwapConnectionSetupOutcomeDto =
+  | { readonly kind: "CREATED"; readonly connectionId: string; readonly state: string }
+  | { readonly kind: "RESUMED"; readonly connectionId: string; readonly state: string }
+  | { readonly kind: "REFUSED"; readonly reason: string };

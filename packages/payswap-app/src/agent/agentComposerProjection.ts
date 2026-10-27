@@ -19,6 +19,7 @@
 
 import type { MissionIntentDirection } from "../console/contracts.js";
 import { isTerminalAgentTaskStatusPin, type AgentTaskPin, type AgentTaskStatusPin } from "../lib/agent-task-pins.js";
+import type { AgentTaskModelSelectionPin } from "../lib/agent-task-pins.js";
 
 /* ------------------------- the pinned notes ------------------------- */
 
@@ -93,6 +94,8 @@ export interface AgentComposerTaskView {
   readonly createdAt: string;
   /** Is the task still resumable (non-terminal)? */
   readonly resumable: boolean;
+  /** (P21-B, D4) The task's persisted model + difficulty selection (absent = never selected). */
+  readonly modelSelection?: AgentTaskModelSelectionPin;
   /** The append-only event timeline, oldest first (as recorded). */
   readonly events: readonly { readonly id: string; readonly at: string; readonly kind: string; readonly summary: string; readonly correlationRef?: string }[];
 }
@@ -163,6 +166,7 @@ export function projectAgentComposerTasks(
         updatedAt: task.updatedAt,
         createdAt: task.createdAt,
         resumable: !isTerminalAgentTaskStatusPin(task.status),
+        ...(task.modelSelection !== undefined ? { modelSelection: task.modelSelection } : {}),
         events: task.events.map((event) => ({
           id: event.id,
           at: event.at,

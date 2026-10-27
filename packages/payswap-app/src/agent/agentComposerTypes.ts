@@ -14,6 +14,8 @@ import type { AgentTaskSessionPort } from "./taskSessionPort.js";
 import type { AgentComposerTaskView } from "./agentComposerProjection.js";
 import type { AgentComposerTranscriptEntry } from "./agentComposerUiState.js";
 import type { MissionIntakePlanePort, MissionIntakeState } from "./missionIntakePins.js";
+import type { ModelCatalogPort, ModelControlsState } from "./taskModelPins.js";
+import type { AgentTaskModelSelectionPin } from "../lib/agent-task-pins.js";
 
 /* ------------------------------ the state --------------------------- */
 
@@ -36,6 +38,8 @@ export interface AgentComposerState {
   readonly uiPersistence: "browser-profile" | "memory-only";
   /** (P21-B, D2) The mission-intake binding's projected state (UNBOUND without a plane). */
   readonly missionIntake: MissionIntakeState;
+  /** (P21-B, D4) The model/difficulty controls state (UNBOUND without a catalog). */
+  readonly modelControls: ModelControlsState;
 }
 
 /** A surface-action seed request (card clicks and area entries). */
@@ -73,6 +77,13 @@ export interface AgentComposerControllerOptions {
    * (the web tier) — the honest unbound note, never a faked mission.
    */
   readonly missionIntakePlane?: MissionIntakePlanePort;
+  /**
+   * (P21-B, ADR-0014 D4) The substrate model-catalog port: when bound,
+   * the composer's model + difficulty controls hydrate from the REAL
+   * catalogue (never a fabricated list); absent (the web tier) — the
+   * honest unbound note, never a model list.
+   */
+  readonly modelCatalog?: ModelCatalogPort;
 }
 
 export interface AgentComposerController {
@@ -93,6 +104,10 @@ export interface AgentComposerController {
   cancelTask(taskId: string): Promise<void>;
   /** Reload the task list from the session port (honest phases). */
   refresh(): Promise<void>;
+  /** (P21-B, D4) Load the model catalogue through the injected port (honest phases). */
+  loadModelCatalog(): Promise<void>;
+  /** (P21-B, D4) Record the model + difficulty selection on the newest resumable task (fail-closed). */
+  selectModel(selection: AgentTaskModelSelectionPin): Promise<void>;
   /**
    * The controller's ONE task-session port (P17-C, ADR-0010 D5): the
    * composition seam a platform host uses to bind a route-planning

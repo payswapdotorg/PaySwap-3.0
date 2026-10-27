@@ -21,6 +21,11 @@ import { AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT_PIN } from "../lib/agent-task-pi
 import type { AgentComposerController, AgentComposerState, AgentComposerTranscriptEntry } from "./agentComposerController.js";
 import { RoutePlanningMount } from "./RoutePlanningMount.js";
 import {
+  AGENT_TASK_MODEL_DISCLOSURE_NOTE_PIN,
+  MODEL_CATALOG_UNBOUND_NOTE,
+  type CatalogModel,
+} from "./taskModelPins.js";
+import {
   AGENT_COMPOSER_DURABILITY_FACT,
   AGENT_COMPOSER_EMPTY_TRANSCRIPT_NOTE,
   AGENT_COMPOSER_INPUT_HINT,
@@ -96,6 +101,134 @@ function AgentComposerTaskCard({
         </ol>
       ) : null}
     </li>
+  );
+}
+
+/** One catalog option's value (a stable composite key — never an id guess). */
+function modelOptionValue(model: CatalogModel): string {
+  return `${model.providerId}/${model.modelId}`;
+}
+
+/**
+ * The MODEL/DIFFICULTY controls (P21-B, ADR-0014 D4): hydrated from the
+ * injected substrate catalog — REAL available models only, never a
+ * fabricated list; an UNBOUND catalog renders the honest unbound note
+ * and NO list. The selection records on the task record (fail-closed);
+ * the disclosure note renders VERBATIM whenever a model is selected.
+ */
+function AgentModelControls({
+  state,
+  controller,
+}: {
+  readonly state: AgentComposerState;
+  readonly controller: AgentComposerController;
+}): React.ReactNode {
+  const controls = state.modelControls;
+  const [draftModel, setDraftModel] = useState<string>("");
+  const [draftLevel, setDraftLevel] = useState<string>("");
+  // Hydrate the REAL catalogue once when the panel mounts (the honest
+  // phases surface; an absent port keeps the UNBOUND tier).
+  useEffect(() => {
+    void controller.loadModelCatalog();
+  }, [controller]);
+  if (controls.phase === "UNBOUND") {
+    return (
+      <div className="ps-agent-model-controls" id="ps-agent-model-controls">
+        <h3 className="ps-agent-tasks-title">Model &amp; difficulty</h3>
+        <p className="ps-agent-line ps-agent-line--empty">{MODEL_CATALOG_UNBOUND_NOTE}</p>
+      </div>
+    );
+  }
+  if (controls.phase === "LOADING") {
+    return (
+      <div className="ps-agent-model-controls" id="ps-agent-model-controls">
+        <h3 className="ps-agent-tasks-title">Model &amp; difficulty</h3>
+        <p className="ps-agent-line" role="status">Loading models…</p>
+      </div>
+    );
+  }
+  if (controls.phase === "ERROR") {
+    return (
+      <div className="ps-agent-model-controls" id="ps-agent-model-controls">
+        <h3 className="ps-agent-tasks-title">Model &amp; difficulty</h3>
+        <p className="ps-agent-line ps-agent-line--error" role="alert">{controls.error}</p>
+      </div>
+    );
+  }
+  const selectedModel =
+    controls.models.find(
+      (model) =>
+        controls.selection !== undefined && modelOptionValue(model) === `${controls.selection.providerId}/${controls.selection.modelId}`,
+    ) ?? undefined;
+  const levelOptions = (draftModel !== ""
+    ? controls.models.find((model) => modelOptionValue(model) === draftModel)
+    : selectedModel)?.reasoningLevels ?? [];
+  const currentModel = controls.selection !== undefined ? `${controls.selection.providerId}/${controls.selection.modelId}` : "";
+  const currentLevel = controls.selection?.reasoningLevel ?? "";
+  const canRecord = draftModel !== "" && draftLevel !== "";
+  const record = (): void => {
+    const parts = draftModel.split("/");
+    const providerId = parts[0] ?? "";
+    const modelId = parts.length > 1 ? (parts[1] ?? "") : "";
+    void controller
+      .selectModel({ providerId, modelId, reasoningLevel: draftLevel })
+      .then(() => {
+        setDraftModel("");
+        setDraftLevel("");
+      })
+      .catch(() => {
+        /* the typed refusal surfaces through the controls' honest error line */
+      });
+  };
+  return (
+    <div className="ps-agent-model-controls" id="ps-agent-model-controls">
+      <h3 className="ps-agent-tasks-title">Model &amp; difficulty</h3>
+      <p className="ps-agent-input-hint">
+        Recorded with the task and applied to the routine's budget knobs — never to eligibility or authorization.
+      </p>
+      <label className="ps-sr-only" htmlFor="ps-agent-model-select">Model</label>
+      <select
+        id="ps-agent-model-select"
+        data-ps-model-select
+        className="ps-agent-model-select"
+        value={draftModel || currentModel}
+        onChange={(event) => {
+          setDraftModel(event.target.value);
+          setDraftLevel("");
+        }}
+      >
+        <option value="">Select a model…</option>
+        {controls.models.map((model) => (
+          <option key={modelOptionValue(model)} value={modelOptionValue(model)}>
+            {model.displayName}
+          </option>
+        ))}
+      </select>
+      <label className="ps-sr-only" htmlFor="ps-agent-difficulty-select">Difficulty (reasoning level)</label>
+      <select
+        id="ps-agent-difficulty-select"
+        data-ps-difficulty-select
+        className="ps-agent-model-select"
+        value={draftLevel || currentLevel}
+        onChange={(event) => setDraftLevel(event.target.value)}
+      >
+        <option value="">Select a difficulty…</option>
+        {levelOptions.map((level) => (
+          <option key={level} value={level}>
+            {level}
+          </option>
+        ))}
+      </select>
+      <button type="button" className="ps-agent-task-action" disabled={!canRecord} onClick={record}>
+        Record model &amp; difficulty
+      </button>
+      {controls.error !== undefined ? (
+        <p className="ps-agent-line ps-agent-line--error" role="alert">{controls.error}</p>
+      ) : null}
+      {controls.selection !== undefined ? (
+        <p className="ps-agent-voice-note">{AGENT_TASK_MODEL_DISCLOSURE_NOTE_PIN}</p>
+      ) : null}
+    </div>
   );
 }
 
@@ -268,6 +401,11 @@ export function AgentComposerPanel({
        * controller — the proceed-or-wait surface, honestly unbound until
        * the platform host binds the real engines (ADR-0009 D2). */}
       <RoutePlanningMount controller={controller} />
+
+      {/* The model/difficulty controls (P21-B, D4) — hydrated from the
+       * injected substrate catalog; an unbound catalog renders the honest
+       * unbound note, never a model list. */}
+      <AgentModelControls state={state} controller={controller} />
 
       <form className="ps-agent-input" onSubmit={handleSubmit}>
         <label htmlFor={inputId} className="ps-sr-only">

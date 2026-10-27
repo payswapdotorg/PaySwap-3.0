@@ -133,9 +133,12 @@ export function composeRoutePlanningBinding(options: {
 
   // The session over the controller's ONE port, with the stage-9a decorator.
   const base = createRoutePlanningSession({ session: controller.sessionPort() });
-  const decorate = (call: () => Promise<unknown>): Promise<unknown> =>
+  const decorate = <T>(call: () => Promise<T>): Promise<T> =>
     call().then(
-      (result) => refresh().then(() => result, () => result),
+      (result) => refresh().then(
+        () => result,
+        () => result,
+      ),
       (error) => {
         throw error;
       },

@@ -22,6 +22,9 @@ export default defineConfig({
       "@payswap/capability": new URL("../capability/src/index.ts", import.meta.url).pathname,
       "@payswap/route-compiler": new URL("../route-compiler/src/index.ts", import.meta.url).pathname,
       "@payswap/lab": new URL("../lab/src/index.ts", import.meta.url).pathname,
+      // P21-B run 3 (ADR-0014 D10): the wait-recheck composition consumes the
+      // REAL opportunities evaluator — same alias triplet law.
+      "@payswap/opportunities": new URL("../opportunities/src/index.ts", import.meta.url).pathname,
     },
   },
   test: {

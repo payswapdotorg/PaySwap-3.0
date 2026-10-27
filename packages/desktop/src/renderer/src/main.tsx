@@ -5,6 +5,8 @@ import { initializeDesktopLocalTtft } from "./localTtftBootstrap.js";
 import { composeRoutePlanningBinding } from "./routePlanningComposition.js";
 import { composePaymentMissionsBinding } from "./paymentMissionsComposition.js";
 import { composeMissionIntakeBinding } from "./missionIntakeComposition.js";
+import { composeModelCatalogBinding } from "./modelCatalogComposition.js";
+import { composeConnectionsActivationBinding } from "./connectionsActivationComposition.js";
 import { createRoot } from "react-dom/client";
 import { useEffect } from "react";
 import {
@@ -349,6 +351,24 @@ function initializeBusinessRoot(port: MessagePort): void {
     composeMissionIntakeBinding({ services });
   } catch {
     // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定摄入说明。
+  }
+  // P21-B（ADR-0014 D4）：绑定模型目录面 —— 组合根需要基底会话设置的
+  // 模型可用性读取（ZCodeSessionSettingsState.model.available）；该读取
+  // 尚未作为渲染器可达的服务缝隙暴露，因此产品默认绑定 NOTHING：
+  // 作曲家如实呈现未绑定目录说明（绝不伪造模型清单 —— 诚实缺口已记录，
+  // 桥接层电池通过 source DI 缝隙验证组合）。
+  try {
+    composeModelCatalogBinding({});
+  } catch {
+    // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定目录说明。
+  }
+  // P21-B（ADR-0014 D5）：绑定连接激活面 —— 密钥录入（一次性、宿主侧
+  // 封存）+ 真实验证探针（唯一的 ACTIVE 路径）+ 权威自己的连接状态。
+  // 密钥从不回显、从不入渲染器状态（密封法）。
+  try {
+    composeConnectionsActivationBinding({ services });
+  } catch {
+    // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定激活说明。
   }
   const settingService = supportsSettings ? services.settingService : undefined;
 

@@ -203,6 +203,34 @@ export interface AgentTaskEventPin {
   readonly correlationRef?: string;
 }
 
+/**
+ * Mirrors surface AGENT_TASK_MODEL_DISCLOSURE_NOTE VERBATIM (P21-B, D4 —
+ * the honest no-narration-tier law): the selected model is RECORDED and
+ * drives real budget knobs — it never authors the financial facts, routes
+ * or scores, and no LLM narration tier is composed in this wave. Rendered
+ * VERBATIM whenever a model is selected (drift is caught by the mirror
+ * test byte-for-byte).
+ */
+export const AGENT_TASK_MODEL_DISCLOSURE_NOTE_PIN =
+  "The model and difficulty you pick are recorded with this task and drive the routine's real budget knobs (search, scenarios, explanation detail). The financial computation stays deterministic and model-independent: no model authored the amounts, routes, scores or provider facts shown here, and no model narration tier is composed in this deployment — every financial fact comes from the deterministic engines and provider evidence." as const;
+
+/**
+ * Mirrors surface AgentTaskModelSelection (P21-B, D4): the persisted
+ * model + difficulty selection on a task record — hydrated from the
+ * substrate's REAL model-selection service (never a fabricated list),
+ * persisted through the ONE task-session port and restored on resume.
+ * The selection NEVER confers eligibility, authorization or security
+ * rights (the financial computation stays model-independent).
+ */
+export interface AgentTaskModelSelectionPin {
+  /** The substrate provider id (e.g. "zai") — opaque here. */
+  readonly providerId: string;
+  /** The substrate model id (e.g. "glm-5.2") — opaque here. */
+  readonly modelId: string;
+  /** The model's OWN reasoning-level value (the difficulty; provider-pinned vocabulary). */
+  readonly reasoningLevel: string;
+}
+
 /** Mirrors surface AgentTask. */
 export interface AgentTaskPin {
   readonly id: AgentTaskIdPin;
@@ -214,6 +242,8 @@ export interface AgentTaskPin {
   readonly status: AgentTaskStatusPin;
   /** Append-only history (the writer appends, never rewrites). */
   readonly events: readonly AgentTaskEventPin[];
+  /** (P21-B, D4) The persisted model + difficulty selection (absent = never selected). */
+  readonly modelSelection?: AgentTaskModelSelectionPin;
 }
 
 /* ====================================================================

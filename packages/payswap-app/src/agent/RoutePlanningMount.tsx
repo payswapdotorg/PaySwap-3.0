@@ -37,6 +37,8 @@ import {
 } from "./routineStageProjection.js";
 import { recordRoutinePin } from "./routineStagePinning.js";
 import { projectRoutePlanningWaiting, type RoutePlanningSession } from "./routePlanningSession.js";
+import { opportunityMatchOfRecheck, type WaitRecheckOutcomePin } from "./waitRecheckPins.js";
+import { sharedWaitRecheckPlane } from "./waitRecheckShared.js";
 import {
   isRoutePlanningEngineUnbound,
   isRoutePlanningNoIntentError,
@@ -46,6 +48,7 @@ import {
   type RoutePlanningWaitCriteriaPin,
 } from "./routePlanningPins.js";
 import type { AgentComposerTaskView } from "./agentComposerProjection.js";
+import type { RoutePlanningRecheckView } from "./RoutePlanningPanel.js";
 
 /* ------------- the shared engine binding (the composition seam) ------------- */
 
@@ -131,8 +134,10 @@ export function RoutePlanningMount({
   );
   const resolvedEngine = engine ?? sharedRoutePlanningEngine();
   const resolvedSession = session ?? sharedRoutePlanningSession();
+  const resolvedRecheckPlane = sharedWaitRecheckPlane();
   const [view, setView] = useState<RoutePlanningPanelView | null>(null);
   const [choiceError, setChoiceError] = useState<string | null>(null);
+  const [recheck, setRecheck] = useState<RoutePlanningRecheckView | undefined>(undefined);
   const recordedDigest = useRef<string | null>(null);
 
   const missionTask = latestPaymentMissionTask(state.tasks);
@@ -148,7 +153,7 @@ export function RoutePlanningMount({
       return;
     }
     try {
-      const engineView = resolvedEngine.presentableView({ taskRef: taskId });
+      const engineView = resolvedEngine.presentableView({ taskRef: taskId, ...(missionTask?.modelSelection !== undefined ? { modelSelection: missionTask.modelSelection } : {}) });
       // (P21-B, D3) Stage 0's typed result: the ROUTINE_PINNED event lands
       // in the app task store when the routine loads (the pinned facts the
       // engine view carries — routineId + version + skill digest). The pin
@@ -178,7 +183,7 @@ export function RoutePlanningMount({
             : { kind: "ENGINE_ERROR", message: thrown instanceof Error ? thrown.message : String(thrown) },
       );
     }
-  }, [taskId, resolvedEngine, resolvedSession, resolvedController]);
+  }, [taskId, missionTask?.modelSelection, resolvedEngine, resolvedSession, resolvedController]);
 
   if (state.tasksPhase === "loading") {
     return (
@@ -242,6 +247,49 @@ export function RoutePlanningMount({
       ? () => runChoice(() => resolvedSession.cancelWait(taskId))
       : undefined;
 
+  // (P21-B, D10) The re-check control: the port recomputes over fresh
+  // observations; a MATCH records OPPORTUNITY_MATCHED through the
+  // session (the task STAYS WAITING — never a dispatch, never an
+  // authorization); the re-plan control re-presents fresh planning
+  // (refresh re-derives the engine view → a new PREVIEW_PRESENTED).
+  const runRecheck = (): void => {
+    if (resolvedRecheckPlane === undefined || taskId === undefined || waiting.criteria === null) {
+      return;
+    }
+    const input = { taskRef: taskId, criteria: waiting.criteria };
+    setRecheck({ phase: "checking" });
+    resolvedRecheckPlane
+      .recheckWait(input)
+      .then(async (outcome: WaitRecheckOutcomePin) => {
+        if (outcome.matchedOpportunityIds.length > 0 && resolvedSession !== undefined) {
+          await resolvedSession.recordOpportunityMatch(taskId, opportunityMatchOfRecheck(outcome));
+        }
+        await resolvedController.refresh();
+        setRecheck({ phase: "done", outcome });
+      })
+      .catch((thrown: unknown) => {
+        setRecheck({ phase: "error", message: thrown instanceof Error ? thrown.message : String(thrown) });
+      });
+  };
+  const onRecheckWait =
+    resolvedRecheckPlane !== undefined && taskId !== undefined && waiting.status === "WAITING_FOR_OPPORTUNITIES"
+      ? runRecheck
+      : undefined;
+  const onReplan =
+    onRecheckWait !== undefined
+      ? () => {
+          setRecheck(undefined);
+          void resolvedController.refresh();
+        }
+      : undefined;
+  const onExpireWait =
+    resolvedSession !== undefined && taskId !== undefined && recheck?.phase === "done" && recheck.outcome.expired
+      ? () => {
+          setRecheck(undefined);
+          runChoice(() => resolvedSession!.expireWait(taskId));
+        }
+      : undefined;
+
   return (
     <>
       <RoutineStagePanel progress={missionFacts === null ? null : stageProgress} />
@@ -251,6 +299,10 @@ export function RoutePlanningMount({
         onProceed={onProceed}
         onChooseWait={onChooseWait}
         onCancelWait={onCancelWait}
+        onRecheckWait={onRecheckWait}
+        recheck={recheck}
+        onReplan={onReplan}
+        onExpireWait={onExpireWait}
       />
       {choiceError !== null ? (
         <p className="ps-agent-route-note ps-agent-route-note--error" role="alert">

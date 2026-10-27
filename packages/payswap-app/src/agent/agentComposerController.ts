@@ -19,7 +19,7 @@
  * reopen) · DETERMINISM (`now` is an explicit input, never displayed).
  */
 
-import type { AgentTaskIntentPin } from "../lib/agent-task-pins.js";
+import type { AgentTaskIntentPin, AgentTaskModelSelectionPin } from "../lib/agent-task-pins.js";
 import { ambientMutationClock } from "../console/useWorkspaceStore.js";
 import { routeAgentText } from "./intentRouter.js";
 import {
@@ -35,6 +35,8 @@ import {
 import { createAgentComposerSeedPath } from "./agentComposerSeedPath.js";
 import { cancelAgentComposerTask } from "./agentComposerTaskClose.js";
 import { MISSION_INTAKE_UNBOUND_STATE } from "./missionIntakePins.js";
+import { MODEL_CONTROLS_UNBOUND_STATE, type ModelControlsState } from "./taskModelPins.js";
+import { createAgentComposerModelWiring, type AgentComposerModelWiring } from "./agentComposerModelControls.js";
 import {
   bindUiStorage,
   readUiSnapshot,
@@ -137,6 +139,7 @@ export function createAgentComposerController(
     sendPhase: "idle",
     uiPersistence,
     missionIntake: MISSION_INTAKE_UNBOUND_STATE,
+    modelControls: MODEL_CONTROLS_UNBOUND_STATE,
   };
 
   const listeners = new Set<() => void>();
@@ -150,6 +153,26 @@ export function createAgentComposerController(
     persistUi();
     emit();
   };
+
+  // (P21-B, D4) The model/difficulty controls wiring (split to
+  // ./agentComposerModelControls.ts for the ≤400-line file law): the
+  // catalog load, the fail-closed selection path over the controller's
+  // ONE session port, and taskModelRecovery.
+  const modelWiring: AgentComposerModelWiring = createAgentComposerModelWiring({
+    catalog: options?.modelCatalog,
+    session: () => resolveSession(),
+    clock: () => clock(),
+    tasks: () => state.tasks,
+    setModelControls: (next: ModelControlsState) => {
+      state = { ...state, modelControls: next };
+      persistUi();
+      emit();
+    },
+    getModelControls: () => state.modelControls,
+    refresh: async () => {
+      await reloadTasks();
+    },
+  });
 
   /** Best-effort UI-state persistence (an honest downgrade on failure). */
   const persistUi = (): void => {
@@ -364,6 +387,9 @@ export function createAgentComposerController(
 
     async refresh(): Promise<void> {
       await reloadTasks();
+      // (P21-B, D4) taskModelRecovery: the controls rehydrate from the
+      // persisted task record (the newest resumable task's modelSelection).
+      modelWiring.recoverModelSelection(state.tasks);
       // (P21-B, D2) The reload path: when a mission plane is bound, a
       // FRESH binding re-derives the task↔mission link from the task's
       // persisted events and re-surfaces the pending ask (idempotent —
@@ -385,6 +411,14 @@ export function createAgentComposerController(
     // route-planning session over the SAME store (never a second adapter).
     sessionPort(): AgentTaskSessionPort {
       return resolveSession();
+    },
+
+    async loadModelCatalog(): Promise<void> {
+      await modelWiring.loadModelCatalog();
+    },
+
+    async selectModel(selection: AgentTaskModelSelectionPin): Promise<void> {
+      await modelWiring.selectModel(selection);
     },
   };
 }

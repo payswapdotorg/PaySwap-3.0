@@ -46,6 +46,7 @@ import type { PaySwapNavigation } from "../../shell/navigation.js";
 import { agentProviderSetupCards } from "../../lib/agent-provider-entries.js";
 import { sharedAgentComposerController } from "../../agent/agentComposerController.js";
 import { AgentComposerEmbed } from "../../agent/AgentComposerEmbed.js";
+import { ConnectionsActivationPanel } from "./ConnectionsActivationPanel.js";
 import { Button, Card, StatusPill } from "@zcode/ui/payswap";
 import {
   ConsoleEmptyStateView,
@@ -225,6 +226,11 @@ export function ConnectionsSection({
         <p className="ps-connections-lede">
           Connect payment providers and manage verified capabilities.
         </p>
+        {/* (P21-B, ADR-0014 D5/D6) The REAL activation surface: key entry
+            through the host credential seal + the verification probe (the
+            only ACTIVE path) + the authority's own connection states. The
+            unbound tier (web) renders the honest unbound note. */}
+        <ConnectionsActivationPanel />
         {/* The concept's provider catalogue row. */}
         <section
           aria-labelledby="ps-connections-catalogue-heading"

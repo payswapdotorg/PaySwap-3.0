@@ -125,6 +125,20 @@ export interface AgentTaskSessionPort {
     summary: string,
     correlationRef?: string,
   ): Promise<AgentTaskPin>;
+  /**
+   * (P21-B, D4) Record the task's model + difficulty selection on the
+   * TASK RECORD (the surface contract's optional modelSelection field —
+   * the closed event vocabulary carries no model kind, so the persisted
+   * FIELD is the record; new event vocabulary only through the surface
+   * one-change law). Fail-closed: unknown ids, malformed selections and
+   * terminal tasks throw typed errors. ZERO authority: the selection
+   * never confers eligibility, authorization or security rights.
+   */
+  recordModelSelection(
+    id: string,
+    selection: AgentTaskPin["modelSelection"],
+    now: string,
+  ): Promise<AgentTaskPin>;
   /** The honest health report. */
   taskSessionHealth(): AgentTaskSessionHealth;
 }

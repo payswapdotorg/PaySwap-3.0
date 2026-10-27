@@ -103,7 +103,75 @@ export {
   bindSharedMissionIntakePlane,
   resetSharedMissionIntakePlane,
   sharedMissionIntakePlane,
+  bindSharedModelCatalog,
+  resetSharedModelCatalog,
+  sharedModelCatalog,
 } from "./agent/agentComposerShared.js";
+// (P21-B run 3, ADR-0014 D10) The shared wait re-check plane seam: the
+// desktop renderer binds the REAL P21-C evaluator behind the pinned port;
+// the web tier binds nothing — the honest not-wired note.
+export {
+  bindSharedWaitRecheckPlane,
+  resetSharedWaitRecheckPlane,
+  sharedWaitRecheckPlane,
+} from "./agent/waitRecheckShared.js";
+export {
+  opportunityMatchOfRecheck,
+  WAIT_RECHECK_MATCH_NOTE,
+  WAIT_RECHECK_UNBOUND_NOTE,
+  type WaitRecheckOutcomePin,
+  type WaitRecheckPlanePort,
+} from "./agent/waitRecheckPins.js";
+// (P21-B run 4 / Part E, ADR-0014 D5/D6) The connection-activation
+// surface: the pinned port over the channel's key-entry + probe members
+// (the desktop composition root binds the REAL channel adapter; the web
+// tier binds nothing — the honest unbound note).
+export {
+  CONNECTIONS_ACTIVATION_PROVIDERS,
+  CONNECTIONS_ACTIVATION_SEAL_NOTE,
+  CONNECTIONS_ACTIVATION_TIER_NOTE,
+  CONNECTIONS_ACTIVATION_UNBOUND_NOTE,
+  CONNECTIONS_PROBE_EVIDENCE_TIER,
+  CONNECTIONS_PROBE_OUTCOMES,
+  type ConnectionsActivationPort,
+  type ConnectionsActivationProviderId,
+  type ConnectionsProbeOutcomeKind,
+  type ConnectionsProbeOutcomePin,
+  type ConnectionsProbeResultPin,
+  type ConnectionsSealReceiptPin,
+  type ConnectionsSeedOutcomePin,
+  type ConnectionsStatusPin,
+} from "./console/connectionsActivationPins.js";
+export {
+  bindSharedConnectionsActivationPlane,
+  resetSharedConnectionsActivationPlane,
+  sharedConnectionsActivationPlane,
+} from "./console/connectionsActivationShared.js";
+export { ConnectionsActivationPanel } from "./console/sections/ConnectionsActivationPanel.js";
+// (P21-B, ADR-0014 D4) The model/difficulty controls surface: the catalog
+// port + the pinned budget mapping the desktop composition derives its
+// REAL engine budgets from; the web tier binds nothing — the honest
+// unbound catalog note.
+export {
+  AGENT_TASK_MODEL_DISCLOSURE_NOTE_PIN,
+  AGENT_TASK_REASONING_LEVELS_PIN,
+  MODEL_CATALOG_UNBOUND_NOTE,
+  MODEL_CONTROLS_UNBOUND_STATE,
+  MODEL_CONTROL_PHASES,
+  ModelSelectionControlError,
+  modelBudgetOf,
+  requireValidModelSelectionPin,
+  type AgentTaskModelSelectionPin,
+  type CatalogModel,
+  type ModelCatalogPort,
+  type ModelControlPhase,
+  type ModelControlsState,
+  type ModelExplanationDetail,
+  type ModelScenarioBudgetPin,
+  type ModelSearchBudgetPin,
+  type PinnedReasoningLevel,
+  type ReasoningLevelBudget,
+} from "./agent/taskModelPins.js";
 export {
   routeAgentText,
   AGENT_INTENT_UNKNOWN_REPLY,

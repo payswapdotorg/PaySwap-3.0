@@ -51,6 +51,8 @@ import type {
 } from "./consolePaymentMissionWire.js";
 import type {
   PaySwapConnectionProbeOutcomeDto,
+  PaySwapConnectionStatusViewDto,
+  PaySwapConnectionSetupOutcomeDto,
   PaySwapCredentialSealReceiptDto,
 } from "./consoleConnectionsWire.js";
 
@@ -95,6 +97,8 @@ export type {
   PaySwapCredentialSealReceiptDto,
   PaySwapConnectionProbeResultDto,
   PaySwapConnectionProbeOutcomeDto,
+  PaySwapConnectionStatusViewDto,
+  PaySwapConnectionSetupOutcomeDto,
 } from "./consoleConnectionsWire.js";
 
 // ---------------------------------------------------------------------------
@@ -317,6 +321,22 @@ export interface IPaySwapDesktopClientService {
     attemptId: string,
     evidence: PaySwapPaymentReconcileEvidenceDto,
   ): Promise<PaySwapPaymentMissionReconciliationOutcomeDto>;
+  /** The connection statuses (never fabricated — empty is honest). */
+  connectionStatuses(): Promise<readonly PaySwapConnectionStatusViewDto[]>;
+  /** Seed a connection setup (create-or-resume; UNCONFIGURED refused with the exact missing operator configuration). */
+  connectionSeedSetup(input: {
+    readonly providerId: string;
+    readonly useCaseRef: string;
+  }): Promise<PaySwapConnectionSetupOutcomeDto>;
+  /**
+   * The U1 key-entry verb — the ONE material-carrying method (renderer →
+   * host, once; sealed immediately; non-returnable handle). LIVE keys are
+   * refused (SANDBOX-only deployment, INV-25).
+   */
+  connectionSubmitStripeRestrictedKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<PaySwapCredentialSealReceiptDto>;
   /**
    * (P21-A, ADR-0014 D5) The Flutterwave key-entry verb — the same ONE
    * material-carrying path as the Stripe member: the key crosses

@@ -34,6 +34,17 @@ import {
   type RoutePlanningWaitCriteriaPin,
   type RoutePlanningWaitingState,
 } from "./routePlanningPins.js";
+import {
+  WAIT_RECHECK_MATCH_NOTE,
+  WAIT_RECHECK_UNBOUND_NOTE,
+  type WaitRecheckOutcomePin,
+} from "./waitRecheckPins.js";
+
+/** The re-check control's view state (the mount owns it — a projection). */
+export type RoutePlanningRecheckView =
+  | { readonly phase: "checking" }
+  | { readonly phase: "done"; readonly outcome: WaitRecheckOutcomePin }
+  | { readonly phase: "error"; readonly message: string };
 
 export interface RoutePlanningPanelProps {
   /** The pinned view model (UNBOUND_ENGINE | NO_VALIDATED_INTENT | PRESENTED_PLAN | ENGINE_ERROR). */
@@ -46,6 +57,14 @@ export interface RoutePlanningPanelProps {
   readonly onChooseWait?: (criteria: RoutePlanningWaitCriteriaPin) => void;
   /** Wired only by a host that can cancel a recorded wait. */
   readonly onCancelWait?: () => void;
+  /** (P21-B, D10) Wired only by a host that bound the re-check evaluator. */
+  readonly onRecheckWait?: () => void;
+  /** (P21-B, D10) The re-check control's view state (absent = never checked). */
+  readonly recheck?: RoutePlanningRecheckView;
+  /** (P21-B, D10) Wired only by a host that can re-present fresh planning (never a dispatch). */
+  readonly onReplan?: () => void;
+  /** (P21-B, D10) Wired only by a host that can expire a wait whose declared bound passed. */
+  readonly onExpireWait?: () => void;
 }
 
 /** One ranked-route row: rank, plan, net + the transparent metric line. */
@@ -101,6 +120,99 @@ function waitCriteriaLine(criteria: RoutePlanningWaitCriteriaPin): string {
   }`;
 }
 
+/** The waiting section's re-check controls (P21-B, D10 — the pure projection). */
+function RoutePlanningRecheckControls({
+  criteriaAvailable,
+  onRecheckWait,
+  recheck,
+  onReplan,
+  onExpireWait,
+}: {
+  readonly criteriaAvailable: boolean;
+  readonly onRecheckWait?: () => void;
+  readonly recheck?: RoutePlanningRecheckView;
+  readonly onReplan?: () => void;
+  readonly onExpireWait?: () => void;
+}): React.ReactNode {
+  if (onRecheckWait === undefined) {
+    return <p className="ps-agent-route-note">{WAIT_RECHECK_UNBOUND_NOTE}</p>;
+  }
+  if (!criteriaAvailable) {
+    return (
+      <p className="ps-agent-route-unknown">
+        The recorded wait criteria cannot be read back from the task record — the re-check needs them and never guesses.
+      </p>
+    );
+  }
+  return (
+    <>
+      <button
+        type="button"
+        className="ps-agent-route-choice"
+        data-ps-route-choice="RECHECK_WAIT"
+        data-testid="ps-agent-route-recheck"
+        onClick={onRecheckWait}
+      >
+        {recheck?.phase === "checking" ? "Re-checking now…" : "Check now — recompute over fresh observations"}
+      </button>
+      {recheck?.phase === "error" ? (
+        <p className="ps-agent-route-note ps-agent-route-note--error" role="alert">
+          The re-check was refused: {recheck.message}
+        </p>
+      ) : null}
+      {recheck?.phase === "done" ? (
+        <div className="ps-agent-route-recheck">
+          <p className="ps-agent-route-meta ps-num">Re-checked at {recheck.outcome.recheckedAt}</p>
+          {recheck.outcome.matchedOpportunityIds.length > 0 ? (
+            <>
+              <p className="ps-agent-route-meta ps-num">
+                Matched opportunities: {recheck.outcome.matchedOpportunityIds.join(", ")}
+              </p>
+              <p className="ps-agent-route-note">{WAIT_RECHECK_MATCH_NOTE}</p>
+              {onReplan !== undefined ? (
+                <button
+                  type="button"
+                  className="ps-agent-route-choice"
+                  data-ps-route-choice="REPLAN"
+                  data-testid="ps-agent-route-replan"
+                  onClick={onReplan}
+                >
+                  Re-plan from fresh evidence — a new preview, never a dispatch
+                </button>
+              ) : null}
+            </>
+          ) : (
+            <p className="ps-agent-route-empty">No opportunity has matched yet — nothing dispatches in the meantime.</p>
+          )}
+          {recheck.outcome.staleOpportunityIds.length > 0 ? (
+            <p className="ps-agent-route-unknown ps-num">
+              Stale observations (never matched): {recheck.outcome.staleOpportunityIds.join(", ")}
+            </p>
+          ) : null}
+          {recheck.outcome.expired ? (
+            <>
+              <p className="ps-agent-route-meta">
+                The declared wait bound has passed (the evaluator&rsquo;s own expiry fact) — the wait can be closed honestly.
+              </p>
+              {onExpireWait !== undefined ? (
+                <button
+                  type="button"
+                  className="ps-agent-route-choice"
+                  data-ps-route-choice="EXPIRE_WAIT"
+                  data-testid="ps-agent-route-expire-wait"
+                  onClick={onExpireWait}
+                >
+                  Close the expired wait — return to active planning
+                </button>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+      ) : null}
+    </>
+  );
+}
+
 /** The five distinct sections (the pinned section ids, in the pinned order). */
 function RoutePlanningSections({
   view,
@@ -108,12 +220,20 @@ function RoutePlanningSections({
   onProceed,
   onChooseWait,
   onCancelWait,
+  onRecheckWait,
+  recheck,
+  onReplan,
+  onExpireWait,
 }: {
   readonly view: RoutePlanningEngineView;
   readonly waiting: RoutePlanningWaitingState | null;
   readonly onProceed?: (planId: string) => void;
   readonly onChooseWait?: (criteria: RoutePlanningWaitCriteriaPin) => void;
   readonly onCancelWait?: () => void;
+  readonly onRecheckWait?: () => void;
+  readonly recheck?: RoutePlanningRecheckView;
+  readonly onReplan?: () => void;
+  readonly onExpireWait?: () => void;
 }): React.ReactNode {
   const isWaiting = waiting?.status === "WAITING_FOR_OPPORTUNITIES";
   const criteria = waiting?.criteria ?? view.waiting.proposal;
@@ -233,6 +353,16 @@ function RoutePlanningSections({
                 Cancel the wait — return to active planning
               </button>
             ) : null}
+            {/* (P21-B, D10) The user-triggered re-check over fresh
+             * observations + the evaluator-driven expiry control — both
+             * REPORT ONLY (a match never dispatches). */}
+            <RoutePlanningRecheckControls
+              criteriaAvailable={criteria !== null}
+              onRecheckWait={onRecheckWait}
+              recheck={recheck}
+              onReplan={onReplan}
+              onExpireWait={onExpireWait}
+            />
           </>
         ) : (
           <>
@@ -266,6 +396,10 @@ export function RoutePlanningPanel({
   onProceed,
   onChooseWait,
   onCancelWait,
+  onRecheckWait,
+  recheck,
+  onReplan,
+  onExpireWait,
 }: RoutePlanningPanelProps): React.ReactNode {
   return (
     <section className="ps-agent-route" aria-label="Route planning — proceed or wait">
@@ -293,6 +427,10 @@ export function RoutePlanningPanel({
             onProceed={onProceed}
             onChooseWait={onChooseWait}
             onCancelWait={onCancelWait}
+            onRecheckWait={onRecheckWait}
+            recheck={recheck}
+            onReplan={onReplan}
+            onExpireWait={onExpireWait}
           />
         </>
       )}

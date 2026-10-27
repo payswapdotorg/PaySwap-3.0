@@ -35,6 +35,7 @@
 
 import { ambientMutationClock } from "../console/useWorkspaceStore.js";
 import { isTerminalAgentTaskStatusPin, type AgentTaskPin } from "../lib/agent-task-pins.js";
+import { validatePinnedModelSelection } from "../lib/agent-task-validation.js";
 import { AgentTaskSessionError } from "./taskSessionPort.js";
 import type { AgentTaskSessionPort } from "./taskSessionPort.js";
 import {
@@ -204,6 +205,16 @@ export function validateRoutePlanningEngineView(candidate: unknown): RoutePlanni
   }
   if (view.scenarios.advisoryOnly !== true) { fail("INVALID_VIEW", "the scenarios section must be advisory-branded (advisoryOnly: true — stage 6 is never production evidence)"); }
   if (typeof view.presentedAt !== "string" || view.presentedAt.length === 0) { fail("INVALID_VIEW", "presentedAt must be the engine's ISO-8601 UTC evaluation instant (DATA)"); }
+  // (P21-B, D4) The optional MODEL STAMP: validated fail-closed when
+  // present; deliberately OUTSIDE the digest projection (the digest pins
+  // the model-independent computation — see routePlanningPins.ts).
+  if ((view as { modelSelection?: unknown }).modelSelection !== undefined) {
+    try {
+      validatePinnedModelSelection((view as { modelSelection?: unknown }).modelSelection);
+    } catch {
+      fail("INVALID_VIEW", "the engine view's optional modelSelection stamp must be the valid selection record { providerId, modelId, reasoningLevel }");
+    }
+  }
   validateRoutePlanningWaitCriteria(view.waiting.proposal);
   const expected = routePlanningViewDigestOf(view);
   if (view.viewDigest !== expected) { fail("INVALID_VIEW", `the view digest must equal the deterministic digest over the view's presentation projection (expected ${expected}) — a tampered view never presents`); }
@@ -290,8 +301,11 @@ function proceedSummary(planId: string): string {
   return `${PROCEED_SUMMARY_PREFIX}${planId}' (stage 9a requested) — a REQUEST record, never an authorization: the fresh scoped approval belongs to the real authority surface, never this composer.`;
 }
 
-function previewSummary(view: RoutePlanningEngineView): string {
-  return `Route planning preview presented (routine ${view.routine.routineId} v${view.routine.routineVersion}, view ${view.viewDigest}): ${view.availableNow.ranked.length} available-now route(s), ${view.availableNow.notScored.length} retained unscored, ${view.exclusions.length} typed exclusion(s), search coverage ${view.truncation.coverage}, ${view.scenarios.outcomes.length} advisory scenario(s) — discovery only, nothing dispatches.`;
+function previewSummary(view: RoutePlanningEngineView, task: AgentTaskPin): string {
+  const stamp = task.modelSelection !== undefined
+    ? ` Model ${task.modelSelection.providerId}/${task.modelSelection.modelId} (reasoning ${task.modelSelection.reasoningLevel}) recorded with the task — provenance only; the computation is deterministic and model-independent.`
+    : "";
+  return `Route planning preview presented (routine ${view.routine.routineId} v${view.routine.routineVersion}, view ${view.viewDigest}): ${view.availableNow.ranked.length} available-now route(s), ${view.availableNow.notScored.length} retained unscored, ${view.exclusions.length} typed exclusion(s), search coverage ${view.truncation.coverage}, ${view.scenarios.outcomes.length} advisory scenario(s) — discovery only, nothing dispatches.${stamp}`;
 }
 
 function matchSummaryOf(match: RoutePlanningOpportunityMatchPin): string {
@@ -355,8 +369,10 @@ export function createRoutePlanningSession(options: RoutePlanningSessionOptions)
     async presentChoices(taskRef, engineView, at) {
       const view = validateRoutePlanningEngineView(engineView);
       const now = at ?? clock();
-      await requireTask(taskRef);
-      return port.appendTaskEvent(taskRef, "PREVIEW_PRESENTED", now, previewSummary(view));
+      const task = await requireTask(taskRef);
+      // (P21-B, D4) The presentation record carries the task's MODEL STAMP
+      // (provenance only — no model authored any fact in the view).
+      return port.appendTaskEvent(taskRef, "PREVIEW_PRESENTED", now, previewSummary(view, task));
     },
 
     async chooseProceed(taskRef, planId, at) {

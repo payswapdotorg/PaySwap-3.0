@@ -43,7 +43,7 @@ import {
   type AgentTaskPin,
   type AgentTaskSeedFold,
 } from "../lib/agent-task-pins.js";
-import { resolvePinnedAgentTaskSeed, validatePinnedAgentTaskIntent } from "../lib/agent-task-validation.js";
+import { resolvePinnedAgentTaskSeed, validatePinnedAgentTaskIntent, validatePinnedModelSelection } from "../lib/agent-task-validation.js";
 import {
   AgentTaskSessionError,
   type AgentTaskSeedInput,
@@ -276,6 +276,30 @@ export function createBrowserAgentTaskSessionPort(
       const event = mintTaskEvent(state.snapshot, eventKind, now, summary, correlationRef);
       const revised = reviseTaskWithEvent(existing, event);
       persist(replaceTask(advanceEventNumber(state.snapshot), revised));
+      return revised;
+    },
+
+    async recordModelSelection(
+      id: string,
+      selection: AgentTaskPin["modelSelection"],
+      now: string,
+    ): Promise<AgentTaskPin> {
+      ensureLoaded();
+      // (P21-B, D4) The surface contract's optional FIELD is the record:
+      // validated fail-closed, stamped on the task, updatedAt advanced so
+      // the projection reorders honestly. NO event kind exists for it (the
+      // closed vocabulary law) — the field IS the persisted selection.
+      const validated = validatePinnedModelSelection(selection);
+      requireIsoInstantUtc(now, "now");
+      const existing = findTask(id);
+      if (isTerminal(existing.status)) {
+        throw new AgentTaskSessionError(
+          "TERMINAL_TASK",
+          `task '${id}' is ${existing.status} — a terminal task records no model selection (the monotonic-terminal law)`,
+        );
+      }
+      const revised: AgentTaskPin = { ...existing, modelSelection: validated, updatedAt: now };
+      persist(replaceTask(state.snapshot, revised));
       return revised;
     },
 

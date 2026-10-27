@@ -32,6 +32,7 @@
  */
 
 import type { AgentTaskStatusPin } from "../lib/agent-task-pins.js";
+import type { AgentTaskModelSelectionPin } from "../lib/agent-task-pins.js";
 
 /* ============ the routine identity pins (VALUE pins — byte-identical) ============ */
 
@@ -282,6 +283,15 @@ export interface RoutePlanningEngineView {
   };
   /** The engine's PROPOSED wait criteria (from its stage-7 discovery); the user's Wait choice declares them. */
   readonly waiting: { readonly proposal: RoutePlanningWaitCriteriaPin };
+  /**
+   * (P21-B, D4) The MODEL STAMP — the task's persisted model + difficulty
+   * selection, stamped on the presentation record by the engine that
+   * computed it. PROVENANCE ONLY: the digest projection deliberately
+   * EXCLUDES it (the digest pins the model-INDEPENDENT computation —
+   * identical engines + inputs → identical digest when only the model
+   * differs), and no model authored any fact in this view.
+   */
+  readonly modelSelection?: AgentTaskModelSelectionPin;
   readonly viewDigest: string;
 }
 
@@ -318,12 +328,16 @@ export class RoutePlanningUxError extends Error {
   }
 }
 
-/** One engine request: the agent task reference ONLY. The composer's people-language
+/** One engine request: the agent task reference + the task's persisted
+ * model/difficulty selection (the D4 stamp + the REAL budget knobs the
+ * engine composition derives from it). The composer's people-language
  * intent is never the financial input contract (ROUTINE-CONTRACT trigger semantics:
  * the composer opening is not a trigger) — the engine resolves the validated typed
  * intent through its own mission linkage and fails closed when none exists. */
 export interface RoutePlanningEngineRequest {
   readonly taskRef: string;
+  /** (P21-B, D4) The task's persisted selection (absent = never selected). */
+  readonly modelSelection?: AgentTaskModelSelectionPin;
 }
 
 /** THE ROUTE-PLANNING ENGINE PORT (the console-injected composition seam, ADR-0009

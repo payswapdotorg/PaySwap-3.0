@@ -163,9 +163,14 @@ export function validatePinnedAgentTask(task: unknown): AgentTaskPin {
   const record = task as Readonly<Record<string, unknown>>;
   requireExactKeys(
     record,
-    ["createdAt", "events", "id", "intent", "kind", "origin", "status", "updatedAt"],
+    record["modelSelection"] === undefined
+      ? ["createdAt", "events", "id", "intent", "kind", "origin", "status", "updatedAt"]
+      : ["createdAt", "events", "id", "intent", "kind", "modelSelection", "origin", "status", "updatedAt"],
     "AgentTask",
   );
+  if (record["modelSelection"] !== undefined) {
+    validatePinnedModelSelection(record["modelSelection"]);
+  }
   if (typeof record["id"] !== "string" || !ID_RE.test(record["id"])) {
     throw new InvalidPinnedAgentTaskError("id must be a non-empty task id (1-128 chars)");
   }
@@ -238,9 +243,26 @@ export function validatePinnedAgentTask(task: unknown): AgentTaskPin {
 }
 
 /* ====================================================================
- * The seed-decision fold (mirrors surface resolveAgentTaskSeed)
+ * The optional model/difficulty selection (P21-B, D4 — mirrors surface
+ * requireValidModelSelection, fail-closed)
  * ==================================================================== */
 
+/** Mirrors surface requireValidModelSelection (exact keys, non-empty strings). */
+export function validatePinnedModelSelection(value: unknown): AgentTaskPin["modelSelection"] {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw new InvalidPinnedAgentTaskError("modelSelection must be an object { providerId, modelId, reasoningLevel }");
+  }
+  const selection = value as Readonly<Record<string, unknown>>;
+  requireExactKeys(selection, ["modelId", "providerId", "reasoningLevel"], "modelSelection");
+  requireString(selection["providerId"], "modelSelection.providerId");
+  requireString(selection["modelId"], "modelSelection.modelId");
+  requireString(selection["reasoningLevel"], "modelSelection.reasoningLevel");
+  return selection as unknown as AgentTaskPin["modelSelection"];
+}
+
+/* ====================================================================
+ * The seed-decision fold (mirrors surface resolveAgentTaskSeed)
+ * ==================================================================== */
 /**
  * Mirrors surface resolveAgentTaskSeed — the CONVERGENCE fold: given an
  * incoming intent (from ANY supported entrypoint) and the existing
