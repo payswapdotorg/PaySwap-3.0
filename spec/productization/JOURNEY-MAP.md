@@ -315,3 +315,37 @@ connections exist in this deployment (the resets destroyed the P13
 provider credentials) — the golden path is fixture-proven only; the
 provider execution lanes and the reconcile-with-evidence member stay
 carried forward.
+
+**P20 RECONCILIATION LEG (2026-10-27, commits `02ea4937`+`a4211624`+`e8e03deb`)**:
+the journey's final honest state is now reachable AND closable — an
+UNKNOWN attempt (a dispatch answering UNKNOWN, or an interrupted
+write-ahead marked by the restart sweep) renders the pending-
+reconciliation card, and the operator can close it with provider
+evidence through the TWO-ACT entry (the pending-fact list, the
+direction choice CONFIRMED|FAILED, the source choice from the
+accepted-sources echo, the references entry; the confirm stays
+DISABLED-UNTIL-VALID — never a guess, never a fabricated provider
+effect). The runtime verb stays the ONLY closer (ADR-0013 D1): the
+member recomputes the pending set host-side AT ACT TIME (an outside
+attemptId is the typed refusal with nothing recorded); the evidence
+bounds validate at the edge by the runtime's own bounds (source ∈ the
+frozen two-kind vocabulary — the operator is the COURIER, not the
+source; refs non-empty and bounded — "reconciliation never closes on a
+bare assertion"); the origin (OPERATOR_EVIDENCE_ACT) + the principal
+stay pinned host-side at the channel edge. The outcome carries facts
+only (the addressing echo, the resolved direction, people-language
+prose — the evidence refs NEVER echo as structure, they live in the
+runtime record + the timeline prose). On CONFIRMED-of-a-create the
+mission COMPLETES; on FAILED it stays open; a re-send against the
+closed attempt is the honest append-only typed refusal. Bridge
+evidence (`packages/desktop/test/payswap/payment-missions-reconcile-binding.test.ts`,
+7 laws over the REAL channel): the honest empty truth (the empty
+pending card with the note; a CONFIRMED dispatch leaves nothing
+pending), the golden path over the labeled fixtures (the scriptedAuthority
+answering UNKNOWN → the pending card → the reconcile through the PORT →
+RECONCILED + the mission COMPLETED + byte-identical details; the
+FAILED variant open), the act-time refusal (the record byte-identical),
+the double-reconcile refusal, the scanner law. Still NO LIVE-TIER
+claim: zero ACTIVE connections — real UNKNOWNs are fixture-only; the
+automatic evidence feeds (the verified-webhook mapping + the retrieval
+service) stay carried with the execution lanes (ADR-0013 D6).

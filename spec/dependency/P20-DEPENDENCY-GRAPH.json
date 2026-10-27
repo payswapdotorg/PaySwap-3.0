@@ -16,7 +16,7 @@
     {
       "id": "P20-A",
       "owner": "worker",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P20-0"
       ],
@@ -25,7 +25,7 @@
     {
       "id": "P20-B",
       "owner": "worker",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P20-0"
       ],
@@ -34,7 +34,7 @@
     {
       "id": "P20-C",
       "owner": "TL",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P20-A",
         "P20-B"
@@ -44,7 +44,7 @@
     {
       "id": "P20-D",
       "owner": "TL",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P20-A",
         "P20-B",
@@ -53,10 +53,37 @@
       "lane_scope": "TL integration: the integrated batteries at the tip; JOURNEY-MAP + FEATURE-MAP reconciliation; the graph closure; the current-state closure; PUSH to GitHub (pay-at-acceptance, ADR-0009 D7); the bundle archive; the honest carry-forward record."
     }
   ],
-  "frontier_after_registration": [
-    "P20-A",
-    "P20-B"
-  ],
+  "frontier_after_registration": [],
   "closure_policy": "P20 closes only when P20-A/B/C/D are all accepted on main with their batteries green at the tip and the honest carry-forward recorded. No live-tier claim is permitted: zero ACTIVE connections is the deployment fact; real UNKNOWNs are fixture-only; the reconcile golden path is proven only over clearly-labeled test-tier fixtures.",
-  "closure": null
+  "closure": {
+    "closed_at": "2026-10-27T07:10:00Z",
+    "commits": {
+      "P20-0": "5ade061",
+      "P20-A": "02ea493",
+      "P20-B": "a42116",
+      "P20-C": "e8e03de",
+      "P20-D": "HEAD"
+    },
+    "batteries": {
+      "desktop": "31f/299t",
+      "payswap-app": "42f/453t",
+      "route-planning": "209",
+      "lab": "169",
+      "opportunities": "250",
+      "capability": "230",
+      "route-compiler": "353",
+      "economic": "105",
+      "protocol": "279",
+      "surface": "224",
+      "architecture_check": "0/0/0"
+    },
+    "push": "PUSHED to github.com/payswapdotorg/PaySwap-3.0 main (pay-at-acceptance, ADR-0009 D7)",
+    "carry_forward": [
+      "the provider execution lanes (FLW/Paystack adapters + the live-grant D2-style amendments — operator credentials required; the P13 credentials were destroyed by the resets)",
+      "the automatic evidence feeds composing with those lanes (the verified-webhook reconciliation mapping + the retrieval service — ADR-0013 D6)",
+      "live-provider route evidence (zero connected capability instances)",
+      "the §5/payment-mission store reconciliation question (ADR-0011 D6)",
+      "the protocol-plane evidence bridge (the SettlementReconciliationCase authority vs the desktop mission plane — ADR-0013 D2/D6)"
+    ]
+  }
 }

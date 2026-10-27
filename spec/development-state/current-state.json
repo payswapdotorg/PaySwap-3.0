@@ -16,10 +16,7 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [
-    "P20-A",
-    "P20-B"
-  ],
+  "frontier": [],
   "active_work_orders": [],
   "completed_work_orders": [
     {
@@ -1341,7 +1338,13 @@
       "actor": "resident-TL",
       "action": "P20_REGISTERED",
       "detail": "P20 REGISTERED from the P19 closure carry-forward: the reconcile-with-evidence surface (closing an UNKNOWN). P20-0 accepted: the gap matrix (22 source-backed rows at 72a6dd7, two Explore survey lanes) + ADR-0013 (D1 the two members — paymentMissionPendingReconciliation [the pending card read] + paymentMissionReconcile [the evidence-submission act] — with the runtime verb the ONLY closer; D2 the courier-not-source vocabulary law; D3 the same-rule pending derivation; D4 the file-disjoint lanes with the runtime/gate/registrar UNTOUCHED; D5 web unbound; D6 the automatic evidence feeds stay carried) + the canonical orders + the machine graph. Frontier = [P20-A, P20-B] (file-disjoint); P20-C/P20-D TL-owned."
+    },
+    {
+      "ts": "2026-10-27T07:10:00Z",
+      "actor": "resident-TL",
+      "action": "P20_CLOSED",
+      "detail": "The reconcile-with-evidence surface is REAL at the CONTRACT+BRIDGE tier — the journey's final honest state is closable: an UNKNOWN attempt renders the pending-reconciliation card and the operator closes it with provider evidence through the two-act entry (the direction + the source from the frozen two-kind vocabulary + the bounded refs; disabled-until-valid, never a guess). Commits 5ade061 (P20-0) + 02ea493 (P20-A: the two members — the pending read over the runtime's own unresolved rule + the evidence-submission act with the act-time pending recomputation, the edge evidence bounds, the origin OPERATOR_EVIDENCE_ACT + principal pinned at the channel edge; the act-time split: outside-mission attemptIds refused at the edge, existing-but-closed delegated to the runtime's honest typed refusal — 11 laws) + a421162 (P20-B: the reconcile card + the two-act evidence entry + the NEW pins file [the 400-line law] + the mount-owned flow — 10 laws) + e8e03de (P20-C: the composition growth [the dispatch + reconciliation interfaces intersected, both structural guards proven] + the bridge battery 7 laws over the REAL channel: the honest empty truth, the golden path [UNKNOWN dispatch → pending card → reconcile → RECONCILED + mission COMPLETED; the FAILED variant open], the act-time refusal, the double-reconcile refusal, the scanner law) + this closure. Integrated batteries green at the tip: desktop 31f/299t, app 42f/453t, route-planning 209, lab 169, opportunities 250, capability 230, route-compiler 353, economic 105, protocol 279, surface 224 (2,561 tests); architecture-check 0/0/0. PUSHED to GitHub. The runtime, the gate, mission-execution and the idempotency registrar UNTOUCHED. Carry-forward: the provider execution lanes + the automatic evidence feeds; live-provider route evidence; the §5 store question; the protocol-plane evidence bridge."
     }
   ],
-  "last_tl_action_at": "2026-10-27T06:30:00Z"
+  "last_tl_action_at": "2026-10-27T07:10:00Z"
 }
