@@ -17,7 +17,7 @@
     "worker-3": "migration-experience-and-integrations"
   },
   "frontier": [
-    "P21-B"
+    "P21-D"
   ],
   "active_work_orders": [],
   "completed_work_orders": [
@@ -1048,6 +1048,11 @@
       "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
       "acceptance_evidence": "commit 2bc3ecaf",
       "summary": "the counterfactual/opportunity lane (domain): the ConditionalOpportunity (party-change preconditions + assumptions + the distinct platformPrerequisites + evidence lineage + opt-in/expiry laws, advisory-only), the wait re-check evaluator (pure; reuses the existing matchers; neverAutoDispatches), the STALE_OBSERVATION incident through the one-change law, the stage-7 deriveConditionalOpportunities (deterministic, fail-closed). opportunities 19f/273t · lab 19f/176t · route-planning 17f/219t; per-package tsc 0/0/0"
+    },
+    {
+      "id": "P21-B",
+      "accepted_commit": "557e3a11",
+      "summary": "The journey lane: the composer↔mission binding (D2), the stage-progress projection + panel (D3), the model/difficulty controls (D4 — with the named honest gaps: the desktop catalog product binding awaits a renderer-reachable substrate seam; the selection records on the task field), the wait controls (D10), the connections activation UI (E)."
     }
   ],
   "policies": {
@@ -1493,6 +1498,10 @@
       "actor": "resident-TL",
       "action": "P21_A_AND_C_ACCEPTED",
       "detail": "P21-A (c2047fe0) + P21-C (2bc3ecaf) verified from source and accepted; both PUSHED. The station-timeout-lost P21-A dispatch was recovered: the worker's landed tree was fully present; the TL ran the gates it never returned to run (desktop 36f/351t; test-check/mirror-check/host all 0 after the TL's boundary fixes; lint 0 errors after the script split) and re-ran the REAL rail-evidence harness — ALL GATES HELD with a fresh secret-free receipt. Frontier recomputed to [P21-B]."
+    },
+    {
+      "event": "P21_B_ACCEPTED",
+      "commit": "557e3a11"
     }
   ],
   "last_tl_action_at": "2026-10-27T10:05:00Z"

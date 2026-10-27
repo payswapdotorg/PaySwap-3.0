@@ -17,31 +17,48 @@
       "id": "P21-A",
       "owner": "worker",
       "status": "PENDING",
-      "depends_on": ["P21-0"],
+      "depends_on": [
+        "P21-0"
+      ],
       "lane_scope": "Host/provider lane: the connection-activation members (FLW + Paystack key submits + connectionRunVerificationProbe — the probe host-side INSIDE the seal over the REAL transports, the outcome through the authority's own recordVerificationOutcome; the one-change census/drift/mirror law) + the connection→capability bridge (ACTIVE + probe evidence → instance + observations; INV-13 machine-enforced; the evidence-tier labels never mix) + the TEST_DATA merchant directory (merchant:stripe-only-test) + the REAL Stripe kernel composition (SANDBOX-only behind the lane resolver + gate; the unwired authority stays the default) + the scripts/p21 rail-evidence harnesses. UNTOUCHED: payment-dispatch-runtime.ts, authorization-gate.ts, mission-execution.ts, idempotency.ts; payswap-app; the renderer composition roots; opportunities/lab/route-planning."
     },
     {
       "id": "P21-C",
       "owner": "worker",
       "status": "PENDING",
-      "depends_on": ["P21-0"],
+      "depends_on": [
+        "P21-0"
+      ],
       "lane_scope": "Domain lane (concurrent with P21-A — disjoint packages): the conditional-opportunity composition (opportunity × party-change precondition × assumptions × expiry + the honest platform-prerequisite note; advisory only) + the wait re-check evaluator (pure domain; fresh observations; STALE never matches) + the scenario-family completion (the staleness incident kind through the one-change vocabulary law; party semantics documented over the existing intervention kinds) + the stage-6/7 composition growth. Files: packages/opportunities/**, packages/lab/**, packages/route-planning/**. UNTOUCHED: desktop, payswap-app, surface."
     },
     {
       "id": "P21-B",
       "owner": "worker",
-      "status": "PENDING",
-      "depends_on": ["P21-A", "P21-C"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P21-A",
+        "P21-C"
+      ],
       "lane_scope": "Journey lane (app + renderer composition, disjoint from P21-A's mirror files): the channel-backed session port (the composer's PAYMENT_MISSION intents seed REAL missions; the ask/capture loop in the composer conversation; web keeps the honest localStorage tier) + the stage-progress panel (derived from persisted typed events + the engine view; the ROUTINE_PINNED task event) + the model/difficulty controls (REAL substrate catalogs; retention + restore; the difficulty→budget mapping; the honest no-narration-tier disclosure) + the wait controls (re-check/cancel) + the Connections UI for the new members. Files: packages/payswap-app/**, the renderer composition roots (routePlanningComposition + NEW session-port/stage files), packages/surface/**."
     },
     {
       "id": "P21-D",
       "owner": "TL",
       "status": "PENDING",
-      "depends_on": ["P21-A", "P21-B", "P21-C"],
+      "depends_on": [
+        "P21-A",
+        "P21-B",
+        "P21-C"
+      ],
       "lane_scope": "TL integration: the bridge battery (the full journey through the REAL channel incl. the revise path's REAL dispatch + authoritative read-back) + the E2E law (the web tier via journey-verification + the NEW Electron CDP desktop harness; screenshots + structured secret-free receipts) + the provider receipts with the fresh credentials + the integrated batteries + the architecture check + the JOURNEY-MAP/FEATURE-MAP reconciliation + the graph closure + the current-state closure + PUSH + the bundle archive + the honest carry-forward record (P22; the CLI-agent skill/MCP candidate; the automatic evidence feeds; the protocol-plane bridge)."
     }
   ],
-  "frontier_after_registration": ["P21-A", "P21-C"],
-  "closure_policy": "P21 closes only when P21-A/B/C/D are all accepted on main with their batteries green at the tip AND the journey is proven end-to-end at the user level: either a genuine route executed and reconciled with provider evidence, or the correct tested NO_ROUTE outcome with evidence-backed conditional opportunities and the durable wait/revise choice — in either case the New Task → terminal-state journey proven against the real application (the CDP desktop tier + the web tier), with the six truth facts still machine-enforced and zero secret material in any artifact. No mock route, synthetic funding claim, fixture-only CONFIRMED, LLM-authored score or unsupported 'payment completed' claim may satisfy the gate."
+  "frontier_after_registration": [
+    "P21-A",
+    "P21-C"
+  ],
+  "closure_policy": "P21 closes only when P21-A/B/C/D are all accepted on main with their batteries green at the tip AND the journey is proven end-to-end at the user level: either a genuine route executed and reconciled with provider evidence, or the correct tested NO_ROUTE outcome with evidence-backed conditional opportunities and the durable wait/revise choice — in either case the New Task → terminal-state journey proven against the real application (the CDP desktop tier + the web tier), with the six truth facts still machine-enforced and zero secret material in any artifact. No mock route, synthetic funding claim, fixture-only CONFIRMED, LLM-authored score or unsupported 'payment completed' claim may satisfy the gate.",
+  "frontier": [
+    "P21-D"
+  ]
 }
