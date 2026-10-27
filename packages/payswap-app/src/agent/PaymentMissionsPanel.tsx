@@ -24,6 +24,7 @@
 
 import { PaymentMissionsDetail } from "./PaymentMissionsDetail.js";
 import type { PaymentMissionsDispatchWiring } from "./paymentMissionsDispatchPins.js";
+import type { PaymentMissionsReconcileWiring } from "./paymentMissionsReconcilePins.js";
 import {
   PAYMENT_MISSIONS_EMPTY_NOTE,
   PAYMENT_MISSIONS_NOT_WIRED_NOTE,
@@ -55,6 +56,8 @@ export interface PaymentMissionsPanelProps {
   readonly onResolveApproval?: (requestId: string, decision: "APPROVE" | "DECLINE") => void;
   /** The dispatch-flow wiring (null/absent when the bound port lacks the dispatch members — P19-B). */
   readonly dispatch?: PaymentMissionsDispatchWiring | null;
+  /** The reconcile-flow wiring (null/absent when the bound port lacks the reconciliation members — P20-B). */
+  readonly reconcile?: PaymentMissionsReconcileWiring | null;
 }
 
 /** The status badge tone per lifecycle status (terminal failure vs done vs in flight).
@@ -122,6 +125,7 @@ export function PaymentMissionsPanel({
   onEngageApproval,
   onResolveApproval,
   dispatch,
+  reconcile,
 }: PaymentMissionsPanelProps): React.ReactNode {
   const onBoard = view.kind === "BOARD" || view.kind === "BOARD_EMPTY";
   return (
@@ -188,6 +192,7 @@ export function PaymentMissionsPanel({
           onEngageApproval={onEngageApproval}
           onResolveApproval={onResolveApproval}
           dispatch={dispatch}
+          reconcile={reconcile}
         />
       ) : (
         <ol className="ps-agent-missions-list">

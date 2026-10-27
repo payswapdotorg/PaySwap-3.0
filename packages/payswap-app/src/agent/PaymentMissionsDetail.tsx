@@ -8,8 +8,10 @@
  * renders → a text answer → capture → the detail refreshes), the compiled
  * 11-key intent (read-only), the presented preview + the two-act approve
  * flow (./PaymentMissionsPreviewCard.tsx), the armed card + the two-act
- * dispatch flow (./PaymentMissionsArmedCard.tsx, P19-B), the plan-selection
- * record and the attempt states (people-language outcomes — ADR-0011 D3).
+ * dispatch flow (./PaymentMissionsArmedCard.tsx, P19-B), the reconcile
+ * card + the two-act evidence entry (./PaymentMissionsReconcileCard.tsx,
+ * P20-B — beside the armed card), the plan-selection record and the
+ * attempt states (people-language outcomes — ADR-0011 D3).
  *
  * The captured intake values render DEFENSIVELY: the per-field typed
  * shapes stay host-side, so this surface formats what it recognizes and
@@ -19,7 +21,9 @@
 
 import { PaymentMissionsArmedCard } from "./PaymentMissionsArmedCard.js";
 import { PaymentMissionsPreviewCard } from "./PaymentMissionsPreviewCard.js";
+import { PaymentMissionsReconcileCard } from "./PaymentMissionsReconcileCard.js";
 import type { PaymentMissionsDispatchWiring } from "./paymentMissionsDispatchPins.js";
+import type { PaymentMissionsReconcileWiring } from "./paymentMissionsReconcilePins.js";
 import {
   PAYMENT_MISSIONS_ATTEMPT_OPERATION_LABELS,
   PAYMENT_MISSIONS_ATTEMPT_OUTCOME_LABELS,
@@ -43,6 +47,8 @@ export interface PaymentMissionsDetailProps {
   readonly onResolveApproval?: (requestId: string, decision: "APPROVE" | "DECLINE") => void;
   /** The dispatch-flow wiring (null/absent when the bound port lacks the dispatch members — P19-B). */
   readonly dispatch?: PaymentMissionsDispatchWiring | null;
+  /** The reconcile-flow wiring (null/absent when the bound port lacks the reconciliation members — P20-B). */
+  readonly reconcile?: PaymentMissionsReconcileWiring | null;
 }
 
 /** The people-language names of the nine intake fields (string-keyed: the
@@ -131,6 +137,7 @@ export function PaymentMissionsDetail({
   onEngageApproval,
   onResolveApproval,
   dispatch,
+  reconcile,
 }: PaymentMissionsDetailProps): React.ReactNode {
   const { detail, ask } = state;
   const answerInputId = `ps-agent-missions-answer-${detail.id}`;
@@ -302,6 +309,20 @@ export function PaymentMissionsDetail({
           state.approval.phase === "RESOLVED" && state.approval.resolution?.outcome === "GRANTED"
         }
         dispatch={dispatch}
+      />
+
+      {/* The reconcile section beside the armed card (P20-B): the pending
+       * card drives it — the section renders whenever the port supports
+       * it (the empty card IS the designed state), and a mission whose
+       * attempts look unresolved states the honest gap when it does not. */}
+      <PaymentMissionsReconcileCard
+        missionId={detail.id}
+        unresolvedAttempts={
+          (detail.attempts ?? []).some(
+            (attempt) => attempt.outcome === "OUTCOME_UNKNOWN" || attempt.outcome === "STARTED",
+          )
+        }
+        reconcile={reconcile}
       />
 
       {detail.planSelection !== undefined ? (

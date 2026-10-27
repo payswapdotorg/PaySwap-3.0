@@ -194,6 +194,37 @@ export {
   PaymentMissionsArmedCard,
   type PaymentMissionsArmedCardProps,
 } from "./agent/PaymentMissionsArmedCard.js";
+// The payment-missions reconciliation surface (P20-B; ADR-0013 D1/D2):
+// the pending-reconciliation read + the two-act evidence entry over the
+// composed reconciliation-capable port — the direction, the source kind
+// and the provider references fire reconcile with EXACTLY
+// (missionId, attemptId, evidence); the runtime verb stays the only
+// closer of an unknown outcome (the operator is the courier of the
+// provider's evidence, never its source). The structural guard keeps
+// the P18 seam law: a port without the members renders the honest
+// reconciliation-unavailable note.
+export {
+  isPaymentMissionsReconciliationPort,
+  PAYMENT_MISSIONS_RECONCILIATION_DIRECTION_LABELS,
+  PAYMENT_MISSIONS_RECONCILIATION_DIRECTIONS,
+  PAYMENT_MISSIONS_RECONCILIATION_SOURCE_LABELS,
+  PAYMENT_MISSIONS_RECONCILIATION_SOURCES,
+  PAYMENT_MISSIONS_RECONCILE_PHASES,
+  type PaymentMissionsPendingAttempt,
+  type PaymentMissionsPendingReconciliation,
+  type PaymentMissionsPortWithReconciliation,
+  type PaymentMissionsReconcileEvidence,
+  type PaymentMissionsReconcileOutcome,
+  type PaymentMissionsReconcilePhase,
+  type PaymentMissionsReconcileState,
+  type PaymentMissionsReconcileWiring,
+  type PaymentMissionsReconciliationDirection,
+  type PaymentMissionsReconciliationSource,
+} from "./agent/paymentMissionsReconcilePins.js";
+export {
+  PaymentMissionsReconcileCard,
+  type PaymentMissionsReconcileCardProps,
+} from "./agent/PaymentMissionsReconcileCard.js";
 export {
   AGENT_PAYMENT_DIRECTION_ENTRIES,
   agentPaymentDirectionEntries,

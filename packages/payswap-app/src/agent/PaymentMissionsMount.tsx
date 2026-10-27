@@ -9,8 +9,11 @@
  * the scope card → resolveApproval), and the TWO-ACT DISPATCH flow
  * (P19-B: armedEffect when the detail is selected → the armed card →
  * the lane choice → the send confirm — ./paymentMissionsDispatchFlow.ts
- * owns the slice so this file keeps the line law). The panel family is
- * a PURE projection of the view model; every port call and every
+ * owns the slice so this file keeps the line law), and the TWO-ACT
+ * RECONCILE flow (P20-B: pendingReconciliation when the detail is
+ * selected → the pending card → the evidence entry → the submit —
+ * ./paymentMissionsReconcileFlow.ts owns the slice). The panel family
+ * is a PURE projection of the view model; every port call and every
  * honest failure lands here.
  *
  * HONESTY LAWS: no port → the not-wired note (never fabricated
@@ -37,6 +40,8 @@ import {
 } from "./paymentMissionsPins.js";
 import { usePaymentMissionsDispatchFlow } from "./paymentMissionsDispatchFlow.js";
 import { isPaymentMissionsDispatchPort } from "./paymentMissionsDispatchPins.js";
+import { usePaymentMissionsReconcileFlow } from "./paymentMissionsReconcileFlow.js";
+import { isPaymentMissionsReconciliationPort } from "./paymentMissionsReconcilePins.js";
 
 /* ------------- the shared port binding (the composition seam) ------------- */
 
@@ -171,6 +176,18 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
   const { wiring: dispatchWiring, loadArmedEffect, onApprovalGranted } =
     usePaymentMissionsDispatchFlow(dispatchPort, setFlowError, refreshDetail);
 
+  // The reconciliation-capable seam resolution (P20-B): a port without
+  // the members keeps the honest reconciliation-unavailable note on the
+  // reconcile section (gated by the mission's unresolved-looking
+  // attempts) — never an error. The flow hook owns the reconcile card's
+  // state machine (the line law).
+  const reconcilePort =
+    resolvedPort !== undefined && isPaymentMissionsReconciliationPort(resolvedPort)
+      ? resolvedPort
+      : undefined;
+  const { wiring: reconcileWiring, loadPendingReconciliation } =
+    usePaymentMissionsReconcileFlow(reconcilePort, setFlowError, refreshDetail);
+
   const openMission = useCallback(
     (missionId: string): void => {
       if (resolvedPort === undefined) {
@@ -188,14 +205,17 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
               : { kind: "DETAIL", state: freshDetailState(detail) },
           );
           // The armed card's own read (P19-B): the dispatch-capable port
-          // loads the armed effect when the detail is selected.
+          // loads the armed effect when the detail is selected. The
+          // reconcile card's own read (P20-B): the reconciliation-capable
+          // port loads the pending card alongside it.
           if (detail !== null) {
             loadArmedEffect(missionId);
+            loadPendingReconciliation(missionId);
           }
         })
         .catch((thrown: unknown) => setView(failureView(thrown)));
     },
-    [resolvedPort, loadArmedEffect],
+    [resolvedPort, loadArmedEffect, loadPendingReconciliation],
   );
 
   const askNextField = useCallback(
@@ -362,6 +382,7 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
       onEngageApproval={engageApproval}
       onResolveApproval={resolveApproval}
       dispatch={dispatchWiring}
+      reconcile={reconcileWiring}
     />
   );
 }
