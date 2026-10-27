@@ -206,9 +206,12 @@ describe("architectural boundary: @payswap/lab (the REWRITTEN zero-sibling guard
     // exact census moved 28 -> 30 src, 20 -> 22 test files and 16 -> 18
     // test suites. The pins stay EXACT toBe (never loosened to ranges) — the
     // census law's strength is unchanged.
+    // DISCLOSED RE-PIN (P21-C, ADR-0014 D9 — the staleness incident kind):
+    // one NEW test suite (stale-observation), so the census moved 22 -> 23
+    // all-test files and 18 -> 19 test suites; src is unchanged.
     expect(sourceFiles.length).toBe(30);
-    expect(allTestFiles.length).toBe(22);
-    expect(testFiles.length).toBe(18);
+    expect(allTestFiles.length).toBe(23);
+    expect(testFiles.length).toBe(19);
   });
 
   it("the manifest law: zero runtime deps, devDependencies exactly typescript+vitest, the core barrel export", () => {

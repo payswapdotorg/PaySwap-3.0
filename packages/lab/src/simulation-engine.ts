@@ -10,11 +10,11 @@
  * Structure: schedule demands (immediate or deferred into a batching
  * window, adversarial screening at arrival) -> apply incidents step by
  * step (outage / liquidity drain / FX volatility / congestion / delayed
- * write / approval delay) -> settle each demand through the settle
- * machinery (simulation-settle.ts) -> coalesce batches when netting is
- * enabled. Deterministic by construction: behaviour is a pure function of
- * (scenario plan, world, program, seed); the caller's objects are never
- * mutated.
+ * write / approval delay / stale observation) -> settle each demand
+ * through the settle machinery (simulation-settle.ts) -> coalesce batches
+ * when netting is enabled. Deterministic by construction: behaviour is a
+ * pure function of (scenario plan, world, program, seed); the caller's
+ * objects are never mutated.
  */
 
 import type { SimulatedWorld } from "./simulation-world.ts";
@@ -151,6 +151,24 @@ export function executeScenario(
         }
         case "APPROVAL_DELAY": {
           state.approvalDelayMs += incident.delayMs;
+          break;
+        }
+        case "STALE_OBSERVATION": {
+          // The rail's observed facts go STALE from this step on (the
+          // freshness degradation). The rail stays in the program's
+          // preference — the program routes on its recorded facts and
+          // cannot know they are stale (the epistemic trap the incident
+          // models); the honest replay consequence lands in the settle
+          // path: a settlement grounded on stale observed facts cannot
+          // be CLAIMED (UNKNOWN-tier). The production answer to this
+          // trap is the freshness law — a stale observation never
+          // matches (evaluateWaitCriteria / the rail snapshot's
+          // STALE_OBSERVATION exclusion).
+          const rail = state.rails.get(incident.railId);
+          if (rail !== undefined) {
+            rail.observedStale = true;
+            rail.degraded = true;
+          }
           break;
         }
       }

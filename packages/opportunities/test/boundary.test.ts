@@ -290,11 +290,15 @@ describe("architectural boundary: @payswap/opportunities (the REWRITTEN zero-sib
     // DISCLOSED RE-PIN (P16-C, ADR-0009 D9 — the established precedent):
     // the lane legitimately added five NEW src modules (offer-lifecycle,
     // consent, matching, wait-criteria, offer-limits) and five NEW test
-    // files, so the exact census moved 26 -> 31 src and 16 -> 21 test. The
-    // pins stay EXACT toBe (never loosened to ranges) — the census law's
-    // strength is unchanged.
-    expect(srcCount).toBe(31);
-    expect(testCount).toBe(21);
+    // files, so the exact census moved 26 -> 31 src and 16 -> 21 test.
+    // DISCLOSED RE-PIN (P21-C, ADR-0014 D9): the lane added four NEW src
+    // modules (conditional, conditional-publication, conditional-lifecycle,
+    // wait-recheck) and two NEW test files (conditional, wait-recheck),
+    // so the census moved 31 -> 35 src and 21 -> 23 test. The pins stay
+    // EXACT toBe (never loosened to ranges) — the census law's strength
+    // is unchanged.
+    expect(srcCount).toBe(35);
+    expect(testCount).toBe(23);
     expect(maxLines).toBeLessThanOrEqual(400);
     expect(maxFile.length).toBeGreaterThan(0);
   });

@@ -26,20 +26,23 @@ import { join, relative } from "node:path";
  * - the manifest exposes the core barrel with devDependencies EXACTLY
  *   typescript + vitest;
  * - every file (src AND test) is <= 400 lines; no TS enum;
- * - the exact census pins below (15 src / 16 test-suite / 19 all-test
+ * - the exact census pins below (18 src / 17 test-suite / 21 all-test
  *   .ts files): the route-planning core lane's own file set — canonical
- *   backbone, error taxonomy, three pin modules, fail-closed ports,
+ *   backbone, error taxonomy, four pin modules, fail-closed ports,
  *   search budget, rail snapshots, candidate enumeration, hard gates,
  *   ranking, barrel — PLUS the P16-D part-1 trio (trigger, manifest,
  *   lab-adapter) landed by the TL-delegated Lane D continuation (137-D1:
  *   the typed trigger + fail-closed manifest + stage-6 lab seam; ADR-0009
- *   D3 gave the trio to the TL lane, which delegated this part); the
- *   sixteen test suites (boundary, canonical, errors, pins-fidelity,
- *   ports, rail-snapshot, search-budget, candidates, hard-gates, ranking,
+ *   D3 gave the trio to the TL lane, which delegated this part) PLUS the
+ *   P21-C stage-7 family (conditional-stage + conditional-validation +
+ *   pins/opportunities, the 400-line file-law split); the seventeen test
+ *   suites (boundary, canonical, errors, pins-fidelity, ports,
+ *   rail-snapshot, search-budget, candidates, hard-gates, ranking,
  *   determinism, pipeline, trigger, manifest, lab-adapter,
- *   routine-composition) plus the three non-suite test-tier helpers
- *   (fixtures, compiler-evidence, node.d.ts). Census re-pin = disclosed
- *   deviation per the ADR-0009 D9 precedent (exact toBe pins kept).
+ *   routine-composition, conditional-stage) plus the four non-suite
+ *   test-tier helpers (fixtures, compiler-evidence, no-route-fixtures,
+ *   node.d.ts). Census re-pin = disclosed deviation per the ADR-0009 D9
+ *   precedent (exact toBe pins kept).
  */
 
 const packageRoot = process.cwd();
@@ -99,7 +102,8 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
       }
     }
     expect(offenders.join("\n")).toBe("");
-    expect(sourceFiles.length).toBe(15);
+    // DISCLOSED RE-PIN (P21-C, ADR-0014 D9): +3 src modules (conditional-stage.ts + conditional-validation.ts + pins/opportunities.ts).
+    expect(sourceFiles.length).toBe(18);
   });
 
   it("no @payswap/* or @zcode/* import appears ANYWHERE in src (the pin-only law)", () => {
@@ -158,8 +162,17 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
       }
     }
     expect(offenders.join("\n")).toBe("");
-    expect(testFiles.length).toBe(16);
-    expect(allTestFiles.length).toBe(19);
+    // DISCLOSED RE-PIN (P21-C, ADR-0014 D7/D9 — the stage-7 conditional
+    // derivation): three NEW src modules (conditional-stage + its
+    // validation split + the opportunities pins split under the 400-line
+    // file law) and two NEW test-tier files (the no-route world fixtures
+    // + the conditional-stage battery), so the census moved 15 -> 18 src,
+    // 16 -> 17 test suites and 19 -> 21 all-test .ts files. The pins stay
+    // EXACT toBe (never loosened to ranges) — the census law's strength
+    // is unchanged.
+    expect(sourceFiles.length).toBe(18);
+    expect(testFiles.length).toBe(17);
+    expect(allTestFiles.length).toBe(21);
   });
 
   it("the manifest law + tsconfig carries EXACTLY the one documented type-only paths mapping + a single node.d.ts process declaration", () => {

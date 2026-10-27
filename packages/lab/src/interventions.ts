@@ -167,7 +167,7 @@ function incidentShape(incident: unknown): ScenarioIncident {
   const incidentType = expectOneOf(incident.incidentType, "incident.incidentType", SCENARIO_INCIDENT_TYPES);
   const atStep = expectInt(incident.atStep, "incident.atStep", 0);
   switch (incidentType) {
-    case "PROVIDER_OUTAGE": case "DELAYED_WRITE":
+    case "PROVIDER_OUTAGE": case "DELAYED_WRITE": case "STALE_OBSERVATION":
       return { incidentType, atStep, railId: expectString(incident.railId, "incident.railId") };
     case "LIQUIDITY_SHORTAGE":
       return { incidentType, atStep, poolId: expectString(incident.poolId, "incident.poolId"), drainedMinor: expectBigInt(incident.drainedMinor, "incident.drainedMinor", 0n) };

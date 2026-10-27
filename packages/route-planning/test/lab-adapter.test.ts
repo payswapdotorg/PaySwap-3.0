@@ -146,7 +146,7 @@ describe("the four Lane-B vocabulary pins (byte-identical to the REAL lab author
     expect([...PINNED_THIRD_PARTY_NODE_ROLES]).toEqual(["intermediary", "liquidity_source", "payout_endpoint"]);
     expect([...PINNED_SCENARIO_INCIDENT_TYPES]).toEqual([
       "PROVIDER_OUTAGE", "LIQUIDITY_SHORTAGE", "FX_VOLATILITY",
-      "CONGESTION", "DELAYED_WRITE", "APPROVAL_DELAY",
+      "CONGESTION", "DELAYED_WRITE", "APPROVAL_DELAY", "STALE_OBSERVATION",
     ]);
     for (const pin of [PINNED_INTERVENTION_KINDS, PINNED_THIRD_PARTY_NODE_ROLES, PINNED_SCENARIO_BUDGET_DIMENSIONS, PINNED_SCENARIO_INCIDENT_TYPES]) {
       expect(Object.isFrozen(pin)).toBe(true);
@@ -291,5 +291,32 @@ describe("exploreBoundedScenarios with the REAL lab machinery bound", () => {
       budget: { maxScenarios: 5, maxInterventionsPerRun: 5, maxDemands: 5, maxPools: 5, maxRails: 5 },
       baseProgram: BASE_PROGRAM, variantProgram: VARIANT_PROGRAM, seed: SEED, stepMs: 250,
     })).toThrow(ScenarioExplorationError);
+  });
+
+  it("the STALE_OBSERVATION incident binds through the adapter with the honest UNKNOWN-tier delta (P21-C, ADR-0014 D9 — the one-change law companion)", () => {
+    // The staleness incident kind (the P21-C vocabulary growth) explores
+    // through the stage-6 port over the REAL lab machinery: a settlement
+    // grounded on stale-marked observed facts cannot be CLAIMED — the
+    // demand that would have settled on the rail becomes
+    // UNKNOWN-requires-reconciliation (variant − base: settled −1,
+    // unknownOutcomes +1), deterministically.
+    const interventions: readonly ScenarioIntervention[] = [
+      {
+        kind: "INCIDENT_APPLIED", interventionId: "stale-rail-a",
+        incident: { incidentType: "STALE_OBSERVATION", atStep: 0, railId: "rail-a" },
+      },
+    ];
+    const run = () => exploreBoundedScenarios({
+      port: realScenarioExplorationPort(), baseFacts: scenarioBaseFacts(), interventions,
+      budget: { maxScenarios: 5, maxInterventionsPerRun: 5, maxDemands: 5, maxPools: 5, maxRails: 5 },
+      baseProgram: BASE_PROGRAM, variantProgram: VARIANT_PROGRAM, seed: SEED, stepMs: 250,
+    });
+    const exploration = run();
+    expect(exploration.coverage).toBe("COMPLETE");
+    expect(exploration.scenarios).toHaveLength(1);
+    expect(exploration.scenarios[0]?.kind).toBe("INCIDENT_APPLIED");
+    expect(exploration.scenarios[0]?.delta.unknownOutcomes).toBe(1);
+    expect(exploration.scenarios[0]?.delta.settled).toBe(-1);
+    expect(run().explorationDigest).toBe(exploration.explorationDigest);
   });
 });

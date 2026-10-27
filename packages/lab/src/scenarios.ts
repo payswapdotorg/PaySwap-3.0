@@ -5,9 +5,9 @@
  *
  * The baseline suite covers the full LAB.md scenario taxonomy: normal
  * demand plus liquidity shortages, provider outages, FX volatility,
- * delayed writes, approval delays, fraud, collusion, malicious agents,
- * incentive gaming, partial payments, congestion and adversarial model
- * behavior.
+ * delayed writes, approval delays, stale observations, fraud, collusion,
+ * malicious agents, incentive gaming, partial payments, congestion and
+ * adversarial model behavior.
  *
  * The canonical payment-routing Domain Pack is declared here beside the
  * suite it evaluates (LAB.md: the pack's evaluationSuite references the
@@ -135,7 +135,7 @@ export const PAYMENT_ROUTING_DOMAIN_PACK: DomainPack = {
   domain: "payment-routing",
   scenarioTypes: [
     "NORMAL_DEMAND", "LIQUIDITY_SHORTAGE", "PROVIDER_OUTAGE", "FX_VOLATILITY",
-    "DELAYED_WRITE", "APPROVAL_DELAY", "FRAUD", "COLLUSION", "MALICIOUS_AGENT",
+    "DELAYED_WRITE", "APPROVAL_DELAY", "STALE_OBSERVATION", "FRAUD", "COLLUSION", "MALICIOUS_AGENT",
     "INCENTIVE_GAMING", "PARTIAL_PAYMENT", "CONGESTION", "ADVERSARIAL_MODEL_BEHAVIOR",
   ],
   hardConstraints: ["AUTHORIZATION", "COMPLIANCE", "PRIVACY", "DEADLINE", "EXPLICIT_CREDIT"],
@@ -254,6 +254,17 @@ export const BASELINE_SCENARIOS: readonly LabScenario[] = Object.freeze([
       demand("d-ap-2", 2, 130_000n),
     ],
     [{ incidentType: "APPROVAL_DELAY", atStep: 1, delayMs: 8_000 }],
+  ),
+  scenario(
+    "lab.baseline.stale-observation",
+    "STALE_OBSERVATION",
+    "rail-a's observed facts go stale mid-flight; later settlements grounded on them cannot be claimed",
+    [
+      demand("d-st-1", 0, 200_000n),
+      demand("d-st-2", 3, 240_000n),
+      demand("d-st-3", 4, 150_000n),
+    ],
+    [{ incidentType: "STALE_OBSERVATION", atStep: 2, railId: "rail-a" }],
   ),
   scenario(
     "lab.baseline.fraud",

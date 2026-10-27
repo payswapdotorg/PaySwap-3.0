@@ -66,6 +66,24 @@ export * from "./observation.ts";
 // The opportunity -> proposal -> decision seam (NET-NEW, hard law 2).
 export * from "./proposal-seam.ts";
 
+// The P16-C offer/consent/matching/wait family (the evidence-backed
+// offer lifecycle, the minimum-disclosure consent ledger, the
+// consent-gated match projection, the durable wait criteria and the
+// publication-rate limits — exported for the P21 journey surfaces).
+export * from "./offer-lifecycle.ts";
+export * from "./consent.ts";
+export * from "./matching.ts";
+export * from "./wait-criteria.ts";
+export * from "./offer-limits.ts";
+
+// The P21-C conditional opportunity + the wait re-check (ADR-0014 D9:
+// the party-change precondition composition and the pure "check now"
+// service consumed by the journey panel and the E2E).
+export * from "./conditional.ts";
+export * from "./conditional-publication.ts";
+export * from "./conditional-lifecycle.ts";
+export * from "./wait-recheck.ts";
+
 // The secret-free law (runtime scrubber, hard law 5).
 export * from "./secret-free.ts";
 

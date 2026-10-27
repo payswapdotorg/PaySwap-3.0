@@ -40,6 +40,8 @@ export interface WorkingRail {
   available: boolean;
   degraded: boolean;
   pendingUnknown: boolean;
+  /** The rail's observed facts are STALE (a STALE_OBSERVATION incident marked them). */
+  observedStale: boolean;
 }
 
 export interface WorkingPool {
@@ -92,6 +94,7 @@ export function createEngineState(
       available: true,
       degraded: false,
       pendingUnknown: false,
+      observedStale: false,
     });
   }
   const pools = new Map<string, WorkingPool>();
@@ -239,9 +242,12 @@ export function settleOne(
     deferredSteps * state.world.stepLatencyMs +
     jitterMs;
 
-  if (rail.pendingUnknown) {
-    // The external write is delayed: the outcome is UNKNOWN and requires
-    // reconciliation (INV-4: UNKNOWN is never FAILED and never success).
+  if (rail.pendingUnknown || rail.observedStale) {
+    // The outcome is UNKNOWN and requires reconciliation (INV-4: UNKNOWN
+    // is never FAILED and never success) — moved 0, fees counted. Two
+    // distinct causes, the same honest UNKNOWN tier: a delayed write is
+    // an in-flight effect; a stale observation is untrustworthy grounding
+    // for the settlement claim. (P21-C, ADR-0014 D9.)
     state.outcomes.push({
       demandId: demand.demandId,
       outcome: "UNKNOWN_REQUIRES_RECONCILIATION",

@@ -179,7 +179,7 @@ describe("Domain Pack declarations (all ten LAB.md dimensions)", () => {
   });
 
   it("the scenario-type vocabulary is a total predicate covering the taxonomy", () => {
-    expect(LAB_SCENARIO_TYPE_IDS.length).toBe(13);
+    expect(LAB_SCENARIO_TYPE_IDS.length).toBe(14);
     for (const scenarioType of LAB_SCENARIO_TYPE_IDS) {
       expect(isLabScenarioTypeId(scenarioType)).toBe(true);
     }

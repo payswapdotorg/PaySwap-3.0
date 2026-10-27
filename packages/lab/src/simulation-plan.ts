@@ -78,7 +78,8 @@ export interface DemandPlan {
 /**
  * One incident injected into a scenario at a discrete step. The taxonomy:
  * provider outage, liquidity shortage, FX volatility, congestion, delayed
- * writes (UNKNOWN discipline) and approval delays.
+ * writes (UNKNOWN discipline), approval delays and stale observations
+ * (the observed facts behind a rail go stale — P21-C, ADR-0014 D9).
  */
 export type ScenarioIncident =
   | {
@@ -112,6 +113,12 @@ export type ScenarioIncident =
       readonly incidentType: "APPROVAL_DELAY";
       readonly atStep: number;
       readonly delayMs: number;
+    }
+  | {
+      /** The rail's observed facts go STALE: settlements grounded on them cannot be claimed (UNKNOWN-tier). */
+      readonly incidentType: "STALE_OBSERVATION";
+      readonly atStep: number;
+      readonly railId: string;
     };
 
 /** The incident-type vocabulary (used by scenario validation). */
@@ -122,6 +129,7 @@ export const SCENARIO_INCIDENT_TYPES = [
   "CONGESTION",
   "DELAYED_WRITE",
   "APPROVAL_DELAY",
+  "STALE_OBSERVATION",
 ] as const;
 
 export type ScenarioIncidentType = (typeof SCENARIO_INCIDENT_TYPES)[number];

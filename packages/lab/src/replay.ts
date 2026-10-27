@@ -184,6 +184,8 @@ function deriveScenarioPlan(input: ReplayInput): {
         return { incidentType: "DELAYED_WRITE", atStep, railId: fact.railId };
       case "APPROVAL_DELAY":
         return { incidentType: "APPROVAL_DELAY", atStep, delayMs: fact.delayMs };
+      case "STALE_OBSERVATION":
+        return { incidentType: "STALE_OBSERVATION", atStep, railId: fact.railId };
     }
   });
   return { scenarioId: `replay:${input.facts.factsId}`, demands, incidents };
