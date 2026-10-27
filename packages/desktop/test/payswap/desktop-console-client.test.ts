@@ -121,8 +121,11 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       "connectionRecordVerificationOutcome",
       "connectionRegistry",
       "connectionRevoke",
+      "connectionRunVerificationProbe",
       "connectionSeedSetup",
       "connectionStatuses",
+      "connectionSubmitFlutterwaveSecretKey",
+      "connectionSubmitPaystackSecretKey",
       "connectionSubmitStripeRestrictedKey",
       "delegateMoneyMovement",
       "deploymentFacts",
@@ -198,6 +201,20 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
     // the runtime's reconcile verb — not this channel — closes the
     // UNKNOWN).
     for (const member of ["paymentMissionPendingReconciliation", "paymentMissionReconcile"]) {
+      expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).toContain(member);
+      expect(member).not.toMatch(/^(execute|retry|cancel|confirm|settle|payout|approve)/);
+    }
+    // The P21-A connection-activation members pass the law too (ADR-0014
+    // D5 — the names carry the connection prefix; the key-entry verbs
+    // are the ONE material-carrying path sealed host-side, and the
+    // probe runner executes the REAL probe host-side INSIDE the seal —
+    // the outcome recorded through the authority's own recorder, never
+    // a caller-asserted activation).
+    for (const member of [
+      "connectionSubmitFlutterwaveSecretKey",
+      "connectionSubmitPaystackSecretKey",
+      "connectionRunVerificationProbe",
+    ]) {
       expect(PAYSWAP_DESKTOP_CLIENT_MEMBERS).toContain(member);
       expect(member).not.toMatch(/^(execute|retry|cancel|confirm|settle|payout|approve)/);
     }

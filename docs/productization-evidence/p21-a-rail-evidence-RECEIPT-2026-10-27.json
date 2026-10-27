@@ -1,0 +1,262 @@
+{
+  "harness": "p21-a-rail-evidence-real-flow-e2e",
+  "ranAt": "2026-10-27T09:12:34.003Z",
+  "connectionActivation": [
+    {
+      "providerId": "flutterwave",
+      "ran": true,
+      "gates": {
+        "seal-pending-verification": {
+          "held": true,
+          "detail": "sealed 1 secret(s); state PENDING_VERIFICATION (verification still required)"
+        },
+        "inv25-live-key-refused": {
+          "held": true,
+          "detail": "refused: The supplied key is not a Flutterwave test-mode secret key (expected FLWSECK_TEST-…). LIVE keys are refused: this deployment is SANDBOX-only"
+        },
+        "probe-outcome-recorded-through-authority": {
+          "held": true,
+          "detail": "probe CONFIRMED; connection ACTIVE (the ONLY ACTIVE path is probe-CONFIRMED recorded through the authority's own recorder)"
+        },
+        "evidence-tier-labeled": {
+          "held": true,
+          "detail": "evidence tier PROVIDER_OBSERVATION; probed operation flutterwave.balances.read"
+        },
+        "active-on-probe-alone": {
+          "held": true,
+          "detail": "final state ACTIVE via PROBE_CONFIRMED"
+        },
+        "structured-evidence-landed": {
+          "held": true,
+          "detail": "observationVersion 1; observedAt 2026-10-27T09:12:36.455Z; keyClass READ_ONLY_TEST"
+        }
+      },
+      "probe": {
+        "probedOperation": "flutterwave.balances.read",
+        "outcome": "CONFIRMED",
+        "providerReferences": [
+          "NGN",
+          "KES",
+          "GHS",
+          "USD",
+          "EUR",
+          "ZAR",
+          "GBP",
+          "TZS",
+          "UGX",
+          "MZN",
+          "RWF",
+          "ZMW",
+          "INR",
+          "XOF",
+          "MUR",
+          "ETB",
+          "JPY",
+          "MAD",
+          "XAF",
+          "AUD",
+          "CAD",
+          "MYR",
+          "CNY",
+          "BRL",
+          "eNGN",
+          "MWK",
+          "EGP",
+          "AED",
+          "USDC",
+          "USDT",
+          "RLUSD"
+        ],
+        "transport": "REAL HTTPS (the host transport over globalThis.fetch)",
+        "latencyMs": 2447,
+        "note": "A Flutterwave probe proves read-only balance access on the connected test account — never a send capability. No Flutterwave send or transfer operation exists in this deployment, so this evidence cannot make any outgoing payment eligible."
+      },
+      "connection": {
+        "connectionId": "conn:cffcbbe1-4566-4033-8b2f-e5cc07653ab6",
+        "state": "ACTIVE",
+        "executionMode": "SANDBOX"
+      }
+    },
+    {
+      "providerId": "stripe",
+      "ran": true,
+      "gates": {
+        "seal-pending-verification": {
+          "held": true,
+          "detail": "sealed 1 secret(s); state PENDING_VERIFICATION (verification still required)"
+        },
+        "inv25-live-key-refused": {
+          "held": true,
+          "detail": "refused: The supplied key is not a Stripe test-mode secret key (expected rk_test_… or sk_test_…). LIVE keys are refused: this deployment is SANDBOX-o"
+        },
+        "probe-outcome-recorded-through-authority": {
+          "held": true,
+          "detail": "probe CONFIRMED; connection ACTIVE (the ONLY ACTIVE path is probe-CONFIRMED recorded through the authority's own recorder)"
+        },
+        "evidence-tier-labeled": {
+          "held": true,
+          "detail": "evidence tier PROVIDER_OBSERVATION; probed operation stripe.balance.read + stripe.account.read"
+        },
+        "active-on-probe-alone": {
+          "held": true,
+          "detail": "final state ACTIVE via PROBE_CONFIRMED"
+        },
+        "structured-evidence-landed": {
+          "held": true,
+          "detail": "observationVersion 1; observedAt 2026-10-27T09:12:37.262Z; keyClass FULL_TEST"
+        }
+      },
+      "probe": {
+        "probedOperation": "stripe.balance.read + stripe.account.read",
+        "outcome": "CONFIRMED",
+        "providerReferences": [
+          "acct_1FPs7UAkPdhgtN6I",
+          "balance"
+        ],
+        "transport": "REAL HTTPS (the host transport over globalThis.fetch)",
+        "latencyMs": 804,
+        "note": "A Stripe probe proves balance and account read access on the connected test account — nothing more. Merchant acceptance facts come only from the merchant directory (labeled test data), never from this probe."
+      },
+      "connection": {
+        "connectionId": "conn:56bac43b-fae7-4467-bcb1-556964f4537a",
+        "state": "ACTIVE",
+        "executionMode": "SANDBOX"
+      }
+    },
+    {
+      "providerId": "paystack",
+      "ran": true,
+      "gates": {
+        "seal-pending-verification": {
+          "held": true,
+          "detail": "sealed 1 secret(s); state PENDING_VERIFICATION (verification still required)"
+        },
+        "inv25-live-key-refused": {
+          "held": true,
+          "detail": "refused: The supplied key is not a Paystack test-mode secret key (expected sk_test_…). LIVE keys are refused: this deployment is SANDBOX-only (INV-25"
+        },
+        "probe-outcome-recorded-through-authority": {
+          "held": true,
+          "detail": "probe CONFIRMED; connection ACTIVE (the ONLY ACTIVE path is probe-CONFIRMED recorded through the authority's own recorder)"
+        },
+        "evidence-tier-labeled": {
+          "held": true,
+          "detail": "evidence tier PROVIDER_OBSERVATION; probed operation paystack.transactions.read"
+        },
+        "active-on-probe-alone": {
+          "held": true,
+          "detail": "final state ACTIVE via PROBE_CONFIRMED"
+        },
+        "structured-evidence-landed": {
+          "held": true,
+          "detail": "observationVersion 1; observedAt 2026-10-27T09:12:37.698Z; keyClass READ_ONLY_TEST"
+        }
+      },
+      "probe": {
+        "probedOperation": "paystack.transactions.read",
+        "outcome": "CONFIRMED",
+        "providerReferences": [
+          "txn_6432088601",
+          "txn_6424965940",
+          "txn_6424932808",
+          "txn_6424930600",
+          "txn_6424907480",
+          "txn_6424817922"
+        ],
+        "transport": "REAL HTTPS (the host transport over globalThis.fetch)",
+        "latencyMs": 433,
+        "note": "A Paystack probe proves read-only transaction-list access on the connected test account — never a send capability. No Paystack send or transfer operation exists in this deployment."
+      },
+      "connection": {
+        "connectionId": "conn:165a2ada-e120-417f-b12a-f2bec081950e",
+        "state": "ACTIVE",
+        "executionMode": "SANDBOX"
+      }
+    }
+  ],
+  "bridge": {
+    "gates": {
+      "tiers-never-mix": {
+        "held": true,
+        "detail": "the probe facts are PROVIDER_OBSERVATION (balance/account read, never more); the merchant directory + the declared test corridor are TEST_DATA — the tiers never mix (D9)"
+      },
+      "flw-probe-is-read-only-evidence": {
+        "held": true,
+        "detail": "the Flutterwave probe proves read-only balance access — NEVER a send capability (F3); no Flutterwave send/transfer operation exists in this deployment"
+      }
+    }
+  },
+  "stripeExecutionSubtest": {
+    "gates": {
+      "bridge-derives-stripe-instance": {
+        "held": true,
+        "detail": "instance instance:conn:9f9e3555-258a-4fe3-a07f-95daa3482d5a; tier PROVIDER_OBSERVATION; accountRef acct_1FPs7UAkPdhgtN6I"
+      },
+      "environment-composes-both-tiers": {
+        "held": true,
+        "detail": "funding sources 2 (probe + declared); destinations 1 (merchant-directory)"
+      },
+      "gates-proceed-over-real-environment": {
+        "held": true,
+        "detail": "all six gates PROCEED over the bridge environment"
+      },
+      "real-kernel-confirmed": {
+        "held": true,
+        "detail": "envelope CONFIRMED; providerReferences pi_3UV6QsAkPdhgtN6I0STd21TC/succeeded"
+      },
+      "mission-completed": {
+        "held": true,
+        "detail": "mission COMPLETED; attempts 1"
+      },
+      "authoritative-read-back": {
+        "held": true,
+        "detail": "read-back CONFIRMED; PaymentIntent status succeeded"
+      }
+    },
+    "ran": true,
+    "mission": {
+      "missionId": "task:PAYMENT_MISSION:d5739741521e973c7295d5b3387dcd1f",
+      "finalStatus": "COMPLETED",
+      "authorizationOrigin": "PREVIEW_UI_ACT",
+      "attemptCount": 1
+    },
+    "dispatch": {
+      "outcome": "CONFIRMED",
+      "providerReferences": [
+        "pi_3UV6QsAkPdhgtN6I0STd21TC",
+        "succeeded"
+      ],
+      "paymentIntentId": "pi_3UV6QsAkPdhgtN6I0STd21TC",
+      "paymentIntentStatus": "succeeded",
+      "dispatchLatencyMs": 1270,
+      "envelopeDispatchedAt": 1793092358811,
+      "envelopeCompletedAt": 1793092359623
+    },
+    "readBack": {
+      "operation": "stripe.payment_intent.retrieve",
+      "status": "succeeded",
+      "providerReferences": [
+        "pi_3UV6QsAkPdhgtN6I0STd21TC",
+        "succeeded"
+      ]
+    },
+    "reconciliationEvidenceShape": {
+      "note": "the SHAPE a reconcile act would carry — NOT a recorded reconciliation (no UNKNOWN arose on this run; the authoritative read-back verified the state directly)",
+      "resolvedTo": "CONFIRMED",
+      "source": "EXTERNAL_PROVIDER_RETRIEVAL",
+      "evidenceRefs": [
+        "pi_3UV6QsAkPdhgtN6I0STd21TC",
+        "succeeded"
+      ]
+    }
+  },
+  "honestNotes": [
+    "credential source: the station secret store (STRIPE_SECRET_KEY / FLUTTERWAVE_SECRET_KEY / PAYSTACK_SECRET_KEY env); never chat, never echoed, never in this receipt (machine-scanned)",
+    "credential service: harness-local AES-256-GCM (node:crypto) standing in for the substrate safeStorage-backed service — the U1-harness boundary",
+    "SANDBOX only (INV-25): test-mode keys; no live corridor is touched or certified",
+    "the Flutterwave probe is READ-ONLY evidence (F3): it proves balance-read access on the connected test account — never a send capability; no Flutterwave send/transfer operation exists in this deployment",
+    "the Stripe PaymentIntent is funded by the PUBLISHED TEST PAYMENT METHOD (pm_card_visa) — the declared test funding instrument (TEST_DATA, the P14 declared-test-corridor precedent; F4): never a Flutterwave-funded claim",
+    "TOGETHER THESE SUBTESTS DO NOT PROVE ANY CROSS-PROVIDER FULFILLMENT: no FLW→Stripe route exists or is manufactured (ADR-0014 D7); the honest outcome for the original intent stays NO_ROUTE",
+    "the merchant-directory destination and the declared test corridor are TEST_DATA (declared fixtures, never provider observations); the probe evidence is PROVIDER_OBSERVATION (never inflated)"
+  ]
+}

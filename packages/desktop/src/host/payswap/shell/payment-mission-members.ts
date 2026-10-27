@@ -26,7 +26,7 @@ import {
 } from "../payments/contracts.js";
 import type { PaymentMissionRuntime } from "../payments/payment-mission-runtime.js";
 import type { StoredPaymentPreview } from "../payments/payment-mission-store.js";
-import { createHonestEmptyGateEnvironment } from "../payments/validation-gates.js";
+import { createHonestEmptyGateEnvironment, type PaymentGateEnvironment } from "../payments/validation-gates.js";
 import { PaymentPlaneNotConfiguredError } from "./plane-errors.js";
 import { projectAttemptStates } from "./approval-members.js";
 import type {
@@ -47,6 +47,20 @@ export interface PaymentMissionChannelDeps {
   readonly now: () => string;
   /** The host seam log (never console; no secret material is ever logged). */
   readonly log: (level: "info" | "warn" | "error", message: string) => void;
+  /**
+   * (P21-A, ADR-0014 D6) The gate-environment composition seam: when
+   * the host composed the connection plane + the probe plane, the
+   * service injects the bridge-backed environment builder (the REAL
+   * environment when connections are ACTIVE with confirmed probe
+   * evidence; the honest-empty one otherwise — byte-identical). When
+   * ABSENT (the uncomposed-plane default), the member composes the
+   * honest-empty environment itself, exactly as before.
+   */
+  readonly gateEnvironmentOf?: (input: {
+    readonly now: string;
+    /** The mission's captured amount, when complete (the declared quote's denominations). */
+    readonly missionAmount?: { readonly currency: string; readonly minorUnits: string };
+  }) => Promise<PaymentGateEnvironment>;
 }
 
 /**
@@ -262,21 +276,37 @@ export function createPaymentMissionChannelMembers(
     async paymentMissionPresentPreview(missionId) {
       const runtime = deps.resolveRuntime();
       try {
-        // The deployment fact: the six gates run over the HONEST EMPTY
-        // environment (zero connected capability instances) and the
-        // compile may BLOCK typed (INV-7 — no observed funding
-        // source). The runtime's presentPreview returns the BLOCKED
-        // preview honestly (gates BLOCK with verbatim reasons,
-        // dispatchable false) — nothing is fabricated, and the typed
-        // block IS the surfaced outcome.
-        const preview = await runtime.presentPreview(
-          missionId,
-          createHonestEmptyGateEnvironment(deps.now()),
-        );
+        // The gate environment (P21-A, ADR-0014 D6): the injected
+        // composition seam builds the REAL bridge environment when the
+        // host composed the connection + probe planes (ACTIVE
+        // connections with confirmed probe evidence); otherwise the
+        // HONEST EMPTY environment is the deployment fact (zero
+        // connected capability instances) and the compile may BLOCK
+        // typed (INV-7 — no observed funding source). The runtime's
+        // presentPreview returns the BLOCKED preview honestly (gates
+        // BLOCK with verbatim reasons, dispatchable false) — nothing is
+        // fabricated, and the typed block IS the surfaced outcome.
+        const now = deps.now();
+        let env: PaymentGateEnvironment;
+        if (deps.gateEnvironmentOf !== undefined) {
+          const mission = await runtime.getMission(missionId);
+          const captured = mission?.fields.amountAndCurrency;
+          const missionAmount =
+            captured !== undefined && captured.status === "CAPTURED" ? captured.value : undefined;
+          env = await deps.gateEnvironmentOf({
+            now,
+            ...(missionAmount !== undefined ? { missionAmount } : {}),
+          });
+        } else {
+          env = createHonestEmptyGateEnvironment(now);
+        }
+        const preview = await runtime.presentPreview(missionId, env);
         const mission = await runtime.getMission(missionId);
         deps.log(
           "info",
-          `payswap-desktop: payment mission preview presented ${preview.previewId} over the honest empty gate environment (dispatchable=${String(preview.dispatchable)})`,
+          `payswap-desktop: payment mission preview presented ${preview.previewId} over the ${
+            deps.gateEnvironmentOf !== undefined ? "composed connection-bridge" : "honest empty"
+          } gate environment (dispatchable=${String(preview.dispatchable)})`,
         );
         return toPreviewDto(preview, mission?.planSelection);
       } catch (error) {

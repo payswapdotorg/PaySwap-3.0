@@ -111,8 +111,18 @@ describe("delegated money movement laws (P7-W2)", () => {
       "connectionRecordVerificationOutcome",
       "connectionRegistry",
       "connectionRevoke",
+      // (P21-A connection-ACTIVATION members — ADR-0014 D5: the
+      // Flutterwave/Paystack key-entry verbs ride the same ONE
+      // material-carrying seal path, and connectionRunVerificationProbe
+      // runs the REAL read-only probe HOST-SIDE inside the credential
+      // seal, recording the outcome through the authority's own
+      // recorder — the ONLY ACTIVE path. Never a money-movement verb;
+      // never a caller-asserted activation.)
+      "connectionRunVerificationProbe",
       "connectionSeedSetup",
       "connectionStatuses",
+      "connectionSubmitFlutterwaveSecretKey",
+      "connectionSubmitPaystackSecretKey",
       "connectionSubmitStripeRestrictedKey",
       "delegateMoneyMovement",
       "deploymentFacts",

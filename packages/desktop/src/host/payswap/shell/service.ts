@@ -49,6 +49,13 @@ import type {
 } from "../connections/contracts.js";
 import type { PaymentMissionRuntime } from "../payments/payment-mission-runtime.js";
 import type { DispatchLaneCandidateRecord } from "../payments/dispatch-lane-resolver.js";
+import type { ProbeEvidenceStore } from "../connections/probe-evidence.js";
+import type { HostFetch } from "../connections/host-https-transports.js";
+import { createConnectionProbeChannelMembers } from "../connections/probe-members.js";
+import {
+  DECLARED_STRIPE_TEST_CORRIDOR,
+  createGateEnvironmentFromConnections,
+} from "../connections/gate-environment.js";
 import {
   createPaymentMissionChannelMembers,
   createPaymentMissionRuntimeResolver,
@@ -87,6 +94,22 @@ export interface PaySwapDesktopServiceOptions {
    * pretending to be durable.
    */
   readonly connectionAuthority?: ConnectionSessionAuthority;
+  /**
+   * (P21-A, ADR-0014 D5) The connection-ACTIVATION plane deps: the
+   * probe-evidence ledger (composed with the authority at the node
+   * edge) + the REAL fetch binding the host-side probes and the
+   * execution kernel ride (the composition edge binds globalThis.fetch;
+   * tests inject deterministic fakes). When ABSENT, the two new
+   * key-entry members still ride the authority, but the verification-
+   * probe runner fails closed with the typed
+   * ConnectionPlaneNotConfiguredError — never a caller-asserted
+   * outcome, never an in-memory-only probe pretending to be real.
+   */
+  readonly connectionProbe?: {
+    readonly evidenceStore: ProbeEvidenceStore;
+    readonly fetchImpl: HostFetch;
+    readonly nowMs?: () => number;
+  };
   /**
    * (P17-A) The payment-mission runtime, composed at the composition
    * edge over the payments store directory (store → runtime →
@@ -173,6 +196,52 @@ export function createPaySwapDesktopService(
   const listLaneCandidateRecords = async (): Promise<readonly DispatchLaneCandidateRecord[]> => {
     return await resolveConnectionAuthority().connectionStatuses();
   };
+
+  // (P21-A, ADR-0014 D5) The connection-ACTIVATION members: the two new
+  // key-entry verbs ride the SAME authority resolver; the probe runner
+  // additionally requires the probe plane (the evidence ledger + the
+  // REAL fetch binding) and fails closed with the same typed error
+  // when it was not composed — the workspace-store posture.
+  const connectionProbe = options.connectionProbe;
+  function resolveProbeEvidenceStore(): ProbeEvidenceStore {
+    if (connectionProbe === undefined) {
+      throw new ConnectionPlaneNotConfiguredError();
+    }
+    return connectionProbe.evidenceStore;
+  }
+  const connectionProbeMembers =
+    connectionAuthority !== undefined && connectionProbe !== undefined
+      ? createConnectionProbeChannelMembers({
+          resolveAuthority: resolveConnectionAuthority,
+          resolveEvidenceStore: resolveProbeEvidenceStore,
+          fetchImpl: connectionProbe.fetchImpl,
+          nowMs: connectionProbe.nowMs ?? Date.now,
+          log: seamLog,
+        })
+      : {
+          async connectionSubmitFlutterwaveSecretKey(input: {
+            readonly connectionId: string;
+            readonly secretKey: string;
+          }): Promise<DesktopCredentialSealReceipt> {
+            return resolveConnectionAuthority().submitFlutterwaveSecretKey(input);
+          },
+          async connectionSubmitPaystackSecretKey(input: {
+            readonly connectionId: string;
+            readonly secretKey: string;
+          }): Promise<DesktopCredentialSealReceipt> {
+            return resolveConnectionAuthority().submitPaystackSecretKey(input);
+          },
+          async connectionRunVerificationProbe(providerId: string) {
+            // The probe runner is REAL or absent — never a caller-asserted
+            // outcome (resolveProbeEvidenceStore throws the typed error
+            // when the probe plane was not composed; the authority
+            // resolver likewise when the connection plane is absent).
+            resolveConnectionAuthority();
+            resolveProbeEvidenceStore();
+            void providerId;
+            throw new ConnectionPlaneNotConfiguredError();
+          },
+        };
 
   const service: IPaySwapDesktopService = {
     session,
@@ -299,13 +368,47 @@ export function createPaySwapDesktopService(
       return resolveConnectionAuthority().revokeConnection(connectionId);
     },
 
+    // (P21-A, ADR-0014 D5) The connection-ACTIVATION members — the
+    // Flutterwave/Paystack key-entry verbs + the host-side REAL probe
+    // runner (the caller-trust fix: the ONLY ACTIVE path stays a
+    // probe-CONFIRMED outcome recorded through the authority's own
+    // recorder; the outcome never echoes key material).
+    ...connectionProbeMembers,
+
     // (P17-A, ADR-0010 D2) The payment-mission plane — read/input
     // members over the composed runtime (instants are stamped at the
     // channel edge from the host clock, never renderer-supplied).
+    // (P21-A, ADR-0014 D6) When the connection plane + the probe plane
+    // are composed, the preview member's gate environment comes from
+    // the connection→capability bridge over the declared test corridor
+    // (the REAL environment when connections are ACTIVE with confirmed
+    // probe evidence; the honest-empty one otherwise — byte-identical).
     ...createPaymentMissionChannelMembers({
       resolveRuntime: resolvePaymentMissionRuntime,
       now: paymentMissionClock,
       log: seamLog,
+      ...(connectionAuthority !== undefined && connectionProbe !== undefined
+        ? {
+            gateEnvironmentOf: async (input: {
+              readonly now: string;
+              readonly missionAmount?: { readonly currency: string; readonly minorUnits: string };
+            }) => {
+              // The statuses + evidence read through the composed planes
+              // (fail-closed typed resolvers, never fabricated).
+              const [statuses, evidence] = await Promise.all([
+                resolveConnectionAuthority().connectionStatuses(),
+                resolveProbeEvidenceStore().latestProbeEvidence(),
+              ]);
+              return createGateEnvironmentFromConnections({
+                now: input.now,
+                statuses,
+                evidence,
+                declaredTestCorridor: DECLARED_STRIPE_TEST_CORRIDOR,
+                ...(input.missionAmount !== undefined ? { missionAmount: input.missionAmount } : {}),
+              });
+            },
+          }
+        : {}),
     }),
 
     // (P18-A, ADR-0011 D2) The approval members — the SAME resolver

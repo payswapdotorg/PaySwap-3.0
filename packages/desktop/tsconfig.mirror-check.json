@@ -15,13 +15,15 @@
     "types": ["node"],
     "paths": {
       "@payswap/app/routes": ["../payswap-app/src/routes.ts"],
-      "@payswap/app": ["../payswap-app/src/index.ts"]
+      "@payswap/app": ["../payswap-app/src/index.ts"],
+      "@payswap/trust": ["../trust/src/index.ts"]
     }
   },
   "include": [
     "src/host/payswap",
     "src/renderer/src/consoleWorkspaceMount.tsx",
     "src/renderer/src/consolePaymentMissionWire.ts",
+    "src/renderer/src/consoleConnectionsWire.ts",
     "src/renderer/src/paymentMissionsComposition.ts",
     "../payswap-app/src",
     "test/payswap/desktop-console-client.test.ts",
@@ -30,6 +32,11 @@
     "test/payswap/payment-missions-dispatch-binding.test.ts",
     "test/payswap/payment-missions-reconcile-binding.test.ts",
     "test/payswap/payment-dispatch-plane-fixtures.ts",
-    "test/payswap/payment-reconcile-plane-fixtures.ts"
+    "test/payswap/payment-reconcile-plane-fixtures.ts",
+    "test/payswap/p21-transport-probe-mirrors.test.ts",
+    "test/payswap/connections-bridge.test.ts",
+    "../capability/src",
+    "../provider-runtime/src",
+    "../trust/src"
   ]
 }

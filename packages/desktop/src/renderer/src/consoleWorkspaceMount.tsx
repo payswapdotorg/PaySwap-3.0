@@ -49,6 +49,10 @@ import type {
   PaySwapPaymentPreviewDto,
   PaySwapPaymentReconcileEvidenceDto,
 } from "./consolePaymentMissionWire.js";
+import type {
+  PaySwapConnectionProbeOutcomeDto,
+  PaySwapCredentialSealReceiptDto,
+} from "./consoleConnectionsWire.js";
 
 // The payment-mission wire types (the pinned host DTO mirrors, split to
 // ./consolePaymentMissionWire.ts at P18-A) — re-exported so the module's
@@ -84,6 +88,14 @@ export type {
   PaySwapPaymentReconcileInputDto,
   PaySwapPaymentMissionReconciliationOutcomeDto,
 } from "./consolePaymentMissionWire.js";
+export type {
+  PaySwapProbeProviderId,
+  PaySwapConnectionProbeOutcome,
+  PaySwapConnectionProbeEvidenceTier,
+  PaySwapCredentialSealReceiptDto,
+  PaySwapConnectionProbeResultDto,
+  PaySwapConnectionProbeOutcomeDto,
+} from "./consoleConnectionsWire.js";
 
 // ---------------------------------------------------------------------------
 // The re-declared client descriptor (renderer-reachable; drift-tested)
@@ -120,7 +132,11 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   "workspaceStoreHealth",
   // P13-B connection-plane members (registry/records/setup-seed/key
   // seal/probe-evidence/callback-consume/revocation — connection
-  // orchestration only, never money movement).
+  // orchestration only, never money movement) + the P21-A
+  // connection-ACTIVATION members (the Flutterwave/Paystack key-entry
+  // verbs + the host-side REAL verification-probe runner — ADR-0014
+  // D5: the ONLY ACTIVE path stays a probe-CONFIRMED outcome recorded
+  // through the authority's own recorder).
   "connectionRegistry",
   "connectionStatuses",
   "connectionSeedSetup",
@@ -128,6 +144,9 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   "connectionRecordVerificationOutcome",
   "connectionConsumeProviderCallback",
   "connectionRevoke",
+  "connectionSubmitFlutterwaveSecretKey",
+  "connectionSubmitPaystackSecretKey",
+  "connectionRunVerificationProbe",
   // P17-A payment-mission members (read/input verbs only — board /
   // detail / seed / ask-next-field / capture / preview-present /
   // plan-selection-record).
@@ -298,6 +317,33 @@ export interface IPaySwapDesktopClientService {
     attemptId: string,
     evidence: PaySwapPaymentReconcileEvidenceDto,
   ): Promise<PaySwapPaymentMissionReconciliationOutcomeDto>;
+  /**
+   * (P21-A, ADR-0014 D5) The Flutterwave key-entry verb — the same ONE
+   * material-carrying path as the Stripe member: the key crosses
+   * renderer→host ONCE and is sealed immediately (PENDING_VERIFICATION;
+   * LIVE keys refused, INV-25); the receipt carries counts and the
+   * opaque handle ref, never the key.
+   */
+  connectionSubmitFlutterwaveSecretKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<PaySwapCredentialSealReceiptDto>;
+  /**
+   * (P21-A, ADR-0014 D5) The Paystack key-entry verb — the same seal law.
+   */
+  connectionSubmitPaystackSecretKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<PaySwapCredentialSealReceiptDto>;
+  /**
+   * (P21-A, ADR-0014 D5 — THE CALLER-TRUST FIX) Run the REAL
+   * verification probe HOST-SIDE inside the credential seal over the
+   * real HTTPS transport; the outcome is recorded through the
+   * authority's own recorder (the ONLY ACTIVE path stays
+   * probe-CONFIRMED) and the answer is secret-free: provider, probed
+   * operation, per-connection results and the honest scope note.
+   */
+  connectionRunVerificationProbe(providerId: string): Promise<PaySwapConnectionProbeOutcomeDto>;
 }
 
 /** What the renderer needs from its service connection for the console. */

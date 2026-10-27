@@ -265,6 +265,40 @@ export interface IPaySwapDesktopService extends IPaySwapDesktopPaymentMissionMem
     readonly evidenceSummary: string;
   }): Promise<import("../connections/contracts.js").DesktopConnectionStatusView>;
 
+  /**
+   * (P21-A, ADR-0014 D5) The Flutterwave key-entry verb — the same ONE
+   * material-carrying path as the Stripe member (sealed immediately;
+   * PENDING_VERIFICATION; LIVE keys refused, INV-25). Never called by
+   * the composer/agent plane — the chat law.
+   */
+  connectionSubmitFlutterwaveSecretKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<import("../connections/contracts.js").DesktopCredentialSealReceipt>;
+
+  /**
+   * (P21-A, ADR-0014 D5) The Paystack key-entry verb — the same seal
+   * law (sk_test_ only; LIVE keys refused, INV-25).
+   */
+  connectionSubmitPaystackSecretKey(input: {
+    readonly connectionId: string;
+    readonly secretKey: string;
+  }): Promise<import("../connections/contracts.js").DesktopCredentialSealReceipt>;
+
+  /**
+   * (P21-A, ADR-0014 D5 — THE CALLER-TRUST FIX) Run the REAL
+   * verification probe HOST-SIDE inside the credential seal over the
+   * real HTTPS transport, and record the outcome through the
+   * authority's own recordVerificationOutcome (the ONLY ACTIVE path
+   * stays probe-CONFIRMED). The outcome is secret-free: provider,
+   * probed operation, per-connection results and the honest scope note
+   * (a Flutterwave probe proves read-only balance access — never send
+   * capability; a Stripe probe proves balance + account read).
+   */
+  connectionRunVerificationProbe(
+    providerId: string,
+  ): Promise<import("../connections/probe-contracts.js").ConnectionProbeOutcomeDto>;
+
   /** Validate + consume a provider deep-link return (D3: single-use, 10-minute states). */
   connectionConsumeProviderCallback(input: {
     readonly state: string;

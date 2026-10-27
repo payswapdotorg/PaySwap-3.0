@@ -35,6 +35,58 @@ export type { PaySwapDesktopServiceOptions } from "./service.js";
 export { ConnectionPlaneNotConfiguredError, PaymentPlaneNotConfiguredError } from "./service.js";
 export { createPaymentMissionChannelMembers } from "./payment-mission-members.js";
 export type { PaymentMissionChannelDeps, PaymentMissionChannelMemberSurface } from "./payment-mission-members.js";
+// (P21-A, ADR-0014 D5) The connection-ACTIVATION members (the
+// Flutterwave/Paystack key-entry verbs + the host-side REAL probe
+// runner) + the probe DTO/vocabulary surface.
+export { createConnectionProbeChannelMembers } from "../connections/probe-members.js";
+export type { ConnectionProbeChannelDeps } from "../connections/probe-members.js";
+export {
+  PAYSWAP_PROBE_PROVIDER_IDS,
+  CONNECTION_PROBE_OUTCOME_KINDS,
+  CONNECTION_PROBE_EVIDENCE_TIERS,
+  CONNECTION_PROBE_KEY_CLASSES,
+  CONNECTION_PROBE_OPERATIONS,
+  CONNECTION_PROBE_HONEST_NOTES,
+  type PaySwapProbeProviderId,
+  type ConnectionProbeOutcomeKind,
+  type ConnectionProbeEvidenceTier,
+  type ConnectionProbeKeyClass,
+  type ConnectionProbeResultDto,
+  type ConnectionProbeOutcomeDto,
+} from "../connections/probe-contracts.js";
+export { openProbeEvidenceStore } from "../connections/probe-evidence.js";
+export type { ProbeEvidenceRecord, ProbeEvidenceInput, ProbeEvidenceStore } from "../connections/probe-evidence.js";
+// (P21-A, ADR-0014 D6/D8) The connection→capability bridge + the
+// gate-environment composition seam + the lane-aware REAL kernel
+// composition.
+export {
+  BRIDGE_PROVIDER_OBSERVATION_TIER,
+  BRIDGE_READ_ONLY_OPERATION_CLASSES,
+  BRIDGE_STRIPE_SANDBOX_EXECUTION_OPERATION_CLASSES,
+  BRIDGE_OBSERVATION_FRESHNESS_POLICY,
+  deriveConnectionCapabilityBridge,
+  type BridgeConnectedInstance,
+  type BridgeCapabilityObservation,
+  type BridgeDerivation,
+} from "../connections/capability-bridge.js";
+export {
+  DECLARED_STRIPE_TEST_CORRIDOR,
+  createGateEnvironmentFromConnections,
+  type DeclaredTestCorridorInput,
+} from "../connections/gate-environment.js";
+export {
+  createLaneAwareStripeExecutionAuthority,
+  LANE_NOT_WIRED_REASON_PREFIX,
+  type LaneAwareStripeExecutionAuthorityOptions,
+  type LaneAwareConnectionSeam,
+} from "../payments/execution-lane-composition.js";
+// (P21-A, ADR-0014 D6) The labeled TEST_DATA merchant directory.
+export {
+  MERCHANT_DIRECTORY_EVIDENCE_TIER,
+  listMerchantDirectoryEntries,
+  findMerchantDirectoryEntry,
+  type MerchantDirectoryEntry,
+} from "../payments/merchant-directory.js";
 // (P18-A, ADR-0011 D2/D3) The approval members + the attempt-state projection.
 export { createPaymentApprovalChannelMembers, projectAttemptStates } from "./approval-members.js";
 // (P19-A, ADR-0012 D1/D2) The dispatch members (the armed-effect read + the lane-choice act).

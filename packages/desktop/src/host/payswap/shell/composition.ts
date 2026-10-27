@@ -40,6 +40,9 @@ import {
   type PaymentMissionRuntime,
 } from "../payments/payment-mission-runtime.js";
 import { createUnwiredExecutionAuthority } from "../payments/execution-authority.js";
+import { createLaneAwareStripeExecutionAuthority } from "../payments/execution-lane-composition.js";
+import type { ConnectionSessionAuthority } from "../connections/session-authority.js";
+import type { HostFetch } from "../connections/host-https-transports.js";
 
 /**
  * The node:fs binding for the DESKTOP_PROFILE workspace store snapshot,
@@ -82,16 +85,27 @@ export function derivePaymentsStoreDirectory(workspaceStoreDirectory: string): s
  * precedent, scripts/p14/a1-stripe-execution-real-flow-e2e.ts:135-157):
  * open the durable store over the injected node:fs under the seam's
  * payments directory, compose the runtime with the HONEST UNWIRED
- * execution authority (the deployment fact — the real kernel is a TL
- * integration), and run recoverInterruptions ONCE at composition,
- * before any channel member can dispatch. Returns undefined when the
- * seam carries no payments directory (the runtime stays un-injected
- * and the channel members fail closed with the typed error — the
- * workspace-store posture).
+ * execution authority (the deployment fact) — or, since P21-A
+ * (ADR-0014 D8), with the LANE-AWARE authority when the connection
+ * plane + a fetch binding were composed: the REAL Stripe kernel then
+ * composes ONLY behind an ACTIVE SANDBOX Stripe connection (the grant
+ * law stays enforced inside the credential seal on every dispatch);
+ * every other lane keeps the honest NO_AUTHORITY_WIRED refusal — and
+ * run recoverInterruptions ONCE at composition, before any channel
+ * member can dispatch. Returns undefined when the seam carries no
+ * payments directory (the runtime stays un-injected and the channel
+ * members fail closed with the typed error — the workspace-store
+ * posture).
  */
 export async function composePaymentMissionRuntime(
   seam: PaySwapDesktopHostSeam,
   log: (level: "info" | "warn" | "error", message: string) => void,
+  options?: {
+    /** (P21-A) The composed connection session authority (the kernel's seal seam). */
+    readonly connectionAuthority?: ConnectionSessionAuthority;
+    /** (P21-A) The REAL fetch binding the kernel transport rides. */
+    readonly fetchImpl?: HostFetch;
+  },
 ): Promise<PaymentMissionRuntime | undefined> {
   const directory = seam.paymentsStoreDirectory?.trim();
   if (directory === undefined || directory.length === 0) {
@@ -102,11 +116,25 @@ export async function composePaymentMissionRuntime(
     fileSystem: PAYMENTS_STORE_NODE_FILE_SYSTEM,
     directory,
   });
+  // (P21-A, ADR-0014 D8) The lane-aware composition seam: with the
+  // connection plane + a fetch binding, the REAL Stripe kernel
+  // composes behind the lane eligibility law (ACTIVE SANDBOX stripe
+  // only; the grant inside the seal). Without either, the honest
+  // UNWIRED authority remains the composition — byte-identical to the
+  // pre-P21 truth.
+  const laneAware =
+    options?.connectionAuthority !== undefined && options?.fetchImpl !== undefined;
   const runtime = createPaymentMissionRuntime({
     store,
-    // The honest unwired default: every dispatch fails closed, typed
-    // (NO_AUTHORITY_WIRED) — nothing simulates an execution.
-    executionAuthority: createUnwiredExecutionAuthority(),
+    executionAuthority: laneAware
+      ? createLaneAwareStripeExecutionAuthority({
+          connectionAuthority: options!.connectionAuthority!,
+          fetchImpl: options!.fetchImpl!,
+          log,
+        })
+      : // The honest unwired default: every dispatch fails closed, typed
+        // (NO_AUTHORITY_WIRED) — nothing simulates an execution.
+        createUnwiredExecutionAuthority(),
     // The trust plane owns identity; this deployment's host process
     // serves the single local user (the composition edge supplies it).
     principalRef: "principal:payswap-desktop-local",
@@ -115,7 +143,12 @@ export async function composePaymentMissionRuntime(
   // ONCE at composition: the honest restart sweep over any write-ahead
   // left interrupted by a previous process (a no-op is truthful here).
   await runtime.dispatch.recoverInterruptions(new Date().toISOString());
-  log("info", `payswap-desktop: payment-mission runtime composed (directory ${directory})`);
+  log(
+    "info",
+    `payswap-desktop: payment-mission runtime composed (directory ${directory}, execution authority ${
+      laneAware ? "lane-aware REAL stripe kernel (SANDBOX only)" : "unwired (NO_AUTHORITY_WIRED)"
+    })`,
+  );
   return runtime;
 }
 
@@ -156,9 +189,24 @@ export async function registerPaySwapDesktopService(
     seam.storeDirectory !== undefined && options.workspaceStoreFileSystem === undefined
       ? { ...options, workspaceStoreFileSystem: WORKSPACE_STORE_NODE_FILE_SYSTEM }
       : options;
-  const paymentMissionRuntime = await composePaymentMissionRuntime(seam, (level, message) => {
-    seam.log(level, message);
-  });
+  const paymentMissionRuntime = await composePaymentMissionRuntime(
+    seam,
+    (level, message) => {
+      seam.log(level, message);
+    },
+    // (P21-A, ADR-0014 D8) Forward the connection plane + the REAL
+    // fetch binding so the composition can wire the lane-aware REAL
+    // kernel (ACTIVE SANDBOX stripe lanes only; the unwired authority
+    // stays the answer for everything else).
+    {
+      ...(options.connectionAuthority !== undefined
+        ? { connectionAuthority: options.connectionAuthority }
+        : {}),
+      ...(options.connectionProbe?.fetchImpl !== undefined
+        ? { fetchImpl: options.connectionProbe.fetchImpl }
+        : {}),
+    },
+  );
   const service = createPaySwapDesktopService(
     seam,
     paymentMissionRuntime === undefined
