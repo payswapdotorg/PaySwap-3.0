@@ -1,6 +1,6 @@
 {
   "harness": "p21-a-rail-evidence-real-flow-e2e",
-  "ranAt": "2026-10-27T09:12:34.003Z",
+  "ranAt": "2026-10-27T16:20:12.070Z",
   "connectionActivation": [
     {
       "providerId": "flutterwave",
@@ -28,7 +28,7 @@
         },
         "structured-evidence-landed": {
           "held": true,
-          "detail": "observationVersion 1; observedAt 2026-10-27T09:12:36.455Z; keyClass READ_ONLY_TEST"
+          "detail": "observationVersion 1; observedAt 2026-10-27T16:20:20.282Z; keyClass READ_ONLY_TEST"
         }
       },
       "probe": {
@@ -41,38 +41,38 @@
           "USD",
           "EUR",
           "ZAR",
-          "GBP",
-          "TZS",
-          "UGX",
-          "MZN",
-          "RWF",
-          "ZMW",
-          "INR",
-          "XOF",
-          "MUR",
-          "ETB",
-          "JPY",
+          "BRL",
+          "eNGN",
+          "MWK",
+          "EGP",
+          "AED",
           "MAD",
           "XAF",
           "AUD",
           "CAD",
           "MYR",
           "CNY",
-          "BRL",
-          "eNGN",
-          "MWK",
-          "EGP",
-          "AED",
+          "ZMW",
+          "INR",
+          "XOF",
+          "MUR",
+          "ETB",
+          "JPY",
+          "GBP",
+          "TZS",
+          "UGX",
+          "MZN",
+          "RWF",
           "USDC",
           "USDT",
           "RLUSD"
         ],
         "transport": "REAL HTTPS (the host transport over globalThis.fetch)",
-        "latencyMs": 2447,
+        "latencyMs": 8207,
         "note": "A Flutterwave probe proves read-only balance access on the connected test account — never a send capability. No Flutterwave send or transfer operation exists in this deployment, so this evidence cannot make any outgoing payment eligible."
       },
       "connection": {
-        "connectionId": "conn:cffcbbe1-4566-4033-8b2f-e5cc07653ab6",
+        "connectionId": "conn:21f52ad5-6808-4d89-b2ee-d7730f1e70a7",
         "state": "ACTIVE",
         "executionMode": "SANDBOX"
       }
@@ -103,7 +103,7 @@
         },
         "structured-evidence-landed": {
           "held": true,
-          "detail": "observationVersion 1; observedAt 2026-10-27T09:12:37.262Z; keyClass FULL_TEST"
+          "detail": "observationVersion 1; observedAt 2026-10-27T16:20:21.167Z; keyClass FULL_TEST"
         }
       },
       "probe": {
@@ -114,11 +114,11 @@
           "balance"
         ],
         "transport": "REAL HTTPS (the host transport over globalThis.fetch)",
-        "latencyMs": 804,
+        "latencyMs": 881,
         "note": "A Stripe probe proves balance and account read access on the connected test account — nothing more. Merchant acceptance facts come only from the merchant directory (labeled test data), never from this probe."
       },
       "connection": {
-        "connectionId": "conn:56bac43b-fae7-4467-bcb1-556964f4537a",
+        "connectionId": "conn:af02c964-54b9-4bed-8ac6-36c64c636ee5",
         "state": "ACTIVE",
         "executionMode": "SANDBOX"
       }
@@ -149,7 +149,7 @@
         },
         "structured-evidence-landed": {
           "held": true,
-          "detail": "observationVersion 1; observedAt 2026-10-27T09:12:37.698Z; keyClass READ_ONLY_TEST"
+          "detail": "observationVersion 1; observedAt 2026-10-27T16:20:21.969Z; keyClass READ_ONLY_TEST"
         }
       },
       "probe": {
@@ -164,11 +164,11 @@
           "txn_6424817922"
         ],
         "transport": "REAL HTTPS (the host transport over globalThis.fetch)",
-        "latencyMs": 433,
+        "latencyMs": 801,
         "note": "A Paystack probe proves read-only transaction-list access on the connected test account — never a send capability. No Paystack send or transfer operation exists in this deployment."
       },
       "connection": {
-        "connectionId": "conn:165a2ada-e120-417f-b12a-f2bec081950e",
+        "connectionId": "conn:64c35bf8-f1fd-4aaf-ab1b-7f86c16ee885",
         "state": "ACTIVE",
         "executionMode": "SANDBOX"
       }
@@ -190,7 +190,7 @@
     "gates": {
       "bridge-derives-stripe-instance": {
         "held": true,
-        "detail": "instance instance:conn:9f9e3555-258a-4fe3-a07f-95daa3482d5a; tier PROVIDER_OBSERVATION; accountRef acct_1FPs7UAkPdhgtN6I"
+        "detail": "instance instance:conn:bbbeeaa9-37e8-4e82-add9-8e48ff0b45fe; tier PROVIDER_OBSERVATION; accountRef acct_1FPs7UAkPdhgtN6I"
       },
       "environment-composes-both-tiers": {
         "held": true,
@@ -202,7 +202,7 @@
       },
       "real-kernel-confirmed": {
         "held": true,
-        "detail": "envelope CONFIRMED; providerReferences pi_3UV6QsAkPdhgtN6I0STd21TC/succeeded"
+        "detail": "envelope CONFIRMED; providerReferences pi_3UVD6oAkPdhgtN6I1Rg4EVOv/succeeded"
       },
       "mission-completed": {
         "held": true,
@@ -215,7 +215,7 @@
     },
     "ran": true,
     "mission": {
-      "missionId": "task:PAYMENT_MISSION:d5739741521e973c7295d5b3387dcd1f",
+      "missionId": "task:PAYMENT_MISSION:4b68381732e9fed7ac2a96080c955362",
       "finalStatus": "COMPLETED",
       "authorizationOrigin": "PREVIEW_UI_ACT",
       "attemptCount": 1
@@ -223,20 +223,20 @@
     "dispatch": {
       "outcome": "CONFIRMED",
       "providerReferences": [
-        "pi_3UV6QsAkPdhgtN6I0STd21TC",
+        "pi_3UVD6oAkPdhgtN6I1Rg4EVOv",
         "succeeded"
       ],
-      "paymentIntentId": "pi_3UV6QsAkPdhgtN6I0STd21TC",
+      "paymentIntentId": "pi_3UVD6oAkPdhgtN6I1Rg4EVOv",
       "paymentIntentStatus": "succeeded",
-      "dispatchLatencyMs": 1270,
-      "envelopeDispatchedAt": 1793092358811,
-      "envelopeCompletedAt": 1793092359623
+      "dispatchLatencyMs": 1331,
+      "envelopeDispatchedAt": 1793118023094,
+      "envelopeCompletedAt": 1793118023989
     },
     "readBack": {
       "operation": "stripe.payment_intent.retrieve",
       "status": "succeeded",
       "providerReferences": [
-        "pi_3UV6QsAkPdhgtN6I0STd21TC",
+        "pi_3UVD6oAkPdhgtN6I1Rg4EVOv",
         "succeeded"
       ]
     },
@@ -245,7 +245,7 @@
       "resolvedTo": "CONFIRMED",
       "source": "EXTERNAL_PROVIDER_RETRIEVAL",
       "evidenceRefs": [
-        "pi_3UV6QsAkPdhgtN6I0STd21TC",
+        "pi_3UVD6oAkPdhgtN6I1Rg4EVOv",
         "succeeded"
       ]
     }
