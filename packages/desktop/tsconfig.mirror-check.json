@@ -28,6 +28,8 @@
     "test/payswap/payment-approval-plane-harness.ts",
     "test/payswap/payment-missions-binding.test.ts",
     "test/payswap/payment-missions-dispatch-binding.test.ts",
-    "test/payswap/payment-dispatch-plane-fixtures.ts"
+    "test/payswap/payment-missions-reconcile-binding.test.ts",
+    "test/payswap/payment-dispatch-plane-fixtures.ts",
+    "test/payswap/payment-reconcile-plane-fixtures.ts"
   ]
 }

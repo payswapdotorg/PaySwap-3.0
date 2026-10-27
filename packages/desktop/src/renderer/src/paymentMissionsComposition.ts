@@ -1,9 +1,11 @@
 /**
- * PaySwap Desktop renderer (P18-C, ADR-0011 D1) — the payment-missions
- * composition root: binds the payswap-desktop channel's mission-plane
- * members (the P17-A read/input members + the P18-A edge-pinned approval
- * members) into the app's pinned PaymentMissionsPort, at the desktop
- * renderer's business-root initialization.
+ * PaySwap Desktop renderer (P18-C, ADR-0011 D1; grown P19-C + P20-C) — the
+ * payment-missions composition root: binds the payswap-desktop
+ * channel's mission-plane members (the P17-A read/input members + the
+ * P18-A edge-pinned approval members + the P19-A dispatch members +
+ * the P20-A reconciliation members) into the app's pinned
+ * PaymentMissionsPort, at the desktop renderer's business-root
+ * initialization.
  *
  * THE WIRING (ADR-0011 D1/D2):
  * - The port: channelPaymentMissionsPort adapts the channel client to
@@ -17,7 +19,11 @@
  * - THE ORIGIN LAW (ADR-0011 D2) is preserved by the channel members
  *   themselves: the renderer supplies ONLY requestId + APPROVE|DECLINE;
  *   the origin (PREVIEW_UI_ACT) and the principal are pinned HOST-SIDE
- *   at the channel edge. This adapter never touches an origin.
+ *   at the channel edge. This adapter never touches an origin. The
+ *   P20-A reconciliation members carry the same discipline
+ *   (ADR-0013 D1): the renderer supplies ONLY the attemptId + the
+ *   transcribed evidence; the origin (OPERATOR_EVIDENCE_ACT) and the
+ *   principal stay pinned host-side at the channel edge.
  * - HONEST FAILURE: if the composition cannot bind (the channel is
  *   absent), the seam stays at its honest default — the missions
  *   surface renders the not-wired note; nothing is masked.
@@ -33,8 +39,8 @@ import {
   PaymentMissionsPlaneNotConfiguredError,
   resetSharedPaymentMissionsPort,
   type PaymentMissionsApprovalResolution,
-  type PaymentMissionsPort,
   type PaymentMissionsPortWithDispatch,
+  type PaymentMissionsPortWithReconciliation,
 } from "@payswap/app";
 import type { DesktopConsoleChannelServices } from "./consoleWorkspaceMount.js";
 import type {
@@ -44,7 +50,10 @@ import type {
   PaySwapPaymentMissionArmedEffectDto,
   PaySwapPaymentMissionBoardItemDto,
   PaySwapPaymentMissionDetailDto,
+  PaySwapPaymentMissionPendingReconciliationDto,
+  PaySwapPaymentMissionReconciliationOutcomeDto,
   PaySwapPaymentPreviewDto,
+  PaySwapPaymentReconcileEvidenceDto,
 } from "./consolePaymentMissionWire.js";
 
 /* ------------- the channel client surface this composition rides ------------- */
@@ -75,6 +84,14 @@ export interface MissionPlaneApprovalChannelClient {
     missionId: string,
     connectionRef: string,
   ): Promise<PaySwapPaymentDispatchOutcomeDto>;
+  paymentMissionPendingReconciliation(
+    missionId: string,
+  ): Promise<PaySwapPaymentMissionPendingReconciliationDto>;
+  paymentMissionReconcile(
+    missionId: string,
+    attemptId: string,
+    evidence: PaySwapPaymentReconcileEvidenceDto,
+  ): Promise<PaySwapPaymentMissionReconciliationOutcomeDto>;
 }
 
 /** The wire shapes are the pin shapes structurally (the mirror pins both sides). */
@@ -107,6 +124,14 @@ function isHostPlaneNotConfigured(thrown: unknown): boolean {
 }
 
 /**
+ * The composed channel-backed port: the dispatch-capable AND
+ * reconciliation-capable port (the app's two composed interfaces,
+ * intersected — both structural guards pass over the same object).
+ */
+type ChannelPaymentMissionsPort = PaymentMissionsPortWithDispatch &
+  PaymentMissionsPortWithReconciliation;
+
+/**
  * Adapt the channel services (the payswap-desktop proxy) to the pinned
  * PaymentMissionsPort. Every member's rejection path maps the host's
  * typed plane-not-configured error onto the app's typed class; every
@@ -114,7 +139,7 @@ function isHostPlaneNotConfigured(thrown: unknown): boolean {
  */
 export function channelPaymentMissionsPort(
   services: DesktopConsoleChannelServices,
-): PaymentMissionsPortWithDispatch {
+): ChannelPaymentMissionsPort {
   const client = services.payswapDesktopService as unknown as MissionPlaneApprovalChannelClient;
   const guard = async <T>(call: () => Promise<T>): Promise<T> => {
     try {
@@ -141,14 +166,18 @@ export function channelPaymentMissionsPort(
     armedEffect: (missionId) => guard(() => client.paymentMissionArmedEffect(missionId)),
     dispatch: (missionId, connectionRef) =>
       guard(() => client.paymentMissionDispatch(missionId, connectionRef)),
+    pendingReconciliation: (missionId) =>
+      guard(() => client.paymentMissionPendingReconciliation(missionId)),
+    reconcile: (missionId, attemptId, evidence) =>
+      guard(() => client.paymentMissionReconcile(missionId, attemptId, evidence)),
   };
 }
 
 /* ------------------------------ the composition ------------------------------ */
 
-/** The composed binding handle (the dispatch-capable port + the reset for the bridge-tier battery). */
+/** The composed binding handle (the dispatch + reconciliation-capable port + the reset for the bridge-tier battery). */
 export interface PaymentMissionsComposition {
-  readonly port: PaymentMissionsPortWithDispatch;
+  readonly port: ChannelPaymentMissionsPort;
   /** Restore the seam's honest default (unbound — the not-wired note). */
   readonly reset: () => void;
 }
@@ -162,7 +191,7 @@ export interface PaymentMissionsComposition {
  */
 export function composePaymentMissionsBinding(options: {
   readonly services?: DesktopConsoleChannelServices;
-  readonly port?: PaymentMissionsPortWithDispatch;
+  readonly port?: ChannelPaymentMissionsPort;
 }): PaymentMissionsComposition {
   const port =
     options.port ?? (options.services !== undefined ? channelPaymentMissionsPort(options.services) : null);
