@@ -16,7 +16,10 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [],
+  "frontier": [
+    "P20-A",
+    "P20-B"
+  ],
   "active_work_orders": [],
   "completed_work_orders": [
     {
@@ -1326,7 +1329,19 @@
       "actor": "resident-TL",
       "action": "P19_CLOSED",
       "detail": "The dispatch act surface is REAL at the CONTRACT+BRIDGE tier — the authority chain's surface is complete end-to-end (seed → intake → gates → preview → plan selection → the two-act approval → the armed card → the lane choice → the dispatch → the attempt states). Commits a013e8e (P19-0) + 7e79167 (P19-A: the gate's mission-scoped armed lookup + the SANDBOX-only lane resolver + the two dispatch members [the artifact never crossing, not even as an input; the eligible set recomputed host-side at act time] — 12 laws) + d493503 (P19-B: the armed card + the two-act dispatch flow in the detail view — 12 laws incl. the call-order law and the scan-clean law; the P18-B worker's transport timed out, the work verified directly per the 137-D1 precedent with ONE test-expectation fix: the typed-failure line asserts mid-journey because success clears it) + 6d508e2 (P19-C: the composition growth + the bridge battery 5 laws over the REAL channel). Integrated batteries green at the tip: desktop 29f/281t, app 41f/443t, route-planning 209, lab 169, opportunities 250, capability 230, route-compiler 353, economic 105, protocol 279, surface 224 (2,543 tests); architecture-check 0/0/0. PUSHED to GitHub. Carry-forward: the provider execution lanes + the reconcile-with-evidence member; live-provider route evidence; the store reconciliation question."
+    },
+    {
+      "ts": "2026-10-27T06:10:00Z",
+      "actor": "resident-TL",
+      "action": "STATION_RESET_4_RECOVERED",
+      "detail": "The fourth station reset destroyed /home/z/payswap-3.0-repo. Recovery: the full-history backup bundle (backups/payswap-3.0-at-P16-0.bundle, base 8db3ff7) + the six incremental bundles (p16-rebuild-COMPLETE..p19-COMPLETE) → CHAIN VERIFIED (8db3ff7 ⊂ 1a04a37 ⊂ 46cb885 ⊂ 69bd73c ⊂ 43d6068 ⊂ a013e8e ⊂ 72a6dd7) → main restored at 72a6dd7 clean. pnpm 10.33.2 via corepack (user-writable shims); install --frozen-lockfile green; project references rebuilt via tsc -b. Baseline batteries EXACT-MATCH the P19-D closure: desktop 29f/281t, app 41f/443t, route-planning 209, lab 169, opportunities 250, capability 230, route-compiler 353, economic 105, protocol 279, surface 224 (2,543 tests); architecture-check 0/0/0; the three scoped tsc gates 0; lint 0 errors. CORRECTION to the recovery forensics: the payswap remote is github.com/payswapdotorg/PaySwap-3.0 (NOT replay2 — that is the console session's separate repo; there is NO flip war: PaySwap-3.0 main is exactly at 72a6dd7, local == origin, normal fast-forward pushes resume). Station console courtesy: the my-project dev server was hard-broken by an untracked P15-era route.ts leftover (my own) conflicting with the console lineage's tracked page.tsx — moved to backups/, GET / → 200 restored."
+    },
+    {
+      "ts": "2026-10-27T06:30:00Z",
+      "actor": "resident-TL",
+      "action": "P20_REGISTERED",
+      "detail": "P20 REGISTERED from the P19 closure carry-forward: the reconcile-with-evidence surface (closing an UNKNOWN). P20-0 accepted: the gap matrix (22 source-backed rows at 72a6dd7, two Explore survey lanes) + ADR-0013 (D1 the two members — paymentMissionPendingReconciliation [the pending card read] + paymentMissionReconcile [the evidence-submission act] — with the runtime verb the ONLY closer; D2 the courier-not-source vocabulary law; D3 the same-rule pending derivation; D4 the file-disjoint lanes with the runtime/gate/registrar UNTOUCHED; D5 web unbound; D6 the automatic evidence feeds stay carried) + the canonical orders + the machine graph. Frontier = [P20-A, P20-B] (file-disjoint); P20-C/P20-D TL-owned."
     }
   ],
-  "last_tl_action_at": "2026-10-26T23:10:00Z"
+  "last_tl_action_at": "2026-10-27T06:30:00Z"
 }

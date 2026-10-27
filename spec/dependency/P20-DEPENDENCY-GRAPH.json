@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "wave": "P20",
+  "title": "The reconcile-with-evidence surface (closing an UNKNOWN)",
+  "source": "The P19 closure carry-forward (spec/dependency/P19-DEPENDENCY-GRAPH.json closure.carry_forward item 2); ADR-0013 (the decision record)",
+  "registration_commit_base": "72a6dd7",
+  "policy": "Register only. No P20 implementation or acceptance is claimed by the graph. The reconcile act crosses the channel ONLY as an evidence submission over the host-recomputed pending set (ADR-0013 D1): the runtime verb stays the ONLY closer (no parallel engine); the pending derivation rides the runtime's own attemptIsUnresolved rule (D3); the source vocabulary stays the frozen two-kind set — the operator is the courier, not the source (D2); the evidence refs never echo as wire structure; the act's actor is pinned at the channel edge (OPERATOR_EVIDENCE_ACT / principal:operator); the runtime (627, the deliberate exception), the gate, mission-execution and the idempotency registrar are UNTOUCHED; the honest empty environment is the presented truth (nothing pending reconciliation on a healthy mission — the designed empty state); the golden path is fixture-proven only (the labeled test-tier fixtures + the scripted answering authority); web stays unbound (ADR-0010 D7); the §5 store stays disjoint (ADR-0011 D6).",
+  "work_orders": [
+    {
+      "id": "P20-0",
+      "owner": "TL",
+      "status": "COMPLETE",
+      "depends_on": [],
+      "lane_scope": "Source-backed gap matrix (spec/productization/P20-0-GAP-MATRIX-2026-10-27.md — 22 rows verified at 72a6dd7 by two Explore survey lanes) + ADR-0013 (D1 the two members with the runtime verb the only closer; D2 the courier-not-source vocabulary law; D3 the same-rule pending derivation; D4 the file-disjoint lanes; D5 web unbound; D6 the automatic feeds stay carried) + the canonical work orders + this graph + the current-state registration. Ordering decision recorded: the reconcile surface composes directly on P19's dispatch members and the P18 attempt projection; the provider execution lanes and live-provider evidence stay carried (credentials destroyed); the §5 store question and the protocol-plane bridge stay named questions."
+    },
+    {
+      "id": "P20-A",
+      "owner": "worker",
+      "status": "PENDING",
+      "depends_on": [
+        "P20-0"
+      ],
+      "lane_scope": "Host lane: NEW shell/reconcile-contracts.ts + NEW shell/reconcile-members.ts (the pending READ + the evidence-submission ACT with the act-time pending-set recomputation, the edge evidence validation, the origin/principal pin, the typed refusals BEFORE any runtime call) + the payment-mission-contracts interface growth + the service spread + the shell index exports + the renderer mirror growth + the census/drift updates (the never-crosses list grows 'reconcile') + the host battery + the fixtures growth. UNTOUCHED: payment-dispatch-runtime.ts, authorization-gate.ts, mission-execution.ts, idempotency.ts."
+    },
+    {
+      "id": "P20-B",
+      "owner": "worker",
+      "status": "PENDING",
+      "depends_on": [
+        "P20-0"
+      ],
+      "lane_scope": "App lane: the NEW pins file (paymentMissionsReconcilePins.ts — the 400-line law forces the split) + PaymentMissionsReconcileCard.tsx (the two-act evidence entry: direction + source + refs, disabled-until-valid) + the flow module + the detail-view integration beside the armed card + the barrel growth + the jsdom battery (the call-order law extended; the scan-clean law)."
+    },
+    {
+      "id": "P20-C",
+      "owner": "TL",
+      "status": "PENDING",
+      "depends_on": [
+        "P20-A",
+        "P20-B"
+      ],
+      "lane_scope": "TL lane: the composition growth (the port gains the two members — the composed-port structural guard pattern) + the bridge battery (the honest empty truth; the golden path over the labeled fixtures: UNKNOWN dispatch → pending card → evidence submission → RECONCILED + the mission state side effects; the act-time refusal; the runtime typed refusals surfaced honestly; byte-identical detail re-reads)."
+    },
+    {
+      "id": "P20-D",
+      "owner": "TL",
+      "status": "PENDING",
+      "depends_on": [
+        "P20-A",
+        "P20-B",
+        "P20-C"
+      ],
+      "lane_scope": "TL integration: the integrated batteries at the tip; JOURNEY-MAP + FEATURE-MAP reconciliation; the graph closure; the current-state closure; PUSH to GitHub (pay-at-acceptance, ADR-0009 D7); the bundle archive; the honest carry-forward record."
+    }
+  ],
+  "frontier_after_registration": [
+    "P20-A",
+    "P20-B"
+  ],
+  "closure_policy": "P20 closes only when P20-A/B/C/D are all accepted on main with their batteries green at the tip and the honest carry-forward recorded. No live-tier claim is permitted: zero ACTIVE connections is the deployment fact; real UNKNOWNs are fixture-only; the reconcile golden path is proven only over clearly-labeled test-tier fixtures.",
+  "closure": null
+}
