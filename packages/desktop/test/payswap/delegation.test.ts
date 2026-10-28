@@ -170,6 +170,12 @@ describe("delegated money movement laws (P7-W2)", () => {
       "paymentMissionRequestApproval",
       "paymentMissionResolveApproval",
       "paymentMissionSeed",
+      // (P21-D reviewer-gate, Gap C — read-only derivation comment: the
+      // verify member is the single-act authoritative read-back over a
+      // CONFIRMED attempt; the host performs the retrieval inside the
+      // credential seal, an ambiguous attempt refuses typed with the
+      // reviewer's law, and the runtime verb stays the only writer.)
+      "paymentMissionVerifyAttempt",
       "progressTimeline",
       "quoteDisclosure",
       "securityDecision",

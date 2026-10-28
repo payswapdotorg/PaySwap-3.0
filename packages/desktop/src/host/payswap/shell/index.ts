@@ -93,6 +93,7 @@ export {
 } from "../connections/gate-environment.js";
 export {
   createLaneAwareStripeExecutionAuthority,
+  createLaneAwareStripeReadBack,
   LANE_NOT_WIRED_REASON_PREFIX,
   type LaneAwareStripeExecutionAuthorityOptions,
   type LaneAwareConnectionSeam,
@@ -115,6 +116,27 @@ export {
   CHANNEL_RECONCILIATION_PRINCIPAL,
   createPaymentReconciliationChannelMembers,
 } from "./reconcile-members.js";
+// (P21-D reviewer-gate, Gap C) The verification member (the single-act
+// authoritative read-back) + the read-back port surface.
+export {
+  createAbsentPaymentVerifyChannelMembers,
+  createPaymentVerifyChannelMembers,
+} from "./verify-members.js";
+export type { PaymentVerifyChannelDeps } from "./verify-members.js";
+export type {
+  IPaySwapDesktopVerifyMembers,
+  PaymentMissionVerificationOutcomeDto,
+} from "./verify-contracts.js";
+export {
+  createStripeReadBack,
+  type StripeReadBackPort,
+  type StripeReadBackResult,
+  type StripeReadBackOptions,
+} from "../payments/stripe-read-back.js";
+export {
+  projectAttemptVerification,
+  type AttemptVerificationDecision,
+} from "../payments/attempt-verification.js";
 export { createWorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 export type { WorkspaceStoreChannelDeps, WorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 export {

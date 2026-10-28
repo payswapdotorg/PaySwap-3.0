@@ -151,6 +151,11 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       "paymentMissionRequestApproval",
       "paymentMissionResolveApproval",
       "paymentMissionSeed",
+      // (P21-D reviewer-gate, Gap C) The verification member (the
+      // single-act authoritative read-back; the host does the retrieval
+      // inside the credential seal — the name passes the no-authority-
+      // verb law, the typed refusals propagate).
+      "paymentMissionVerifyAttempt",
       "progressTimeline",
       "quoteDisclosure",
       "securityDecision",

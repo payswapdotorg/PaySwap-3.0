@@ -29,7 +29,17 @@ export type PaymentMissionErrorKind =
   | "RECONCILIATION_EVIDENCE_INVALID"
   | "MISSION_TERMINAL"
   | "STORE_NOT_CONFIGURED"
-  | "PERSISTENCE_FAILED";
+  | "PERSISTENCE_FAILED"
+  /**
+   * (P21-D reviewer-gate, Gap C) The verify operation's typed refusal
+   * family: the attempt is not in a verifiable state (already reconciled,
+   * ambiguous — the reviewer's law: an ambiguous outcome must remain
+   * UNKNOWN and require the actual reconciliation path —, refused,
+   * definitively failed, or carrying no provider reference), or the
+   * authoritative read-back itself was ambiguous / disagreed with the
+   * recorded confirmation. ONE kind, many honest reasons in the message.
+   */
+  | "VERIFICATION_REFUSED";
 
 /** The one typed error family of the payment-mission runtime. */
 export class PaymentMissionError extends Error {

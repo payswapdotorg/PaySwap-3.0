@@ -205,6 +205,72 @@ describe("D3 — a stage completes ONLY from its typed result", () => {
     expect(progress.find((entry) => entry.stageId === "9a")!.status).toBe("COMPLETED");
     expect(progress.find((entry) => entry.stageId === "9b")!.status).toBe("COMPLETED");
     expect(progress.find((entry) => entry.stageId === "10")!.status).toBe("COMPLETED");
+    // The RECONCILED closer is NAMED (the final-stage completion contract).
+    expect(progress.find((entry) => entry.stageId === "10")!.summary).toContain("Reconciliation closed the attempt");
+  });
+
+  it("stage 10 (the reviewer's Gap C contract): ATTEMPT_VERIFIED completes it with the read-back closer named; IN_PROGRESS names the honest choice", () => {
+    // A CONFIRMED dispatch closed by the authoritative read-back — the
+    // typed persisted verification fact (mission OR task events).
+    const verified = projectRoutineStageProgress({
+      taskEvents: [],
+      mission: {
+        missionId: "task:PAYMENT_MISSION:01",
+        status: "COMPLETED",
+        events: [
+          { kind: "ATTEMPT_STARTED", summary: "dispatch attempt started on the authority surface", at: T1 },
+          { kind: "ATTEMPT_VERIFIED", summary: "Authoritative read-back verified the confirmed attempt.", at: T1 },
+        ],
+      },
+      engineView: fixedEngineView(),
+    });
+    const stage10 = verified.find((entry) => entry.stageId === "10")!;
+    expect(stage10.status).toBe("COMPLETED");
+    expect(stage10.summary).toContain("authoritative read-back verification closed the confirmed attempt");
+    // The task-side record closes it too (the same hasKind discipline).
+    const taskSide = projectRoutineStageProgress({
+      taskEvents: [
+        { kind: "ATTEMPT_STARTED", summary: "attempt", at: T0 },
+        { kind: "ATTEMPT_VERIFIED", summary: "verified by the read-back", at: T1 },
+      ],
+      mission: { missionId: "task:PAYMENT_MISSION:01", status: "COMPLETED", events: [] },
+      engineView: fixedEngineView(),
+    });
+    expect(taskSide.find((entry) => entry.stageId === "10")!.status).toBe("COMPLETED");
+    // A dispatched attempt with NEITHER closer stays honestly in
+    // progress, naming the choice that remains.
+    const dispatched = projectRoutineStageProgress({
+      taskEvents: [],
+      mission: {
+        missionId: "task:PAYMENT_MISSION:01",
+        status: "COMPLETED",
+        events: [
+          { kind: "ATTEMPT_STARTED", summary: "dispatch attempt started on the authority surface", at: T1 },
+          { kind: "ATTEMPT_CONFIRMED", summary: "confirmed", at: T1 },
+        ],
+      },
+      engineView: fixedEngineView(),
+    });
+    const inProgress = dispatched.find((entry) => entry.stageId === "10")!;
+    expect(inProgress.status).toBe("IN_PROGRESS");
+    expect(inProgress.summary).toBe(
+      "A dispatched attempt exists — an ambiguous outcome reconciles; a confirmed attempt closes through the authoritative read-back verification.",
+    );
+    // RECONCILED still wins when both closers somehow exist (reconciliation
+    // is the ambiguity closer; the summary names it).
+    const both = projectRoutineStageProgress({
+      taskEvents: [],
+      mission: {
+        missionId: "task:PAYMENT_MISSION:01",
+        status: "COMPLETED",
+        events: [
+          { kind: "RECONCILED", summary: "reconciled", at: T1 },
+          { kind: "ATTEMPT_VERIFIED", summary: "verified", at: T1 },
+        ],
+      },
+      engineView: fixedEngineView(),
+    });
+    expect(both.find((entry) => entry.stageId === "10")!.summary).toContain("Reconciliation closed the attempt");
   });
 
   it("a proceed REQUEST alone never completes 9a (the approval belongs to the authority surface)", () => {

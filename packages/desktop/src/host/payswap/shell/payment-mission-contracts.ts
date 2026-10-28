@@ -70,6 +70,7 @@ import type {
 import type { PaymentGateId } from "../payments/validation-gates.js";
 import type { IPaySwapDesktopDispatchMembers } from "./dispatch-contracts.js";
 import type { IPaySwapDesktopReconcileMembers } from "./reconcile-contracts.js";
+import type { IPaySwapDesktopVerifyMembers } from "./verify-contracts.js";
 export type {
   IPaySwapDesktopDispatchMembers,
   PaymentDispatchLaneDto,
@@ -86,6 +87,10 @@ export type {
   PaymentReconciliationSourceKind,
 } from "./reconcile-contracts.js";
 export { PAYMENT_RECONCILIATION_SOURCE_KINDS } from "./reconcile-contracts.js";
+export type {
+  IPaySwapDesktopVerifyMembers,
+  PaymentMissionVerificationOutcomeDto,
+} from "./verify-contracts.js";
 
 // ---------------------------------------------------------------------------
 // The DTOs (JSON-safe channel shapes — projections of host records)
@@ -281,6 +286,16 @@ export interface PaymentMissionAttemptStateDto {
   readonly outcome: PaymentAttemptOutcome;
   /** People language (the outcome fact, phrased for the operator). */
   readonly summary: string;
+  /**
+   * The typed verification fact (the P21-D reviewer-gate, Gap C), when
+   * an authoritative provider read-back verified this CONFIRMED
+   * attempt: its OWN typed fact — NOT a new outcome (the outcome
+   * vocabulary above stays frozen at its six values).
+   */
+  readonly verification?: {
+    readonly readBackStatus: string;
+    readonly verifiedAt: string;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -297,7 +312,8 @@ export interface PaymentMissionAttemptStateDto {
  */
 export interface IPaySwapDesktopPaymentMissionMembers
   extends IPaySwapDesktopDispatchMembers,
-    IPaySwapDesktopReconcileMembers
+    IPaySwapDesktopReconcileMembers,
+    IPaySwapDesktopVerifyMembers
 {
   /**
    * The mission board, newest-updated-first: the read model for the

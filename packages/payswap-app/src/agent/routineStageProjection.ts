@@ -239,16 +239,26 @@ export function projectRoutineStageProgress(
     rows.push(row("9b", "PENDING", PENDING_SUMMARY));
   }
 
-  // Stage 10 — Reconcile and close: COMPLETE from RECONCILED (the mission
-  // timeline's reconciliation, or the task-side record); IN_PROGRESS once
-  // a dispatched attempt exists without reconciliation.
+  // Stage 10 — Reconcile and close: the FINAL-STAGE COMPLETION CONTRACT
+  // (the P21-D reviewer-gate, Gap C). The stage completes from EITHER
+  // typed closer — RECONCILED (reconciliation closed an AMBIGUOUS
+  // attempt with provider evidence: the only closer of an UNKNOWN) OR
+  // ATTEMPT_VERIFIED (the authoritative read-back verified a CONFIRMED
+  // attempt: the typed persisted verification fact, completed when
+  // reconciliation is not needed — no ambiguity ever existed). The
+  // COMPLETED summary names WHICH closer landed. IN_PROGRESS names the
+  // honest choice that remains once a dispatched attempt exists.
   if (hasKind(missionEvents, "RECONCILED") || hasKind(taskEvents, "RECONCILED")) {
     rows.push(
-      row("10", "COMPLETED", "Reconciliation closed the attempt — confirmed/failed/UNKNOWN backed by provider evidence and the append-only timeline."),
+      row("10", "COMPLETED", "Reconciliation closed the attempt — provider evidence resolved the ambiguous outcome, and the confirmed/failed truth plus the append-only timeline stand as the record."),
+    );
+  } else if (hasKind(missionEvents, "ATTEMPT_VERIFIED") || hasKind(taskEvents, "ATTEMPT_VERIFIED")) {
+    rows.push(
+      row("10", "COMPLETED", "The authoritative read-back verification closed the confirmed attempt — the provider's own record agreed with the recorded confirmation, and the typed verification fact stands on the attempt record."),
     );
   } else if (hasKind(missionEvents, "ATTEMPT_STARTED") || hasKind(missionEvents, "OUTCOME_UNKNOWN")) {
     rows.push(
-      row("10", "IN_PROGRESS", "A dispatched attempt exists — reconciliation follows from provider evidence."),
+      row("10", "IN_PROGRESS", "A dispatched attempt exists — an ambiguous outcome reconciles; a confirmed attempt closes through the authoritative read-back verification."),
     );
   } else {
     rows.push(row("10", "PENDING", PENDING_SUMMARY));

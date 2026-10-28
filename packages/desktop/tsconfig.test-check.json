@@ -24,6 +24,9 @@
     "test/payswap/gate-environment-corridor.test.ts",
     "test/payswap/execution-lane-composition.test.ts",
     "test/payswap/session-model-catalog.test.ts",
+    "test/payswap/attempt-verification.test.ts",
+    "test/payswap/payment-verify-plane.test.ts",
+    "test/payswap/payment-verify-plane-fixtures.ts",
     "test/payswap/product-connection-composition.test.ts"
   ]
 }

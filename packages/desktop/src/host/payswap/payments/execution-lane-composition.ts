@@ -30,7 +30,10 @@
  */
 
 import type { ExecutionAuthorityPort } from "./execution-authority.js";
+import { PaymentMissionError } from "./contracts.js";
 import { createStripeExecutionKernel } from "./execution-kernel.js";
+import type { StripeReadBackPort } from "./stripe-read-back.js";
+import { createStripeReadBack } from "./stripe-read-back.js";
 import { createStripeHostTransport, type HostFetch } from "../connections/host-https-transports.js";
 
 /**
@@ -133,6 +136,48 @@ export function createLaneAwareStripeExecutionAuthority(
       // re-checks the ACTIVE + mode facts, and the sk_test_ full-key
       // grant is enforced INSIDE the seal on every dispatch).
       return kernel.dispatch(command);
+    },
+  };
+}
+
+/**
+ * (P21-D reviewer-gate, Gap C) Compose the LANE-AWARE STRIPE READ-BACK
+ * port: the SAME lane law as the dispatch authority above — every read
+ * re-resolves the connection from the registry's own read model, and a
+ * lane is eligible exactly when providerId === "stripe" AND state ===
+ * "ACTIVE" AND executionMode === "SANDBOX". A read-back is NEVER
+ * fabricated over an ineligible lane: the not-eligible case throws the
+ * typed PaymentMissionError carrying the lane-not-wired reason (the
+ * dispatch authority returns its refusal as an answer because the
+ * dispatch envelope has a refusal channel; the read-back port's result
+ * union carries only the three-valued outcome, so the honest mapping for
+ * an ineligible lane is the typed throw — the channel member propagates
+ * it, never masking it).
+ */
+export function createLaneAwareStripeReadBack(
+  options: LaneAwareStripeExecutionAuthorityOptions,
+): StripeReadBackPort {
+  const readBack = createStripeReadBack({
+    connectionAuthority: options.connectionAuthority,
+    transport: createStripeHostTransport(options.fetchImpl),
+    ...(options.nowMs !== undefined ? { nowMs: options.nowMs } : {}),
+  });
+  return {
+    async readBack(input) {
+      const statuses = await options.connectionAuthority.connectionStatuses();
+      const lane = statuses.find((status) => status.connectionId === input.connectionRef);
+      const eligible =
+        lane !== undefined &&
+        lane.providerId === "stripe" &&
+        lane.state === "ACTIVE" &&
+        lane.executionMode === "SANDBOX";
+      if (!eligible) {
+        throw new PaymentMissionError(
+          "VERIFICATION_REFUSED",
+          `${laneNotWiredReason(lane)} — an authoritative read-back is never fabricated over an ineligible lane`,
+        );
+      }
+      return readBack.readBack(input);
     },
   };
 }

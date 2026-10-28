@@ -101,6 +101,9 @@ export const PAYMENT_EVENT_KINDS: readonly string[] = [
   "ATTEMPT_CONFIRMED", "ATTEMPT_FAILED", "OUTCOME_UNKNOWN", "RECONCILED",
   "CANCELLED", "EXPIRED", "WAIT_STARTED", "WAIT_CRITERIA_RECORDED",
   "OPPORTUNITY_MATCHED", "WAIT_EXPIRED", "PLAN_SELECTION_RECORDED",
+  // The P21-D reviewer-gate append (Gap C): the confirmed-attempt
+  // verification closer — the conscious two-step mirror change.
+  "ATTEMPT_VERIFIED",
 ];
 const INTAKE_FIELD_IDS: readonly string[] = [
   "amountAndCurrency", "fundingSource", "recipient", "countryCorridor",

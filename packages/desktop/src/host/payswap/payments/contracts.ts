@@ -91,7 +91,12 @@ export function isTerminalPaymentTaskStatus(status: PaymentTaskStatus): boolean 
  * own PLAN_SELECTION_RECORDED (P17-A, ADR-0010 D3), appended after the
  * shared 21 — the payment-mission event vocabulary is a strict superset
  * of the shared agent-task one (22 kinds), and the mirror test pins
- * both sides of that split.
+ * both sides of that split — PLUS the payment plane's own
+ * ATTEMPT_VERIFIED (the P21-D reviewer-gate append, Gap C: the
+ * confirmed-attempt verification closer — the typed persisted record of
+ * an authoritative provider read-back agreeing with a CONFIRMED
+ * attempt; it is the payment plane's OWN kind and NEVER a substitute
+ * for RECONCILED, which stays the only closer of an ambiguous UNKNOWN).
  */
 export const PAYMENT_TASK_EVENT_KINDS = [
   "CREATED", "RESUMED", "FIELD_CAPTURED", "MISSING_FIELD_ASKED", "VALIDATED",
@@ -103,6 +108,9 @@ export const PAYMENT_TASK_EVENT_KINDS = [
   "WAIT_STARTED", "WAIT_CRITERIA_RECORDED", "OPPORTUNITY_MATCHED", "WAIT_EXPIRED",
   // The payment plane's own kind (P17-A, ADR-0010 D3 — the stage-9a landing site).
   "PLAN_SELECTION_RECORDED",
+  // The payment plane's own kind (the P21-D reviewer-gate append, Gap C — the
+  // confirmed-attempt verification closer; NEVER a substitute for RECONCILED).
+  "ATTEMPT_VERIFIED",
 ] as const;
 export type PaymentTaskEventKind = (typeof PAYMENT_TASK_EVENT_KINDS)[number];
 
@@ -255,6 +263,23 @@ export interface PaymentResultEnvelope {
   readonly completedAt: number;
 }
 
+/**
+ * The typed persisted verification fact (the P21-D reviewer-gate, Gap C):
+ * present once an authoritative provider read-back verified a CONFIRMED
+ * attempt's terminal state (no ambiguity ever existed). It is its OWN
+ * typed fact — NOT a new attempt outcome (the outcome vocabulary stays
+ * frozen) and NEVER a substitute for reconciliation (which stays the
+ * only closer of an ambiguous UNKNOWN).
+ */
+export interface PaymentAttemptVerification {
+  /** The provider status the read-back observed (e.g. "succeeded"). */
+  readonly readBackStatus: string;
+  /** The provider references the read-back carried (e.g. [pi_xxx, succeeded]). */
+  readonly providerReferences: readonly string[];
+  readonly source: "EXTERNAL_PROVIDER_RETRIEVAL";
+  readonly verifiedAt: string;
+}
+
 /** One consequential attempt on a mission (append-only fields after start). */
 export interface PaymentAttemptRecord {
   readonly attemptId: string;
@@ -287,6 +312,12 @@ export interface PaymentAttemptRecord {
     readonly evidenceRefs: readonly string[];
     readonly resolvedAt: string;
   };
+  /**
+   * Present once an authoritative provider read-back verified a CONFIRMED
+   * attempt's terminal state (no ambiguity ever existed — the reviewer's
+   * typed persisted verification result, P21-D Gap C).
+   */
+  readonly verification?: PaymentAttemptVerification;
 }
 
 // ---------------------------------------------------------------------------

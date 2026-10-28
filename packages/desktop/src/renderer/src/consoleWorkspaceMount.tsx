@@ -44,6 +44,7 @@ import type {
   PaySwapPaymentMissionPendingReconciliationDto,
   PaySwapPaymentMissionReconciliationOutcomeDto,
   PaySwapPaymentMissionSeedInputDto,
+  PaySwapPaymentMissionVerificationOutcomeDto,
   PaySwapPaymentDispatchOutcomeDto,
   PaySwapPaymentPlanSelectionInputDto,
   PaySwapPaymentPreviewDto,
@@ -91,6 +92,7 @@ export type {
   PaySwapPaymentReconcileEvidenceDto,
   PaySwapPaymentReconcileInputDto,
   PaySwapPaymentMissionReconciliationOutcomeDto,
+  PaySwapPaymentMissionVerificationOutcomeDto,
 } from "./consolePaymentMissionWire.js";
 export type {
   PaySwapProbeProviderId,
@@ -197,6 +199,12 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   // and the runtime verb stays the ONLY closer of an UNKNOWN).
   "paymentMissionPendingReconciliation",
   "paymentMissionReconcile",
+  // (P21-D reviewer-gate, Gap C) The verification member — the
+  // single-act authoritative read-back: the HOST performs the provider
+  // retrieval inside the credential seal over the attempt's own
+  // recorded facts; an ambiguous attempt refuses typed (the reviewer's
+  // law) and the typed refusals propagate, never masked.
+  "paymentMissionVerifyAttempt",
 ] as const;
 
 /**
@@ -338,6 +346,21 @@ export interface IPaySwapDesktopClientService {
     attemptId: string,
     evidence: PaySwapPaymentReconcileEvidenceDto,
   ): Promise<PaySwapPaymentMissionReconciliationOutcomeDto>;
+  /**
+   * (P21-D reviewer-gate, Gap C) The verification act — the SINGLE-ACT
+   * authoritative read-back: the renderer supplies ONLY the mission id
+   * and the attempt id; the HOST performs the provider retrieval
+   * inside the credential seal (no evidence entry exists — no
+   * ambiguity ever existed on a CONFIRMED attempt). A read-back that
+   * agrees appends the typed persisted verification fact; an
+   * ambiguous attempt refuses typed (it must remain UNKNOWN and take
+   * the reconciliation path) and the typed refusals rethrow through.
+   * The outcome carries facts only.
+   */
+  paymentMissionVerifyAttempt(
+    missionId: string,
+    attemptId: string,
+  ): Promise<PaySwapPaymentMissionVerificationOutcomeDto>;
   /** The connection statuses (never fabricated — empty is honest). */
   connectionStatuses(): Promise<readonly PaySwapConnectionStatusViewDto[]>;
   /** Seed a connection setup (create-or-resume; UNCONFIGURED refused with the exact missing operator configuration). */

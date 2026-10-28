@@ -28,11 +28,14 @@
 
 import {
   PaymentMissionError,
+  type PaymentAttemptVerification,
   type PaymentExecutionMode,
   type PaymentMissionRecord,
   type PaymentResultEnvelope,
 } from "./contracts.js";
 import type { PaymentMissionCore } from "./payment-mission-runtime.js";
+import { projectAttemptVerification } from "./attempt-verification.js";
+import type { StripeReadBackPort } from "./stripe-read-back.js";
 import { compiledIntentDigest, confirmedCreateAttempt, missionHasUnresolvedAttempt, planInterruptionRecovery, type InterruptionRecoveryItem } from "./mission-execution.js";
 import {
   PAYMENT_OPERATION_SCOPES,
@@ -69,6 +72,28 @@ export interface PaymentReconciliationEvidence {
   readonly evidenceRefs: readonly string[];
 }
 
+/**
+ * The typed verification outcome (the P21-D reviewer-gate, Gap C):
+ * outcome facts ONLY — the addressing echo, the provider status the
+ * authoritative read-back observed, the verification instant and a
+ * people-language summary that NEVER uses the word "reconciled" (this
+ * is not a reconciliation). Every non-verifiable state is a THROWN
+ * typed PaymentMissionError (VERIFICATION_REFUSED / MISSION_NOT_FOUND)
+ * — the channel's established fail-closed discipline.
+ */
+export interface PaymentAttemptVerificationOutcome {
+  readonly kind: "VERIFIED";
+  readonly attemptId: string;
+  readonly readBackStatus: string;
+  readonly verifiedAt: string;
+  readonly summary: string;
+}
+
+/** The verification event's people-language summary (no ambiguity ever existed — never the word "reconciled"). */
+function verificationSummaryOf(paymentIntentId: string, readBackStatus: string): string {
+  return `Authoritative read-back verified the confirmed attempt: the provider's own record for ${paymentIntentId} reports '${readBackStatus}', agreeing with the recorded confirmation. No ambiguity ever existed; the typed verification persists on the attempt record as its own fact.`;
+}
+
 /** The consequential slice surface. */
 export interface PaymentDispatchSlice {
   /**
@@ -82,13 +107,34 @@ export interface PaymentDispatchSlice {
     input: PaymentDispatchInput,
     now: string,
   ): Promise<PaymentDispatchOutcome>;
-  /** Close an UNKNOWN (or interrupted) attempt with provider evidence. */
+  /**
+   * Close an UNKNOWN (or interrupted) attempt with provider evidence.
+   */
   reconcile(
     missionId: string,
     attemptId: string,
     evidence: PaymentReconciliationEvidence,
     now: string,
   ): Promise<PaymentMissionRecord>;
+  /**
+   * (P21-D reviewer-gate, Gap C) Verify a CONFIRMED attempt through the
+   * AUTHORITATIVE provider read-back: the typed, persisted verification
+   * result that completes the final stage when reconciliation is not
+   * needed (no ambiguity ever existed). An ambiguous outcome NEVER
+   * verifies — it must remain UNKNOWN and require the actual
+   * reconciliation path (the pure decision in ./attempt-verification.ts
+   * enforces the law; the typed refusals carry it in the message). The
+   * readBackPort is a PARAMETER (the channel member supplies the
+   * composed port) — the runtime stays seam-pure. Idempotent: an
+   * already-verified attempt replays its recorded verification with
+   * NOTHING appended.
+   */
+  verify(
+    missionId: string,
+    attemptId: string,
+    readBackPort: StripeReadBackPort,
+    now: string,
+  ): Promise<PaymentAttemptVerificationOutcome>;
   /**
    * The restart sweep: mark every interrupted write-ahead UNKNOWN (the
    * command may have landed) and AMBIGUOUS in the registrar. Call ONCE
@@ -585,6 +631,144 @@ export function createPaymentDispatchSlice(core: PaymentMissionCore): PaymentDis
       );
       log("info", `payswap-payments: attempt ${attemptId} reconciled to ${evidence.resolvedTo}`);
       return updated;
+    },
+
+    async verify(missionId, attemptId, readBackPort, now) {
+      let outcome!: PaymentAttemptVerificationOutcome;
+      await core.serialized(async () => {
+        const state = await store.load();
+        const mission = core.requireMission(state, missionId);
+        // (1) THE PURE DECISION drives everything (the reviewer's law).
+        const decision = projectAttemptVerification(mission, attemptId);
+        if (decision.kind === "NO_SUCH_ATTEMPT") {
+          throw new PaymentMissionError(
+            "MISSION_NOT_FOUND",
+            `No attempt '${attemptId}' exists on mission '${missionId}'`,
+            { missionId },
+          );
+        }
+        if (decision.kind === "ALREADY_VERIFIED") {
+          // THE IDEMPOTENT REPLAY: the recorded typed fact answers;
+          // NOTHING is appended and the recorded instant never rewrites.
+          const recorded = mission.events.find(
+            (event) => event.kind === "ATTEMPT_VERIFIED" && event.correlationRef === attemptId,
+          );
+          outcome = {
+            kind: "VERIFIED",
+            attemptId,
+            readBackStatus: decision.verification.readBackStatus,
+            verifiedAt: decision.verification.verifiedAt,
+            summary:
+              recorded?.summary ??
+              verificationSummaryOf(
+                decision.verification.providerReferences[0] ?? "the provider's object",
+                decision.verification.readBackStatus,
+              ),
+          };
+          return;
+        }
+        if (decision.kind === "ALREADY_RECONCILED") {
+          throw new PaymentMissionError(
+            "VERIFICATION_REFUSED",
+            `Attempt '${attemptId}' was already closed by reconciliation evidence — verification is not applicable to a reconciled attempt; nothing was recorded`,
+            { missionId },
+          );
+        }
+        if (decision.kind === "RECONCILIATION_REQUIRED") {
+          throw new PaymentMissionError(
+            "VERIFICATION_REFUSED",
+            `Attempt '${attemptId}' is unresolved — an ambiguous outcome must remain UNKNOWN and require the actual reconciliation path; verification never substitutes for reconciliation`,
+            { missionId },
+          );
+        }
+        if (decision.kind === "NOT_CONFIRMED") {
+          // The decision carries no payload by contract; the recorded
+          // attempt (it exists — NO_SUCH_ATTEMPT did not fire) names WHY.
+          const recorded = mission.attempts.find((candidate) => candidate.attemptId === attemptId)!;
+          throw new PaymentMissionError(
+            "VERIFICATION_REFUSED",
+            recorded.envelope?.outcome === "FAILED"
+              ? `Attempt '${attemptId}' definitively failed — no confirmed effect exists to verify; the mission stays open for a fresh authorization`
+              : `Attempt '${attemptId}' was refused before any effect — no provider object exists to read back; the mission stays open for a fresh authorization`,
+            { missionId },
+          );
+        }
+        if (decision.kind === "NO_PROVIDER_REFERENCE") {
+          throw new PaymentMissionError(
+            "VERIFICATION_REFUSED",
+            `Attempt '${attemptId}' is CONFIRMED but its recorded envelope carries no provider reference — the read-back has nothing to address; nothing was recorded`,
+            { missionId },
+          );
+        }
+        // (2) VERIFIABLE — THE AUTHORITATIVE READ-BACK (inside the
+        // serialized chain, exactly like the dispatch authority call).
+        const readBack = await readBackPort.readBack({
+          connectionRef: decision.attempt.connectionRef,
+          paymentIntentId: decision.paymentIntentId,
+          executionMode: decision.attempt.executionMode,
+        });
+        if (readBack.outcome === "UNKNOWN") {
+          // Append NOTHING: the attempt stays exactly as recorded.
+          throw new PaymentMissionError(
+            "VERIFICATION_REFUSED",
+            `The read-back itself was ambiguous for attempt '${attemptId}' — the attempt stays exactly as recorded; reconciliation remains the path`,
+            { missionId },
+          );
+        }
+        if (readBack.outcome === "FAILED" || readBack.paymentIntentStatus !== "succeeded") {
+          // Append NOTHING: the envelope is never mutated.
+          throw new PaymentMissionError(
+            "VERIFICATION_REFUSED",
+            `The provider's read-back does not agree with the recorded confirmation for attempt '${attemptId}' (observed '${readBack.paymentIntentStatus ?? "no status"}') — take the reconciliation path; nothing was rewritten`,
+            { missionId },
+          );
+        }
+        // (3) THE AGREEMENT — the typed persisted verification fact + the
+        // append-only event land in ONE store transaction.
+        const verification: PaymentAttemptVerification = {
+          readBackStatus: readBack.paymentIntentStatus,
+          providerReferences: [readBack.paymentIntentId, readBack.paymentIntentStatus],
+          source: "EXTERNAL_PROVIDER_RETRIEVAL",
+          verifiedAt: now,
+        };
+        const summary = verificationSummaryOf(readBack.paymentIntentId, readBack.paymentIntentStatus);
+        await store.commit((current) => {
+          const missionNow = core.requireMission(current, missionId);
+          const attemptIndex = missionNow.attempts.findIndex((candidate) => candidate.attemptId === attemptId);
+          if (attemptIndex < 0) {
+            throw new PaymentMissionError(
+              "MISSION_NOT_FOUND",
+              `No attempt '${attemptId}' exists on mission '${missionId}'`,
+              { missionId },
+            );
+          }
+          const attempts = [...missionNow.attempts];
+          attempts[attemptIndex] = { ...attempts[attemptIndex]!, verification };
+          const withEvent = core.appendEvent(
+            { ...missionNow, attempts },
+            "ATTEMPT_VERIFIED",
+            summary,
+            now,
+            attemptId,
+          );
+          return {
+            ...current,
+            missions: current.missions.map((candidate) => (candidate.id === missionId ? withEvent : candidate)),
+          };
+        });
+        outcome = {
+          kind: "VERIFIED",
+          attemptId,
+          readBackStatus: verification.readBackStatus,
+          verifiedAt: now,
+          summary,
+        };
+      });
+      log(
+        "info",
+        `payswap-payments: attempt ${attemptId} verified by the authoritative read-back on mission ${missionId} — the typed persisted verification fact (never a reconciliation)`,
+      );
+      return outcome;
     },
 
     async recoverInterruptions(now) {

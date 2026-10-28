@@ -195,7 +195,7 @@ export const AGENT_ROUTINE_STAGES: readonly AgentRoutineStageDeclaration[] = Obj
     advisory: false,
     authorityClass: "RECONCILIATION",
     prerequisites: "A dispatched attempt carrying its provider correlation.",
-    checkpoint: "Confirmed/failed/UNKNOWN backed by provider evidence, a durable report and the append-only timeline — reconciliation closes it.",
+    checkpoint: "Confirmed/failed/UNKNOWN backed by provider evidence, a durable report and the append-only timeline — an ambiguous attempt closes through reconciliation; a confirmed attempt closes through the typed authoritative read-back verification.",
   },
 ]);
 

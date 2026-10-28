@@ -41,6 +41,7 @@ import {
   type PaymentMissionsApprovalResolution,
   type PaymentMissionsPortWithDispatch,
   type PaymentMissionsPortWithReconciliation,
+  type PaymentMissionsPortWithVerification,
 } from "@payswap/app";
 import type { DesktopConsoleChannelServices } from "./consoleWorkspaceMount.js";
 import type {
@@ -52,6 +53,7 @@ import type {
   PaySwapPaymentMissionDetailDto,
   PaySwapPaymentMissionPendingReconciliationDto,
   PaySwapPaymentMissionReconciliationOutcomeDto,
+  PaySwapPaymentMissionVerificationOutcomeDto,
   PaySwapPaymentPreviewDto,
   PaySwapPaymentReconcileEvidenceDto,
 } from "./consolePaymentMissionWire.js";
@@ -92,6 +94,10 @@ export interface MissionPlaneApprovalChannelClient {
     attemptId: string,
     evidence: PaySwapPaymentReconcileEvidenceDto,
   ): Promise<PaySwapPaymentMissionReconciliationOutcomeDto>;
+  paymentMissionVerifyAttempt(
+    missionId: string,
+    attemptId: string,
+  ): Promise<PaySwapPaymentMissionVerificationOutcomeDto>;
 }
 
 /** The wire shapes are the pin shapes structurally (the mirror pins both sides). */
@@ -124,12 +130,14 @@ function isHostPlaneNotConfigured(thrown: unknown): boolean {
 }
 
 /**
- * The composed channel-backed port: the dispatch-capable AND
- * reconciliation-capable port (the app's two composed interfaces,
- * intersected — both structural guards pass over the same object).
+ * The composed channel-backed port: the dispatch-capable,
+ * reconciliation-capable AND verification-capable port (the app's three
+ * composed interfaces, intersected — all structural guards pass over
+ * the same object).
  */
 type ChannelPaymentMissionsPort = PaymentMissionsPortWithDispatch &
-  PaymentMissionsPortWithReconciliation;
+  PaymentMissionsPortWithReconciliation &
+  PaymentMissionsPortWithVerification;
 
 /**
  * Adapt the channel services (the payswap-desktop proxy) to the pinned
@@ -170,6 +178,8 @@ export function channelPaymentMissionsPort(
       guard(() => client.paymentMissionPendingReconciliation(missionId)),
     reconcile: (missionId, attemptId, evidence) =>
       guard(() => client.paymentMissionReconcile(missionId, attemptId, evidence)),
+    verifyAttempt: (missionId, attemptId) =>
+      guard(() => client.paymentMissionVerifyAttempt(missionId, attemptId)),
   };
 }
 

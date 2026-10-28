@@ -69,6 +69,11 @@ import {
 import { createPaymentApprovalChannelMembers } from "./approval-members.js";
 import { createPaymentDispatchChannelMembers } from "./dispatch-members.js";
 import { createPaymentReconciliationChannelMembers } from "./reconcile-members.js";
+import {
+  createAbsentPaymentVerifyChannelMembers,
+  createPaymentVerifyChannelMembers,
+} from "./verify-members.js";
+import { createLaneAwareStripeReadBack } from "../payments/execution-lane-composition.js";
 import { createWorkspaceStoreChannelMembers } from "./workspace-store-members.js";
 import { ConnectionPlaneNotConfiguredError } from "./plane-errors.js";
 
@@ -281,6 +286,28 @@ export function createPaySwapDesktopService(
     seamLog,
   );
 
+  // (P21-D reviewer-gate, Gap C) The VERIFICATION member: the single-act
+  // authoritative read-back over the LANE-AWARE Stripe read-back port,
+  // composed over the SAME connection + probe planes the dispatch
+  // authority rides (a read-back is never fabricated over an ineligible
+  // lane). When either plane is absent the member is still spread (the
+  // census holds) but fails closed with the typed
+  // PaymentPlaneNotConfiguredError — the absent probe-members posture.
+  const paymentVerifyMembers =
+    connectionAuthority !== undefined && connectionProbe !== undefined
+      ? createPaymentVerifyChannelMembers({
+          resolveRuntime: resolvePaymentMissionRuntime,
+          readBackPort: createLaneAwareStripeReadBack({
+            connectionAuthority,
+            fetchImpl: connectionProbe.fetchImpl,
+            ...(connectionProbe.nowMs !== undefined ? { nowMs: connectionProbe.nowMs } : {}),
+            log: seamLog,
+          }),
+          now: paymentMissionClock,
+          log: seamLog,
+        })
+      : createAbsentPaymentVerifyChannelMembers(resolvePaymentMissionRuntime);
+
   const service: IPaySwapDesktopService = {
     session,
 
@@ -490,6 +517,11 @@ export function createPaySwapDesktopService(
       now: paymentMissionClock,
       log: seamLog,
     }),
+
+    // (P21-D reviewer-gate, Gap C) The verification member — the
+    // single-act authoritative read-back over the composed lane-aware
+    // port (the absent-planes posture above fails closed typed).
+    ...paymentVerifyMembers,
   };
   return service;
 }

@@ -109,8 +109,46 @@ class KernelRefusal extends Error {
   }
 }
 
+/**
+ * The grant law (D2) — runs on every path, inside the seal. Exported for
+ * the read-back port (./stripe-read-back.ts) so the SAME grant law admits
+ * a retrieval — never a duplicated derivation.
+ */
+export function admitGrant(apiKey: string, executionMode: string): void {
+  if (executionMode !== "SANDBOX") {
+    throw new KernelRefusal({
+      kind: "MODE_NOT_OFFERED",
+      reason: `INV-25: the execution kernel is SANDBOX-only in this deployment (got ${executionMode}); a live corridor is never derived here`,
+    });
+  }
+  if (KERNEL_STRIPE_LIVE_PREFIXES.some((prefix) => apiKey.startsWith(prefix))) {
+    throw new KernelRefusal({
+      kind: "MODE_NOT_OFFERED",
+      reason: "INV-25: a LIVE Stripe key cannot serve the SANDBOX execution kernel (test keys serve SANDBOX; live keys serve LIVE)",
+    });
+  }
+  if (apiKey.startsWith(KERNEL_STRIPE_RESTRICTED_TEST_PREFIX)) {
+    throw new KernelRefusal({
+      kind: "COMMAND_REJECTED",
+      reason:
+        "a RESTRICTED Stripe key never derives an execution grant from the key alone — restricted-key grants derive only from their DECLARED scopes (the P13-B read-only default remains the enforcement point)",
+    });
+  }
+  if (!apiKey.startsWith(KERNEL_STRIPE_FULL_TEST_PREFIX)) {
+    throw new KernelRefusal({
+      kind: "COMMAND_REJECTED",
+      reason: "the sealed Stripe key does not carry a canonical test-mode key prefix (sk_test_ for the full-key execution grant)",
+    });
+  }
+}
+
+/** True iff the thrown value is the kernel's typed seal refusal (the read-back mapping aid). */
+export function isKernelRefusal(thrown: unknown): thrown is KernelRefusal {
+  return thrown instanceof KernelRefusal;
+}
+
 /** Read {id, status} off a confirmed body (never guesses). */
-function intentFieldsOf(body: unknown): { id: string | null; status: string | null } {
+export function intentFieldsOf(body: unknown): { id: string | null; status: string | null } {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
     return { id: null, status: null };
   }
@@ -130,7 +168,7 @@ interface KernelClassification {
   readonly retryable?: boolean;
 }
 
-function classify(response: KernelTransportResponse): KernelClassification {
+export function classify(response: KernelTransportResponse): KernelClassification {
   if (response.delivered) {
     const status = response.status ?? 0;
     if (status >= 200 && status < 300) {
@@ -168,7 +206,7 @@ interface ExecutionOutcome {
 }
 
 /** The material shape the seal consumer validates (never echoes it). */
-function apiKeyOf(material: unknown): string {
+export function apiKeyOf(material: unknown): string {
   if (material === null || typeof material !== "object" || Array.isArray(material)) {
     throw new PaymentMissionError("INVALID_TRANSITION", "the sealed credential material is malformed");
   }
@@ -191,35 +229,6 @@ export function createStripeExecutionKernel(
   const headersOf = (apiKey: string): Record<string, string> => ({
     Authorization: `Bearer ${apiKey}`,
   });
-
-  /** The grant law (D2) — runs on every path, inside the seal. */
-  function admitGrant(apiKey: string, executionMode: string): void {
-    if (executionMode !== "SANDBOX") {
-      throw new KernelRefusal({
-        kind: "MODE_NOT_OFFERED",
-        reason: `INV-25: the execution kernel is SANDBOX-only in this deployment (got ${executionMode}); a live corridor is never derived here`,
-      });
-    }
-    if (KERNEL_STRIPE_LIVE_PREFIXES.some((prefix) => apiKey.startsWith(prefix))) {
-      throw new KernelRefusal({
-        kind: "MODE_NOT_OFFERED",
-        reason: "INV-25: a LIVE Stripe key cannot serve the SANDBOX execution kernel (test keys serve SANDBOX; live keys serve LIVE)",
-      });
-    }
-    if (apiKey.startsWith(KERNEL_STRIPE_RESTRICTED_TEST_PREFIX)) {
-      throw new KernelRefusal({
-        kind: "COMMAND_REJECTED",
-        reason:
-          "a RESTRICTED Stripe key never derives an execution grant from the key alone — restricted-key grants derive only from their DECLARED scopes (the P13-B read-only default remains the enforcement point)",
-      });
-    }
-    if (!apiKey.startsWith(KERNEL_STRIPE_FULL_TEST_PREFIX)) {
-      throw new KernelRefusal({
-        kind: "COMMAND_REJECTED",
-        reason: "the sealed Stripe key does not carry a canonical test-mode key prefix (sk_test_ for the full-key execution grant)",
-      });
-    }
-  }
 
   async function sendExecution(
     apiKey: string,

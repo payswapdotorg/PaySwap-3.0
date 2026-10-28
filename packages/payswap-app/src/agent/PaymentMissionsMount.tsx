@@ -42,6 +42,8 @@ import { usePaymentMissionsDispatchFlow } from "./paymentMissionsDispatchFlow.js
 import { isPaymentMissionsDispatchPort } from "./paymentMissionsDispatchPins.js";
 import { usePaymentMissionsReconcileFlow } from "./paymentMissionsReconcileFlow.js";
 import { isPaymentMissionsReconciliationPort } from "./paymentMissionsReconcilePins.js";
+import { usePaymentMissionsVerifyFlow } from "./paymentMissionsVerifyFlow.js";
+import { isPaymentMissionsVerificationPort } from "./paymentMissionsVerifyPins.js";
 import { useMissionCompletionProjection, type AgentTaskSessionPort } from "./missionCompletionProjection.js";
 
 /* ------------- the shared port binding (the composition seam) ------------- */
@@ -198,6 +200,17 @@ export function PaymentMissionsMount({ port, taskSession, missionLink }: Payment
   const { wiring: reconcileWiring, loadPendingReconciliation } =
     usePaymentMissionsReconcileFlow(reconcilePort, setFlowError, refreshDetail);
 
+  // The verification-capable seam resolution (the P21-D reviewer-gate,
+  // Gap C): a port without the member keeps the verify card UNRENDERED
+  // (the honest unbound tier, never a dead button). The flow hook owns
+  // the single-act state machine (the line law).
+  const verifyPort =
+    resolvedPort !== undefined && isPaymentMissionsVerificationPort(resolvedPort)
+      ? resolvedPort
+      : undefined;
+  const { wiring: verifyWiring, resetForMission: resetVerifyForMission } =
+    usePaymentMissionsVerifyFlow(verifyPort, setFlowError, refreshDetail);
+
   const openMission = useCallback(
     (missionId: string): void => {
       if (resolvedPort === undefined) {
@@ -222,11 +235,12 @@ export function PaymentMissionsMount({ port, taskSession, missionLink }: Payment
             observeMissionCompletion(detail);
             loadArmedEffect(missionId);
             loadPendingReconciliation(missionId);
+            resetVerifyForMission(missionId);
           }
         })
         .catch((thrown: unknown) => setView(failureView(thrown)));
     },
-    [resolvedPort, loadArmedEffect, loadPendingReconciliation, observeMissionCompletion],
+    [resolvedPort, loadArmedEffect, loadPendingReconciliation, observeMissionCompletion, resetVerifyForMission],
   );
 
   const askNextField = useCallback(
@@ -394,6 +408,7 @@ export function PaymentMissionsMount({ port, taskSession, missionLink }: Payment
       onResolveApproval={resolveApproval}
       dispatch={dispatchWiring}
       reconcile={reconcileWiring}
+      verify={verifyWiring}
     />
   );
 }

@@ -41,10 +41,6 @@ export { BRIDGE_PROVIDER_OBSERVATION_TIER } from "../../src/host/payswap/connect
 import type { ConnectionSessionAuthority } from "../../src/host/payswap/connections/index.js";
 import type { ProbeEvidenceStore } from "../../src/host/payswap/connections/probe-evidence.js";
 import {
-  createStripePaymentExecution,
-  StripeHttpsTransport,
-} from "../../../provider-runtime/src/index.js";
-import {
   FAKE_FLW_KEY,
   FAKE_STRIPE_FULL_KEY,
   FLW_BALANCES_OK,
@@ -64,8 +60,6 @@ export const T3 = "2026-10-27T12:15:00Z";
 export const T4 = "2026-10-27T12:20:00Z";
 /** The probe/kernel edge clock (the fixtures' own pinned ms). */
 export const NOW_MS = 1_000_000;
-/** The canonical runtime clock for the read-back (bigint TimestampMs). */
-export const RUNTIME_CLOCK = { now: () => 1_000_000n, monotonic: () => 1n } as const;
 
 /* ------------------------ the scripted provider world ----------------------- */
 
@@ -212,14 +206,5 @@ export async function journeyBridge(
   return deriveConnectionCapabilityBridge({
     statuses: await authority.connectionStatuses(),
     evidence: await evidenceStore.latestProbeEvidence(),
-  });
-}
-
-/** The authoritative read-back execution (the scripted retrieval — INV-04's reconcile read). */
-export function journeyReadBackExecution(world: World) {
-  return createStripePaymentExecution({
-    transport: new StripeHttpsTransport({ fetchImpl: world.fetchImpl }),
-    clock: RUNTIME_CLOCK,
-    executionMode: "SANDBOX",
   });
 }

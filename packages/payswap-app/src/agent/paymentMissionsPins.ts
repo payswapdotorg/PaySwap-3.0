@@ -145,6 +145,15 @@ export interface PaymentMissionsAttemptState {
   readonly executionMode: "SANDBOX" | "LIVE";
   readonly outcome: PaymentMissionsAttemptOutcome;
   readonly summary: string;
+  /**
+   * The typed verification fact (the P21-D reviewer-gate, Gap C), when an
+   * authoritative read-back verified this CONFIRMED attempt — its OWN
+   * typed fact, never a new outcome (the vocabulary above stays frozen).
+   */
+  readonly verification?: {
+    readonly readBackStatus: string;
+    readonly verifiedAt: string;
+  };
 }
 
 /** The people-language renders of the attempt operations. */

@@ -353,6 +353,34 @@ export {
   PaymentMissionsReconcileCard,
   type PaymentMissionsReconcileCardProps,
 } from "./agent/PaymentMissionsReconcileCard.js";
+// The payment-missions verification surface (the P21-D reviewer-gate,
+// Gap C): the single-act authoritative read-back over the composed
+// verification-capable port — the host performs the provider retrieval
+// inside the credential seal (no evidence entry exists; no ambiguity
+// ever existed on a CONFIRMED attempt); the verification is a typed
+// persisted fact, never a new outcome and never a substitute for
+// reconciliation (an ambiguous attempt refuses typed — the reviewer's
+// law — and the refusal propagates to the surface's flow-error line).
+// A port without the member keeps the verify card unrendered (the
+// honest unbound tier, never a dead button).
+export {
+  isPaymentMissionsVerificationPort,
+  PAYMENT_MISSIONS_VERIFICATION_CARD_NOTE,
+  PAYMENT_MISSIONS_VERIFY_PHASES,
+  type PaymentMissionsAttemptVerification,
+  type PaymentMissionsPortWithVerification,
+  type PaymentMissionsVerifyPhase,
+  type PaymentMissionsVerifyState,
+  type PaymentMissionsVerifyWiring,
+} from "./agent/paymentMissionsVerifyPins.js";
+export {
+  PaymentMissionsVerifyCard,
+  type PaymentMissionsVerifyCardProps,
+} from "./agent/PaymentMissionsVerifyCard.js";
+export {
+  usePaymentMissionsVerifyFlow,
+  type PaymentMissionsVerifyFlow,
+} from "./agent/paymentMissionsVerifyFlow.js";
 export {
   AGENT_PAYMENT_DIRECTION_ENTRIES,
   agentPaymentDirectionEntries,

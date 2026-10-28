@@ -38,12 +38,15 @@
  *     test funding instrument (TEST_DATA — the published test PM); fresh
  *     eligibility PROCEEDs; the two-act approval through the channel
  *     members; the dispatch through the REAL lane-aware Stripe kernel
- *     over the scripted transport; the AUTHORITATIVE read-back
- *     (succeeded); the mission COMPLETES; NO FLW-funded claim anywhere.
+ *     over the scripted transport; the AUTHORITATIVE read-back through
+ *     the PRODUCT verify member (the P21-D reviewer-gate, Gap C — the
+ *     typed persisted verification fact); the mission COMPLETES; NO
+ *     FLW-funded claim anywhere.
  *  9. The truthful terminals: the task's terminal state matches the
  *     mission's (COMPLETED); the twelve-stage checklist reflects the
- *     authority events (9a COMPLETE; 10 honestly IN_PROGRESS — the
- *     read-back verified the state directly, no reconcile act ran).
+ *     authority events (9a COMPLETE; 10 COMPLETE through the
+ *     ATTEMPT_VERIFIED closer the product member appended — the
+ *     final-stage completion contract for a confirmed attempt).
  */
 
 import { describe, expect, it } from "vitest";
@@ -94,12 +97,11 @@ import {
   BRIDGE_PROVIDER_OBSERVATION_TIER,
   JOURNEY_MODEL,
   JOURNEY_MODEL_SELECTION,
-  JOURNEY_PAYMENT_INTENT_ID,
   composeJourneyService,
   journeyBridge,
-  journeyReadBackExecution,
   scriptJourneyFetch,
   seedJourneyConnections,
+  T0,
   T1,
   T2,
   T3,
@@ -318,21 +320,25 @@ async function driveJourney(): Promise<JourneyOutcome> {
     expect(dispatched.kind).toBe("DISPATCHED");
     expect(dispatched.summary).toContain("confirmed");
 
-    // ---- the AUTHORITATIVE read-back (the scripted retrieval — inside the seal) ----
-    const retrieve = journeyReadBackExecution(world);
-    const readBack = await connections.authority.withSealedCredential(
-      connections.stripeConnectionId,
-      (material) => retrieve.retrieve(material, JOURNEY_PAYMENT_INTENT_ID),
-      "p21d-journey-readback",
-    );
-    expect(readBack.outcome).toBe("CONFIRMED");
-    expect(readBack.paymentIntentStatus).toBe("succeeded");
+    // ---- the AUTHORITATIVE read-back through the PRODUCT member (the
+     // P21-D reviewer-gate, Gap C): the single-act verify over the REAL
+     // lane-aware read-back inside the credential seal — the typed
+     // persisted verification fact replaces the test-side read-back ----
+    const verified = await service.paymentMissionVerifyAttempt(missionId, dispatched.attemptId);
+    expect(verified.verified).toBe(true);
+    expect(verified.readBackStatus).toBe("succeeded");
+    expect(verified.summary).toContain("read-back");
 
     // ---- (9) THE TRUTHFUL TERMINALS ----
     const finalDetail = (await service.paymentMissionDetail(missionId))!;
     expect(finalDetail.status).toBe("COMPLETED");
     expect(finalDetail.attempts).toHaveLength(1);
     expect(finalDetail.attempts[0]?.outcome).toBe("CONFIRMED");
+    // The typed verification fact rides the attempt state (facts only).
+    expect(finalDetail.attempts[0]?.verification).toEqual({
+      readBackStatus: "succeeded",
+      verifiedAt: T0,
+    });
     await session.updateTaskStatus(
       taskId, "COMPLETED", "ATTEMPT_CONFIRMED", T4,
       "The mission's dispatch attempt confirmed through the execution authority — the task completes with the mission.",
@@ -350,6 +356,7 @@ async function driveJourney(): Promise<JourneyOutcome> {
     expect(missionFacts?.missionStatus).toBe("COMPLETED");
     expect(missionFacts?.events.some((event) => event.kind === "ATTEMPT_STARTED")).toBe(true);
     expect(missionFacts?.events.some((event) => event.kind === "ATTEMPT_CONFIRMED")).toBe(true);
+    expect(missionFacts?.events.some((event) => event.kind === "ATTEMPT_VERIFIED")).toBe(true);
     const rows = projectRoutineStageProgress({
       taskEvents: finalTask.events.map((event) => ({ kind: event.kind, summary: event.summary, at: event.at })),
       mission: missionFacts,
@@ -363,7 +370,7 @@ async function driveJourney(): Promise<JourneyOutcome> {
     expect(byStage.get("8")).toBe("COMPLETED");
     expect(byStage.get("9a")).toBe("COMPLETED");
     expect(byStage.get("9b")).toBe("COMPLETED");
-    expect(byStage.get("10")).toBe("IN_PROGRESS");
+    expect(byStage.get("10")).toBe("COMPLETED");
 
     const missionStore = JSON.stringify(
       [...world.files.entries()].filter(([path]) => path.startsWith("/mem/p21d-payments")).sort(([a], [b]) => (a < b ? -1 : 1)),

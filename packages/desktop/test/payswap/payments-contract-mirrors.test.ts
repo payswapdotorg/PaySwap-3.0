@@ -50,17 +50,22 @@ describe("the agent-task vocabulary pin (surface agent-tasks.ts, TL-frozen)", ()
     expect([...TERMINAL_PAYMENT_TASK_STATUSES]).toEqual([...TERMINAL_AGENT_TASK_STATUSES]);
   });
 
-  it("event kinds: the shared 21 mirror the surface's first 21 EXACTLY; ROUTINE_PINNED is app-store-only; the payment plane appends its own 22nd (P17-A, ADR-0010 D3 + P21-B, ADR-0014 D3)", () => {
+  it("event kinds: the shared 21 mirror the surface's first 21 EXACTLY; ROUTINE_PINNED is app-store-only; the payment plane appends its own 22nd + 23rd (P17-A, ADR-0010 D3 + P21-B, ADR-0014 D3 + the P21-D reviewer-gate, Gap C)", () => {
     // The first 21 kinds are the shared agent-task vocabulary, mirrored
     // exactly; the 22nd is the payment plane's own PLAN_SELECTION_RECORDED
-    // (the stage-9a landing site — a strict superset, pinned on both sides).
+    // (the stage-9a landing site — a strict superset, pinned on both sides)
+    // and the 23rd is the payment plane's own ATTEMPT_VERIFIED (the P21-D
+    // reviewer-gate append, Gap C — the confirmed-attempt verification
+    // closer; NEVER a substitute for RECONCILED).
     // (P21-B run 1 appended ROUTINE_PINNED as the SURFACE's 22nd shared
     // kind — stage 0's pin lands on the APP task store only, never the
     // mission timeline, so the payment plane never carries it.)
-    expect(PAYMENT_TASK_EVENT_KINDS).toHaveLength(22);
+    expect(PAYMENT_TASK_EVENT_KINDS).toHaveLength(23);
     expect([...PAYMENT_TASK_EVENT_KINDS].slice(0, 21)).toEqual([...AGENT_TASK_EVENT_KINDS].slice(0, 21));
     expect(PAYMENT_TASK_EVENT_KINDS[21]).toBe("PLAN_SELECTION_RECORDED");
+    expect(PAYMENT_TASK_EVENT_KINDS[22]).toBe("ATTEMPT_VERIFIED");
     expect([...AGENT_TASK_EVENT_KINDS]).not.toContain("PLAN_SELECTION_RECORDED");
+    expect([...AGENT_TASK_EVENT_KINDS]).not.toContain("ATTEMPT_VERIFIED");
     expect(AGENT_TASK_EVENT_KINDS).toHaveLength(22);
     expect(AGENT_TASK_EVENT_KINDS[21]).toBe("ROUTINE_PINNED");
     expect([...PAYMENT_TASK_EVENT_KINDS]).not.toContain("ROUTINE_PINNED");
@@ -68,15 +73,15 @@ describe("the agent-task vocabulary pin (surface agent-tasks.ts, TL-frozen)", ()
     expect(PAYMENT_TASK_EVENT_KINDS).toContain("RECONCILED");
   });
 
-  it("the STORE validator's pinned event-kind list equals the full 22-kind contracts set (the P16-D defect re-pin, P17-A)", () => {
+  it("the STORE validator's pinned event-kind list equals the full 23-kind contracts set (the P16-D defect re-pin, P17-A + the P21-D reviewer-gate append)", () => {
     // The store re-pins its own list (never imports the contracts const)
     // so the persisted-record validator drifts only through a conscious
     // two-step change — this pin IS that drift check: before P17-A the
     // store pinned only 17 kinds and a mission persisting a wait event
     // loaded into QUARANTINE.
-    expect(PAYMENT_EVENT_KINDS).toHaveLength(22);
+    expect(PAYMENT_EVENT_KINDS).toHaveLength(23);
     expect([...PAYMENT_EVENT_KINDS]).toEqual([...PAYMENT_TASK_EVENT_KINDS]);
-    for (const kind of ["WAIT_STARTED", "WAIT_CRITERIA_RECORDED", "OPPORTUNITY_MATCHED", "WAIT_EXPIRED", "PLAN_SELECTION_RECORDED"]) {
+    for (const kind of ["WAIT_STARTED", "WAIT_CRITERIA_RECORDED", "OPPORTUNITY_MATCHED", "WAIT_EXPIRED", "PLAN_SELECTION_RECORDED", "ATTEMPT_VERIFIED"]) {
       expect(PAYMENT_EVENT_KINDS).toContain(kind);
     }
   });

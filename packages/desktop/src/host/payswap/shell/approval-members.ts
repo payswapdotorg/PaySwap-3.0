@@ -151,6 +151,17 @@ export function projectAttemptStates(
       executionMode: attempt.executionMode,
       outcome,
       summary: attemptSummaryOf(attempt, outcome),
+      // (P21-D reviewer-gate, Gap C) The typed verification fact — its OWN
+      // fact, never a new outcome: the observed status + the instant only
+      // (the provider references stay host-side with the envelope).
+      ...(attempt.verification !== undefined
+        ? {
+            verification: {
+              readBackStatus: attempt.verification.readBackStatus,
+              verifiedAt: attempt.verification.verifiedAt,
+            },
+          }
+        : {}),
     };
   });
 }

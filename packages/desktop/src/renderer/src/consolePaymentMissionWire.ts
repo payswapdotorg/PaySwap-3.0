@@ -58,14 +58,15 @@ export type PaySwapPaymentMissionStatus =
   | "CANCELLED"
   | "EXPIRED";
 
-/** The append-only event-kind vocabulary (mirrors the host pin: the shared 21 + PLAN_SELECTION_RECORDED). */
+/** The append-only event-kind vocabulary (mirrors the host pin: the shared 21 + the payment plane's own PLAN_SELECTION_RECORDED + ATTEMPT_VERIFIED). */
 export type PaySwapPaymentMissionEventKind =
   | "CREATED" | "RESUMED" | "FIELD_CAPTURED" | "MISSING_FIELD_ASKED" | "VALIDATED"
   | "PREVIEW_PRESENTED" | "AUTHORIZATION_GRANTED" | "AUTHORIZATION_DECLINED"
   | "EXTERNAL_RETURN_VALIDATED" | "EXTERNAL_RETURN_REJECTED" | "ATTEMPT_STARTED"
   | "ATTEMPT_CONFIRMED" | "ATTEMPT_FAILED" | "OUTCOME_UNKNOWN" | "RECONCILED"
   | "CANCELLED" | "EXPIRED" | "WAIT_STARTED" | "WAIT_CRITERIA_RECORDED"
-  | "OPPORTUNITY_MATCHED" | "WAIT_EXPIRED" | "PLAN_SELECTION_RECORDED";
+  | "OPPORTUNITY_MATCHED" | "WAIT_EXPIRED" | "PLAN_SELECTION_RECORDED"
+  | "ATTEMPT_VERIFIED";
 
 /** The exact-money wire shape (integer minor units). */
 export interface PaySwapPaymentAmountDto {
@@ -256,6 +257,13 @@ export interface PaySwapPaymentMissionAttemptStateDto {
   readonly executionMode: "SANDBOX" | "LIVE";
   readonly outcome: PaySwapPaymentAttemptOutcome;
   readonly summary: string;
+  /** The typed verification fact (the P21-D reviewer-gate, Gap C), when an
+   * authoritative read-back verified this CONFIRMED attempt — its OWN
+   * typed fact, never a new outcome (the vocabulary above stays frozen). */
+  readonly verification?: {
+    readonly readBackStatus: string;
+    readonly verifiedAt: string;
+  };
 }
 
 /**
@@ -378,5 +386,20 @@ export interface PaySwapPaymentReconcileInputDto extends PaySwapPaymentReconcile
 export interface PaySwapPaymentMissionReconciliationOutcomeDto {
   readonly attemptId: string;
   readonly resolvedTo: "CONFIRMED" | "FAILED";
+  readonly summary: string;
+}
+
+// ---------------------------------------------------------------------------
+// The P21-D reviewer-gate verify wire types (Gap C — the single-act
+// authoritative read-back; the outcome carries facts only, the typed
+// refusals propagate)
+// ---------------------------------------------------------------------------
+
+/** The typed verification outcome on the wire (facts only — no connectionRef echo, no provider internals beyond the status). */
+export interface PaySwapPaymentMissionVerificationOutcomeDto {
+  readonly attemptId: string;
+  readonly verified: true;
+  readonly readBackStatus: string;
+  readonly verifiedAt: string;
   readonly summary: string;
 }

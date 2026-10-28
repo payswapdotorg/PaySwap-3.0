@@ -22,8 +22,10 @@
 import { PaymentMissionsArmedCard } from "./PaymentMissionsArmedCard.js";
 import { PaymentMissionsPreviewCard } from "./PaymentMissionsPreviewCard.js";
 import { PaymentMissionsReconcileCard } from "./PaymentMissionsReconcileCard.js";
+import { PaymentMissionsVerifyCard } from "./PaymentMissionsVerifyCard.js";
 import type { PaymentMissionsDispatchWiring } from "./paymentMissionsDispatchPins.js";
 import type { PaymentMissionsReconcileWiring } from "./paymentMissionsReconcilePins.js";
+import type { PaymentMissionsVerifyWiring } from "./paymentMissionsVerifyPins.js";
 import {
   PAYMENT_MISSIONS_ATTEMPT_OPERATION_LABELS,
   PAYMENT_MISSIONS_ATTEMPT_OUTCOME_LABELS,
@@ -49,6 +51,8 @@ export interface PaymentMissionsDetailProps {
   readonly dispatch?: PaymentMissionsDispatchWiring | null;
   /** The reconcile-flow wiring (null/absent when the bound port lacks the reconciliation members — P20-B). */
   readonly reconcile?: PaymentMissionsReconcileWiring | null;
+  /** The verify-flow wiring (null/absent when the bound port lacks the verify member — the P21-D reviewer-gate, Gap C; the card does not render). */
+  readonly verify?: PaymentMissionsVerifyWiring | null;
 }
 
 /** The people-language names of the nine intake fields (string-keyed: the
@@ -138,6 +142,7 @@ export function PaymentMissionsDetail({
   onResolveApproval,
   dispatch,
   reconcile,
+  verify,
 }: PaymentMissionsDetailProps): React.ReactNode {
   const { detail, ask } = state;
   const answerInputId = `ps-agent-missions-answer-${detail.id}`;
@@ -324,6 +329,39 @@ export function PaymentMissionsDetail({
         }
         reconcile={reconcile}
       />
+
+      {/* The verify section beside the reconcile card (the P21-D
+       * reviewer-gate, Gap C): SINGLE-ACT — it renders only when the
+       * LATEST attempt is CONFIRMED and carries NO typed verification
+       * fact (a RECONCILED outcome means provider evidence already
+       * closed an ambiguity — the reconciliation surface owns that
+       * case), and only when the bound port carries the verify member
+       * (an absent member keeps it unrendered — never a dead button). */}
+      {(() => {
+        const attempts = detail.attempts ?? [];
+        const latest = attempts[attempts.length - 1];
+        if (latest === undefined || verify == null) {
+          return null;
+        }
+        // The act is offerable while the latest attempt is CONFIRMED and
+        // carries no typed verification fact; once the fact lands, the
+        // card withdraws the affordance and only the flow's outcome note
+        // remains (the honest post-state).
+        const available =
+          latest.outcome === "CONFIRMED" && latest.verification === undefined;
+        const outcomeForLatest = verify.state.outcome?.attemptId === latest.attemptId;
+        if (!available && !outcomeForLatest) {
+          return null;
+        }
+        return (
+          <PaymentMissionsVerifyCard
+            missionId={detail.id}
+            attemptId={latest.attemptId}
+            available={available}
+            verify={verify}
+          />
+        );
+      })()}
 
       {detail.planSelection !== undefined ? (
         <section className="ps-agent-missions-section" id="ps-agent-missions-section-plan">
