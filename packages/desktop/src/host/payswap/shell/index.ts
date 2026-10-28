@@ -32,7 +32,24 @@ export {
 
 export { createPaySwapDesktopService } from "./service.js";
 export type { PaySwapDesktopServiceOptions } from "./service.js";
-export { ConnectionPlaneNotConfiguredError, PaymentPlaneNotConfiguredError } from "./service.js";
+export {
+  ConnectionPlaneNotConfiguredError,
+  PaymentPlaneNotConfiguredError,
+  SessionModelCatalogNotConfiguredError,
+} from "./service.js";
+// (P21-D Gap C, ADR-0014 D4) The session-model-catalog seam: the PURE
+// substrate-settings→DTO mapping + the channel member over the injected
+// substrate read + the agent-service-backed product wiring.
+export {
+  sessionModelCatalogFromSettings,
+  type SessionModelCatalogEntryDto,
+} from "./session-model-catalog.js";
+export {
+  createAbsentSessionModelCatalogChannelMembers,
+  createSessionModelCatalogChannelMembers,
+} from "./session-model-members.js";
+export type { SessionModelCatalogChannelDeps } from "./session-model-members.js";
+export { createSubstrateSessionSettingsRead } from "./session-model-substrate-read.js";
 export { createPaymentMissionChannelMembers } from "./payment-mission-members.js";
 export type { PaymentMissionChannelDeps, PaymentMissionChannelMemberSurface } from "./payment-mission-members.js";
 // (P21-A, ADR-0014 D5) The connection-ACTIVATION members (the

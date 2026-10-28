@@ -2,7 +2,7 @@
  * @payswap/journey-verification — the spec ↔ journey COVERAGE REGISTRY.
  *
  * The no-orphans law, both directions (the operations package's pattern,
- * applied to the journey map): every journey J1–J23 must be covered by at
+ * applied to the journey map): every journey J1–J24 must be covered by at
  * least one test in the suite, and every test must declare the journey
  * id(s) it covers. This registry is the file-level half; the test-level
  * half is the `[Jn]` title convention (every `test(...)` title carries at
@@ -39,101 +39,14 @@ export interface SpecCoverage {
 }
 
 export const SPEC_COVERAGE: readonly SpecCoverage[] = [
-  {
-    spec: "first-launch.spec.ts",
-    journeys: ["J1"],
-    kind: "journey",
-  },
-  {
-    spec: "navigation.spec.ts",
-    journeys: ["J1", "J2", "J8", "J10", "J12", "J14"],
-    kind: "journey",
-  },
-  {
-    spec: "journey-entry.spec.ts",
-    journeys: ["J1", "J2", "J7", "J9", "J11"],
-    kind: "journey",
-  },
-  {
-    spec: "setup-required.spec.ts",
-    journeys: ["J2", "J3", "J4", "J5", "J6"],
-    kind: "journey",
-  },
-  {
-    spec: "error-unknown.spec.ts",
-    journeys: ["J7", "J10"],
-    kind: "journey",
-  },
-  {
-    spec: "settings-about.spec.ts",
-    journeys: ["J13"],
-    kind: "journey",
-  },
-  {
-    spec: "branding.spec.ts",
-    journeys: ["J1", "J2", "J8", "J13"],
-    kind: "journey",
-  },
-  {
-    spec: "legacy-redirect.spec.ts",
-    journeys: ["J15"],
-    kind: "journey",
-  },
-  {
-    spec: "responsive.spec.ts",
-    journeys: ["J1", "J2", "J8"],
-    kind: "journey",
-  },
-  {
-    spec: "accessibility.spec.ts",
-    journeys: ["J1", "J2", "J8", "J10", "J12"],
-    kind: "journey",
-  },
-  {
-    spec: "console-workspace.spec.ts",
-    journeys: ["J14"],
-    kind: "journey",
-  },
-  {
-    spec: "console-mission-lifecycle.spec.ts",
-    journeys: ["J14"],
-    kind: "journey",
-  },
-  {
-    spec: "console-honest-empties.spec.ts",
-    journeys: ["J14"],
-    kind: "journey",
-  },
-  {
-    spec: "console-advanced.spec.ts",
-    journeys: ["J14"],
-    kind: "journey",
-  },
-  {
-    spec: "console-a11y-responsive.spec.ts",
-    journeys: ["J14"],
-    kind: "journey",
-  },
-  {
-    spec: "payments-discovery.spec.ts",
-    journeys: ["J16"],
-    kind: "journey",
-  },
-  {
-    spec: "onchain-discovery.spec.ts",
-    journeys: ["J17"],
-    kind: "journey",
-  },
-  {
-    spec: "psp-connection.spec.ts",
-    journeys: ["J18"],
-    kind: "journey",
-  },
-  {
-    spec: "advanced-workspace-access.spec.ts",
-    journeys: ["J19"],
-    kind: "journey",
-  },
+  // (P21-D reconciliation) The P15-strip retirement: the nineteen
+  // product-surface spec files retired with their journeys (J1–J19 +
+  // the surface-specific halves of J21/J22 — the pre-strip marketing/app
+  // shell no longer exists in the web build; the laws live on at the
+  // desktop product tier; see JOURNEY-MAP.md §5 and the manifest's
+  // retirement fields). The web tier's living suite: the composer laws
+  // (J20–J23, re-scoped to the substrate shell) + the task-tier
+  // journey (J24) + this enforcement spec.
   {
     spec: "agent-composer-surfaces.spec.ts",
     journeys: ["J20"],
@@ -142,6 +55,11 @@ export const SPEC_COVERAGE: readonly SpecCoverage[] = [
   {
     spec: "agent-composer-convergence.spec.ts",
     journeys: ["J21", "J22", "J23"],
+    kind: "journey",
+  },
+  {
+    spec: "agent-task-tier-journey.spec.ts",
+    journeys: ["J24"],
     kind: "journey",
   },
   {

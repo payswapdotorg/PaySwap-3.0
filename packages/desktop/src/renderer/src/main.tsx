@@ -5,7 +5,10 @@ import { initializeDesktopLocalTtft } from "./localTtftBootstrap.js";
 import { composeRoutePlanningBinding } from "./routePlanningComposition.js";
 import { composePaymentMissionsBinding } from "./paymentMissionsComposition.js";
 import { composeMissionIntakeBinding } from "./missionIntakeComposition.js";
-import { composeModelCatalogBinding } from "./modelCatalogComposition.js";
+import {
+  channelSessionModelCatalogSource,
+  composeModelCatalogBinding,
+} from "./modelCatalogComposition.js";
 import { composeConnectionsActivationBinding } from "./connectionsActivationComposition.js";
 import { createRoot } from "react-dom/client";
 import { useEffect } from "react";
@@ -352,13 +355,18 @@ function initializeBusinessRoot(port: MessagePort): void {
   } catch {
     // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定摄入说明。
   }
-  // P21-B（ADR-0014 D4）：绑定模型目录面 —— 组合根需要基底会话设置的
-  // 模型可用性读取（ZCodeSessionSettingsState.model.available）；该读取
-  // 尚未作为渲染器可达的服务缝隙暴露，因此产品默认绑定 NOTHING：
-  // 作曲家如实呈现未绑定目录说明（绝不伪造模型清单 —— 诚实缺口已记录，
-  // 桥接层电池通过 source DI 缝隙验证组合）。
+  // P21-D Gap C（ADR-0014 D4）：绑定模型目录面 —— 基底会话设置的模型可用性
+  // （ZCodeSessionSettingsState.model.available）现在通过 payswap-desktop
+  // 通道的 sessionModelCatalog 成员暴露（宿主侧 1:1 映射，仅模型元数据）；
+  // 组合根把该成员适配为本组合的 source 并绑上共享缝隙（首个共享 controller
+  // 构造之前）。旧宿主不暴露该成员 → 无 source，组合如实 fail-closed，
+  // 作曲家呈现未绑定目录说明（绝不伪造模型清单）；成员读取失败在加载期
+  // 如实进入 ERROR 相位，绝不拖垮启动。
   try {
-    composeModelCatalogBinding({});
+    const modelCatalogSource = channelSessionModelCatalogSource(services);
+    composeModelCatalogBinding(
+      modelCatalogSource !== null ? { source: modelCatalogSource } : {},
+    );
   } catch {
     // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定目录说明。
   }

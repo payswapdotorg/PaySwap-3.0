@@ -65,7 +65,11 @@ import {
   type HostApiNetworkTransport,
   type OffPeakRequestAuthBuilder,
 } from "@zcode/services/node";
-import { derivePaymentsStoreDirectory, registerPaySwapDesktopService } from "./payswap/index.js";
+import {
+  createSubstrateSessionSettingsRead,
+  derivePaymentsStoreDirectory,
+  registerPaySwapDesktopService,
+} from "./payswap/index.js";
 import { createHostResourceUsageResponder } from "./hostResourceUsage.js";
 import {
   assertBoundSessionDispatchable,
@@ -2917,6 +2921,22 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
         // leaves the runtime un-injected and the members fail closed
         // with the typed PaymentPlaneNotConfiguredError.
         const payswapWorkspaceStoreDir = process.env.PAYSWAP_WORKSPACE_STORE_DIR?.trim() || undefined;
+        // P21-D Gap C (ADR-0014 D4): the substrate session-settings read
+        // backing the sessionModelCatalog member — the agent service's
+        // EXISTING read-only surface (listSessions + readSession,
+        // existing-only: the observer NEVER starts a runtime) over this
+        // init's workspace. Without an agent service or a workspace the
+        // member is not composed and fails closed typed on first use.
+        const payswapAgentService = services.getOptional(IZCodeAgentService);
+        const payswapSessionSettingsWorkspace =
+          msg.workspacePath !== undefined
+            ? {
+                workspacePath: msg.workspacePath,
+                ...(msg.workspaceIdentity !== undefined
+                  ? { workspaceIdentity: msg.workspaceIdentity }
+                  : {}),
+              }
+            : undefined;
         await registerPaySwapDesktopService(services, {
           scope: { kind: "local" },
           log: (level, message, ...args) => {
@@ -2925,6 +2945,16 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
           storeDirectory: payswapWorkspaceStoreDir,
           ...(payswapWorkspaceStoreDir !== undefined
             ? { paymentsStoreDirectory: derivePaymentsStoreDirectory(payswapWorkspaceStoreDir) }
+            : {}),
+          ...(payswapAgentService !== undefined && payswapSessionSettingsWorkspace !== undefined
+            ? {
+                sessionModelCatalog: {
+                  readSettings: createSubstrateSessionSettingsRead(
+                    payswapAgentService,
+                    payswapSessionSettingsWorkspace,
+                  ),
+                },
+              }
             : {}),
         });
         hasDisposedHostResources = false;

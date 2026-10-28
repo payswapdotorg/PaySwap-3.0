@@ -356,6 +356,16 @@ export function AgentComposerPanel({
       {state.entryArea !== null ? (
         <p className="ps-agent-panel-entry">Opened from the {state.entryArea} area.</p>
       ) : null}
+      {/* (P21-D, the J24 E2E finding) The ONE scrollable panel body: the
+       * entry/law notes, the transcript, the tasks, the route-planning
+       * section and the model controls scroll TOGETHER when the panel's
+       * max-height clips them — the tasks section previously carried
+       * flex: 1 1 auto + min-height: 0 and collapsed to ZERO height
+       * whenever the sibling sections' min-content exceeded the panel
+       * box (the task board rendered into scrollable overflow — present
+       * in the a11y tree, invisible and unclickable on screen). The
+       * header and the input form stay fixed; the body scrolls. */}
+      <div className="ps-agent-panel-body">
       <p className="ps-agent-panel-law">{AGENT_COMPOSER_ZERO_AUTHORITY_NOTE}</p>
 
       <div className="ps-agent-transcript" role="log" aria-live="polite" aria-label="Composer conversation">
@@ -406,6 +416,7 @@ export function AgentComposerPanel({
        * injected substrate catalog; an unbound catalog renders the honest
        * unbound note, never a model list. */}
       <AgentModelControls state={state} controller={controller} />
+      </div>
 
       <form className="ps-agent-input" onSubmit={handleSubmit}>
         <label htmlFor={inputId} className="ps-sr-only">

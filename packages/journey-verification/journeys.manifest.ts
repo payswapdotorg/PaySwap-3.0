@@ -1,5 +1,5 @@
 /**
- * @payswap/journey-verification — the J1–J23 journey manifest.
+ * @payswap/journey-verification — the J1–J24 journey manifest.
  *
  * Authority: spec/productization/JOURNEY-MAP.md §1 (the primary journey
  * map, REGISTERED by the TL) + PRODUCT-IDENTITY.md §3 (the route contract
@@ -29,7 +29,7 @@
  * suite; an unjourneyed test fails it too.
  */
 
-/** A journey id from the J1–J23 map (JOURNEY-MAP.md §1). */
+/** A journey id from the J1–J24 map (JOURNEY-MAP.md §1 + the P21-D J24 row). */
 export type JourneyId = `J${number}`;
 
 /** Where a journey's acceptance can run green. */
@@ -54,6 +54,20 @@ export interface JourneyRow {
   readonly baseSurface: string | null;
   /** What remains contract-gated even for tier-1 rows. */
   readonly integrationNote: string;
+  /**
+   * (P21-D reconciliation) Present when the journey's WEB surface was
+   * retired by the P15 strip (the web entry boots the ZCode substrate
+   * Root for every pathname — spec/productization/JOURNEY-MAP.md §5).
+   * A retired row is exempt from the coverage law (law 4): its spec
+   * files retired with it; the law itself lives on at the named
+   * successor tier. NEVER a silent deletion — the row stays REGISTERED
+   * with its reason.
+   */
+  readonly retirement?: {
+    readonly at: string;
+    readonly successor: string;
+    readonly reason: string;
+  };
 }
 
 export const JOURNEYS: readonly JourneyRow[] = [
@@ -69,6 +83,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap",
     integrationNote:
       "the first-launch EXPERIENCE (brand, hero, CTA, gate note, zero console errors) is base-green at /payswap; the route MOVE to / plus the PaySwap favicon/boot mark are @contract (Lane P9-A)",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J2",
@@ -82,6 +101,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap/app",
     integrationNote:
       "the honest authenticated entry boundary + eleven-area map are base-green at /payswap/app; the route move to /app is @contract",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J3",
@@ -95,6 +119,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap",
     integrationNote:
       "the outcome-action dispatchability board with typed prerequisites is base-green on the home + app-entry surfaces; the /app payments area route is @contract",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J4",
@@ -106,6 +135,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     tier: 1,
     baseSurface: "/payswap",
     integrationNote: "same as J3 — the receive action's typed prerequisite is base-green",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J5",
@@ -118,6 +152,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     tier: 1,
     baseSurface: "/payswap",
     integrationNote: "the convert action's typed prerequisite is base-green",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J6",
@@ -130,6 +169,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap",
     integrationNote:
       "the checkout action's typed prerequisite (no merchant plane — refuse to fabricate a checkout session) is base-green",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J7",
@@ -142,6 +186,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap/app",
     integrationNote:
       "the activity area's designed-empty contract + the UNKNOWN-is-never-FAILED surface copy are base-green; the activity ledger route is @contract",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J8",
@@ -155,6 +204,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap/capabilities",
     integrationNote:
       "the honest coverage explorer + home coverage summary at providerCount 0 are base-green; the /capabilities route move is @contract",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J9",
@@ -167,6 +221,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap/app",
     integrationNote:
       "the opportunities area's designed-empty contract (discovery runs on real capability observations only) is base-green",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J10",
@@ -179,6 +238,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap/security",
     integrationNote:
       "the six structural commitments + non-custody page are base-green; the /security route move is @contract",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J11",
@@ -190,6 +254,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     tier: 1,
     baseSurface: "/payswap/app",
     integrationNote: "the reports area's designed-empty contract is base-green",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J12",
@@ -202,6 +271,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap/developers",
     integrationNote:
       'the "Not configured — and shown as such" API runtime state is base-green; the /developers route move is @contract',
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J13",
@@ -214,6 +288,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: "/payswap/app",
     integrationNote:
       "the settings area's honest empty state (nothing configurable without a session) is base-green; the FULL settings + about surface with PaySwap identity and upstream attribution is @contract (Lane P9-A)",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J14",
@@ -227,6 +306,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: null,
     integrationNote:
       "at the lane base the console IS the substrate root (the ZCode client at /) — no distinct /console surface exists to test honestly; fully @contract. P10 INTEGRATION UPDATE: on the merged console wave (4137bf6) the /console surface EXISTS as the PaySwap Agent Workspace and JOURNEY-MAP.md §3 flows 15–19 are tier-1-green browser flows (this suite's console-*.spec.ts, P10-D) — the @contract pair in navigation.spec.ts still pins the reachability + never-the-default-landing law",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J15",
@@ -239,6 +323,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: null,
     integrationNote:
       "at the lane base /payswap/* ARE the real product routes (no redirect exists); the redirect contract only exists post-P9-A — fully @contract",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J16",
@@ -252,6 +341,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: null,
     integrationNote:
       "the typed payments landing (PaymentsAreaSurface, Lane P12-C) — @contract, gates at TL integration on the merged tree (specs/payments-discovery.spec.ts)",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J17",
@@ -265,6 +359,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: null,
     integrationNote:
       "the onchain rail surface (foldOnchainRail + ConnectionsAreaSurface + AccountsAreaSurface, Lane P12-C) — @contract, gates at TL integration (specs/onchain-discovery.spec.ts)",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J18",
@@ -278,6 +377,11 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: null,
     integrationNote:
       "the PSP setup surface (foldConnectionsSetup + ConnectionsAreaSurface, Lane P12-C) — @contract, gates at TL integration (specs/psp-connection.spec.ts)",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J19",
@@ -291,11 +395,16 @@ export const JOURNEYS: readonly JourneyRow[] = [
     baseSurface: null,
     integrationNote:
       "the in-IA advanced entry (DevelopersPage + section-vocabulary, Lane P12-C) — @contract, gates at TL integration (specs/advanced-workspace-access.spec.ts)",
+    retirement: {
+      at: "P15-strip",
+      successor: "the desktop product tier (the PaySwap desktop app carries these surfaces)",
+      reason: "the P15 strip removed the pre-strip product surfaces from the web build (the web entry boots the ZCode substrate Root for every pathname — the marketing/app shell these tests drove no longer exists there)",
+    },
   },
   {
     id: "J20",
     title: "Shared agent entrypoints — one composer, every surface",
-    route: "/ → /app → /app/payments → /app/connections → /app/accounts → /console",
+    route: "/ → /console (the substrate shell — every pathname boots the substrate Root; the composer mounts on all of it)",
     control: "the persistent, toggleable PaySwap agent composer (dock + panel)",
     prerequisite: "none (the composer works standalone in the browser profile, honestly labeled)",
     honestState:
@@ -307,9 +416,9 @@ export const JOURNEYS: readonly JourneyRow[] = [
   },
   {
     id: "J21",
-    title: "Connections → Stripe and chat → “connect Stripe” converge on ONE setup task",
-    route: "/app/connections (agent-led setup section)",
-    control: "the Stripe connect cards + the composer text path",
+    title: "Chat → “connect Stripe” seeds the ONE resumable setup task",
+    route: "/ (the composer text path on the substrate shell)",
+    control: "the composer text path (the pre-strip connect CARDS retired with the P15 strip — the desktop product tier carries the surface entrypoints)",
     prerequisite: "no provider connection exists (the honest empty; a catalogue entry is never a connection)",
     honestState:
       "a card click and a typed “connect Stripe” reach the SAME resumable CONNECTION_SETUP task inside the window — CREATED then RESUMED, never a duplicate; the task record states nothing is connected (a connection exists only when the connection plane records real provider evidence); Stripe is the one declared provider and no other is ever offered; the U2/U3 forms state their exact missing operator configuration (never simulated OAuth)",
@@ -320,9 +429,9 @@ export const JOURNEYS: readonly JourneyRow[] = [
   },
   {
     id: "J22",
-    title: "Pay by button and text — the same payment-intake task; voice honestly unsupported",
-    route: "/app/payments (agent-led payments section)",
-    control: "the Pay/Receive/Move direction cards + the composer text path",
+    title: "Pay by text — the payment-intake task; voice honestly unsupported",
+    route: "/ (the composer text path on the substrate shell)",
+    control: "the composer text path (the pre-strip direction CARDS retired with the P15 strip — the desktop product tier carries the surface entrypoints)",
     prerequisite: "no payment can dispatch (the preview→authorization→execution path is host-side; the composer holds zero financial authority)",
     honestState:
       "a Pay-card click and a typed “pay the supplier” seed the SAME resumable PAYMENT_MISSION task; checkout has NO card (no direction exists in the mission vocabulary — never a guessed seed); the card copy states starting a task pays nothing; voice input is not supported in this deployment and is never simulated",
@@ -334,7 +443,7 @@ export const JOURNEYS: readonly JourneyRow[] = [
   {
     id: "J23",
     title: "Composer durability — minimize/reopen and reload never lose context",
-    route: "/app/payments (any integrated surface)",
+    route: "/ (any substrate-shell surface)",
     control: "the composer dock/panel toggle + the browser-profile task store",
     prerequisite: "the standalone browser-profile persistence (honestly labeled: not synced anywhere, clearing site data removes it)",
     honestState:
@@ -344,9 +453,22 @@ export const JOURNEYS: readonly JourneyRow[] = [
     integrationNote:
       "the composer UI-state + task-store persistence (Lane P13-A) — @contract, gates at TL integration (specs/agent-composer-convergence.spec.ts)",
   },
+  {
+    id: "J24",
+    title: "The task-tier agent journey — New Task through the composer; the mission/model tiers honestly unbound",
+    route: "/console",
+    control: "the composer dock → the panel's text input (the New Task path)",
+    prerequisite: "none (the composer works standalone in the browser profile, honestly labeled)",
+    honestState:
+      "a payment-shaped request (e.g. \"Pay merchant X\") seeds ONE task that lands on the composer's task board with its honest draft status; the model/difficulty controls render the honest unbound-catalog note VERBATIM with ZERO model options (never a fabricated list); the mission tier's honest unbound note renders VERBATIM in the conversation; the routine-stage checklist and the route-planning section render their honest unbound notes with ZERO fabricated progress, ZERO routes, ZERO choice controls; the task record survives a full reload (browser-profile tier)",
+    tier: 1,
+    baseSurface: "/console",
+    integrationNote:
+      "the P21-D web-tier E2E law (ADR-0014 D10 + D2's web analogue: the web build renders the task tier + the honest unbound notes, never a faked mission tier — the desktop tier carries the full bound journey). The J20–J23 composer surfaces are LANDED in the merged tree, so this row is tier-1 base-green. POST-P15 ROUTING: every pathname boots the same substrate shell with the composer mounted beside it — /console is the console surface this row drives. SERVING: the suite serves the built dist through the REAL substrate HTTP server (ZCODE_WEB_STATIC_ROOT + /ws) — the P15-stripped app cannot boot static-only (see scripts/webserver.mjs). The JOURNEY-MAP.md §1 J24 row + the map reconciliation are the TL's closure item (recorded in the P21-D worklog)",
+  },
 ] as const;
 
-/** The ordered id list J1..J23 (the map is total; the cross-check pins it). */
+/** The ordered id list J1..J24 (the map is total; the cross-check pins it). */
 export const JOURNEY_IDS: readonly JourneyId[] = JOURNEYS.map((row) => row.id);
 
 /** Tier lookup for the cross-check (tier-1 journeys need non-@contract tests). */

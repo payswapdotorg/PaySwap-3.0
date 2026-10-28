@@ -22,13 +22,12 @@
  * - The typed trigger + fail-closed manifest + pin ledger run stages
  *   0/1; the idempotency key is `route:<missionId>` (one routine start
  *   per mission; an identical re-record replays — the D1 law).
- * - The corridor chains are the deployment's REAL connected capability
- *   instances — ZERO in this deployment — so the REAL projectCorridor
- *   projects the honest empty evaluation and the compiler's own honest
- *   exclusion ("no route family grounds the observed origin/destination
- *   pair — the honest empty state, never a fabricated route") surfaces
- *   verbatim. The scenario section runs the REAL Lab machinery over the
- *   EMPTY recorded-facts snapshot (the deployment records none).
+ * - The corridor chains are the composition-injected bridge derivation
+ *   (P21-D Gap A: the optional `chains` state field, fed by the channel's
+ *   connectionCapabilityChains member); the DEFAULT is the honest EMPTY
+ *   set — unbound callers keep the exact pre-wiring behavior; the injected
+ *   chains are re-validated fail-closed by the REAL corridor machinery at
+ *   the stage-2/3 snapshot derivation (the scenario section stays EMPTY).
  * - The pinned default best-execution policy is the composition root's
  *   OWN transparent ranking preference (versioned, fully declared; the
  *   identity conversion only — no fabricated market rates; a route
@@ -54,6 +53,7 @@ import {
   type RouteCompilationPort,
   type ScenarioExplorationPort,
   type PinnedCorridorQuery,
+  type PinnedCorridorRouteChain,
   type PinnedCorridorSideEvaluation,
   type RouteCompilerEvidenceBundle,
 } from "@payswap/route-planning";
@@ -221,7 +221,7 @@ export interface RoutePlanningEngineState {
  */
 export function createRealRoutePlanningEngine(
   source: RoutePlanningMissionSource,
-  state: { missions: readonly RoutePlanningMissionBoardItem[]; details: ReadonlyMap<string, RoutePlanningMissionDetail> },
+  state: { missions: readonly RoutePlanningMissionBoardItem[]; details: ReadonlyMap<string, RoutePlanningMissionDetail>; chains?: readonly PinnedCorridorRouteChain[] },
   engineState: { lastPresented: RoutePlanningEngineState["lastPresented"] },
 ): RoutePlanningEnginePort & RoutePlanningMissionFactsSource {
   const registry = new RoutePlanningTriggerRegistry();
@@ -277,12 +277,15 @@ export function createRealRoutePlanningEngine(
       const budgets = request.modelSelection !== undefined
         ? modelBudgetOf(request.modelSelection.reasoningLevel)
         : compositionDefaultBudgets();
-      // Stages 2/3 — the per-side snapshots over the REAL corridor projection, ZERO chains (the deployment fact).
+      // Stages 2/3 — the per-side snapshots over the REAL corridor projection.
+      // (P21-D Gap A) The chains come from the composition root's cache — the
+      // channel member's bridge-derived chains, DEFAULT the honest EMPTY set;
+      // both sides evaluate the SAME set (the merged view dedupes by route id).
       const corridorPort = realCorridorPort();
       const freshnessPolicy = { maxAgeSeconds: 3600 };
       const pair = deriveRailSnapshotPair({
-        sender: { side: "SENDER", query, freshnessPolicy, chains: [], corridorPort },
-        recipient: { side: "RECIPIENT", query, freshnessPolicy, chains: [], corridorPort },
+        sender: { side: "SENDER", query, freshnessPolicy, chains: state.chains ?? [], corridorPort },
+        recipient: { side: "RECIPIENT", query, freshnessPolicy, chains: state.chains ?? [], corridorPort },
       });
       // Stage 4 — the REAL compiler through the port over the honest EMPTY evidence bundle.
       const enumeration = enumerateRouteCandidates({

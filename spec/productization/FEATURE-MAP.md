@@ -28,6 +28,15 @@ The route contract is PRODUCT-IDENTITY.md §3; the area set is the pinned
 eleven-area IA (INV-22 — unchanged by this wave). Machine-checkable companion:
 `packages/payswap-app/test/payswap/feature-map.test.ts` parses this file and
 asserts every wired row's route resolves and every cited component exists.
+*(P21-D reconciliation note, 2026-10-28 — see JOURNEY-MAP.md §5.)* The
+routes below name the PRODUCT's route contract; since the P15 strip
+the WEB BUILD's entry boots the ZCode substrate Root for every
+pathname (the marketing/app shell is not mounted by the web entry —
+the cited components live on in `packages/payswap-app` and mount in
+the DESKTOP product tier; the web tier renders the substrate shell +
+the shared agent composer, whose journey is J24). The machine-check
+companion keeps asserting component existence (unchanged); the
+journey-level truth is the JOURNEY-MAP's §5 reconciliation.
 
 ## 1. Payments family
 

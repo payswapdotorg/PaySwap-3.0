@@ -76,13 +76,15 @@ function parseSpecTests(spec: string): ParsedTest[] {
 test("no-orphans law: the manifest, the registry and the spec files agree in both directions", async ({ page }) => {
   expect(page).toBeDefined();
 
-  // The map itself is the canonical J1–J23 (23 unique, ordered — the
-  // P12 Lane C wave added J16–J19, JOURNEY-MAP.md §5; the P13 wave added
-  // J20–J23, JOURNEY-MAP.md §6).
+  // The map itself is the canonical J1–J24 (24 unique, ordered — the
+  // P12 wave added J16–J19 (§5), the P13 wave J20–J23 (§6), the P21-D
+  // web-tier E2E lane added J24 (ADR-0014 D10 — the task-tier journey +
+  // the honest unbound notes; the JOURNEY-MAP.md row is the TL's closure
+  // item, recorded in the manifest integrationNote)).
   expect(JOURNEY_IDS).toEqual(
-    Array.from({ length: 23 }, (_, index) => `J${index + 1}` as JourneyId),
+    Array.from({ length: 24 }, (_, index) => `J${index + 1}` as JourneyId),
   );
-  expect(new Set(JOURNEY_IDS).size).toBe(23);
+  expect(new Set(JOURNEY_IDS).size).toBe(24);
 
   const onDisk = readdirSync(SPECS_DIR)
     .filter((name) => name.endsWith(".spec.ts"))
@@ -107,9 +109,20 @@ test("no-orphans law: the manifest, the registry and the spec files agree in bot
     }
   }
 
-  // Law 4: every manifest journey is covered by at least one spec.
+  // Law 4: every manifest journey is covered by at least one spec —
+  // EXCEPT the retired rows (the P21-D reconciliation: a retired row's
+  // web surface was removed by the P15 strip; its spec files retired
+  // with it; the law lives on at the named successor tier — never a
+  // silent deletion, the row stays REGISTERED with its reason).
   const covered = new Set(SPEC_COVERAGE.flatMap((entry) => entry.journeys));
   for (const row of JOURNEYS) {
+    if (row.retirement !== undefined) {
+      expect(
+        covered.has(row.id),
+        `retired journey ${row.id} (${row.title}) still has a covering spec — retirement means the spec retired too`,
+      ).toBe(false);
+      continue;
+    }
     expect(
       covered.has(row.id),
       `journey ${row.id} (${row.title}) has no covering spec — an orphan journey fails the suite`,
@@ -176,6 +189,9 @@ test("no-orphans law: the manifest, the registry and the spec files agree in bot
     }
   }
   for (const row of JOURNEYS) {
+    if (row.retirement !== undefined) {
+      continue;
+    }
     if (journeyTier(row.id) === 1) {
       expect(
         nonContractCoverage.has(row.id),
@@ -183,11 +199,16 @@ test("no-orphans law: the manifest, the registry and the spec files agree in bot
       ).toBe(true);
     }
   }
-  const tier2Only = JOURNEYS.filter((row) => journeyTier(row.id) === 2);
+  const tier2Only = JOURNEYS.filter((row) => row.retirement === undefined && journeyTier(row.id) === 2);
   expect(tier2Only.map((row) => row.id)).toEqual([
-    "J14", "J15", "J16", "J17", "J18", "J19",
-    // The P13 composer journeys (JOURNEY-MAP.md §6).
+    // (P21-D reconciliation) J14–J19 are RETIRED (the P15 strip removed
+    // their web surfaces) — excluded above; the living tier-2 set is the
+    // composer journeys (JOURNEY-MAP.md §6), re-scoped to the substrate
+    // shell (every pathname boots the substrate Root — the composer
+    // mounts on all of it).
     "J20", "J21", "J22", "J23",
+    // J24 (the P21-D web tier) is TIER 1 — the composer surfaces are
+    // landed in the merged tree, so it needs base-green coverage only.
   ]);
   for (const row of tier2Only) {
     expect(

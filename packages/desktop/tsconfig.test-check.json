@@ -22,6 +22,7 @@
     "test/payswap/connections-probe-plane.test.ts",
     "test/payswap/connections-probe-plane-fixtures.ts",
     "test/payswap/gate-environment-corridor.test.ts",
-    "test/payswap/execution-lane-composition.test.ts"
+    "test/payswap/execution-lane-composition.test.ts",
+    "test/payswap/session-model-catalog.test.ts"
   ]
 }

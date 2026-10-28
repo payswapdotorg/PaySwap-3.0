@@ -27,3 +27,6 @@ export * from "./verification-probes.js";
 export * from "./probe-members.js";
 export * from "./capability-bridge.js";
 export * from "./gate-environment.js";
+export * from "./chain-definitions.js";
+export * from "./chain-from-bridge.js";
+export * from "./chain-members.js";

@@ -41,6 +41,7 @@ import type {
   RoutePlanningMissionSource,
 } from "./routePlanningMissionLinkage.js";
 import type { DesktopConsoleChannelServices } from "./consoleWorkspaceMount.js";
+import type { PaySwapConnectionCapabilityChainDto } from "./consoleConnectionsWire.js";
 
 /* ---------------- the channel-backed mission source (P17-A members) ---------------- */
 
@@ -54,6 +55,15 @@ export interface MissionPlaneChannelClient {
   ): Promise<RoutePlanningMissionDetail>;
 }
 
+/**
+ * (P21-D Gap A) The corridor-chains member the composition reads (the
+ * channel client's surface — the bridge-derived four-layer route chains
+ * the engine's stages 2/3 consume).
+ */
+export interface RoutePlanningChainsChannelClient {
+  connectionCapabilityChains(): Promise<readonly PaySwapConnectionCapabilityChainDto[]>;
+}
+
 /** Adapt the channel services (the payswap-desktop proxy) to the mission source. */
 export function channelMissionSource(services: DesktopConsoleChannelServices): RoutePlanningMissionSource {
   const client = services.payswapDesktopService as unknown as MissionPlaneChannelClient;
@@ -65,10 +75,17 @@ export function channelMissionSource(services: DesktopConsoleChannelServices): R
 
 /* ------------------------------ the composition ------------------------------ */
 
-/** The composition's mutable state (the mission cache + the engine's linkage). */
+/** The composition's mutable state (the mission cache + the corridor chains cache + the engine's linkage). */
 export interface RoutePlanningCompositionState {
   missions: readonly RoutePlanningMissionBoardItem[];
   details: ReadonlyMap<string, RoutePlanningMissionDetail>;
+  /**
+   * (P21-D Gap A) The corridor capability chains cache — the wire DTO
+   * shape structurally mirrors the route-planning pin, so the engine
+   * consumes it without a cast; the REAL corridor validators re-validate
+   * every chain fail-closed at the stage-2/3 snapshot derivation.
+   */
+  chains: readonly PaySwapConnectionCapabilityChainDto[];
   lastPresented: { missionId: string; viewDigest: string; routineId: string; routineVersion: string } | null;
   planSelectionSink: ((input: { planId: string; viewDigest: string; routineId: string; routineVersion: string }) => Promise<unknown>) | null;
 }
@@ -97,12 +114,24 @@ export function composeRoutePlanningBinding(options: {
 }): RoutePlanningComposition {
   const controller = options.controller ?? sharedAgentComposerController();
   const source = options.source ?? (options.services !== undefined ? channelMissionSource(options.services) : null);
-  const state: RoutePlanningCompositionState = { missions: [], details: new Map(), lastPresented: null, planSelectionSink: options.planSelectionSink ?? null };
+  const state: RoutePlanningCompositionState = { missions: [], details: new Map(), chains: [], lastPresented: null, planSelectionSink: options.planSelectionSink ?? null };
   if (source === null) {
     // HONEST FAILURE: no channel and no injected source — the seams stay
     // at their defaults (the unbound engine + the not-wired notes).
     throw new Error("the route-planning composition requires the payswap-desktop channel services (or an injected mission source) — nothing is bound, the honest defaults stand");
   }
+  // (P21-D Gap A) The corridor-chains reader: the channel member when the
+  // host exposes it; NULL when the member is absent (an older host — the
+  // composition then stays at the honest EMPTY chain set, fail-closed,
+  // never a crash, never fabricated chains).
+  const chainsClient =
+    options.services !== undefined
+      ? (options.services.payswapDesktopService as unknown as Partial<RoutePlanningChainsChannelClient>)
+      : undefined;
+  const readChains =
+    chainsClient !== undefined && typeof chainsClient.connectionCapabilityChains === "function"
+      ? chainsClient.connectionCapabilityChains.bind(chainsClient)
+      : null;
   const engine = createRealRoutePlanningEngine(source, state, state);
   bindRoutePlanningEngine(engine);
 
@@ -128,6 +157,23 @@ export function composeRoutePlanningBinding(options: {
     } catch {
       // The honest read-failure posture: the cache stays as-is; the
       // engine fails closed on its own typed states, never fabricated.
+    }
+    // (P21-D Gap A) The corridor chains cache: read through the channel
+    // member after every mission refresh (init + after every session
+    // mutation — the same cache law). Fail-closed: an absent member (an
+    // older host) keeps the honest empty set; a rejected read keeps the
+    // previous set (the observations are freshness-stamped — the corridor
+    // evaluation itself excludes stale rails); a non-array answer changes
+    // nothing. Never a crash, never a fabricated chain.
+    if (readChains !== null) {
+      try {
+        const chains = await readChains();
+        if (Array.isArray(chains)) {
+          state.chains = chains;
+        }
+      } catch {
+        // the honest read-failure posture: the chains cache stays as-is
+      }
     }
   };
 

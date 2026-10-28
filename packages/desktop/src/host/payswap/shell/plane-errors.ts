@@ -29,3 +29,20 @@ export class PaymentPlaneNotConfiguredError extends Error {
     this.name = "PaymentPlaneNotConfiguredError";
   }
 }
+
+/**
+ * The typed fail-closed error for an unconfigured session-model-catalog
+ * seam (P21-D Gap C, ADR-0014 D4 — the same posture): the substrate
+ * session-settings read was not composed at the host composition edge,
+ * so the catalog member fails closed — never a silent empty list
+ * pretending the substrate seam exists.
+ */
+export class SessionModelCatalogNotConfiguredError extends Error {
+  readonly kind = "SESSION_MODEL_CATALOG_NOT_CONFIGURED" as const;
+  constructor() {
+    super(
+      "The session-model catalog seam is not configured in this host (no substrate session-settings read on the seam) — session-model-catalog calls fail closed",
+    );
+    this.name = "SessionModelCatalogNotConfiguredError";
+  }
+}

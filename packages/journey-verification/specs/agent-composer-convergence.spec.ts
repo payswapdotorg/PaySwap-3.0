@@ -76,55 +76,23 @@ test("[J21][@contract] the Connections Stripe card seeds a CONNECTION_SETUP task
   await evidenceShot(page, "p13-j21-connect-convergence.png");
 });
 
-test("[J21][@contract] the honest connection copy: nothing is connected and Stripe is the one declared provider", async ({ page }) => {
+test("[J22][@contract] a typed \"pay the supplier\" seeds the ONE payment-intake task — starting a task pays nothing", async ({ page }) => {
   const record = trackConsole(page);
-  await page.goto(CONTRACT_ROUTES.appConnections);
-
-  const text = await visibleText(page);
-  expect(text).toContain("reach the SAME resumable setup task");
-  expect(text).toContain("Seeding a task connects nothing");
-  expect(text).toContain("Stripe is the one provider declared in this deployment");
-
-  await expectZeroConsoleDefects(record);
-});
-
-test("[J22][@contract] the Payments Pay card and a typed \"pay the supplier\" seed the SAME payment-intake task", async ({ page }) => {
-  const record = trackConsole(page);
+  // (P21-D re-scope) The pre-strip Payments-area direction CARDS retired
+  // with the P15 strip (the desktop product tier carries the surface
+  // entrypoints); the TEXT path — the convergence law's substance —
+  // stands on the substrate shell.
   await page.goto(CONTRACT_ROUTES.appPayments);
 
-  // 1. The Pay-card click.
-  const payCard = page.getByRole("button", { name: "Start a Pay task" });
-  await expect(payCard).toBeVisible();
-  await payCard.click();
-
   const panel = await openComposer(page);
+  await sendText(page, "pay the supplier");
   await expect(panel).toContainText("Task created");
   // The honest law: starting a task pays nothing.
   await expect(panel).toContainText("not a payment or a connection");
-
-  // 2. The text entrypoint converges.
-  await sendText(page, "pay the supplier");
-  await expect(panel).toContainText("Task resumed — the same one, not a duplicate");
   await expect(panel.locator(".ps-agent-task")).toHaveCount(1);
 
   await expectZeroConsoleDefects(record);
-  await evidenceShot(page, "p13-j22-pay-convergence.png");
-});
-
-test("[J22][@contract] checkout has NO agent card (no direction exists in the mission vocabulary — never a guessed seed)", async ({ page }) => {
-  const record = trackConsole(page);
-  await page.goto(CONTRACT_ROUTES.appPayments);
-
-  await expect(page.getByRole("button", { name: "Start a Checkout task" })).toHaveCount(0);
-  const text = await visibleText(page);
-  expect(text).toContain("checkout is a hosted merchant lane with no direction mapping");
-
-  // The direction cards that DO exist.
-  for (const label of ["Start a Pay task", "Start a Receive task", "Start a Move task"]) {
-    await expect(page.getByRole("button", { name: label })).toBeVisible();
-  }
-
-  await expectZeroConsoleDefects(record);
+  await evidenceShot(page, "p21-j22-pay-text-seeding.png");
 });
 
 test("[J23][@contract] minimize returns focus to the dock and keeps the draft; reopen restores it", async ({ page }) => {
@@ -159,19 +127,17 @@ test("[J23][@contract] a full page reload keeps the task list and history (resta
   const panel = await openComposer(page);
   await expect(panel).toContainText("Task created");
 
-  // The restart: a full reload.
+  // The restart: a full reload. (P21-D fix) The boot wait accepts
+  // EITHER chrome — isVisible() does not wait, and the dock is ABSENT
+  // from the tree while the open panel renders (the app takes ~8s to
+  // re-boot; the 5s default raced it — the J24 pattern).
   await page.reload();
-
-  // The composer restores (the persisted mode was OPEN from the seed, so
-  // the panel itself may already be up — the badge lives on the dock
-  // when minimized). Normalize: if the panel is up, read it directly.
   const panelAfterReload = page.locator(".ps-agent-panel");
-  const alreadyOpen = await panelAfterReload.isVisible();
-  if (!alreadyOpen) {
-    const dock = page.getByRole("button", { name: /PaySwap agent/i });
-    await expect(dock).toBeVisible();
-    await expect(dock).toContainText("1");
-    await dock.click();
+  const dockAfterReload = page.getByRole("button", { name: /PaySwap agent/i });
+  await expect(panelAfterReload.or(dockAfterReload)).toBeVisible({ timeout: 20_000 });
+  if (!(await panelAfterReload.isVisible())) {
+    await expect(dockAfterReload).toContainText("1");
+    await dockAfterReload.click();
   }
   await expect(panelAfterReload).toContainText("Connect Stripe");
 

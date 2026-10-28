@@ -117,6 +117,8 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
     expect(hostMembers).toEqual([...PAYSWAP_DESKTOP_CLIENT_MEMBERS].sort());
     // The known host members, spelled out (a drift in EITHER list fails).
     expect(hostMembers).toEqual([
+      // (P21-D Gap A, ADR-0014 D6/D12) The bridge-derived corridor chains.
+      "connectionCapabilityChains",
       "connectionConsumeProviderCallback",
       "connectionRecordVerificationOutcome",
       "connectionRegistry",
@@ -153,6 +155,10 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       "quoteDisclosure",
       "securityDecision",
       "session",
+      // (P21-D Gap C, ADR-0014 D4) The substrate session-settings model
+      // catalog (read-only model metadata DTOs; the honest empty list
+      // when the substrate reports no models).
+      "sessionModelCatalog",
       "workspaceArchiveMissionDraft",
       "workspaceListMissions",
       "workspaceMissionDetail",

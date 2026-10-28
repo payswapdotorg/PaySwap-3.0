@@ -7,11 +7,18 @@
  * - webServer: scripts/webserver.mjs — reuses packages/web/dist when the
  *   lane battery already built it, otherwise runs the ONE-SHOT
  *   `vite build --minify false --sourcemap false` (OOM law: 4GB box,
- *   never dev/watch). Serving = scripts/serve.mjs, a dependency-free
- *   static server with SPA fallback (documented choice — see serve.mjs).
+ *   never dev/watch). Serving = the REAL substrate HTTP server
+ *   (packages/server entry-http) over the built dist — ZCODE_WEB_STATIC_ROOT
+ *   + SPA fallback + the /ws + /api endpoints the P15-stripped app
+ *   REQUIRES to boot (a static-only serve renders the app's own
+ *   "Web bootstrap failed" report — no shipped workflow to drive; see
+ *   scripts/webserver.mjs for the recorded decision).
  * - projects: desktop 1280×800 (all specs) + mobile 390×844 (the
  *   responsive specs — acceptance flow 9's two core viewports; the third,
- *   1440×900, is driven inside a desktop test via viewport resize).
+ *   1440×900, is driven inside a desktop test via viewport resize. The
+ *   mobile project also runs the J24 task-tier journey spec, whose
+ *   dedicated responsive law drives the composer controls at 390×844 —
+ *   the responsive.spec.ts mechanism, extended).
  * - retries: 0 — journey evidence is deterministic or it is not evidence.
  * - reporters: list (console) + HTML + JSON (the structured receipt the
  *   acceptance record cites).
@@ -57,7 +64,7 @@ export default defineConfig({
     },
     {
       name: "mobile",
-      testMatch: /responsive\.spec\.ts/,
+      testMatch: /responsive\.spec\.ts|agent-task-tier-journey\.spec\.ts/,
       use: { viewport: { width: 390, height: 844 } },
     },
   ],

@@ -349,3 +349,69 @@ the double-reconcile refusal, the scanner law. Still NO LIVE-TIER
 claim: zero ACTIVE connections — real UNKNOWNs are fixture-only; the
 automatic evidence feeds (the verified-webhook mapping + the retrieval
 service) stay carried with the execution lanes (ADR-0013 D6).
+
+## 5. The P21-D reconciliation (2026-10-28) — the web tier's post-strip truth
+
+REGISTERED by the resident TL at the P21-D closure (ADR-0014 D10 — the
+E2E law's web half). This section reconciles the map with the WEB
+BUILD's truth since the P15 strip (spec/MIGRATION-FROM-ZCODE.md): the
+web entry boots the ZCode substrate Root for EVERY pathname
+(packages/web/src/substrateRoutes.ts — no route gate stands between
+the browser and the Root); the pre-strip marketing/app shell this
+map's §1 rows J1–J19 were authored against NO LONGER EXISTS in the web
+build.
+
+The reconciliation laws:
+
+- **J1–J19 are RETIRED from the web tier** (their manifest rows carry
+  the `retirement` field with the reason and the successor). The
+  surfaces they drove — the PaySwap-branded home, the eleven-area
+  `/app` shell, the capabilities/security/developers pages, the
+  `/payswap/*` redirect, the browser-rendered Agent Workspace console
+  — moved to the DESKTOP product tier (the PaySwap desktop app is the
+  product; its E2E proof is the ADR-0014 D10 desktop tier — the
+  Electron CDP harness). Retirement is a REGISTERED fact, never a
+  silent deletion: the rows stay in the manifest with their reasons,
+  and the nineteen spec files that drove them retired in the same
+  change (journeys.coverage.ts carries the record).
+- **J20–J23 (the composer laws) are RE-SCOPED to the substrate
+  shell**: the composer mounts on every substrate surface (the dock,
+  the one shared controller, the zero-authority/no-tools/voice notes,
+  the secret-refusal chat law, the browser-profile durability). The
+  pre-strip surface ENTRYPOINTS (the Connections connect-cards, the
+  Payments direction cards) retired with the strip; where a law's
+  substance was the card, the law is retired; where the substance is
+  the composer itself (the text path, the convergence, the notes),
+  the law stands and is proven green at the substrate routes.
+- **J24 is REGISTERED (tier 1)** — the web tier's own journey: the
+  task-tier agent journey ("Pay merchant X" → ONE task on the board →
+  the model/difficulty controls' honest unbound-catalog note VERBATIM
+  with ZERO model options → the mission tier's honest unbound note →
+  the routine-stage and route-planning unbound notes → the record
+  survives a full reload; the responsive 390×844 law). This is the
+  ADR-0014 D10 web-tier deliverable: the task-tier journey + the
+  honest unbound notes — the web build renders the task tier and
+  states its gaps; the full bound journey (the pinned routine, the
+  rail snapshots, the honest no-route, the dispatch, the read-back)
+  is the DESKTOP tier's law.
+- **The suite's serving shape**: the journey suite serves the REAL
+  substrate HTTP server (packages/server entry-http) over the built
+  dist — a static-only serve renders the app's own "Web bootstrap
+  failed" report (the substrate Root fail-fasts its WebSocket
+  connect), and "no mock-rendered page substitutes for the shipped
+  workflow" (ADR-0014 D10). The one-shot build keeps the documented
+  heap cap (1600MB — the OOM law).
+- **The finding the E2E law caught** (fixed in the same change): the
+  composer panel's tasks section collapsed to ZERO height whenever
+  the sibling sections' min-content exceeded the panel's max-height
+  (`flex: 1 1 auto` + `min-height: 0` on `.ps-agent-tasks`) — the
+  task board rendered into scrollable overflow: a11y-present,
+  invisible, unclickable. The panel now scrolls as ONE body (the
+  `.ps-agent-panel-body` wrapper; the header and input stay fixed).
+  This is the E2E law working as designed: the first DOM-level
+  journey through the real built app caught a real product defect the
+  controller-tier batteries could not see.
+
+The living web-tier suite: tier-1 = J24 + the manifest enforcement
+(7 tests green); tier-2 = the composer laws J20–J23 (8 tests green).
+The desktop tier carries the product-surface journeys (ADR-0014 D10).

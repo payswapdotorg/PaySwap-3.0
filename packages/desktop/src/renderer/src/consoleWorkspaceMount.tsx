@@ -50,11 +50,13 @@ import type {
   PaySwapPaymentReconcileEvidenceDto,
 } from "./consolePaymentMissionWire.js";
 import type {
+  PaySwapConnectionCapabilityChainDto,
   PaySwapConnectionProbeOutcomeDto,
   PaySwapConnectionStatusViewDto,
   PaySwapConnectionSetupOutcomeDto,
   PaySwapCredentialSealReceiptDto,
 } from "./consoleConnectionsWire.js";
+import type { PaySwapSessionModelCatalogEntryDto } from "./consoleSessionModelWire.js";
 
 // The payment-mission wire types (the pinned host DTO mirrors, split to
 // ./consolePaymentMissionWire.ts at P18-A) — re-exported so the module's
@@ -99,7 +101,13 @@ export type {
   PaySwapConnectionProbeOutcomeDto,
   PaySwapConnectionStatusViewDto,
   PaySwapConnectionSetupOutcomeDto,
+  PaySwapConnectionCapabilityDefinitionDto,
+  PaySwapConnectionCapabilityImplementationDto,
+  PaySwapConnectionCapabilityInstanceDto,
+  PaySwapConnectionCapabilityObservationDto,
+  PaySwapConnectionCapabilityChainDto,
 } from "./consoleConnectionsWire.js";
+export type { PaySwapSessionModelCatalogEntryDto } from "./consoleSessionModelWire.js";
 
 // ---------------------------------------------------------------------------
 // The re-declared client descriptor (renderer-reachable; drift-tested)
@@ -151,6 +159,15 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   "connectionSubmitFlutterwaveSecretKey",
   "connectionSubmitPaystackSecretKey",
   "connectionRunVerificationProbe",
+  // (P21-D Gap A, ADR-0014 D6/D12) The bridge-derived corridor
+  // capability chains (the engine's stages 2/3 input; capability
+  // metadata only — the honest empty set when nothing is ACTIVE).
+  "connectionCapabilityChains",
+  // (P21-D Gap C, ADR-0014 D4) The substrate session-settings model
+  // catalog (read-only model metadata DTOs — the honest empty list
+  // when the substrate reports no models; fail-closed typed when the
+  // seam is not composed).
+  "sessionModelCatalog",
   // P17-A payment-mission members (read/input verbs only — board /
   // detail / seed / ask-next-field / capture / preview-present /
   // plan-selection-record).
@@ -364,6 +381,23 @@ export interface IPaySwapDesktopClientService {
    * operation, per-connection results and the honest scope note.
    */
   connectionRunVerificationProbe(providerId: string): Promise<PaySwapConnectionProbeOutcomeDto>;
+  /**
+   * (P21-D Gap A, ADR-0014 D6/D12) The connection-derived corridor
+   * capability chains: the four-layer route chains derived HOST-SIDE
+   * from the REAL connection bridge (the registry statuses + the
+   * probe-evidence ledger) — the route-planning engine's stages 2/3
+   * input. Capability metadata ONLY; the honest empty set when no
+   * connection is ACTIVE with confirmed probe evidence.
+   */
+  connectionCapabilityChains(): Promise<readonly PaySwapConnectionCapabilityChainDto[]>;
+  /**
+   * (P21-D Gap C, ADR-0014 D4) The substrate SESSION-MODEL catalog: the
+   * session settings' REAL model availability (fed by the agent
+   * protocol — the same state the native composer's projection
+   * consumes) mapped 1:1 onto catalog DTOs HOST-SIDE. Model metadata
+   * ONLY; the honest empty list when the substrate reports no models.
+   */
+  sessionModelCatalog(): Promise<readonly PaySwapSessionModelCatalogEntryDto[]>;
 }
 
 /** What the renderer needs from its service connection for the console. */

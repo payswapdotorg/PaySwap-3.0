@@ -236,3 +236,26 @@ Dependency: P21-0 accepted (concurrent with P21-A — disjoint packages). Scope:
 
 ## P21-D — TL integration and wave closure
 Dependency: P21-A/B/C accepted. The bridge battery (the full journey through the REAL channel: New Task → model/difficulty → 'Pay merchant X' → the ask loop → the compiled intent → the pinned routine → the stage checklist → the REAL rail snapshots (the seeded ACTIVE connections) → the honest NO_ROUTE with explained exclusions → the conditional opportunities → the wait (re-check/cancel/expiry) → the revise path → fresh eligibility → preview → the two-act approval → the dispatch through the REAL kernel → the authoritative read-back → RECONCILED + the truthful terminal states). The E2E law: the web tier (journey-verification growth over the built web app — the task-tier journey + the honest unbound notes; the one-shot build with the documented heap cap) + the desktop tier (the NEW Electron CDP harness over the real renderer at the prescribed viewport; screenshots + structured secret-free receipts). The provider receipts with the fresh credentials (the P21-A harnesses re-run; the receipts machine-scanned for secret material). The integrated batteries; the architecture check; the JOURNEY-MAP/FEATURE-MAP reconciliation; the P21 graph closure; the current-state closure; PUSH to GitHub; the bundle archive; the honest carry-forward record (the P22 Stellar/Paystack redo; the CLI-agent skill/MCP integration candidate; the automatic evidence feeds; the protocol-plane evidence bridge).
+
+## P21 — CLOSED (2026-10-28, the P21-D acceptance)
+
+P21-0/A/B/C/D all accepted. The P21-D closure record (the bridge battery
+147-a at 1f17c62 + the receipts a51a30c + the 149-A/B/C/D lanes) lives in
+spec/development-state/current-state.json. The honest carry-forwards (the
+Electron CDP harness; the live-HTTPS re-probe tier pending the operator's
+re-supplied test-mode keys; the P22 wave; the P20 carry-forwards unchanged)
+are recorded there and in the station worklog (Task 149 closure record).
+
+## P22 — the frontier (the operator's order): the cross-provider journey redo over Stellar/Stripe/Flutterwave/PayStack
+
+The same journey law as P20/P21 — typed intent → pinned routine → honest
+rails → candidate compile → hard gates → deterministic ranking → frozen
+counterfactuals → evidence-backed opportunities (with wait semantics) →
+explicit authorization → host-authority test-mode execution → authoritative
+read-back → truthful terminals — over ANY combination of
+Stellar/Stripe/Flutterwave/PayStack, including the Stellar testnet corridor
+(test-wallet contract deployment + GHS → USDC(Stellar) → KES). Dependencies:
+P21 closed; the operator's test-mode credentials for all four providers
+(the Stellar testnet keypair is held for P22 per the station record);
+the CDP harness carry-forward is ORTHOGONAL (it may land inside P22's
+closure as the desktop E2E tier).

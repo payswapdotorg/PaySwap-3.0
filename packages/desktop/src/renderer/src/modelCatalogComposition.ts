@@ -1,21 +1,22 @@
 /**
- * PaySwap Desktop renderer (P21-B run 3, ADR-0014 D4) — the
- * MODEL-CATALOG composition root: binds a REAL model catalogue into the
+ * PaySwap Desktop renderer (P21-B run 3 + P21-D Gap C, ADR-0014 D4) —
+ * the MODEL-CATALOG composition root: binds a REAL model catalogue into the
  * app's shared ModelCatalogPort seam (bindSharedModelCatalog) at the
  * desktop renderer's business-root initialization — the
  * missionIntakeComposition.ts pattern.
  *
- * THE HONEST GAP (named, never papered over): the substrate's REAL
+ * THE SEAM (P21-D Gap C, CLOSED): the substrate's REAL
  * model-availability catalogue is the session-settings state
- * (ZCodeSessionSettingsState.model.available + thoughtLevel, fed by the
- * agent protocol — see packages/ui/src/lib/zcodeSessionProjection.ts).
- * No renderer-reachable service seam exposes that state to this
- * composition root today (the substrate Root owns it internally), so the
- * PRODUCT default binds NOTHING: the composer renders the honest
- * unbound-catalog note (never a fabricated model list — the ADR-0014 D4
- * law). The bridge-tier battery (and a future P23 substrate seam) binds
- * a catalogue through the `source` DI option — the only replaced part,
- * always labeled.
+ * (ZCodeSessionSettingsState.model.available, fed by the agent
+ * protocol — see packages/ui/src/lib/zcodeSessionProjection.ts). The
+ * payswap-desktop channel now exposes it through the HOST-SIDE
+ * sessionModelCatalog member (the 1:1 settings→DTO mapping in
+ * src/host/payswap/shell/session-model-catalog.ts), and
+ * channelSessionModelCatalogSource below adapts that member onto this
+ * composition's `source` seam — the product default binds the REAL
+ * catalogue (main.tsx); an OLDER host that does not expose the member
+ * yields NO source and the honest unbound-catalog note stands (the
+ * ADR-0014 D4 law — never a fabricated model list).
  *
  * THE WIRING LAWS: the port maps 1:1 onto the source (listModels → the
  * source read; NO default implementation, NO invented models); the
@@ -30,6 +31,8 @@ import {
   type CatalogModel,
   type ModelCatalogPort,
 } from "@payswap/app";
+import type { DesktopConsoleChannelServices } from "./consoleWorkspaceMount.js";
+import type { PaySwapSessionModelCatalogEntryDto } from "./consoleSessionModelWire.js";
 
 /** The catalogue source this composition rides (the DI seam). */
 export type ModelCatalogSource = () => Promise<readonly CatalogModel[]>;
@@ -39,6 +42,49 @@ export interface ModelCatalogComposition {
   readonly catalog: ModelCatalogPort;
   /** Restore the seam's honest default (unbound — the honest unbound note). */
   readonly reset: () => void;
+}
+
+/* ------------- the channel client surface this composition rides ------------- */
+
+/**
+ * The session-model-catalog member the source rides (the channel
+ * client's surface — the drift-tested member set; see
+ * consoleWorkspaceMount.tsx).
+ */
+export interface SessionModelCatalogChannelClient {
+  sessionModelCatalog(): Promise<readonly PaySwapSessionModelCatalogEntryDto[]>;
+}
+
+/**
+ * Adapt the channel services (the payswap-desktop proxy) onto this
+ * composition's `source` seam: the member's DTO list mapped 1:1 onto
+ * the app's CatalogModel (the label is the app's displayName; the
+ * model metadata fields the controls read cross, nothing else).
+ * Returns NULL when the channel client does not expose the member (an
+ * older host) — the caller then keeps the honest unbound-catalog
+ * posture (composeModelCatalogBinding({}) fails closed and the
+ * composer renders the unbound note; nothing crashes, nothing is
+ * fabricated).
+ */
+export function channelSessionModelCatalogSource(
+  services: DesktopConsoleChannelServices,
+): ModelCatalogSource | null {
+  const client =
+    services.payswapDesktopService as unknown as Partial<SessionModelCatalogChannelClient>;
+  if (typeof client.sessionModelCatalog !== "function") {
+    // An older host without the member — the honest unbound posture.
+    return null;
+  }
+  const read = client.sessionModelCatalog.bind(client);
+  return async () => {
+    const entries = await read();
+    return entries.map((entry) => ({
+      providerId: entry.providerId,
+      modelId: entry.modelId,
+      displayName: entry.label,
+      reasoningLevels: [...entry.reasoningLevels],
+    }));
+  };
 }
 
 /**

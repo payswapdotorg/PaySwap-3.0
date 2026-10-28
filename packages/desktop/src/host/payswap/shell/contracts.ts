@@ -308,6 +308,41 @@ export interface IPaySwapDesktopService extends IPaySwapDesktopPaymentMissionMem
   /** Revoke a connection (principal act — deletes the sealed credential). */
   connectionRevoke(connectionId: string): Promise<import("../connections/contracts.js").DesktopConnectionStatusView>;
 
+  /**
+   * (P21-D Gap A, ADR-0014 D6/D12) The connection-derived CORRIDOR
+   * CAPABILITY CHAINS: the four-layer route chains (definition →
+   * implementation → instance → observation) derived host-side from the
+   * REAL connection bridge over the registry's own statuses + the
+   * probe-evidence ledger — the product route-planning engine's stages
+   * 2/3 input. Capability metadata ONLY: no credentials, no secret
+   * material, no authorization artifacts (the instance's credential
+   * scope carries the OPAQUE connection reference, INV-19). Requires
+   * the connection + probe planes (fail-closed typed otherwise); a
+   * composed plane with zero ACTIVE connections returns the honest
+   * empty chain set.
+   */
+  connectionCapabilityChains(): Promise<
+    readonly import("../connections/chain-from-bridge.js").ConnectionCapabilityRouteChain[]
+  >;
+
+  /**
+   * (P21-D Gap C, ADR-0014 D4) The substrate SESSION-MODEL CATALOG: the
+   * session settings' REAL model availability
+   * (ZCodeSessionSettingsState.model.available — fed by the agent
+   * protocol, the same state the native composer's projection
+   * consumes) mapped 1:1 onto catalog DTOs for the renderer's
+   * model-catalog composition root. Model METADATA ONLY: provider/model
+   * ids, label, description, the reasoning levels + default — no
+   * credentials, no secret material, no authorization artifacts. An
+   * EMPTY available list stays EMPTY (the honest no-models truth);
+   * requires the composed substrate session-settings read (fail-closed
+   * typed otherwise); a substrate with nothing reportable (no session /
+   * no live runtime) resolves the honest empty list.
+   */
+  sessionModelCatalog(): Promise<
+    readonly import("./session-model-catalog.js").SessionModelCatalogEntryDto[]
+  >;
+
   // -------------------------------------------------------------------------
   // The payment-mission plane (P17-A, ADR-0010 D2) — read/input members
   // declared in ./payment-mission-contracts.ts (the no-authority-verb

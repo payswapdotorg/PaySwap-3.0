@@ -17,7 +17,7 @@
     "worker-3": "migration-experience-and-integrations"
   },
   "frontier": [
-    "P21-D"
+    "P22"
   ],
   "active_work_orders": [],
   "completed_work_orders": [
@@ -1053,6 +1053,17 @@
       "id": "P21-B",
       "accepted_commit": "557e3a11",
       "summary": "The journey lane: the composer↔mission binding (D2), the stage-progress projection + panel (D3), the model/difficulty controls (D4 — with the named honest gaps: the desktop catalog product binding awaits a renderer-reachable substrate seam; the selection records on the task field), the wait controls (D10), the connections activation UI (E)."
+    },
+    {
+      "id": "P21-D",
+      "accepted_commit": "pending-TL-commit",
+      "summary": "The P21 closure wave: the bridge battery (147-a, accepted at 1f17c62 — the operator's ordered journey end-to-end through the REAL channel + REAL engines + REAL host runtime, scripted transport, deterministic replay) + the provider receipts (a51a30c — 3 probes CONFIRMED over real HTTPS + the Stripe execution subtest dispatched/read-back) + the three product gaps closed: the host-side chain-from-bridge composition (149-A: the PRODUCT derives the corridor capability chains from the REAL connection bridge and wires them into the engine's stages 2/3 — the grant law pinned, fail-closed, drift-typed), the product task-completion projection (149-B: mission COMPLETED with a CONFIRMED attempt projects the linked agent task to COMPLETED/ATTEMPT_CONFIRMED through the public session port — idempotent, correlation-linked), the model-catalog substrate seam (149-D: ZCodeSessionSettingsState.model.available crosses to the renderer through the channel and binds at the product root) + the E2E law's web half (149-C: the J24 task-tier journey + the honest unbound notes over the BUILT web app served by the REAL substrate server; the journey suite RECONCILED with the post-P15-strip web truth — J1-J19 retired REGISTERED with reasons, J20-J23 re-scoped to the substrate shell, both tiers fully green; the REAL product defect caught + fixed: the composer task-board zero-height collapse, now the one-scrollable-body panel). Desktop 45f/398t · app 53f/557t · route-planning 219t · opportunities 273t · lab 176t · surface 234t · economic 105t · protocol 279t · capability 230t · route-compiler 353t — all green; architecture 0/0/0; the scoped tsc gates 0.",
+      "carry_forward": [
+        "the Electron CDP harness (ADR-0014 D10's desktop half): the shipped app already exposes remote-debugging-port 9229 (packages/desktop/src/main/index.ts:262) — the harness needs launch-under-xvfb + playwright-core connectOverCDP + the real-renderer DOM journey + screenshots + secret-free receipts; TWO worker attempts died on the station's tool deadline with nothing landed — the lane is scoped in the work orders and the 149-E order text",
+        "the live-HTTPS re-probe tier needs the operator's test-mode keys re-supplied (the station secrets env was lost in the seventh reset; the a51a30c receipts remain the accepted live evidence)",
+        "the P22 wave (the operator's order): the same cross-provider journey work with any combination of Stellar/Stripe/Flutterwave/PayStack — the Stellar test wallet for contract deployment + the GHS→USDC(Stellar)→KES corridor",
+        "the CLI-agent skill/MCP integration candidate; the automatic evidence feeds; the protocol-plane evidence bridge (the P20-recorded carry-forwards, unchanged)"
+      ]
     }
   ],
   "policies": {

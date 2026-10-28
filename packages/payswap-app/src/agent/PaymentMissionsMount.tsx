@@ -25,7 +25,7 @@
  * scope card, and the scope card exists only after requestApproval
  * returned — no resolveApproval call can be wired without act one (the
  * host still fails any un-scoped resolve closed; it is the authority).
- * ZERO ambient clock/random — every instant arrives on a DTO.
+ * ZERO ambient clock/random — every instant arrives on a DTO (the one carve-out: the task-completion projection instant — the pinned ambient site).
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -42,6 +42,7 @@ import { usePaymentMissionsDispatchFlow } from "./paymentMissionsDispatchFlow.js
 import { isPaymentMissionsDispatchPort } from "./paymentMissionsDispatchPins.js";
 import { usePaymentMissionsReconcileFlow } from "./paymentMissionsReconcileFlow.js";
 import { isPaymentMissionsReconciliationPort } from "./paymentMissionsReconcilePins.js";
+import { useMissionCompletionProjection, type AgentTaskSessionPort } from "./missionCompletionProjection.js";
 
 /* ------------- the shared port binding (the composition seam) ------------- */
 
@@ -101,14 +102,21 @@ function messageOf(thrown: unknown): string {
 export interface PaymentMissionsMountProps {
   /** Injectable port (tests); default: the shared binding (absent → the honest not-wired note). */
   readonly port?: PaymentMissionsPort;
+  /** (P21-D, Gap B) The task-completion projection seam: the composer's ONE task-session port + the live mission↔task link (absent = not composed). */
+  readonly taskSession?: AgentTaskSessionPort;
+  readonly missionLink?: () => { readonly missionId: string; readonly taskId: string } | null;
 }
 
-export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React.ReactNode {
+export function PaymentMissionsMount({ port, taskSession, missionLink }: PaymentMissionsMountProps): React.ReactNode {
   const resolvedPort = port ?? sharedPaymentMissionsPort();
   const [view, setView] = useState<PaymentMissionsView>({ kind: "LOADING" });
   const [flowError, setFlowError] = useState<string | null>(null);
   // The mission whose scope card is engaged (act one) — the refresh target after act two.
   const approvalMission = useRef<string | null>(null);
+
+  // (P21-D, Gap B) The task-completion projection: every mission detail this
+  // mount observes flows through it (see ./missionCompletionProjection.ts).
+  const observeMissionCompletion = useMissionCompletionProjection(taskSession, missionLink, setFlowError);
 
   /** Update the current DETAIL view's interaction state (a no-op on any other view). */
   const updateDetail = useCallback(
@@ -152,6 +160,8 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
         .detail(missionId)
         .then((detail) => {
           if (detail !== null) {
+            // (P21-D, Gap B) the outcome re-read feeds the task-completion projection.
+            observeMissionCompletion(detail);
             updateDetail((state) =>
               state.detail.id === missionId ? { ...state, detail } : state,
             );
@@ -163,7 +173,7 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
           setFlowError(`the mission detail could not be re-read: ${messageOf(thrown)}`);
         });
     },
-    [resolvedPort, updateDetail],
+    [resolvedPort, updateDetail, observeMissionCompletion],
   );
 
   // The dispatch-capable seam resolution (P19-B): a P18-only port keeps
@@ -209,13 +219,14 @@ export function PaymentMissionsMount({ port }: PaymentMissionsMountProps): React
           // reconcile card's own read (P20-B): the reconciliation-capable
           // port loads the pending card alongside it.
           if (detail !== null) {
+            observeMissionCompletion(detail);
             loadArmedEffect(missionId);
             loadPendingReconciliation(missionId);
           }
         })
         .catch((thrown: unknown) => setView(failureView(thrown)));
     },
-    [resolvedPort, loadArmedEffect, loadPendingReconciliation],
+    [resolvedPort, loadArmedEffect, loadPendingReconciliation, observeMissionCompletion],
   );
 
   const askNextField = useCallback(

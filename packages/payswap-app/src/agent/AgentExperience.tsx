@@ -166,7 +166,22 @@ export function PaySwapAgentExperience({
           </p>
         </nav>
       ) : null}
-      {railVisible && missionsOpen ? <PaymentMissionsMount /> : null}
+      {railVisible && missionsOpen ? (
+        // (P21-D, Gap B) The task-completion projection seam: the composer's
+        // ONE task-session port + the live mission-intake link — every
+        // mission detail the missions mount observes flows through the
+        // projection (mission COMPLETED + a CONFIRMED attempt → the linked
+        // task COMPLETED + ATTEMPT_CONFIRMED through the public port).
+        <PaymentMissionsMount
+          taskSession={controller.sessionPort()}
+          missionLink={() => {
+            const intake = controller.getState().missionIntake;
+            return intake.missionId !== undefined && intake.taskId !== undefined
+              ? { missionId: intake.missionId, taskId: intake.taskId }
+              : null;
+          }}
+        />
+      ) : null}
       <AgentComposer area={area} />
     </>
   );

@@ -51,7 +51,13 @@ import type { PaymentMissionRuntime } from "../payments/payment-mission-runtime.
 import type { DispatchLaneCandidateRecord } from "../payments/dispatch-lane-resolver.js";
 import type { ProbeEvidenceStore } from "../connections/probe-evidence.js";
 import type { HostFetch } from "../connections/host-https-transports.js";
+import type { ZCodeSessionSettingsState } from "@zcode/shared";
 import { createConnectionProbeChannelMembers } from "../connections/probe-members.js";
+import {
+  createAbsentConnectionCapabilityChainChannelMembers,
+  createConnectionCapabilityChainChannelMembers,
+} from "../connections/chain-members.js";
+import { sessionModelCatalogMembersOf } from "./session-model-members.js";
 import {
   DECLARED_STRIPE_TEST_CORRIDOR,
   createGateEnvironmentFromConnections,
@@ -70,6 +76,7 @@ import { ConnectionPlaneNotConfiguredError } from "./plane-errors.js";
 export {
   ConnectionPlaneNotConfiguredError,
   PaymentPlaneNotConfiguredError,
+  SessionModelCatalogNotConfiguredError,
 } from "./plane-errors.js";
 
 /** Options for constructing the service (id generation injectable — deterministic tests). */
@@ -119,6 +126,15 @@ export interface PaySwapDesktopServiceOptions {
   readonly paymentMissionRuntime?: PaymentMissionRuntime;
   /** (P17-A) The host clock for the payment-mission members — instants are stamped at the channel edge, never renderer-supplied. */
   readonly paymentMissionClock?: () => string;
+  /**
+   * (P21-D Gap C, ADR-0014 D4) The substrate session-settings read
+   * backing the sessionModelCatalog member (see
+   * ./session-model-substrate-read.ts). ABSENT → the member fails
+   * closed typed; undefined-resolving reads → the honest EMPTY catalog.
+   */
+  readonly sessionModelCatalog?: {
+    readonly readSettings: () => Promise<ZCodeSessionSettingsState | undefined>;
+  };
 }
 
 function defaultSessionId(): string {
@@ -242,6 +258,28 @@ export function createPaySwapDesktopService(
             throw new ConnectionPlaneNotConfiguredError();
           },
         };
+
+  // (P21-D Gap A, ADR-0014 D6/D12) The connection-capability-chains
+  // member: the corridor route chains derived from the REAL bridge over
+  // the SAME fail-closed resolvers (the probe-members pattern — the
+  // member requires BOTH planes; a composed plane with zero ACTIVE
+  // connections returns the honest empty chain set).
+  const connectionChainMembers =
+    connectionAuthority !== undefined && connectionProbe !== undefined
+      ? createConnectionCapabilityChainChannelMembers({
+          resolveAuthority: resolveConnectionAuthority,
+          resolveEvidenceStore: resolveProbeEvidenceStore,
+          log: seamLog,
+        })
+      : createAbsentConnectionCapabilityChainChannelMembers();
+
+  // (P21-D Gap C, ADR-0014 D4) The session-model-catalog member: the
+  // substrate session settings' model availability mapped 1:1 onto the
+  // catalog DTOs (the members module owns the absent/composed postures).
+  const sessionModelCatalogMembers = sessionModelCatalogMembersOf(
+    options.sessionModelCatalog,
+    seamLog,
+  );
 
   const service: IPaySwapDesktopService = {
     session,
@@ -374,6 +412,15 @@ export function createPaySwapDesktopService(
     // probe-CONFIRMED outcome recorded through the authority's own
     // recorder; the outcome never echoes key material).
     ...connectionProbeMembers,
+
+    // (P21-D Gap A, ADR-0014 D6/D12) The connection-capability-chains
+    // member — the bridge-derived corridor route chains (capability
+    // metadata only; the honest empty set when nothing is ACTIVE).
+    ...connectionChainMembers,
+
+    // (P21-D Gap C, ADR-0014 D4) The session-model-catalog member — the
+    // substrate session settings' model availability as catalog DTOs.
+    ...sessionModelCatalogMembers,
 
     // (P17-A, ADR-0010 D2) The payment-mission plane — read/input
     // members over the composed runtime (instants are stamped at the

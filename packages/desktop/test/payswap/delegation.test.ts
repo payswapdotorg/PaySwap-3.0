@@ -107,6 +107,11 @@ describe("delegated money movement laws (P7-W2)", () => {
       // seal/probe-evidence/callback-consume/revocation — connection
       // orchestration ONLY (never money movement; connectionRevoke
       // closes a CONNECTION record and deletes its credential).
+      // (P21-D chain-from-bridge member: connectionCapabilityChains is
+      // a READ-ONLY derivation of the corridor capability chains from
+      // the connection bridge — capability metadata DTOs only, never a
+      // money-movement verb, never credentials.)
+      "connectionCapabilityChains",
       "connectionConsumeProviderCallback",
       "connectionRecordVerificationOutcome",
       "connectionRegistry",
@@ -168,6 +173,11 @@ describe("delegated money movement laws (P7-W2)", () => {
       "progressTimeline",
       "quoteDisclosure",
       "securityDecision",
+      // (P21-D Gap C, ADR-0014 D4) The session-model-catalog member: a
+      // READ-ONLY projection of the substrate session settings' model
+      // availability onto catalog DTOs (model metadata only — never a
+      // money-movement verb, never credentials, never a fabricated model).
+      "sessionModelCatalog",
       // P10-B console workspace members: demand-side mission intent +
       // host-computed deployment facts ONLY (never money movement).
       "workspaceArchiveMissionDraft",

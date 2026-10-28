@@ -179,11 +179,24 @@
 
 /* ------------------------------- the tasks --------------------------- */
 
+/* (P21-D, the J24 E2E finding) The panel's ONE scrollable body: the
+ * law note, transcript, tasks, route-planning and model sections
+ * scroll together when the panel's max-height clips them. Previously
+ * .ps-agent-tasks carried flex: 1 1 auto + min-height: 0 and collapsed
+ * to ZERO height whenever the sibling sections' min-content exceeded
+ * the panel box — the task board rendered into scrollable overflow
+ * (a11y-present but invisible and unclickable). The header and the
+ * input form stay fixed; the body scrolls. */
+.ps-agent-panel-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .ps-agent-tasks {
   margin: 10px 0 0;
-  overflow-y: auto;
-  min-height: 0;
-  flex: 1 1 auto;
 }
 
 .ps-agent-tasks-title {
