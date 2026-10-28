@@ -1051,18 +1051,27 @@
     },
     {
       "id": "P21-B",
-      "accepted_commit": "557e3a11",
+      "owner": "worker",
+      "status": "COMPLETE",
+      "session": "payswap3-p21",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit 557e3a1 (accepted at 2083cf6)",
       "summary": "The journey lane: the composer↔mission binding (D2), the stage-progress projection + panel (D3), the model/difficulty controls (D4 — with the named honest gaps: the desktop catalog product binding awaits a renderer-reachable substrate seam; the selection records on the task field), the wait controls (D10), the connections activation UI (E)."
     },
     {
       "id": "P21-D",
-      "accepted_commit": "pending-TL-commit",
-      "summary": "The P21 closure wave: the bridge battery (147-a, accepted at 1f17c62 — the operator's ordered journey end-to-end through the REAL channel + REAL engines + REAL host runtime, scripted transport, deterministic replay) + the provider receipts (a51a30c — 3 probes CONFIRMED over real HTTPS + the Stripe execution subtest dispatched/read-back) + the three product gaps closed: the host-side chain-from-bridge composition (149-A: the PRODUCT derives the corridor capability chains from the REAL connection bridge and wires them into the engine's stages 2/3 — the grant law pinned, fail-closed, drift-typed), the product task-completion projection (149-B: mission COMPLETED with a CONFIRMED attempt projects the linked agent task to COMPLETED/ATTEMPT_CONFIRMED through the public session port — idempotent, correlation-linked), the model-catalog substrate seam (149-D: ZCodeSessionSettingsState.model.available crosses to the renderer through the channel and binds at the product root) + the E2E law's web half (149-C: the J24 task-tier journey + the honest unbound notes over the BUILT web app served by the REAL substrate server; the journey suite RECONCILED with the post-P15-strip web truth — J1-J19 retired REGISTERED with reasons, J20-J23 re-scoped to the substrate shell, both tiers fully green; the REAL product defect caught + fixed: the composer task-board zero-height collapse, now the one-scrollable-body panel). Desktop 45f/398t · app 53f/557t · route-planning 219t · opportunities 273t · lab 176t · surface 234t · economic 105t · protocol 279t · capability 230t · route-compiler 353t — all green; architecture 0/0/0; the scoped tsc gates 0.",
+      "owner": "tech-lead",
+      "status": "COMPLETE",
+      "session": "payswap3-p21",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commit c9cf05e (the Electron CDP desktop journey) + this closure commit",
+      "summary": "The P21 closure wave: the bridge battery (147-a, accepted at 1f17c62 — the operator's ordered journey end-to-end through the REAL channel + REAL engines + REAL host runtime, scripted transport, deterministic replay) + the provider receipts (a51a30c — 3 probes CONFIRMED over real HTTPS + the Stripe execution subtest dispatched/read-back) + the three product gaps closed at 3f4c609 (the chain-from-bridge composition 149-A; the task-completion projection 149-B; the model-catalog substrate seam 149-D; the web-tier E2E journey J24 + the journey-suite reconciliation 149-C) + the reviewer-gate closure lanes: 151-a the product connection-plane composition (6d926d5 — composeNodeConnectionPlane at the host registration root: the model catalog + the provider-rail snapshots reach the product composition root, fail-closed default preserved, restart-stable) + 151-b the final-stage verification contract (3d5b120 — Gap C closed: the typed persisted read-back verification ATTEMPT_VERIFIED + the pure decision table; an ambiguous outcome stays UNKNOWN and requires the real reconciliation path; the stage-10 projection COMPLETED from RECONCILED || ATTEMPT_VERIFIED; the app single-act verify card; the bridge battery re-driven through the PRODUCT read-back member) + 152 the Electron CDP desktop journey (c9cf05e — the REAL app driven end-to-end under Xvfb over CDP 9229: 9/9 PASS, the honest capability note, the REAL model-catalog member, the nine-field ask loop, the typed BLOCKED preview with all six gate reasons verbatim, the derived stage checklist, the quit/relaunch persistence SURVIVED; screenshots + a machine-scanned secret-free receipt; three real product defects caught + fixed + pinned: the registration call-shape drop, the composition-root boot order, the route-planning cache freshness). Desktop 51f/436t · app 54f/566t · surface 19f/234t — all green; host/test-check/mirror-check tsc 0; app tsc = the 33 pre-existing exactly; oxlint 0/0 on lane files; architecture 0/0/0.",
       "carry_forward": [
-        "the Electron CDP harness (ADR-0014 D10's desktop half): the shipped app already exposes remote-debugging-port 9229 (packages/desktop/src/main/index.ts:262) — the harness needs launch-under-xvfb + playwright-core connectOverCDP + the real-renderer DOM journey + screenshots + secret-free receipts; TWO worker attempts died on the station's tool deadline with nothing landed — the lane is scoped in the work orders and the 149-E order text",
-        "the live-HTTPS re-probe tier needs the operator's test-mode keys re-supplied (the station secrets env was lost in the seventh reset; the a51a30c receipts remain the accepted live evidence)",
+        "the live-HTTPS re-probe tier needs the operator's test-mode keys re-supplied (the station payment-providers env was lost in the resets; the a51a30c receipts remain the accepted live evidence) — a P22-ready action",
         "the P22 wave (the operator's order): the same cross-provider journey work with any combination of Stellar/Stripe/Flutterwave/PayStack — the Stellar test wallet for contract deployment + the GHS→USDC(Stellar)→KES corridor",
-        "the CLI-agent skill/MCP integration candidate; the automatic evidence feeds; the protocol-plane evidence bridge (the P20-recorded carry-forwards, unchanged)"
+        "the CLI-agent skill/MCP integration candidate; the automatic evidence feeds; the protocol-plane evidence bridge (the P20-recorded carry-forwards, unchanged)",
+        "docs/customer-journeys/JOURNEY-ACCEPTANCE-RECORD.md still carries the pre-P15-strip verdict matrix — the reconciled truth lives in JOURNEY-MAP §5 (manifest-enforced retirement); a docs-only refresh",
+        "the FEATURE-MAP machine-check companion (feature-map.test.ts) named since P12-C was never authored — the phantom claim corrected at the P21 closure; authoring the promised parser test is a P22 docs-law item"
       ]
     }
   ],
@@ -1513,7 +1522,13 @@
     {
       "event": "P21_B_ACCEPTED",
       "commit": "557e3a11"
+    },
+    {
+      "ts": "2026-10-28T15:59:43Z",
+      "actor": "resident-TL",
+      "action": "P21_D_ACCEPTED_AND_P21_CLOSED",
+      "detail": "P21-D accepted at c9cf05e (the Electron CDP desktop journey, 9/9 PASS) with the closure lanes landed: 151-a the product connection-plane composition (6d926d5), 151-b the final-stage verification contract (3d5b120 — Gap C closed), 152 the Electron CDP desktop journey (c9cf05e — three real product defects found + fixed + pinned: the registration call-shape drop, the composition-root boot order, the route-planning cache freshness). The wave closed per the closure policy: the journey proven end-to-end at both user-facing tiers (web J24 + desktop CDP) with the honest typed outcomes; the real-dispatch tier covered by the accepted a51a30c receipt; the six truth facts machine-enforced; zero secret material in any artifact. PUSHED; the bundle archive refreshed. Carry-forward (P22): the live-provider legs stay operator-gated; the provider-combination redo (Stellar + Paystack) awaits the operator."
     }
   ],
-  "last_tl_action_at": "2026-10-27T10:05:00Z"
+  "last_tl_action_at": "2026-10-28T15:59:43Z"
 }

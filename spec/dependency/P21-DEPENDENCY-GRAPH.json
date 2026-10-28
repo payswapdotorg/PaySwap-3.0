@@ -16,7 +16,7 @@
     {
       "id": "P21-A",
       "owner": "worker",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P21-0"
       ],
@@ -25,7 +25,7 @@
     {
       "id": "P21-C",
       "owner": "worker",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P21-0"
       ],
@@ -44,7 +44,7 @@
     {
       "id": "P21-D",
       "owner": "TL",
-      "status": "PENDING",
+      "status": "COMPLETE",
       "depends_on": [
         "P21-A",
         "P21-B",
@@ -58,7 +58,35 @@
     "P21-C"
   ],
   "closure_policy": "P21 closes only when P21-A/B/C/D are all accepted on main with their batteries green at the tip AND the journey is proven end-to-end at the user level: either a genuine route executed and reconciled with provider evidence, or the correct tested NO_ROUTE outcome with evidence-backed conditional opportunities and the durable wait/revise choice — in either case the New Task → terminal-state journey proven against the real application (the CDP desktop tier + the web tier), with the six truth facts still machine-enforced and zero secret material in any artifact. No mock route, synthetic funding claim, fixture-only CONFIRMED, LLM-authored score or unsupported 'payment completed' claim may satisfy the gate.",
-  "frontier": [
-    "P21-D"
-  ]
+  "closure": {
+    "closed_at": "2026-10-28T15:59:43Z",
+    "commits": {
+      "P21-0": "453e280",
+      "P21-A": "c2047fe (accepted at aea4965)",
+      "P21-C": "2bc3eca (accepted at aea4965)",
+      "P21-B": "557e3a1 (accepted at 2083cf6)",
+      "P21-D": "HEAD — a51a30c → 1f17c62 → 3f4c609 → 6d926d5 → 3d5b120 → c9cf05e → this closure commit"
+    },
+    "batteries": {
+      "desktop": "51f/436t GREEN (re-run after every CDP-discovered fix)",
+      "payswap-app": "54f/566t",
+      "surface": "19f/234t",
+      "host_tsc": "0",
+      "test_check_tsc": "0",
+      "mirror_check_tsc": "0",
+      "app_tsc": "the 33 pre-existing exactly (no new)",
+      "oxlint_lane_files": "0 warnings / 0 errors",
+      "architecture_check": "0/0/0",
+      "web_journey": "tier-1 J24 + manifest enforcement (7 tests) · tier-2 J20-J23 composer laws (8 tests)",
+      "desktop_cdp_journey": "9/9 PASS — docs/productization-evidence/p21-d-cdp-desktop-journey-RECEIPT-2026-10-28.json (secret-scan CLEAN, 6 screenshots, persistence SURVIVED)"
+    },
+    "push": "PUSHED to github.com/payswapdotorg/PaySwap-3.0 main (pay-at-acceptance, ADR-0009 D7) + the bundle archive refreshed under the operator's persistent backups directory",
+    "carry_forward": [
+      "the live-provider execution legs stay operator-gated: the station payment-providers env was destroyed by the resets — the accepted a51a30c rail-evidence receipt (3 probes CONFIRMED over real HTTPS + the Stripe execution subtest dispatched + authoritatively read back) remains the live evidence; re-running with fresh operator keys is a P22-ready action",
+      "the P22 wave (the operator's order): the provider-combination redo with Stellar/Paystack (GHS→USDC(Stellar)→KES) — no Stellar adapter exists today (chain families: EVM, SOLANA, UTXO, MOVE, COSMOS, SUBSTRATE, OTHER); the Stellar test keypair was held station-secret-store-only",
+      "the CLI-agent skill/MCP integration candidate; the automatic evidence feeds composing with the provider lanes; the protocol-plane evidence bridge (the P20-recorded carry-forwards, unchanged)",
+      "docs/customer-journeys/JOURNEY-ACCEPTANCE-RECORD.md still carries the pre-P15-strip verdict matrix — the reconciled truth lives in JOURNEY-MAP §5 (the retirement is manifest-enforced); a docs-only refresh",
+      "the FEATURE-MAP machine-check companion (feature-map.test.ts) named since P12-C was never authored — the phantom claim corrected at this closure; authoring the promised parser test (wired rows' routes resolve + cited components exist) is a P22 docs-law item"
+    ]
+  }
 }

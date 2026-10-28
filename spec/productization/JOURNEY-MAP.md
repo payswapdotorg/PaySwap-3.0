@@ -415,3 +415,18 @@ The reconciliation laws:
 The living web-tier suite: tier-1 = J24 + the manifest enforcement
 (7 tests green); tier-2 = the composer laws J20–J23 (8 tests green).
 The desktop tier carries the product-surface journeys (ADR-0014 D10).
+
+The desktop tier's CDP journey landed (2026-10-28, the P21-D closure):
+the Electron CDP harness (scripts/p21/desktop-cdp-journey.mjs +
+cdp-harness-lib.mjs) drives the REAL app end-to-end — the honest
+zero-financial-authority note, the REAL session-model-catalog member
+(zero options honestly — never fabricated), the nine-field guided ask
+loop, the typed BLOCKED preview with all six gate reasons verbatim, the
+derived stage checklist + the honest no-intent route note, and the
+quit/relaunch persistence law (the task, the conversation and the DRAFT
+mission all survive) — 9/9 PASS with screenshots + a machine-scanned
+secret-free receipt
+(docs/productization-evidence/p21-d-cdp-desktop-journey-RECEIPT-2026-10-28.json).
+The E2E law caught three real product defects on the way (the
+registration call-shape drop, the composition-root boot order, the
+route-planning cache freshness) — each fixed and pinned by a test.
