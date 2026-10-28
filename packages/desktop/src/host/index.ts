@@ -62,13 +62,16 @@ import {
   createSettingServiceWithMigrations,
   OffPeakModelUnavailableError,
   OffPeakPermanentDispatchError,
+  createCredentialService,
   type HostApiNetworkTransport,
   type OffPeakRequestAuthBuilder,
 } from "@zcode/services/node";
+import { dirname, join } from "node:path";
 import {
   createSubstrateSessionSettingsRead,
   derivePaymentsStoreDirectory,
   registerPaySwapDesktopService,
+  composeNodeConnectionPlane,
 } from "./payswap/index.js";
 import { createHostResourceUsageResponder } from "./hostResourceUsage.js";
 import {
@@ -2937,6 +2940,35 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
                   : {}),
               }
             : undefined;
+        // (P21-D lane 151-a — the reviewer's composition-root ask) The
+        // PRODUCT CONNECTION PLANE: the REAL ConnectionSessionAuthority
+        // + the probe-evidence ledger + the sealed credential store,
+        // composed over the same user-data root as the workspace store
+        // and forwarded on the service options. With the plane bound,
+        // the shipped app's connection channel members answer over the
+        // REAL plane (key entry, verification probes, the bridge
+        // derivation, the corridor capability chains) and the
+        // payment-mission runtime composes the LANE-AWARE authority
+        // (ACTIVE SANDBOX Stripe lanes only — the grant law stays
+        // inside the credential seal). The fetch binding is the REAL
+        // host fetch (globalThis.fetch — the probes and the kernel
+        // transport ride it); the credential service is the
+        // substrate's own encrypted store (the D4 durable broker
+        // law). WITHOUT a store directory on the seam the plane stays
+        // un-composed and every one of those members keeps the honest
+        // fail-closed typed error (the workspace-store posture —
+        // asserted by the composition battery).
+        const payswapConnectionPlane =
+          payswapWorkspaceStoreDir !== undefined
+            ? await composeNodeConnectionPlane({
+                userDataDirectory: dirname(payswapWorkspaceStoreDir),
+                credentialService: createCredentialService(),
+                fetchImpl: globalThis.fetch,
+                log: (level, message) => {
+                  writeHostLog(level, message);
+                },
+              })
+            : undefined;
         await registerPaySwapDesktopService(services, {
           scope: { kind: "local" },
           log: (level, message, ...args) => {
@@ -2945,6 +2977,12 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
           storeDirectory: payswapWorkspaceStoreDir,
           ...(payswapWorkspaceStoreDir !== undefined
             ? { paymentsStoreDirectory: derivePaymentsStoreDirectory(payswapWorkspaceStoreDir) }
+            : {}),
+          ...(payswapConnectionPlane !== undefined
+            ? {
+                connectionAuthority: payswapConnectionPlane.connectionAuthority,
+                connectionProbe: payswapConnectionPlane.connectionProbe,
+              }
             : {}),
           ...(payswapAgentService !== undefined && payswapSessionSettingsWorkspace !== undefined
             ? {

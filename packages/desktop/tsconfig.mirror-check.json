@@ -63,6 +63,7 @@
     "test/payswap/p21-journey-bridge-planning.ts",
     "test/payswap/p21-journey-bridge-conversation.ts",
     "test/payswap/p21-journey-bridge.test.ts",
+    "test/payswap/product-connection-composition.test.ts",
     "../opportunities/src",
     "../opportunities/test/fixtures-catalog.ts",
     "../opportunities/test/fixtures.ts",

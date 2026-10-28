@@ -156,6 +156,11 @@ export async function openProbeEvidenceStore(input: {
       version: 1,
       records: [...latest.values()],
     };
+    // mkdir-then-write (the record-store's own law): the ledger can be
+    // the FIRST writer into a fresh connections directory (before any
+    // connection record persists) — the composition edge's directory
+    // must exist before the snapshot lands.
+    await input.fileSystem.mkdir(input.directory);
     await input.fileSystem.writeFile(path, JSON.stringify(snapshot, null, 2));
   };
 
