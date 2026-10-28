@@ -66,7 +66,7 @@ import {
   type HostApiNetworkTransport,
   type OffPeakRequestAuthBuilder,
 } from "@zcode/services/node";
-import { dirname, join } from "node:path";
+import { dirname } from "node:path";
 import {
   createSubstrateSessionSettingsRead,
   derivePaymentsStoreDirectory,
@@ -2969,32 +2969,48 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
                 },
               })
             : undefined;
-        await registerPaySwapDesktopService(services, {
-          scope: { kind: "local" },
-          log: (level, message, ...args) => {
-            writeHostLog(level, message, ...args);
+        // P21-D reviewer-gate ③/④（the registration call-shape law）: the
+        // composition's signature is (services, SEAM, OPTIONS) — the seam
+        // carries scope/log/storeDirectory/paymentsStoreDirectory only;
+        // sessionModelCatalog + the connection-plane fragment are SERVICE
+        // OPTIONS the service and composePaymentMissionRuntime read from
+        // the THIRD argument. The 2026-10-28 CDP finding: riding them on
+        // the seam object silently dropped them (the conditional spreads
+        // bypassed excess-property checking) — the model catalog answered
+        // ABSENT and the 151-a connection plane never reached the mission
+        // runtime (NO_AUTHORITY_WIRED). host-registration-call-shape.test.ts
+        // pins the three-argument split.
+        await registerPaySwapDesktopService(
+          services,
+          {
+            scope: { kind: "local" },
+            log: (level, message, ...args) => {
+              writeHostLog(level, message, ...args);
+            },
+            storeDirectory: payswapWorkspaceStoreDir,
+            ...(payswapWorkspaceStoreDir !== undefined
+              ? { paymentsStoreDirectory: derivePaymentsStoreDirectory(payswapWorkspaceStoreDir) }
+              : {}),
           },
-          storeDirectory: payswapWorkspaceStoreDir,
-          ...(payswapWorkspaceStoreDir !== undefined
-            ? { paymentsStoreDirectory: derivePaymentsStoreDirectory(payswapWorkspaceStoreDir) }
-            : {}),
-          ...(payswapConnectionPlane !== undefined
-            ? {
-                connectionAuthority: payswapConnectionPlane.connectionAuthority,
-                connectionProbe: payswapConnectionPlane.connectionProbe,
-              }
-            : {}),
-          ...(payswapAgentService !== undefined && payswapSessionSettingsWorkspace !== undefined
-            ? {
-                sessionModelCatalog: {
-                  readSettings: createSubstrateSessionSettingsRead(
-                    payswapAgentService,
-                    payswapSessionSettingsWorkspace,
-                  ),
-                },
-              }
-            : {}),
-        });
+          {
+            ...(payswapConnectionPlane !== undefined
+              ? {
+                  connectionAuthority: payswapConnectionPlane.connectionAuthority,
+                  connectionProbe: payswapConnectionPlane.connectionProbe,
+                }
+              : {}),
+            ...(payswapAgentService !== undefined && payswapSessionSettingsWorkspace !== undefined
+              ? {
+                  sessionModelCatalog: {
+                    readSettings: createSubstrateSessionSettingsRead(
+                      payswapAgentService,
+                      payswapSessionSettingsWorkspace,
+                    ),
+                  },
+                }
+              : {}),
+          },
+        );
         hasDisposedHostResources = false;
         disposeHostResourcesInFlight = null;
         const agentWarmupTargets =

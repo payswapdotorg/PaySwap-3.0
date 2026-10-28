@@ -213,5 +213,29 @@ export function composeRoutePlanningBinding(options: {
   };
   bindRoutePlanningSession(session);
 
+  // (P21-D reviewer-gate ③ — the cache-freshness law) A mission seeded
+  // or resumed AFTER the composition boot must enter the cache: the
+  // composition subscribes to the shared composer controller and
+  // refreshes the mission cache (coalesced — one refresh per emit
+  // batch) whenever the controller state changes. Without this, the
+  // engine's missionFacts read answers null for a mission that EXISTS
+  // in the host store and the composer's stage checklist renders the
+  // "not wired" note over a BOUND plane — a dishonest understatement
+  // (the 2026-10-28 CDP finding; route-planning-cache-freshness.test.ts
+  // pins the law).
+  let refreshScheduled = false;
+  controller.subscribe(() => {
+    if (refreshScheduled) {
+      return;
+    }
+    refreshScheduled = true;
+    void Promise.resolve().then(() => {
+      refreshScheduled = false;
+      void refresh().catch(() => {
+        // The honest read-failure posture: the cache stays as-is.
+      });
+    });
+  });
+
   return { state, source, session, refresh };
 }

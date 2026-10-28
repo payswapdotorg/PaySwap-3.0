@@ -1,0 +1,94 @@
+{
+  "harness": "scripts/p21/desktop-cdp-journey.mjs + scripts/p21/cdp-harness-lib.mjs (the P21-D Electron CDP desktop journey — the E2E law's desktop half)",
+  "ranAt": "2026-10-28T15:45:36.513Z",
+  "durationMs": 44580,
+  "appRuntime": {
+    "tier": "the desktop dev-tier runtime (tsup-built main/host/preload + the vite-built renderer — unminified, the sandbox memory cap — over file://)",
+    "launchRecipe": "electron . --no-sandbox --disable-dev-shm-usage --open-workspace <workspace> (CDP 9229, Xvfb :99, isolated ZCODE_DESKTOP_USER_DATA_DIR)",
+    "isolatedUserDataDir": "<journey-scoped>",
+    "workspace": "/home/z/payswap-e2e-workspace"
+  },
+  "honestScope": "zero provider credentials in this run — the execution leg is operator-gated (the accepted a51a30c rail-evidence receipt covers the real-dispatch tier); this journey proves the REAL renderer + REAL host runtime render the ordered journey with the honest typed outcomes",
+  "steps": [
+    {
+      "id": "run1-1",
+      "name": "the composer opens with the honest zero-financial-authority note",
+      "status": "PASS",
+      "detail": "the capability note renders verbatim"
+    },
+    {
+      "id": "run1-2",
+      "name": "model & difficulty: the REAL session-model-catalog member answers the honest catalog (0 model option(s) from the substrate — never fabricated)",
+      "status": "PASS",
+      "detail": "select=true realOptions=[]"
+    },
+    {
+      "id": "run1-3",
+      "name": "New Task 'Pay merchant X': the task lands and the mission's deterministic ask loop starts",
+      "status": "PASS",
+      "detail": "the first intake question rendered in the conversation"
+    },
+    {
+      "id": "run1-4",
+      "name": "the nine-field guided intake completes through the conversation (all nine distinct answers captured, no question pending)",
+      "status": "PASS",
+      "detail": "distinctAnswered=9/9 pendingRemaining=false"
+    },
+    {
+      "id": "run1-5",
+      "name": "the structured preview presents the honest typed BLOCK (all six gate reasons verbatim, zero connections)",
+      "status": "PASS",
+      "detail": "all six gate reasons rendered verbatim"
+    },
+    {
+      "id": "run1-6",
+      "name": "the stage checklist derives from the mission's typed timeline (not the unbound note) and route planning states the honest no-intent truth",
+      "status": "PASS",
+      "detail": "stageChecklist=derived, routePlanning=no-validated-intent"
+    },
+    {
+      "id": "run1-7",
+      "name": "the mission store persists the journey under the isolated userData (DRAFT mission + PREVIEW_PRESENTED)",
+      "status": "PASS",
+      "detail": "/tmp/payswap-cdp-journey-1793202336514/payments/payment-missions.json"
+    },
+    {
+      "id": "run2-1",
+      "name": "PERSISTENCE: the task + the conversation survive the app quit/relaunch on the same profile",
+      "status": "PASS",
+      "detail": "task=true, conversation=true"
+    },
+    {
+      "id": "run2-2",
+      "name": "PERSISTENCE: the mission board lists the DRAFT mission with its timeline after relaunch",
+      "status": "PASS",
+      "detail": "the mission + timeline survived"
+    }
+  ],
+  "screenshots": [
+    "p21-d-cdp-run1-3-seeded.png",
+    "p21-d-cdp-run1-4-intake-complete.png",
+    "p21-d-cdp-run1-5-blocked-preview.png",
+    "p21-d-cdp-run1-6-stage-checklist.png",
+    "p21-d-cdp-run2-1-persisted-composer.png",
+    "p21-d-cdp-run2-2-persisted-board.png"
+  ],
+  "journeySummary": {
+    "askLoopFieldsCaptured": 9,
+    "previewOutcome": "BLOCKED (the typed six-gate truth for a zero-connection deployment)",
+    "persistence": "SURVIVED"
+  },
+  "secretScan": {
+    "patterns": [
+      "sk_live_*",
+      "sk_test_*",
+      "pk_live_*",
+      "pk_test_*",
+      "whsec_*",
+      "Bearer *",
+      "PRIVATE KEY blocks"
+    ],
+    "findings": [],
+    "result": "CLEAN (no secret-shaped material in this receipt)"
+  }
+}

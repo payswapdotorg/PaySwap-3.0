@@ -332,12 +332,13 @@ function initializeBusinessRoot(port: MessagePort): void {
   baseServicesForRemoteSessions = services;
   registerBaseWorkspaceServices(services);
   flushPendingRemoteWorkspaceServicePorts();
-  // P17-C（ADR-0010 D1/D5）：在业务根初始化时绑定 REAL 路由规划引擎与会话 ——
-  // 组合根消费 payswap-desktop 的 mission-plane 成员（P17-A）；失败时保持诚实
-  // 默认（未绑定引擎 + 未接线选择），面板如实呈现，绝不掩盖。
-  void composeRoutePlanningBinding({ services }).refresh().catch(() => {
-    // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定说明 + 未接线选择。
-  });
+  // P21-D reviewer-gate ③（the composition-root boot-order law）：共享
+  // composer controller 在首次构造时捕获摄入面与模型目录缝隙
+  // （agentComposerShared.ts 的"先绑定、后构造"纪律）。route-planning
+  // 组合是唯一同步构造该 controller 的组合（options.controller ??
+  // sharedAgentComposerController()），因此它必须排在所有会被捕获的
+  // 缝隙绑定之后 —— 否则真实应用永久降级为 web 档诚实说明（2026-10-28
+  // CDP 探针实测发现；composition-root-boot-order.test.ts 钉死该顺序）。
   // P18-C（ADR-0011 D1）：绑定 payment-missions 观察面 —— 组合根把通道的
   // mission-plane 成员（P17-A 读取/输入 + P18-A 边缘钉死的审批成员）适配到
   // 面板的固定端口；失败时保持诚实默认（未绑定说明，绝不掩盖）。
@@ -378,6 +379,15 @@ function initializeBusinessRoot(port: MessagePort): void {
   } catch {
     // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定激活说明。
   }
+  // P17-C（ADR-0010 D1/D5）：绑定 REAL 路由规划引擎与会话 —— 组合根消费
+  // payswap-desktop 的 mission-plane 成员（P17-A）；失败时保持诚实默认
+  // （未绑定引擎 + 未接线选择），面板如实呈现，绝不掩盖。
+  // 顺序法：这是唯一同步构造共享 composer controller 的组合 —— 它必须
+  // 最后运行（上面的 boot-order law），此时摄入面/模型目录已绑定完毕，
+  // controller 构造即捕获真实缝隙。
+  void composeRoutePlanningBinding({ services }).refresh().catch(() => {
+    // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定说明 + 未接线选择。
+  });
   const settingService = supportsSettings ? services.settingService : undefined;
 
   syncAppTelemetryContext({
