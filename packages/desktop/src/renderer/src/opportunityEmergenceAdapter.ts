@@ -129,9 +129,9 @@ export const COMPOSITION_ADVISORY_ASSUMED_ECONOMICS = Object.freeze({
  * (shapeLegSequence — mirrored here as pinned constants).
  */
 const CITED_SKELETONS: Readonly<Record<string, PinnedCitedShapeSkeleton>> = Object.freeze({
-  ADD_ASSUMED_RAIL: Object.freeze({ shapeId: "provider-native-bridge", legKindSequence: Object.freeze(["ONCHAIN_BRIDGE"]) }),
-  ADD_ASSUMED_CONVERSION_ASSET: Object.freeze({ shapeId: "mixed-dex-bridge", legKindSequence: Object.freeze(["ONCHAIN_DEX_SWAP", "ONCHAIN_BRIDGE"]) }),
-  ADD_ASSUMED_CONNECTOR_OPERATION: Object.freeze({ shapeId: "mixed-psp-onramp", legKindSequence: Object.freeze(["FIAT_PSP_COLLECT", "PSP_STABLECOIN_ISSUANCE", "ONCHAIN_TRANSFER"]) }),
+  ADD_ASSUMED_RAIL: Object.freeze({ shapeId: "provider-native-bridge" as const, legKindSequence: Object.freeze(["ONCHAIN_BRIDGE" as const]) }),
+  ADD_ASSUMED_CONVERSION_ASSET: Object.freeze({ shapeId: "mixed-dex-bridge" as const, legKindSequence: Object.freeze(["ONCHAIN_DEX_SWAP" as const, "ONCHAIN_BRIDGE" as const]) }),
+  ADD_ASSUMED_CONNECTOR_OPERATION: Object.freeze({ shapeId: "mixed-psp-onramp" as const, legKindSequence: Object.freeze(["FIAT_PSP_COLLECT" as const, "PSP_STABLECOIN_ISSUANCE" as const, "ONCHAIN_TRANSFER" as const]) }),
 });
 
 /** The honest UNVERIFIED reason when no hypothetical re-run exists for a party change (frozen). */

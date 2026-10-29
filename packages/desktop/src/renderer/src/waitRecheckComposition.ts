@@ -110,7 +110,6 @@ export type { RoutePlanningWaitCriteriaPin };
 /* ---------------- (P23-B, ADR-0015 D9d) the chains-derived observations source ---------------- */
 
 import { discoverOpportunity } from "@payswap/opportunities";
-import type { FinancialOpportunity } from "@payswap/opportunities";
 import type { PaySwapConnectionCapabilityChainDto } from "./consoleConnectionsWire.js";
 
 /**
@@ -159,13 +158,20 @@ export function chainDerivedWaitRecheckObservations(
         continue;
       }
       const providerName = chain.instance.providerName;
+      // The canonical rail-key law (PINNED_RAIL_KEY_PATTERN — lowercase
+      // namespace:network): the provider's display name is title-cased
+      // ("Flutterwave"), so the provider-scoped fiat rail key lowercases it
+      // (the bridge battery's catch: an uppercase rail key is rejected by
+      // discoverOpportunity and the record was silently skipped — the
+      // source returned the empty set while the chains were ACTIVE).
+      const providerRailKey = `fiat:${providerName.toLowerCase()}`;
       const observation = {
         family: "other" as const,
         observationId: `chain-observation:${chain.instance.instanceId}`,
         observationVersion: chain.observation.observationVersion,
         venueId: `provider:${providerName}`,
         railKind: "FIAT" as const,
-        railKey: `fiat:${providerName}`,
+        railKey: providerRailKey,
         adapterId: chain.implementation.adapterRef,
         observerId: `connection-bridge:${chain.observation.provenance.source}`,
         freshness: { asOfMs, maxAgeMs: 3_600_000 },

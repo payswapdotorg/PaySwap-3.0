@@ -94,7 +94,7 @@ interface OperatorPresentation {
 
 const OPERATOR_PRESENTATIONS: Readonly<Record<string, OperatorPresentation>> = Object.freeze({
   "repair:recipient-enables-flw-receiving-method": Object.freeze({
-    sideConditions: Object.freeze([{ kind: "P21_FLW_WALLET_FUNDING_PATTERN" }]),
+    sideConditions: Object.freeze([{ kind: "P21_FLW_WALLET_FUNDING_PATTERN" as const }]),
     partyChangeProposal: Object.freeze({
       party: "RECIPIENT",
       change: "ENABLES_FLUTTERWAVE_RECEIVING_METHOD",
@@ -114,7 +114,7 @@ const OPERATOR_PRESENTATIONS: Readonly<Record<string, OperatorPresentation>> = O
     // hardcode semantics).
   }),
   "repair:sender-adds-stripe-compatible-instrument": Object.freeze({
-    sideConditions: Object.freeze([{ kind: "P21_FLW_WALLET_FUNDING_PATTERN" }, { kind: "STRIPE_RECEIVING_RAIL" }]),
+    sideConditions: Object.freeze([{ kind: "P21_FLW_WALLET_FUNDING_PATTERN" as const }, { kind: "STRIPE_RECEIVING_RAIL" as const }]),
     partyChangeProposal: Object.freeze({
       party: "SENDER",
       change: "ADDS_STRIPE_COMPATIBLE_INSTRUMENT",
@@ -128,7 +128,7 @@ const OPERATOR_PRESENTATIONS: Readonly<Record<string, OperatorPresentation>> = O
     }),
   }),
   "repair:recipient-enables-served-funding-method": Object.freeze({
-    sideConditions: Object.freeze([{ kind: "ANY_RECEIVING_RAIL" }]),
+    sideConditions: Object.freeze([{ kind: "ANY_RECEIVING_RAIL" as const }]),
     partyChangeProposal: Object.freeze({
       party: "RECIPIENT",
       change: "ENABLES_COMPATIBLE_RECEIVING_METHOD",
@@ -139,7 +139,7 @@ const OPERATOR_PRESENTATIONS: Readonly<Record<string, OperatorPresentation>> = O
     }),
   }),
   "repair:sender-adds-served-funding-instrument": Object.freeze({
-    sideConditions: Object.freeze([{ kind: "ANY_RECEIVING_RAIL" }]),
+    sideConditions: Object.freeze([{ kind: "ANY_RECEIVING_RAIL" as const }]),
     partyChangeProposal: Object.freeze({
       party: "SENDER",
       change: "ADDS_COMPATIBLE_FUNDING_INSTRUMENT",
@@ -170,7 +170,7 @@ const OPERATOR_PRESENTATIONS: Readonly<Record<string, OperatorPresentation>> = O
     }),
   }),
   "repair:intermediary-introduced": Object.freeze({
-    sideConditions: Object.freeze([{ kind: "NO_ROUTE_STATE" }]),
+    sideConditions: Object.freeze([{ kind: "NO_ROUTE_STATE" as const }]),
     partyChangeProposal: Object.freeze({
       party: "THIRD_PARTY",
       change: "INTERMEDIARY_INTRODUCED",
@@ -183,26 +183,26 @@ const OPERATOR_PRESENTATIONS: Readonly<Record<string, OperatorPresentation>> = O
       platformPrerequisites: Object.freeze([{ gapId: "platform:cross-provider-route-shape", note: CROSS_PROVIDER_SHAPE_NOTE }]),
     }),
     hypothesisProposal: Object.freeze({
-      augmentationKind: "ADD_ASSUMED_RAIL",
+      augmentationKind: "ADD_ASSUMED_RAIL" as const,
       assumptionSummary: "a verified intermediary rail bridges the sender's funding rail and the merchant's receiving context",
     }),
   }),
   "repair:convert-through-supported-asset": Object.freeze({
     hypothesisProposal: Object.freeze({
-      augmentationKind: "ADD_ASSUMED_CONVERSION_ASSET",
+      augmentationKind: "ADD_ASSUMED_CONVERSION_ASSET" as const,
       assumptionSummary: "the corridor converts through an asset the served sets already support",
     }),
   }),
   "repair:bridge-via-intermediary-rail": Object.freeze({
-    sideConditions: Object.freeze([{ kind: "NO_ROUTE_STATE" }]),
+    sideConditions: Object.freeze([{ kind: "NO_ROUTE_STATE" as const }]),
     hypothesisProposal: Object.freeze({
-      augmentationKind: "ADD_ASSUMED_RAIL",
+      augmentationKind: "ADD_ASSUMED_RAIL" as const,
       assumptionSummary: "an intermediary rail bridges the unserved country pair",
     }),
   }),
   "repair:split-below-maximum": Object.freeze({
     hypothesisProposal: Object.freeze({
-      augmentationKind: "ADD_ASSUMED_CONNECTOR_OPERATION",
+      augmentationKind: "ADD_ASSUMED_CONNECTOR_OPERATION" as const,
       assumptionSummary: "the payment splits below the rail's declared maximum",
       operationKind: "split-transfer",
     }),
@@ -217,11 +217,11 @@ const OPERATOR_PRESENTATIONS: Readonly<Record<string, OperatorPresentation>> = O
     platformWorkProposal: Object.freeze({ gapId: "platform:permission-model", title: "a credential permission model that can express the required grant" }),
   }),
   "platform:cross-provider-route-shape": Object.freeze({
-    sideConditions: Object.freeze([{ kind: "NO_ROUTE_STATE" }]),
+    sideConditions: Object.freeze([{ kind: "NO_ROUTE_STATE" as const }]),
     platformWorkProposal: Object.freeze({ gapId: "platform:cross-provider-route-shape", title: "a frozen route shape composing the cross-provider pair" }),
   }),
   "platform:flutterwave-send-operation": Object.freeze({
-    sideConditions: Object.freeze([{ kind: "NO_ROUTE_STATE" }, { kind: "FLW_PROVIDER_RAIL" }]),
+    sideConditions: Object.freeze([{ kind: "NO_ROUTE_STATE" as const }, { kind: "FLW_PROVIDER_RAIL" as const }]),
     platformWorkProposal: Object.freeze({ gapId: "platform:flutterwave-send-operation", title: "a Flutterwave send operation" }),
   }),
 });
