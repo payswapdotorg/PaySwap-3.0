@@ -1,0 +1,117 @@
+{
+  "harness": "scripts/p23/desktop-cdp-emergence-journey.mjs + scripts/p21/cdp-harness-lib.mjs (the P23-D Electron CDP emergence journey — the E2E law's desktop half, ADR-0015 D10)",
+  "ranAt": "2026-10-29T09:13:48.761Z",
+  "durationMs": 58355,
+  "appRuntime": {
+    "tier": "the desktop dev-tier runtime (tsup-built main/host/preload + the vite-built renderer over file://)",
+    "launchRecipe": "electron . --no-sandbox --disable-dev-shm-usage --open-workspace <workspace> (CDP 9229, Xvfb :99, isolated ZCODE_DESKTOP_USER_DATA_DIR)",
+    "isolatedUserDataDir": "<journey-scoped>",
+    "workspace": "/home/z/payswap-e2e-workspace"
+  },
+  "honestScope": "ZERO live provider credentials: the connection plane PRE-SEEDED through the REAL member path over the SCRIPTED provider transport (the p21-journey-bridge fixtures' six answers — the same tier as the bridge battery); the probes that confirmed the connections ran over the scripted answers, and NO live provider was contacted or is claimed. The REAL app derives its bridge, chains, rails, exclusions and CARDS from that state. The re-check surfaces the honest consent-gated refusal (the named carry-forward). The live-dispatch tier stays the a51a30c rail-evidence receipt's.",
+  "steps": [
+    {
+      "id": "seed-1",
+      "name": "the connection-state seeder drives the REAL member path over the scripted transport (seed → seal → probe → CONFIRMED → ACTIVE)",
+      "status": "PASS",
+      "detail": "/tmp/p23-cdp-seed-1793265228765/connections (the scripted test world, disclosed — never a live-probe claim)"
+    },
+    {
+      "id": "run1-1",
+      "name": "the composer opens with the honest zero-financial-authority note",
+      "status": "PASS",
+      "detail": "the capability note renders verbatim"
+    },
+    {
+      "id": "run1-2",
+      "name": "the nine-field guided intake completes over the seeded FLW wallet funding source",
+      "status": "PASS",
+      "detail": "distinctAnswered=9/9 pendingRemaining=false seeded=true"
+    },
+    {
+      "id": "run1-3",
+      "name": "the structured preview presents the honest typed BLOCK with the no-route reason verbatim (the intent compiles; the cards change nothing at the authority tier)",
+      "status": "PASS",
+      "detail": "BLOCKED + NO_ROUTE_FOR_CORRIDOR rendered verbatim"
+    },
+    {
+      "id": "run1-4",
+      "name": "the cards display (launch 1): the route-planning view displays the repair CARDS — ≥3 meaningfully different kinds (the party changes over the service chains' own facts, the evidenced platform work, the never-executable multi-hop hypotheses) with the people-language preconditions, the DISTINCT platform prerequisites, the UNVERIFIED badges with the honest reasons, the wait naming the CONCRETE preconditions and the honest zero-model note",
+      "status": "PASS",
+      "detail": "conditional=2 platform=4 hypotheses=2 view=fnv1a64:4c13a485425f7952"
+    },
+    {
+      "id": "run1-5",
+      "name": "the Wait choice lands (WAITING_FOR_OPPORTUNITIES under the engine-proposed criteria)",
+      "status": "PASS",
+      "detail": "the waiting controls render (the re-check + the cancel)"
+    },
+    {
+      "id": "run1-6",
+      "name": "the re-check over fresh observations surfaces the honest consent-gated typed refusal (the named carry-forward, never masked, never a fabricated match)",
+      "status": "PASS",
+      "detail": "the consent-gate refusal rendered"
+    },
+    {
+      "id": "run1-7",
+      "name": "the persisted records carry the journey + the emergence-bearing presentation (the mission store + the task store)",
+      "status": "PASS",
+      "detail": "missionStore=true taskStore=true"
+    },
+    {
+      "id": "run2-1",
+      "name": "PERSISTENCE: the task + the conversation survive the app quit/relaunch on the same profile",
+      "status": "PASS",
+      "detail": "task=true, conversation=true"
+    },
+    {
+      "id": "run2-4",
+      "name": "PERSISTENCE: the conditionals survive relaunch (the same cards re-derive): the route-planning view displays the repair CARDS — ≥3 meaningfully different kinds (the party changes over the service chains' own facts, the evidenced platform work, the never-executable multi-hop hypotheses) with the people-language preconditions, the DISTINCT platform prerequisites, the UNVERIFIED badges with the honest reasons, the wait naming the CONCRETE preconditions and the honest zero-model note",
+      "status": "PASS",
+      "detail": "conditional=2 platform=4 hypotheses=2 view=fnv1a64:4c13a485425f7952"
+    },
+    {
+      "id": "run2-3",
+      "name": "the re-derived view digest EQUALS launch 1's (the byte-identical deterministic re-derivation over the persisted mission + connections)",
+      "status": "PASS",
+      "detail": "launch1=fnv1a64:4c13a485425f7952 launch2=fnv1a64:4c13a485425f7952"
+    },
+    {
+      "id": "run2-5",
+      "name": "the waiting state survives and the re-check refusal recomputes over fresh observations after relaunch",
+      "status": "PASS",
+      "detail": "the consent-gate refusal re-rendered"
+    }
+  ],
+  "screenshots": [
+    "p23-d-cdp-run1-2-intake-complete.png",
+    "p23-d-cdp-run1-3-blocked-preview.png",
+    "p23-d-cdp-run1-4-cards.png",
+    "p23-d-cdp-run1-4b-cards-hypotheses.png",
+    "p23-d-cdp-run1-5-waiting.png",
+    "p23-d-cdp-run1-6-recheck-refusal.png",
+    "p23-d-cdp-run2-1-persisted-composer.png",
+    "p23-d-cdp-run2-4-cards.png",
+    "p23-d-cdp-run2-4b-cards-hypotheses.png",
+    "p23-d-cdp-run2-4-rederived-cards.png"
+  ],
+  "journeySummary": {
+    "cardKinds": "party changes (2, the service chains' own facts) + platform work items (>=1, evidenced) + multi-hop hypotheses (>=1, never executable)",
+    "previewOutcome": "BLOCKED (NO_ROUTE_FOR_CORRIDOR — the honest no-route with the intent compiled)",
+    "waitOutcome": "WAITING; the re-check honestly consent-refused (the named carry-forward)",
+    "persistence": "SURVIVED (the same cards + the same view digest fnv1a64:4c13a485425f7952)"
+  },
+  "secretScan": {
+    "patterns": [
+      "sk_live_*",
+      "sk_test_*",
+      "pk_live_*",
+      "pk_test_*",
+      "whsec_*",
+      "Bearer *",
+      "PRIVATE KEY blocks"
+    ],
+    "findings": [],
+    "result": "CLEAN (no secret-shaped material in this receipt)"
+  }
+}

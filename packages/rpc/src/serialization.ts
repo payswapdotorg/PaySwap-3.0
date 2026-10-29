@@ -135,6 +135,8 @@ const BufferPresets = {
 
 const RPC_NESTED_UINT8_ARRAY_MARKER = "__zcode_rpc_nested_uint8array_v1";
 const RPC_NESTED_UINT8_ARRAY_BASE64_KEY = "base64";
+const RPC_NESTED_BIGINT_MARKER = "__zcode_rpc_nested_bigint_v1";
+const RPC_NESTED_BIGINT_VALUE_KEY = "bigint";
 
 // ============================================================================
 // serialize / deserialize
@@ -180,6 +182,9 @@ export function serialize(writer: IWriter, data: any): void {
     // 对象字段里的 Uint8Array 之前会被 JSON.stringify 展开成 {"0":...}，
     // 远端 RPC 收到后不再是二进制，skill sync 这类归档传输会在解压阶段失败。
     // 这里保持 Object JSON fallback 的协议形态，只对嵌套 Uint8Array 加标记并在反序列化时恢复。
+    // 同理（P23-D，2026-10-29）：嵌套 BigInt 会被 JSON.stringify 直接抛错（“Do not know
+    // how to serialize a BigInt”）——通道回复整体丢失、调用方永远等不到落点。按 Uint8Array
+    // 的同一先例加标记往返（字符串 ↔ BigInt），加性、向后兼容。
     const buffer = VSBuffer.fromString(JSON.stringify(data, encodeRpcJsonValue));
     writer.write(BufferPresets.Object);
     writeInt32VQL(writer, buffer.byteLength);
@@ -224,14 +229,23 @@ function encodeRpcJsonValue(_key: string, value: unknown): unknown {
       [RPC_NESTED_UINT8_ARRAY_BASE64_KEY]: bytesToBase64(value),
     };
   }
+  if (typeof value === "bigint") {
+    return {
+      [RPC_NESTED_BIGINT_MARKER]: true,
+      [RPC_NESTED_BIGINT_VALUE_KEY]: value.toString(),
+    };
+  }
   return value;
 }
 
 function decodeRpcJsonValue(_key: string, value: unknown): unknown {
-  if (!isRpcEncodedUint8Array(value)) {
-    return value;
+  if (isRpcEncodedUint8Array(value)) {
+    return base64ToBytes(value[RPC_NESTED_UINT8_ARRAY_BASE64_KEY]);
   }
-  return base64ToBytes(value[RPC_NESTED_UINT8_ARRAY_BASE64_KEY]);
+  if (isRpcEncodedBigInt(value)) {
+    return BigInt(value[RPC_NESTED_BIGINT_VALUE_KEY]);
+  }
+  return value;
 }
 
 function isRpcEncodedUint8Array(value: unknown): value is {
@@ -245,6 +259,21 @@ function isRpcEncodedUint8Array(value: unknown): value is {
   return (
     record[RPC_NESTED_UINT8_ARRAY_MARKER] === true &&
     typeof record[RPC_NESTED_UINT8_ARRAY_BASE64_KEY] === "string" &&
+    Object.keys(record).length === 2
+  );
+}
+
+function isRpcEncodedBigInt(value: unknown): value is {
+  [RPC_NESTED_BIGINT_MARKER]: true;
+  [RPC_NESTED_BIGINT_VALUE_KEY]: string;
+} {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return (
+    record[RPC_NESTED_BIGINT_MARKER] === true &&
+    typeof record[RPC_NESTED_BIGINT_VALUE_KEY] === "string" &&
     Object.keys(record).length === 2
   );
 }
