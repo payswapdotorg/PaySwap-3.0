@@ -13,6 +13,7 @@ import {
   PINNED_MINOR_UNIT_PATTERN,
   PINNED_PROTOCOL_COMMAND_MARKER_FIELDS,
   PINNED_PROPOSAL_SCHEMA_VERSION,
+  PINNED_CORRIDOR_EXCLUSION_CODES,
   PINNED_RAIL_KEY_PATTERN,
   PINNED_SOURCE_AVAILABILITIES,
   compareRationals,
@@ -154,6 +155,42 @@ describe("the pinned wire shapes are consistent with their authorities", () => {
     expect(PINNED_PROTOCOL_COMMAND_MARKER_FIELDS[0]).toBe("idempotencyKey");
     expect(PINNED_PROTOCOL_COMMAND_MARKER_FIELDS[10]).toBe("signature");
     expect(PINNED_PROTOCOL_COMMAND_MARKER_FIELDS[17]).toBe("finalityRecordId");
+  });
+
+  it("corridor exclusion codes (P2-W1 capability corridor-types.ts:48-75): the 26 stable machine codes, byte-identical, same order", () => {
+    // VALUE PIN — the authority's published CORRIDOR_EXCLUSION_CODES list
+    // (read at base d28e000; value pinning, never value imports). The
+    // repair-operator catalogue's totality law runs over EXACTLY this list.
+    expect(Object.isFrozen(PINNED_CORRIDOR_EXCLUSION_CODES)).toBe(true);
+    expect([...PINNED_CORRIDOR_EXCLUSION_CODES]).toEqual([
+      "AUTHORIZATION_NOT_ACTIVE",
+      "INSTANCE_INELIGIBLE",
+      "MISSING_PERMISSIONS",
+      "INSTANCE_GEOGRAPHY_NOT_SERVED",
+      "INSTANCE_CURRENCY_NOT_SUPPORTED",
+      "IMPLEMENTATION_SCOPE_NOT_SERVED",
+      "AVAILABILITY_UNAVAILABLE",
+      "AVAILABILITY_UNKNOWN",
+      "OBSERVATION_NOT_ELIGIBLE",
+      "OBSERVATION_ELIGIBILITY_UNKNOWN",
+      "STALE_OBSERVATION",
+      "QUOTA_EXHAUSTED",
+      "SOURCE_COUNTRY_NOT_SERVED",
+      "DESTINATION_COUNTRY_NOT_SERVED",
+      "SOURCE_CURRENCY_NOT_SUPPORTED",
+      "DESTINATION_CURRENCY_NOT_SUPPORTED",
+      "CUSTOMER_TYPE_NOT_SERVED",
+      "AMOUNT_BELOW_MINIMUM",
+      "AMOUNT_ABOVE_MAXIMUM",
+      "AMOUNT_CURRENCY_MISMATCH",
+      "FUNDING_METHOD_NOT_SERVED",
+      "PAYOUT_METHOD_NOT_SERVED",
+      "RECIPIENT_TYPE_NOT_SERVED",
+      "MISSING_REQUIRED_FIELDS",
+      "CUTOFF_PASSED",
+      "NOT_EXECUTABLE_CAPABILITY",
+    ]);
+    expect(new Set(PINNED_CORRIDOR_EXCLUSION_CODES).size).toBe(26);
   });
 
   it("the package identity (the barrel law)", () => {

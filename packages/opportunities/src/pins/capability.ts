@@ -165,3 +165,59 @@ export function pinnedLooksLikeConnectedInstance(value: unknown): boolean {
     typeof record.eligibility.eligible === "boolean"
   );
 }
+
+// ---------------------------------------------------------------------------
+// The corridor exclusion vocabulary (P23-A, ADR-0015 D2 — the 26 codes the
+// repair-operator catalogue is TOTAL over)
+// ---------------------------------------------------------------------------
+
+/**
+ * VALUE PIN — authority: @payswap/capability src/corridor-types.ts
+ * `CORRIDOR_EXCLUSION_CODES` (byte-identical, all 26 entries, same order —
+ * corridor-types.ts:48-75): the stable machine codes for every exclusion
+ * the corridor projection can surface. The typed repair-operator catalogue
+ * (./repair-operators.ts) is TOTAL over EXACTLY this list: every code is
+ * either operator-applicable (at least one repair operator's
+ * `applicableExclusionCodes`) or carries exactly one honest non-operator
+ * classification row (./repair-classifications.ts) — never both, never
+ * neither (the totality law, machine-checked by the battery).
+ */
+export const PINNED_CORRIDOR_EXCLUSION_CODES = Object.freeze([
+  "AUTHORIZATION_NOT_ACTIVE",
+  "INSTANCE_INELIGIBLE",
+  "MISSING_PERMISSIONS",
+  "INSTANCE_GEOGRAPHY_NOT_SERVED",
+  "INSTANCE_CURRENCY_NOT_SUPPORTED",
+  "IMPLEMENTATION_SCOPE_NOT_SERVED",
+  "AVAILABILITY_UNAVAILABLE",
+  "AVAILABILITY_UNKNOWN",
+  "OBSERVATION_NOT_ELIGIBLE",
+  "OBSERVATION_ELIGIBILITY_UNKNOWN",
+  "STALE_OBSERVATION",
+  "QUOTA_EXHAUSTED",
+  "SOURCE_COUNTRY_NOT_SERVED",
+  "DESTINATION_COUNTRY_NOT_SERVED",
+  "SOURCE_CURRENCY_NOT_SUPPORTED",
+  "DESTINATION_CURRENCY_NOT_SUPPORTED",
+  "CUSTOMER_TYPE_NOT_SERVED",
+  "AMOUNT_BELOW_MINIMUM",
+  "AMOUNT_ABOVE_MAXIMUM",
+  "AMOUNT_CURRENCY_MISMATCH",
+  "FUNDING_METHOD_NOT_SERVED",
+  "PAYOUT_METHOD_NOT_SERVED",
+  "RECIPIENT_TYPE_NOT_SERVED",
+  "MISSING_REQUIRED_FIELDS",
+  "CUTOFF_PASSED",
+  "NOT_EXECUTABLE_CAPABILITY",
+] as const);
+
+/**
+ * STRUCTURAL PIN — authority: @payswap/capability src/corridor-types.ts
+ * `CorridorExclusionCode` (the 26-member union over the pinned list).
+ */
+export type PinnedCorridorExclusionCode = (typeof PINNED_CORRIDOR_EXCLUSION_CODES)[number];
+
+/** Fail-closed membership test over the pinned corridor exclusion vocabulary. */
+export function isPinnedCorridorExclusionCode(value: unknown): value is PinnedCorridorExclusionCode {
+  return typeof value === "string" && (PINNED_CORRIDOR_EXCLUSION_CODES as readonly unknown[]).includes(value);
+}

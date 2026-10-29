@@ -57,16 +57,27 @@ export function isConditionalParty(value: unknown): value is ConditionalParty {
 }
 
 /**
- * The closed party-change vocabulary (runtime-frozen): the named changes
- * the P21 cross-provider journey composes — the recipient enables an
- * eligible Flutterwave receiving method; the sender adds a genuinely
- * supported Stripe-compatible payment instrument; a verified
- * intermediary is introduced.
+ * The closed party-change vocabulary (runtime-frozen; the ADR-0015 A.1
+ * growth): the named changes a conditional may require. The three P21
+ * members are preserved BYTE-IDENTICALLY in name and position (they are
+ * first — the P21 corridor behavior is unchanged): the recipient enables
+ * an eligible Flutterwave receiving method; the sender adds a genuinely
+ * supported Stripe-compatible payment instrument; a verified intermediary
+ * is introduced. The P23 growth appends three PROVIDER-NEUTRAL members
+ * (ADR-0015 D2): the recipient enables a compatible receiving method; the
+ * sender adds a compatible funding instrument; the sender completes the
+ * provider permissions. The new members carry no provider identity — the
+ * general repair catalogue (./repair-operators.ts) proposes them on any
+ * corridor, and on the P21 corridor the P21-specific operators shadow the
+ * general ones (the D2 most-specific-applicable-operator rule).
  */
 export const CONDITIONAL_PARTY_CHANGES = Object.freeze([
   "ENABLES_FLUTTERWAVE_RECEIVING_METHOD",
   "ADDS_STRIPE_COMPATIBLE_INSTRUMENT",
   "INTERMEDIARY_INTRODUCED",
+  "ENABLES_COMPATIBLE_RECEIVING_METHOD",
+  "ADDS_COMPATIBLE_FUNDING_INSTRUMENT",
+  "COMPLETES_PROVIDER_PERMISSIONS",
 ] as const);
 export type ConditionalPartyChange = (typeof CONDITIONAL_PARTY_CHANGES)[number];
 

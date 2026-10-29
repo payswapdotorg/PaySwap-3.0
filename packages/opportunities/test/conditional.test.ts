@@ -128,15 +128,43 @@ describe("the conditional opportunity (opportunity x party-change precondition)"
     );
   });
 
-  it("the party/change vocabularies are frozen and closed", () => {
+  it("the party/change vocabularies are frozen and closed (the ADR-0015 A.1 six-member growth)", () => {
     expect(Object.isFrozen(CONDITIONAL_PARTIES)).toBe(true);
     expect(Object.isFrozen(CONDITIONAL_PARTY_CHANGES)).toBe(true);
     expect([...CONDITIONAL_PARTIES]).toEqual(["SENDER", "RECIPIENT", "THIRD_PARTY"]);
+    // The three P21 members stay byte-identical in name and position (they
+    // are first — the P21 corridor behavior is unchanged); the P23 growth
+    // appends the three provider-neutral general members (ADR-0015 A.1).
     expect([...CONDITIONAL_PARTY_CHANGES]).toEqual([
       "ENABLES_FLUTTERWAVE_RECEIVING_METHOD",
       "ADDS_STRIPE_COMPATIBLE_INSTRUMENT",
       "INTERMEDIARY_INTRODUCED",
+      "ENABLES_COMPATIBLE_RECEIVING_METHOD",
+      "ADDS_COMPATIBLE_FUNDING_INSTRUMENT",
+      "COMPLETES_PROVIDER_PERMISSIONS",
     ]);
+    expect(CONDITIONAL_PARTY_CHANGES[0]).toBe("ENABLES_FLUTTERWAVE_RECEIVING_METHOD");
+    expect(CONDITIONAL_PARTY_CHANGES[1]).toBe("ADDS_STRIPE_COMPATIBLE_INSTRUMENT");
+    expect(CONDITIONAL_PARTY_CHANGES[2]).toBe("INTERMEDIARY_INTRODUCED");
+  });
+
+  it("the P23 growth is admitted end-to-end: a provider-neutral member constructs and validates", () => {
+    const opportunity = liquidity();
+    const generalChange: RequiredPartyChange = {
+      party: "SENDER",
+      change: "ADDS_COMPATIBLE_FUNDING_INSTRUMENT",
+    };
+    const conditional = publishConditionalOpportunity(
+      opportunity,
+      publicationInput({ requiredPartyChanges: [generalChange] }),
+      NOW,
+    );
+    expect(conditional.requiredPartyChanges).toEqual([generalChange]);
+    expect(conditional.conditionalId).toBe(
+      `conditional:SENDER:ADDS_COMPATIBLE_FUNDING_INSTRUMENT:${opportunity.opportunityId}`,
+    );
+    const roundTrip = validateConditionalOpportunity(JSON.parse(JSON.stringify(conditional)));
+    expect(JSON.stringify(roundTrip)).toBe(JSON.stringify(conditional));
   });
 
   it("fails closed on a malformed precondition (the closed vocabulary law)", () => {
