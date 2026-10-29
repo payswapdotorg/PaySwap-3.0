@@ -35,6 +35,17 @@
  *   provider, implementation + the typed exclusion facts) — the ids are
  *   derived identities naming those exact facts, never references to
  *   unobserved things (INV-07).
+ *
+ * THE P23-C COMPAT GATE (ADR-0015 D3): the input gains an OPTIONAL
+ * `repairCatalogue`. ABSENT / undefined (the default — the existing call
+ * signature keeps working) the EXACT P21 code path runs, byte-identically
+ * (the existing batteries prove it unmodified). PRESENT — the GENERAL
+ * path runs (deriveExclusionRepairs through the injected catalogue; over
+ * the FLW→Stripe corridor the D2 shadowing rule reproduces the P21 three)
+ * and the output ADDITIVELY grows `platformWork`, `hypotheses` and
+ * `nonRepairClassifications` (the existing fields unchanged; the
+ * derivationDigest is recomputed to include the new sections — it changes
+ * ONLY on the catalogue-bound path).
  */
 
 import { PortUnboundError, RoutePlanningError } from "./errors.ts";
@@ -70,6 +81,12 @@ import {
   validatedSenderSnapshot,
   validatePortResult,
 } from "./conditional-validation.ts";
+import { deriveExclusionRepairs, requireRepairOperatorCatalogue } from "./exclusion-repair.ts";
+import type {
+  NonRepairClassificationRow,
+  RepairOperatorCataloguePort,
+} from "./exclusion-repair.ts";
+import type { PinnedHypothesisRequest, PinnedPlatformWorkRequest } from "./pins/repairs.ts";
 
 /** The stage this seam serves (frozen; the unbound error names it exactly). */
 export const CONDITIONAL_DERIVATION_STAGE = "stage-7:derive-conditional-opportunities" as const;
@@ -118,6 +135,8 @@ export interface ConditionalDerivationInput {
   readonly at: number;
   readonly expiresAt: number;
   readonly disclosurePurpose: string;
+  /** OPTIONAL (the P23-C compat gate): PRESENT -> the general path; ABSENT -> the exact P21 path. */
+  readonly repairCatalogue?: RepairOperatorCataloguePort;
 }
 
 /** The stage-7 derivation output (ADVISORY — the additive panel contract). */
@@ -133,6 +152,12 @@ export interface ConditionalOpportunityDerivation {
   readonly derivationDigest: string;
   readonly advisoryOnly: true;
   readonly conditionalsPermitExecution: false;
+  /** CATALOGUE-BOUND PATH ONLY (additive): the platform work items (D4). */
+  readonly platformWork?: readonly PinnedPlatformWorkRequest[];
+  /** CATALOGUE-BOUND PATH ONLY (additive): the multi-hop hypothesis requests (D5). */
+  readonly hypotheses?: readonly PinnedHypothesisRequest[];
+  /** CATALOGUE-BOUND PATH ONLY (additive): the honest non-repair rows (A.4). */
+  readonly nonRepairClassifications?: readonly NonRepairClassificationRow[];
 }
 
 /** A stage-7 derivation input or port result violated the laws. */
@@ -196,6 +221,61 @@ export function deriveConditionalOpportunities(input: ConditionalDerivationInput
   // The grounded facts: the corridor's VERBATIM typed exclusions, both sides, canonical order.
   const groundedFacts = Object.freeze([...groundedFactsOf("SENDER", sender), ...groundedFactsOf("RECIPIENT", recipient)]);
   const corridorFundingMethod = typeof recipient.query.fundingMethod === "string" ? recipient.query.fundingMethod : "";
+
+  // THE P23-C COMPAT GATE (ADR-0015 D3): the catalogue BOUND -> the GENERAL
+  // path (the typed repair set through deriveExclusionRepairs; the P21
+  // three reproduced byte-identically over the FLW→Stripe corridor by the
+  // D2 shadowing rule); the catalogue ABSENT -> the exact P21 path below.
+  if (input.repairCatalogue !== undefined) {
+    const repairDerivation = deriveExclusionRepairs({
+      senderSnapshot: sender,
+      recipientSnapshot: recipient,
+      hardGates,
+      catalogue: requireRepairOperatorCatalogue(input.repairCatalogue),
+      corridorRail,
+      optIn,
+      at,
+      expiresAt,
+      disclosurePurpose,
+    });
+    const seen = new Set<string>();
+    const conditionalOpportunities = Object.freeze(
+      repairDerivation.conditionalRequests.map((construction) => validatePortResult(port.construct(construction), construction, seen)),
+    );
+    // The digest is RECOMPUTED to include the new additive sections — it
+    // changes ONLY on this catalogue-bound path (the P21 digest below is untouched).
+    const derivationDigest = contentDigest({
+      stage: CONDITIONAL_DERIVATION_STAGE,
+      derivedAt: at,
+      corridorFundingMethod,
+      groundedFacts,
+      conditionalOpportunities: conditionalOpportunities.map((conditional) => conditional.conditionalId),
+      platformWork: repairDerivation.platformWorkRequests.map((work) => work.workItemId),
+      hypotheses: repairDerivation.hypothesisRequests.map((hypothesis) => hypothesis.operatorId),
+      nonRepairClassifications: repairDerivation.nonRepairClassifications.map((row) => ({ code: row.code, classification: row.classification })),
+      senderSnapshotDigest: sender.snapshotDigest,
+      recipientSnapshotDigest: recipient.snapshotDigest,
+      hardGateDigest: hardGates.hardGateDigest,
+      repairDigest: repairDerivation.repairDigest,
+      conditionalsPermitExecution: false,
+    });
+    return deepFreeze({
+      stage: CONDITIONAL_DERIVATION_STAGE,
+      derivedAt: at,
+      corridorFundingMethod,
+      groundedFacts,
+      conditionalOpportunities,
+      senderSnapshotDigest: sender.snapshotDigest,
+      recipientSnapshotDigest: recipient.snapshotDigest,
+      hardGateDigest: hardGates.hardGateDigest,
+      derivationDigest,
+      advisoryOnly: true,
+      conditionalsPermitExecution: false,
+      platformWork: repairDerivation.platformWorkRequests,
+      hypotheses: repairDerivation.hypothesisRequests,
+      nonRepairClassifications: repairDerivation.nonRepairClassifications,
+    });
+  }
 
   // The typed P21 pattern: an FLW-wallet funding method declined by the receiving side.
   const p21FundingFacts = groundedFacts.filter(
