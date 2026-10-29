@@ -67,13 +67,31 @@ export interface PinnedAssetIdentity {
  * VALUE PIN — the canonical chain-key form (authority:
  * @payswap/onchain-domain `isValidChainKey`: `<network>:<segment>`, both
  * lowercase-alphanumeric-with-dashes/-segments — e.g.
- * `ethereum:mainnet`, `solana:mainnet-beta`).
+ * `ethereum:mainnet`, `solana:mainnet-beta`, `stellar:testnet`).
  */
 export const PINNED_CHAIN_KEY_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*(:[a-z0-9]+(-[a-z0-9]+)*)+$/;
 
 /** True iff a chain key matches the pinned canonical form. */
 export function isPinnedChainKey(value: string): boolean {
   return PINNED_CHAIN_KEY_PATTERN.test(value);
+}
+
+/**
+ * VALUE PIN — authority: @payswap/onchain-domain src/asset.ts
+ * `SYMBOL_PATTERN` = /^[A-Z0-9][A-Z0-9._-]{0,31}$/. The canonical asset
+ * symbol format (uppercase-led, 1..32 chars, digits/dots/hyphens/
+ * underscores) — byte-identical. P22-C growth: an onchain position's
+ * symbol and observed amount are denominated in the ASSET (e.g. the
+ * issuer-scoped `USDC` of `stellar:testnet/asset:USDC:<issuerG>`,
+ * ADR-0016 D3), never a three-letter ISO currency code — the asset-symbol
+ * law is the honest bound (the old three-character bound was only ever
+ * coincidentally sufficient for ETH/USC-class fixtures).
+ */
+export const PINNED_ASSET_SYMBOL_PATTERN = /^[A-Z0-9][A-Z0-9._-]{0,31}$/;
+
+/** True iff an asset symbol matches the pinned canonical form. */
+export function isPinnedAssetSymbol(value: string): boolean {
+  return PINNED_ASSET_SYMBOL_PATTERN.test(value);
 }
 
 /**

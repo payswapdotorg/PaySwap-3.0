@@ -102,10 +102,11 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
       }
     }
     expect(offenders.join("\n")).toBe("");
-    // DISCLOSED RE-PIN (P23-C, ADR-0015 D3/D5): +7 src modules (exclusion-repair
-    // + exclusion-validation + hypothetical-views + hypothesis-stage + lab-facts
-    // + pins/repairs + pins/hypotheses).
-    expect(sourceFiles.length).toBe(25);
+    // DISCLOSED RE-PIN (P22-C, ADR-0016 D5/D6/D11): +4 src modules (corridor-plan
+    // + corridor-leg-laws + pins/corridor + pins/route-compiler-input) on top of
+    // the P23-C 25 (exclusion-repair + exclusion-validation + hypothetical-views
+    // + hypothesis-stage + lab-facts + pins/repairs + pins/hypotheses).
+    expect(sourceFiles.length).toBe(29);
   });
 
   it("no @payswap/* or @zcode/* import appears ANYWHERE in src (the pin-only law)", () => {
@@ -179,9 +180,9 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
     // it proves pin == the grown lane-A authority byte-identically per
     // ADR-0015 D11). The pins stay EXACT toBe (never loosened to ranges) —
     // the census law's strength is unchanged.
-    expect(sourceFiles.length).toBe(25);
-    expect(testFiles.length).toBe(23);
-    expect(allTestFiles.length).toBe(28);
+    expect(sourceFiles.length).toBe(29);
+    expect(testFiles.length).toBe(25);
+    expect(allTestFiles.length).toBe(30);
   });
 
   it("the manifest law + tsconfig carries EXACTLY the one documented type-only paths mapping + a single node.d.ts process declaration", () => {

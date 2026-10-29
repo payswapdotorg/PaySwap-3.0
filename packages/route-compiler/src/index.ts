@@ -353,6 +353,7 @@ export { buildRoutePlan, planCustodyChain } from "./route-plan.ts";
 export type { RoutePlan, RouteLeg, RoutePlanIneligibilityReason, BuildRoutePlanInput } from "./route-plan.ts";
 export { compileMoneyMovementRoute, compilationPermitsExecution } from "./compiler.ts";
 export type { RouteCompilationResult, ExcludedRouteShape } from "./compiler.ts";
+export { CROSS_PROVIDER_CORRIDOR_SHAPE_ID, observedCorridorMiddle } from "./compiler-corridor.ts";
 
 // --- The walk + evidence ----------------------------------------------------
 export {

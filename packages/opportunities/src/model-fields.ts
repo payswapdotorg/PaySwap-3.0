@@ -25,6 +25,7 @@ import {
   PINNED_ASSET_SYMBOL_PATTERN,
   PINNED_MINOR_UNIT_PATTERN,
   PINNED_RAIL_KEY_PATTERN,
+  pinnedIsValidCapitalAssetRef,
 } from "./pins/onchain-domain.ts";
 
 export function isNonEmptyString(value: unknown): value is string {
@@ -116,13 +117,13 @@ export function validateCapitalRequirement(
   railKey: string,
 ): void {
   requireNonEmpty(capital.assetRef, "capitalRequired.assetRef");
-  const prefix = `${railKey}/asset:`;
-  const symbol = capital.assetRef.startsWith(prefix)
-    ? capital.assetRef.substring(prefix.length)
-    : "";
-  if (symbol === "" || !PINNED_ASSET_SYMBOL_PATTERN.test(symbol)) {
+  // P22-C growth (ADR-0016 D3): BOTH the canonical two-segment form
+  // (`${railKey}/asset:<SYMBOL>`) AND the issuer-scoped three-segment form
+  // (`${railKey}/asset:<CODE>:<ISSUER_G>` — two issuers of the same code
+  // are two assets) validate; every other shape fails closed.
+  if (!pinnedIsValidCapitalAssetRef(railKey, capital.assetRef)) {
     throw new InvalidOpportunityError(
-      `capitalRequired.assetRef '${capital.assetRef}' is not a canonical asset ref for rail '${railKey}' (expected \`${railKey}/asset:<SYMBOL>\`)`,
+      `capitalRequired.assetRef '${capital.assetRef}' is not a canonical asset ref for rail '${railKey}' (expected \`${railKey}/asset:<SYMBOL>\` or the issuer-scoped \`${railKey}/asset:<CODE>:<ISSUER_G>\`)`,
     );
   }
   if (

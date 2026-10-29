@@ -95,6 +95,20 @@ export class RouteRankingError extends RoutePlanningError {
   }
 }
 
+/**
+ * A cross-provider corridor plan-level law was violated (P22-C,
+ * ADR-0016 D6/D11): a leg outside the pinned skeleton, a silently
+ * skipped leg, a later leg dispatched after an earlier leg's
+ * non-CONFIRMED outcome (the custody-continuity law), or a corridor
+ * demand riding a non-corridor direction class / hop bound.
+ */
+export class CorridorPlanLawError extends RoutePlanningError {
+  constructor(message: string, details?: unknown) {
+    super(message, "CORRIDOR_PLAN_LAW_FAILED", details);
+    this.name = "CorridorPlanLawError";
+  }
+}
+
 /** The closed machine-code vocabulary (frozen; stable identities). */
 export const ROUTE_PLANNING_ERROR_CODES = Object.freeze([
   "ROUTE_PLANNING_VALIDATION_FAILED",
@@ -105,6 +119,8 @@ export const ROUTE_PLANNING_ERROR_CODES = Object.freeze([
   "CANDIDATE_ENUMERATION_FAILED",
   "HARD_GATE_FAILED",
   "ROUTE_RANKING_FAILED",
+  // P22-C growth (ADR-0016 D6/D11): the corridor plan-level laws.
+  "CORRIDOR_PLAN_LAW_FAILED",
 ] as const);
 
 /** True iff the value is one of this package's errors (typed re-throw filters). */

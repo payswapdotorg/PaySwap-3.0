@@ -13,7 +13,9 @@ describe("package surface smoke", () => {
     const count = Object.keys(pkg).length;
     expect(count).toBeGreaterThanOrEqual(206);
     expect(count).toBeLessThanOrEqual(235);
-    expect(count).toBe(231);
+    // DISCLOSED RE-PIN (P22-C, ADR-0016 D5): +4 value exports (the corridor
+    // KES receiving context — three pinned literals + the constructor).
+    expect(count).toBe(235);
   });
 
   it("the package identity constants are stable", () => {

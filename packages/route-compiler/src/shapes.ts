@@ -7,7 +7,9 @@
  * baseline flag — the shapeId is the plan identity's second segment
  * (planId = `route-plan:${intentRef}:${shapeId}`).
  *
- * The nine shapes (the old families, provider-neutralized):
+ * The ten shapes (the old families, provider-neutralized; the tenth is
+ * the P22-C growth — ADR-0016 D5, delivering the P23 platform work item
+ * `platform:cross-provider-route-shape`):
  * - onchain-direct-transfer: same-chain wallet -> recipient;
  * - provider-native-bridge (BASELINE): the incumbent bridge;
  * - mixed-dex-bridge: swap -> bridge (cross-chain, composed);
@@ -18,7 +20,10 @@
  * - merchant-native-settlement (BASELINE, Mode A): the provider-native
  *   merchant balance settlement;
  * - merchant-external-payswap-route (Mode B): the off-ramp shape with
- *   the honest native-unavailable marker.
+ *   the honest native-unavailable marker;
+ * - cross-provider-corridor (P22-C): the fiat -> chain -> fiat corridor
+ *   (collect -> issuance -> onchain relay -> payout), admitted ONLY on
+ *   an OBSERVED onchain middle (the location-pair law, D5).
  *
  * Plus the exclusion-only shape family (unsupported pair).
  */
@@ -34,6 +39,7 @@ export const ROUTE_SHAPE_IDS = Object.freeze([
   "mixed-psp-onramp",
   "merchant-native-settlement",
   "merchant-external-payswap-route",
+  "cross-provider-corridor",
 ] as const);
 
 export type RouteShapeId = (typeof ROUTE_SHAPE_IDS)[number];
@@ -122,6 +128,17 @@ export function shapeLegSequence(shapeId: RouteShapeId): readonly string[] {
         "ONCHAIN_TRANSFER",
         "OFF_RAMP_PAYOUT",
         "BANK_SETTLEMENT",
+      ]);
+    case "cross-provider-corridor":
+      // ADR-0016 D5 (the exact skeleton law — pinned byte-exactly by the
+      // P22-C battery): the fiat -> chain -> fiat corridor over the
+      // OBSERVED onchain middle (the mixed-dex-offramp four-leg precedent,
+      // with the collect/issuance head replacing the DEX-swap head).
+      return Object.freeze([
+        "FIAT_PSP_COLLECT",
+        "PSP_STABLECOIN_ISSUANCE",
+        "ONCHAIN_TRANSFER",
+        "OFF_RAMP_PAYOUT",
       ]);
   }
 }

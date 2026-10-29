@@ -20,9 +20,9 @@ import { assertNoGuaranteeLanguage } from "./vocabulary.ts";
 import { isOpportunityFamily, isRailKind } from "./model.ts";
 import type { SupportingObservation } from "./model.ts";
 import {
-  PINNED_ASSET_SYMBOL_PATTERN,
   PINNED_MINOR_UNIT_PATTERN,
   PINNED_RAIL_KEY_PATTERN,
+  pinnedIsValidCapitalAssetRef,
 } from "./pins/onchain-domain.ts";
 import type { OpportunityObservationInput } from "./discovery.ts";
 
@@ -180,22 +180,18 @@ export function validateDiscoveryInput(
   }
 
   if (input.capitalRequired !== undefined) {
-    const symbol = input.capitalRequired.assetRef.startsWith(
-      `${input.railKey}/asset:`,
-    )
-      ? input.capitalRequired.assetRef.substring(
-          `${input.railKey}/asset:`.length,
-        )
-      : "";
+    // P22-C growth (ADR-0016 D3): the capital asset ref admits BOTH the
+    // authority's canonical two-segment form (`${railKey}/asset:<SYMBOL>`)
+    // AND the issuer-scoped three-segment form
+    // (`${railKey}/asset:<CODE>:<ISSUER_G>` — the corridor's USDC on
+    // stellar:testnet; two issuers of the same code are two assets).
     if (
-      !isNonEmptyString(input.capitalRequired.assetRef) ||
-      symbol === "" ||
-      !PINNED_ASSET_SYMBOL_PATTERN.test(symbol) ||
+      !pinnedIsValidCapitalAssetRef(input.railKey, input.capitalRequired.assetRef) ||
       typeof input.capitalRequired.minorUnits !== "string" ||
       !PINNED_MINOR_UNIT_PATTERN.test(input.capitalRequired.minorUnits)
     ) {
       throw new OpportunityDiscoveryError(
-        "capitalRequired, when present, must be { assetRef: `${railKey}/asset:<SYMBOL>`, minorUnits } (exact integer minor units)",
+        "capitalRequired, when present, must be { assetRef: `${railKey}/asset:<SYMBOL>` (or the issuer-scoped `${railKey}/asset:<CODE>:<ISSUER_G>`), minorUnits } (exact integer minor units)",
       );
     }
   }

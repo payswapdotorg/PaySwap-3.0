@@ -33,8 +33,8 @@ import type {
   PinnedObservationVersionPin,
   PinnedRouteCompilationResult,
   PinnedRoutePlan,
-  RouteCompilerInputPin,
 } from "./pins/route-compiler.ts";
+import type { RouteCompilerInputPin } from "./pins/route-compiler-input.ts";
 import { requireRouteCompilationPort, type RouteCompilationPort } from "./ports.ts";
 import type { EligibleRailSnapshot } from "./rail-snapshot.ts";
 import {

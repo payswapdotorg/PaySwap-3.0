@@ -90,7 +90,10 @@ describe("architectural boundary: @payswap/merchant (the REWRITTEN zero-sibling 
       }
     }
     expect(offenders.join("\n")).toBe("");
-    expect(sourceFiles.length).toBe(43);
+    // DISCLOSED RE-PIN (P22-C, ADR-0016 D5): +1 src module (kes-receiving.ts
+    // — the corridor's KES bank receiving entry over the EXTERNAL conversion
+    // route), so the census moved 43 -> 44 src.
+    expect(sourceFiles.length).toBe(44);
   });
 
   it("no @payswap/* or @zcode/* import appears ANYWHERE in src (the leaf-in-flight pins law)", () => {
@@ -178,8 +181,9 @@ describe("architectural boundary: @payswap/merchant (the REWRITTEN zero-sibling 
       }
     }
     expect(offenders.join("\n")).toBe("");
-    expect(testFiles.length).toBe(25);
-    expect(allTestFiles.length).toBe(30);
+    // DISCLOSED RE-PIN (P22-C): +1 test file (kes-receiving.test.ts).
+    expect(testFiles.length).toBe(26);
+    expect(allTestFiles.length).toBe(31);
   });
 
   it("the manifest law: zero runtime deps, devDependencies exactly typescript+vitest, the core barrel export", () => {

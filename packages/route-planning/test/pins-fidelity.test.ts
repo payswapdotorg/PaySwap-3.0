@@ -129,12 +129,16 @@ describe("capability pins (authority: @payswap/capability)", () => {
 });
 
 describe("route-compiler pins (authority: @payswap/route-compiler)", () => {
-  it("the nine-shape vocabulary is byte-identical in the authority's order", () => {
+  it("the ten-shape vocabulary is byte-identical in the authority's order", () => {
     expect([...PINNED_ROUTE_SHAPE_IDS]).toEqual([...ROUTE_SHAPE_IDS]);
-    expect(PINNED_ROUTE_SHAPE_IDS).toHaveLength(9);
+    // DISCLOSED RE-PIN (P22-C, ADR-0016 D5): the authority's frozen shape
+    // vocabulary grew its TENTH member — `cross-provider-corridor` — and
+    // this pin mirrors it byte-identically (the pin-fidelity law).
+    expect(PINNED_ROUTE_SHAPE_IDS).toHaveLength(10);
     expect(Object.isFrozen(PINNED_ROUTE_SHAPE_IDS)).toBe(true);
     const shapes: readonly PinnedRouteShapeId[] = [...ROUTE_SHAPE_IDS];
-    expect(shapes).toHaveLength(9);
+    expect(shapes).toHaveLength(10);
+    expect(shapes).toContain("cross-provider-corridor");
   });
 
   it("the candidate-status vocabulary is byte-identical", () => {

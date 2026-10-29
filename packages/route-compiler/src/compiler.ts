@@ -31,6 +31,7 @@ import { corridorCandidates } from "./corridor.ts";
 import type { CorridorCandidate } from "./corridor.ts";
 import { compileOffRampShapes, compileMerchantShapes } from "./compiler-offramp.ts";
 import { compileOnRampShapes, compileCrossChainShapes } from "./compiler-onchain-shapes.ts";
+import { compileCorridorShapes, observedCorridorMiddle } from "./compiler-corridor.ts";
 import { locationObservationFor } from "./compiler-assembly.ts";
 import { collectObservationVersionPins } from "./compiler-support.ts";
 import type { RoutePlan } from "./route-plan.ts";
@@ -82,10 +83,17 @@ export function compileMoneyMovementRoute(input: RouteCompilerInput): RouteCompi
   compileCrossChainShapes(input, intent, origin, destination, at, plans, exclusions);
   compileMerchantShapes(input, intent, candidates, onchainOrigin, destination, at, plans, exclusions);
 
+  // The P22-C location-pair law (ADR-0016 D5): the cross-provider fiat
+  // pair is admitted ONLY through the cross-provider-corridor shape and
+  // ONLY on the OBSERVED onchain middle — the middle grounds the chain
+  // hop, never a fabricated relay.
+  const corridorMiddle = observedCorridorMiddle(input);
+  compileCorridorShapes(input, intent, candidates, origin, destination, corridorMiddle, at, plans, exclusions);
+
   if (
     origin === undefined ||
     destination === undefined ||
-    !isSupportedLocationPair(origin, destination)
+    !isSupportedLocationPair(origin, destination, corridorMiddle)
   ) {
     exclusions.push({
       shapeId: "unsupported-origin-destination-pair",
@@ -118,13 +126,23 @@ export function compileMoneyMovementRoute(input: RouteCompilerInput): RouteCompi
   });
 }
 
+/**
+ * The observed location-pair dispatch (the P5-W1 law, grown EXACTLY ONCE
+ * by P22-C — ADR-0016 D5): a fiat PROVIDER_ACCOUNT origin reaches a fiat
+ * BANK_INSTRUMENT destination ONLY through the cross-provider-corridor
+ * shape and ONLY when an ONCHAIN position is OBSERVED in the middle (the
+ * chain hop is grounded in the onchain plane's observations — never a
+ * fabricated middle). Every other pair is unchanged (byte-compat).
+ */
 function isSupportedLocationPair(
   origin: FundsLocationObservation,
   destination: FundsLocationObservation,
+  observedMiddle: OnchainPositionObservation | undefined,
 ): boolean {
   const pairs: Record<string, readonly string[]> = {
     ONCHAIN_POSITION: ["BANK_INSTRUMENT", "ONCHAIN_POSITION", "MERCHANT_BALANCE"],
-    PROVIDER_ACCOUNT: ["ONCHAIN_POSITION"],
+    PROVIDER_ACCOUNT:
+      observedMiddle !== undefined ? ["ONCHAIN_POSITION", "BANK_INSTRUMENT"] : ["ONCHAIN_POSITION"],
     BANK_INSTRUMENT: [],
     MERCHANT_BALANCE: [],
   };

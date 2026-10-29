@@ -17,7 +17,8 @@
 import { PortUnboundError } from "./errors.ts";
 import type { PinnedCorridorQuery, PinnedCorridorRouteChain, PinnedCorridorSideEvaluation } from "./pins/capability.ts";
 import type { PinnedObservationFreshnessPolicy } from "./pins/capability.ts";
-import type { PinnedRouteCompilationResult, RouteCompilerInputPin } from "./pins/route-compiler.ts";
+import type { PinnedRouteCompilationResult } from "./pins/route-compiler.ts";
+import type { RouteCompilerInputPin } from "./pins/route-compiler-input.ts";
 
 /**
  * The routine stage names an engine binding serves (ROUTINE-CONTRACT

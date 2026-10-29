@@ -43,6 +43,44 @@ export function pinnedCanonicalAssetRef(railKey: string, symbol: string): string
 export const PINNED_ASSET_SYMBOL_PATTERN = /^[A-Z0-9][A-Z0-9._-]{0,31}$/;
 
 /**
+ * VALUE PIN — authority: ADR-0016 D3 + the frozen appendix (P22-C): the
+ * Stellar account StrKey shape (the issuer scope of an issuer-scoped
+ * asset — `G…`, 56 base32 characters). The A-lane pins the same literal
+ * independently (the ADR-0015 appendix discipline — never imported).
+ */
+export const PINNED_STELLAR_ISSUER_STRKEY_PATTERN = /^G[A-Z2-7]{55}$/;
+
+/**
+ * VALUE PIN — authority: ADR-0016 D3 + the frozen appendix (P22-C): the
+ * ISSUER-SCOPED capital asset ref on a rail —
+ * `${railKey}/asset:<CODE>:<ISSUER_G>` (e.g.
+ * `stellar:testnet/asset:USDC:GBBD…`): the asset code is the authority's
+ * symbol pattern and the issuer scope is the Stellar account StrKey shape
+ * (two issuers of the same code are two assets — the collision law). The
+ * two-segment `${railKey}/asset:${SYMBOL}` form stays byte-identical (the
+ * authority's canonical identity); this admits the corridor's
+ * issuer-scoped USDC as a capital asset honestly, never a new namespace.
+ */
+export function pinnedIsValidCapitalAssetRef(
+  railKey: string,
+  assetRef: unknown,
+): assetRef is string {
+  if (typeof assetRef !== "string") return false;
+  const prefix = `${railKey}/asset:`;
+  if (!assetRef.startsWith(prefix)) return false;
+  const remainder = assetRef.substring(prefix.length);
+  if (PINNED_ASSET_SYMBOL_PATTERN.test(remainder)) return true;
+  const colonAt = remainder.indexOf(":");
+  if (colonAt === -1) return false;
+  const code = remainder.substring(0, colonAt);
+  const issuer = remainder.substring(colonAt + 1);
+  return (
+    PINNED_ASSET_SYMBOL_PATTERN.test(code) &&
+    PINNED_STELLAR_ISSUER_STRKEY_PATTERN.test(issuer)
+  );
+}
+
+/**
  * VALUE PIN — authority: @payswap/onchain-domain src/family.ts
  * `isValidChainKey` (the pattern predicate). Pinned behaviour-identical;
  * applied to RAIL keys generally and asserted for ONCHAIN-kind rails.
