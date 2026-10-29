@@ -391,3 +391,6 @@ export function exploreBoundedScenarios(input: {
     explorationDigest, advisoryOnly: true, scenariosPermitExecution: false,
   });
 }
+
+/** The P23-C real-facts path (the substance in ./lab-facts.ts, the 400-line file law). */
+export * from "./lab-facts.ts";

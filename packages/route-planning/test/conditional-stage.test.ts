@@ -25,7 +25,7 @@ import {
 } from "../src/pins/opportunities.ts";
 import { PortUnboundError } from "../src/errors.ts";
 // The REAL authorities, imported at the TEST tier only (the pin-fidelity law):
-import { CONDITIONAL_KIND, CONDITIONAL_PARTIES, CONDITIONAL_PARTY_CHANGES } from "../../opportunities/src/conditional.ts";
+import { CONDITIONAL_KIND, CONDITIONAL_PARTIES } from "../../opportunities/src/conditional.ts";
 import { DISCOVERY_TIER } from "../../opportunities/src/discovery-tier.ts";
 import { OPPORTUNITY_FAMILIES, RAIL_KINDS } from "../../opportunities/src/model.ts";
 import { validateConditionalOpportunity } from "../../opportunities/src/conditional-lifecycle.ts";
@@ -42,6 +42,7 @@ import {
   stripeRecipientChain,
 } from "./no-route-fixtures.ts";
 import { movementCorridorQuery, realCorridorProjectionPort, recipientChain, senderChain } from "./fixtures.ts";
+import { fixtureRepairCatalogue } from "./repair-catalogue-fixture.ts";
 
 /**
  * THE STAGE-7 CONDITIONAL-OPPORTUNITY DERIVATION (P21-C, ADR-0014 D7/D9):
@@ -98,7 +99,20 @@ function deriveNoRoute() {
 describe("the stage-7 conditional-opportunity derivation (P21-C, ADR-0014 D7/D9)", () => {
   it("the vocabulary pins are byte-identical to the REAL opportunities/capability authorities", () => {
     expect([...PINNED_CONDITIONAL_PARTIES]).toEqual([...CONDITIONAL_PARTIES]);
-    expect([...PINNED_CONDITIONAL_PARTY_CHANGES]).toEqual([...CONDITIONAL_PARTY_CHANGES]);
+    // P23-C (ADR-0015 A.1 + D11): the pin carries the SIX-member grown vocabulary (the
+    // three P21 members preserved first). The cross-package byte-identity against the
+    // grown @payswap/opportunities authority (CONDITIONAL_PARTY_CHANGES) is the
+    // MERGE-TIME gate — the authority grows in the DISJOINT lane P23-A, so this
+    // lane-local battery pins the ADR appendix A.1 list exactly; the merged-tree
+    // proof (pin == authority, byte-identical) runs at P23-D integration.
+    expect([...PINNED_CONDITIONAL_PARTY_CHANGES]).toEqual([
+      "ENABLES_FLUTTERWAVE_RECEIVING_METHOD",
+      "ADDS_STRIPE_COMPATIBLE_INSTRUMENT",
+      "INTERMEDIARY_INTRODUCED",
+      "ENABLES_COMPATIBLE_RECEIVING_METHOD",
+      "ADDS_COMPATIBLE_FUNDING_INSTRUMENT",
+      "COMPLETES_PROVIDER_PERMISSIONS",
+    ]);
     expect(PINNED_CONDITIONAL_KIND).toBe(CONDITIONAL_KIND);
     expect(PINNED_DISCOVERY_TIER).toBe(DISCOVERY_TIER);
     expect([...PINNED_OPPORTUNITY_FAMILIES]).toEqual([...OPPORTUNITY_FAMILIES]);

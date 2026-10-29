@@ -30,13 +30,18 @@
 export const PINNED_CONDITIONAL_PARTIES = Object.freeze(["SENDER", "RECIPIENT", "THIRD_PARTY"] as const);
 /**
  * VALUE PIN — authority: @payswap/opportunities src/conditional.ts
- * `CONDITIONAL_PARTY_CHANGES` (the closed P21 party-change vocabulary),
- * byte-identical.
+ * `CONDITIONAL_PARTY_CHANGES` (the closed party-change vocabulary, the
+ * ADR-0015 A.1 growth): the three P21 members preserved byte-identically
+ * in name and position (first), the three P23 provider-neutral members
+ * appended (canonical order).
  */
 export const PINNED_CONDITIONAL_PARTY_CHANGES = Object.freeze([
   "ENABLES_FLUTTERWAVE_RECEIVING_METHOD",
   "ADDS_STRIPE_COMPATIBLE_INSTRUMENT",
   "INTERMEDIARY_INTRODUCED",
+  "ENABLES_COMPATIBLE_RECEIVING_METHOD",
+  "ADDS_COMPATIBLE_FUNDING_INSTRUMENT",
+  "COMPLETES_PROVIDER_PERMISSIONS",
 ] as const);
 /** VALUE PIN — authority: @payswap/opportunities src/conditional.ts `CONDITIONAL_KIND`. */
 export const PINNED_CONDITIONAL_KIND = "ConditionalOpportunity" as const;

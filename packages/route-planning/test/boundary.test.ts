@@ -102,8 +102,10 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
       }
     }
     expect(offenders.join("\n")).toBe("");
-    // DISCLOSED RE-PIN (P21-C, ADR-0014 D9): +3 src modules (conditional-stage.ts + conditional-validation.ts + pins/opportunities.ts).
-    expect(sourceFiles.length).toBe(18);
+    // DISCLOSED RE-PIN (P23-C, ADR-0015 D3/D5): +7 src modules (exclusion-repair
+    // + exclusion-validation + hypothetical-views + hypothesis-stage + lab-facts
+    // + pins/repairs + pins/hypotheses).
+    expect(sourceFiles.length).toBe(25);
   });
 
   it("no @payswap/* or @zcode/* import appears ANYWHERE in src (the pin-only law)", () => {
@@ -162,17 +164,21 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
       }
     }
     expect(offenders.join("\n")).toBe("");
-    // DISCLOSED RE-PIN (P21-C, ADR-0014 D7/D9 — the stage-7 conditional
-    // derivation): three NEW src modules (conditional-stage + its
-    // validation split + the opportunities pins split under the 400-line
-    // file law) and two NEW test-tier files (the no-route world fixtures
-    // + the conditional-stage battery), so the census moved 15 -> 18 src,
-    // 16 -> 17 test suites and 19 -> 21 all-test .ts files. The pins stay
-    // EXACT toBe (never loosened to ranges) — the census law's strength
-    // is unchanged.
-    expect(sourceFiles.length).toBe(18);
-    expect(testFiles.length).toBe(17);
-    expect(allTestFiles.length).toBe(21);
+    // DISCLOSED RE-PIN (P23-C, ADR-0015 D3/D5 — the general exclusion→repair
+    // derivation + the hypothetical views + the hypothesis stage + the real-facts
+    // stage-6 path): seven NEW src modules (exclusion-repair + its validation
+    // split + hypothetical-views + hypothesis-stage + lab-facts + the two pins
+    // splits pins/repairs + pins/hypotheses under the 400-line file law) and
+    // five NEW test-tier files (the four batteries exclusion-repair /
+    // hypothetical-views / hypothesis-stage / lab-facts + the catalogue
+    // fixture), so the census moved 18 -> 25 src, 17 -> 22 test suites and
+    // 21 -> 27 all-test .ts files (the fifth suite is the compat-gate battery
+    // conditional-compat.test.ts, split from conditional-stage.test.ts under
+    // the 400-line file law). The pins stay EXACT toBe (never loosened
+    // to ranges) — the census law's strength is unchanged.
+    expect(sourceFiles.length).toBe(25);
+    expect(testFiles.length).toBe(22);
+    expect(allTestFiles.length).toBe(27);
   });
 
   it("the manifest law + tsconfig carries EXACTLY the one documented type-only paths mapping + a single node.d.ts process declaration", () => {
