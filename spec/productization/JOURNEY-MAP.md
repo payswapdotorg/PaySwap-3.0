@@ -430,3 +430,76 @@ secret-free receipt
 The E2E law caught three real product defects on the way (the
 registration call-shape drop, the composition-root boot order, the
 route-planning cache freshness) — each fixed and pinned by a test.
+
+## 9. The P23-D reconciliation (2026-10-29) — the opportunity-card journeys
+
+REGISTERED by the resident TL at the P23-D closure (ADR-0015 D10 — the E2E
+law's desktop half extended with card-CONTENT assertions + the persistence
+recheck; the wave's lane scope named this reconciliation). The
+repair-discovery wave (P23) grew the route-planning journey with the three
+advisory opportunity sections, and this section reconciles the map with the
+journeys that now exist:
+
+- **J24 GROWS (tier 1, web)** — the opportunity-emergence honesty law: the
+  web tier's never-composed deployment renders the unbound-engine note
+  VERBATIM (the P23-B-grown text naming the repair-discovery engines) with
+  ZERO opportunity cards, ZERO advisory-section chrome and ZERO
+  people-language card vocabulary (the same testid surfaces the desktop
+  journey asserts content through). A card on web would be a FABRICATION —
+  the composition requires the platform host's engines, absent BY DESIGN;
+  the desktop tier carries the bound card-content journey.
+- **THE DESKTOP OPPORTUNITY-CARD JOURNEY (the P23-D CDP emergence journey,
+  scripts/p23/desktop-cdp-emergence-journey.mjs)**: the no-route corridor
+  journey ("Pay merchant X" → the FLW-wallet funding over the seeded
+  scripted-test-world connections → the nine-field intake → the typed
+  BLOCKED preview with NO_ROUTE_FOR_CORRIDOR verbatim → the composer's
+  route-planning view DISPLAYS the repair cards — 2 party changes + 4
+  platform work items + 2 multi-hop hypotheses, ≥3 meaningfully different
+  kinds, with the people-language preconditions, the DISTINCT platform
+  prerequisites, the UNVERIFIED badges with the honest reasons, the wait
+  naming the CONCRETE preconditions and the honest zero-model note → the
+  Wait lands → the re-check surfaces the honest consent-gated typed refusal
+  → the relaunch re-derives the SAME cards with the EQUAL view digest).
+  12/12 PASS, a machine-scanned secret-free receipt
+  (docs/productization-evidence/p23-d-cdp-emergence-journey-RECEIPT-2026-10-29.json,
+  itself machine-verified by
+  packages/desktop/test/payswap/p23-cdp-receipt-verification.test.ts) +
+  10 screenshots. The zero-credential honesty: the connection state is
+  PRE-SEEDED through the REAL member path over the SCRIPTED provider
+  transport (the bridge battery's own six answers — the station holds no
+  live keys and the probe transports hardcode the real endpoints); no live
+  provider is contacted or claimed; the live-dispatch tier stays the
+  a51a30c receipt's.
+- **THE P21-0 D7 CONFLATION CORRECTED (recorded)**: the P21-0 gap matrix's
+  D7 row credited "available-now routes presented separately from
+  conditional opportunities" to the RoutePlanningPanel's distinct sections
+  — but until P23 the "conditional opportunities" surface was the
+  SCENARIOS-DIGEST list (the advisory counterfactual scenarios), NOT the
+  opportunity cards (the reviewer's 2026-10-29 finding: the conditional
+  opportunities were never displayed as actionable alternatives). The
+  correction: the D7 law is TRUE as of P23-D (available-now first, then the
+  three advisory card sections — conditionalOpportunities, platformWork,
+  hypotheses — the A.7 order), and every E2E assertion is CARD-SHAPED and
+  content-level, never satisfied by the scenarios digest.
+- **THE E2E LAW'S CATCHES (fixed in the same wave, each pinned by a
+  battery)**: (1) the chains-derived wait-recheck observations source built
+  a non-canonical rail key (`fiat:Flutterwave` — the title-cased provider
+  display name) so `discoverOpportunity` rejected every record and the
+  source silently returned the EMPTY set while the chains were ACTIVE (the
+  bridge battery's catch); (2) the substrate RPC serializer's Object
+  branch threw on a nested BigInt (`bps: bigint` in the chains' cost
+  models) so the `connectionCapabilityChains` reply was lost wholesale —
+  the renderer's engine cache stayed empty, the rails derived 'unobserved'
+  and the cards never composed (the CDP journey's catch; fixed by the
+  marked string round-trip following the serializer's own
+  nested-Uint8Array precedent); (3) the P23-B-grown unbound-engine note
+  had drifted from the journey suite's verbatim pin (the tier-1 re-run's
+  catch). The E2E law keeps working as designed: the DOM-level journeys
+  catch real product defects the controller-tier batteries cannot see.
+
+The living suites after P23-D: web tier-1 = J24 (4 tests, incl. the
+opportunity-emergence honesty law) + the manifest enforcement — 9/9 green
+across both projects; web tier-2 = the composer laws J20–J23 — 8/8 green;
+the desktop tier = the P21 CDP journey (9/9) + the P23-D CDP emergence
+journey (12/12) + the bridge battery + the no-bypass battery (the ADR-0015
+D7 gate) + the emergence battery + the receipt machine-verification.

@@ -17,8 +17,7 @@
     "worker-3": "migration-experience-and-integrations"
   },
   "frontier": [
-    "P22",
-    "P23-D"
+    "P22"
   ],
   "active_work_orders": [],
   "completed_work_orders": [
@@ -1125,6 +1124,22 @@
       "carry_forward": [
         "P23-D remains: the CDP desktop E2E with card-CONTENT assertions + the persistence recheck, the formal no-bypass battery consolidation (the D7 laws are structurally proven across the lane batteries — the marker-scans, the never-execute literals, the typed refusals, the structural guards), the JOURNEY-MAP/FEATURE-MAP reconciliation, the graph/state closure, PUSH, the bundle archive"
       ]
+    },
+    {
+      "id": "P23-D",
+      "owner": "main (z.ai Code, TL)",
+      "status": "COMPLETE",
+      "session": "web-a95c8999-6661-4553-8cd4-51eedc9f4b24",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "the TL closure lane (commits 19e8310 + 179aa06 + 81ee7ee on main, PUSHED before the eleventh reset; the closure-docs commit follows): the bridge battery p23-journey-emergence.test.ts (2 tests incl. the deterministic replay — the cards asserted through the REAL channel: 3 party changes + 3 platform work items + 2 hypotheses, the A.6 distinction, the wait's concrete preconditions, the re-check over the PRODUCT chains-derived source LIVE + the scripted fresh-discovery match, the GATES_BLOCKED refusal through the REAL channel, the persistence; the catch — the chains-derived rail-key defect fixed at source) + the no-bypass battery p23-no-bypass.test.ts (6 tests — the ADR-0015 D7 clauses a-e consolidated + the structural falses) + the CDP card-content E2E scripts/p23/desktop-cdp-emergence-journey.mjs (12/12 PASS; the receipt machine-verified by p23-cdp-receipt-verification.test.ts, 6 tests; the REAL app displays conditional=2 platform=4 hypotheses=2 with every D8 content element; the relaunch re-derives the same cards with the EQUAL view digest fnv1a64:4c13a485425f7952; the zero-credential scripted-test-world seeding disclosed in the receipt; the catch — the substrate RPC serializer's nested-BigInt loss fixed at source and pinned by p23-rpc-bigint-wire.test.ts) + the web tier (journey-verification tier-1 9/9 + tier-2 8/8; J24 grows the opportunity-emergence honesty law; the P23-B unbound-note drift fixed) + the P23-B tsc tail fixed at source with the mirror-check gate grown + the integrated batteries all green (opportunities 22f/317t, route-planning 23f/260t, lab 19f/176t, route-compiler 29f/353t, payswap-app 56f/592t, surface 19f/234t, desktop 57f/463t+1skipped — the untouched siblings exact-matching) + the three scoped desktop tsc gates 0/0/0 + architecture:check 0/0/0 + the JOURNEY-MAP §9 / FEATURE-MAP P23 row / P21-0 D7 conflation correction + the acceptance record docs/productization-evidence/P23-ACCEPTANCE-RECORD-2026-10-29.md",
+      "summary": "The TL closure: P23 IS CLOSED — the review's seven requirement rows all landed and verified; the closure gates (the no-bypass battery + the CDP card-content E2E) both green; the opportunity cards proven end-to-end in Electron (card-CONTENT assertions + the persistence recheck over the EQUAL view digest) and web (the honest-presentation tier); four real defects caught by the closure tiers and fixed at source (the chains-derived rail key, the substrate wire's nested-BigInt loss, the P23-B mirror-check tail, the P23-B unbound-note drift); the maps reconciled; the graph closed; three commits PUSHED before the eleventh reset (zero committed work lost; the closure docs redone after); the bundle archived.",
+      "carry_forward": [
+        "the live-model binding follow-on (ADR-0015 D6: the model-proposal port binds only with a session model AND the substrate model-provider transport seam — the honest UNBOUND states proven; a live binding is the named follow-on)",
+        "the consent plane (ADR-0015 D9e: the product re-check surfaces the honest consent-gated typed refusal — proven by the CDP journey; a real consent plane is the named carry-forward)",
+        "the CLI-agent skill/MCP integration stays on the P24 candidate list (the P21-0 §3 D4 reconciliation)",
+        "P22 unchanged (the operator's Stellar/Paystack provider-combination redo — parked, operator-gated)",
+        "the live-provider legs stay operator-gated (the a51a30c receipts remain the accepted live evidence)"
+      ]
     }
   ],
   "policies": {
@@ -1580,7 +1595,53 @@
       "actor": "resident-TL",
       "action": "P21_D_ACCEPTED_AND_P21_CLOSED",
       "detail": "P21-D accepted at c9cf05e (the Electron CDP desktop journey, 9/9 PASS) with the closure lanes landed: 151-a the product connection-plane composition (6d926d5), 151-b the final-stage verification contract (3d5b120 — Gap C closed), 152 the Electron CDP desktop journey (c9cf05e — three real product defects found + fixed + pinned: the registration call-shape drop, the composition-root boot order, the route-planning cache freshness). The wave closed per the closure policy: the journey proven end-to-end at both user-facing tiers (web J24 + desktop CDP) with the honest typed outcomes; the real-dispatch tier covered by the accepted a51a30c receipt; the six truth facts machine-enforced; zero secret material in any artifact. PUSHED; the bundle archive refreshed. Carry-forward (P22): the live-provider legs stay operator-gated; the provider-combination redo (Stellar + Paystack) awaits the operator."
+    },
+    {
+      "ts": "2026-10-29T00:00:00Z",
+      "actor": "resident-TL",
+      "action": "P23_0_REGISTERED",
+      "detail": "P23 registered beside P22 (the 2026-10-29 TL progress review turned into the repair-discovery wave): the gap matrix + ADR-0015 + the work orders + the machine graph + the current-state registration. Commit b0b212c PUSHED.",
+      "lanes": [],
+      "base": "e03af3e"
+    },
+    {
+      "ts": "2026-10-29T00:00:00Z",
+      "actor": "resident-TL",
+      "action": "P23_A_ACCEPTED",
+      "detail": "P23-A accepted at 7f3ef72 (merged 6d6439b): the repair-operator catalogue + the platform work items + the model-proposal interface; opportunities 22f/317t + tsc 0; the worker died on the station-tool deadline, the tree landed nearly complete, the TL completed the verification tail.",
+      "lanes": [
+        "P23-A"
+      ],
+      "base": "b0b212c"
+    },
+    {
+      "ts": "2026-10-29T00:00:00Z",
+      "actor": "resident-TL",
+      "action": "P23_C_ACCEPTED",
+      "detail": "P23-C accepted at dc3dad7 (merged 93cee74): the general derivation + the hypothetical views + the hypothesis stage + the real-facts stage-6 path; route-planning 22f/257t + tsc 0; the TL authored the missing test tail; the merge-time pin-fidelity gate 037d704 (ADR-0015 D11).",
+      "lanes": [
+        "P23-C"
+      ],
+      "base": "b0b212c"
+    },
+    {
+      "ts": "2026-10-29T00:00:00Z",
+      "actor": "resident-TL",
+      "action": "P23_B_ACCEPTED",
+      "detail": "P23-B accepted at 38211ac (merged 777533e): the actionable cards + the pin growth + the product composition + the wait-recheck boot; desktop 52f/446t + payswap-app 56f/592t + surface 19f/234t; the TL completed the wiring + three source fixes (disclosed).",
+      "lanes": [
+        "P23-B"
+      ],
+      "base": "acfb123"
+    },
+    {
+      "ts": "2026-10-29T09:56:36.404Z",
+      "actor": "resident-TL",
+      "action": "P23_D_ACCEPTED_AND_P23_CLOSED",
+      "detail": "P23-D accepted (commits 19e8310 + 179aa06 + 81ee7ee, PUSHED before the eleventh reset — zero committed work lost; the closure-docs commit follows) and P23 CLOSED: the bridge battery + the no-bypass battery + the CDP card-content E2E (12/12, the machine-verified receipt, the EQUAL-digest persistence proof) + the web tier (tier-1 9/9, tier-2 8/8) + the integrated batteries all green + the tsc gates 0/0/0 + architecture 0/0/0 + the maps reconciled + the acceptance record. Four real defects caught and fixed at source (the rail key, the wire's nested BigInt, the P23-B tsc tail, the P23-B note drift). The frontier returns to P22 (parked, operator-gated); the P24 candidates recorded.",
+      "lanes": [],
+      "base": "9f7a626"
     }
   ],
-  "last_tl_action_at": "2026-10-28T15:59:43Z"
+  "last_tl_action_at": "2026-10-29T09:56:36.404Z"
 }
