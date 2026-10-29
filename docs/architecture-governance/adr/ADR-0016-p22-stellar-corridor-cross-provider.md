@@ -243,6 +243,25 @@ match byte-identically (the ADR-0015 appendix discipline):
 - Corridor direction classes: `MOVE`, `CONVERT` (PAY stays max-hops-1)
 - Funding/payout method pins: the corridor's GHS on-ramp and KES off-ramp method literals (the FLW/Stripe P21 pins preserved; the new pins named by the C lane and pinned in the appendix's acceptance addendum at P22-C merge — never invented twice)
 
+### Appendix acceptance addendum (recorded at the P22-A/P22-C lane acceptance, 2026-10-29)
+
+The C lane named the corridor's funding/payout method literals (the naming shape: the
+FLW/Stripe P21 pin precedent — provider + instrument, grown with the corridor currency
+qualifier because the corridor is defined by its currency pair):
+
+- GHS on-ramp funding method: `flutterwave_ghs_mobile_money` (the Flutterwave Ghana
+  mobile-money collection — the collect leg's lane)
+- KES off-ramp payout method: `paystack_kes_bank_transfer` (the Paystack Kenya
+  bank-transfer payout — the payout leg's lane, the beneficiary bank instrument arrival)
+
+Both literals are pinned byte-identically in `packages/route-planning/src/pins/corridor.ts`
+(`PINNED_CORRIDOR_GHS_ONRAMP_FUNDING_METHOD` / `PINNED_CORRIDOR_KES_OFFRAMP_PAYOUT_METHOD`)
+and mirrored in `packages/merchant/src/kes-receiving.ts` (the KES receiving context's
+payout-method association). The A-lane literals (the family member, the chain key, the
+environment class, the operation kind, the evidence-record fields, the StrKey patterns,
+the assetId format) landed byte-identically to the appendix above — verified at the lane
+acceptance.
+
 ## Alternatives considered
 
 - **Force-fit Stellar into the PSP provider runtime** (a fourth `PAYSWAP_PROBE_PROVIDER_ID`): rejected — ADR-0008 D5's finding stands (Stellar is an onchain rail; the PSP shapes are credential-keyed business providers; the keypair/network semantics don't fit the probe/key-class vocabulary).

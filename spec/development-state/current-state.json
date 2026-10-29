@@ -17,8 +17,7 @@
     "worker-3": "migration-experience-and-integrations"
   },
   "frontier": [
-    "P22-A",
-    "P22-C"
+    "P22-H"
   ],
   "active_work_orders": [],
   "completed_work_orders": [
@@ -1155,6 +1154,24 @@
         "the P24 candidate list unchanged (the live-model binding, the consent plane, the CLI-agent skill/MCP, the automatic evidence feeds)",
         "the dispatch: {P22-A (onchain plane) ∥ P22-C (route vocabulary)} → P22-H (host) → P22-B (app/renderer) → P22-D (TL closure)"
       ]
+    },
+    {
+      "id": "P22-A",
+      "owner": "main (z.ai Code, TL)",
+      "status": "COMPLETE",
+      "session": "web-a95c8999-6661-4553-8cd4-51eedc9f4b24",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commits 50544e4 + 28a5c71 (the lane) + 4023739 (the merge-fidelity pin growth): the STELLAR family member + the semantics entry + the StrKey G/S/C family extension + the issuer-scoped asset (the collision law: two issuers of the same code are two assets) + the stellar:testnet TESTNET environment entry (stellar:pubnet deliberately unregistered, fail-closed) + the onchain.contract_deploy operation kind (INV-20-class consequential) + the deploy lifecycle path prepare-authorize-broadcast-observeResult-evidence + the deployment evidence record {txHash, contractId, sourceHash, bytecodeHash} (the SmartContractExtensionPin derives ONLY from a real deployment) + the Stellar ChainFamilyAdapter over the scripted Horizon (the injected-fetch seam, no SDK: the observe stage, the Soroban deploy, the transfer, the classic-asset issuance alternative) + the no-grant typed refusals (DeploymentGrantRequiredError; the recording transport proves zero calls) + the StrKey secret law (S... is secret material; G/C are public identifiers). Batteries: onchain-domain 17f/266t, onchain-adapters 23f/201t, onchain-security 33f/400t, onchain-extensions 16f/164t (exact-match untouched); typechecks 0; architecture 0/0/0.",
+      "completed_at": "2026-10-29T15:30:00Z"
+    },
+    {
+      "id": "P22-C",
+      "owner": "main (z.ai Code, TL)",
+      "status": "COMPLETE",
+      "session": "web-a95c8999-6661-4553-8cd4-51eedc9f4b24",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commits f26bd45 + 82a0b1b (the lane) + 4023739 (the merge): the cross-provider-corridor shape (FIAT_PSP_COLLECT -> PSP_STABLECOIN_ISSUANCE -> ONCHAIN_TRANSFER -> OFF_RAMP_PAYOUT, the exact skeleton law) + the ONE new location pair (PROVIDER_ACCOUNT -> BANK_INSTRUMENT, this shape only, observed-ONCHAIN-middle only — never a fabricated middle) + the byte-compat gate (the nine existing shapes byte-identical over the P23 fixture worlds) + the P21 no-route law re-pinned (the unobserved middle compiles NOTHING, the exclusion surfaces) + the corridor fixtures (the stellar relay chain with stellar:testnet/asset:USDC:<issuerG>, the GHS on-ramp, the KES off-ramp) + the funding/payout method pins (flutterwave_ghs_mobile_money, paystack_kes_bank_transfer — the appendix acceptance addendum records them) + the leg-separation/custody-continuity/hop-bound laws (CorridorPlanLawError; a later leg NEVER dispatches after an earlier leg's non-CONFIRMED outcome; legs never silently skip; PAY stays DIRECT_PAYMENT_MAX_ROUTE_HOPS=1) + the ONCHAIN-rail vocabulary growth in opportunities (the issuer-scoped capital asset at BOTH validation sites; the rail-key/rail-kind laws) + the repair-catalogue delivery record (the platform:cross-provider-route-shape row names the P22-C delivery) + the merchant KES receiving context (the EXTERNAL conversion route; BANK_INSTRUMENT/KES; the non-custody law). Batteries: route-compiler 29f/375t, route-planning 25f/290t, opportunities 23f/325t, merchant 26f/358t, financial-certification 16f/134t (exact-match untouched); typechecks 0; architecture 0/0/0.",
+      "completed_at": "2026-10-29T15:30:00Z"
     }
   ],
   "policies": {
@@ -1663,7 +1680,13 @@
       "action": "P22_REGISTERED",
       "detail": "The Stellar corridor wave registered at 7e19526 (the operator's follow-on order; the gap matrix + ADR-0016 + six work orders + the machine graph + the baselines re-run — the seven exact-matching the P23 closure record plus the eight onchain/provider additions, the three tsc gates 0/0/0, architecture 0/0/0; the eleventh-reset sibling-dist casualty rebuilt and disclosed). Frontier → [P22-A, P22-C] (concurrent, file-disjoint); then P22-H → P22-B → P22-D. The honest credential gate recorded: the live tiers operator-gated on the re-supply of secrets/payment-providers.env; the lanes proceed credential-free on the scripted tier.",
       "base": "7e19526"
+    },
+    {
+      "ts": "2026-10-29T15:30:00Z",
+      "actor": "resident-TL",
+      "action": "P22_LANES_AC_ACCEPTED",
+      "detail": "P22-A (the Stellar onchain plane) and P22-C (the route vocabulary) accepted at the merged tip 4023739 — the two lanes dispatched in parallel worktrees, merged clean (file-disjoint), the integrated batteries green (the nine lane packages + the untouched siblings exact-matching + the payswap-app onchain-pins mirror grown per the ADR-0015 D11 merge-fidelity law + the three desktop tsc gates 0/0/0 + architecture 0/0/0). The frontier is P22-H (the host execution plane: the Stellar seal verb + the kernel table + the composite dispatch + the Paystack execution lane amendment)."
     }
   ],
-  "last_tl_action_at": "2026-10-29T12:30:00.000Z"
+  "last_tl_action_at": "2026-10-29T15:30:00Z"
 }
