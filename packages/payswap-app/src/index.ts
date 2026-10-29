@@ -249,6 +249,45 @@ export {
   type MoneyMovementIntentPin,
   type PaymentIntentPin,
 } from "./agent/routePlanningPins.js";
+// (P23-B, ADR-0015 D8/A.6/A.7) The opportunity-emergence pins: the three
+// advisory engine-view sections' local structural mirrors (the
+// conditional/platform-work/hypothesis card pins, the frozen people-language
+// label maps, the verification pairing vocabulary and the honest standing
+// notes) — the platform host's composition root binds the REAL derivation
+// engines behind them; the web tier renders the honest not-composed notes.
+export {
+  ROUTE_PLANNING_CONDITIONAL_PARTIES_PIN,
+  ROUTE_PLANNING_CONDITIONAL_PARTY_CHANGES_PIN,
+  ROUTE_PLANNING_CONDITIONAL_OPPORTUNITIES_EMPTY_NOTE,
+  ROUTE_PLANNING_CONDITIONAL_OPPORTUNITIES_NOTE,
+  ROUTE_PLANNING_CONDITIONAL_OPPORTUNITIES_UNCOMPOSED_NOTE,
+  ROUTE_PLANNING_HYPOTHESES_EMPTY_NOTE,
+  ROUTE_PLANNING_HYPOTHESES_NOTE,
+  ROUTE_PLANNING_HYPOTHESES_UNCOMPOSED_NOTE,
+  ROUTE_PLANNING_HYPOTHESIS_NEVER_EXECUTABLE_NOTE,
+  ROUTE_PLANNING_MODEL_PROPOSALS_UNBOUND_NO_MODEL_NOTE,
+  ROUTE_PLANNING_MODEL_PROPOSALS_UNBOUND_NO_TRANSPORT_NOTE,
+  ROUTE_PLANNING_PARTY_CHANGE_LABELS,
+  ROUTE_PLANNING_PARTY_LABELS,
+  ROUTE_PLANNING_PLATFORM_WORK_EMPTY_NOTE,
+  ROUTE_PLANNING_PLATFORM_WORK_NOTE,
+  ROUTE_PLANNING_PLATFORM_WORK_UNCOMPOSED_NOTE,
+  ROUTE_PLANNING_REPAIR_INTERVENTION_ID_PREFIX,
+  ROUTE_PLANNING_VERIFICATION_STATUSES_PIN,
+  ROUTE_PLANNING_VERIFIED_BADGE_NOTE,
+  ROUTE_PLANNING_WAIT_PRECONDITIONS_PREFIX,
+  ROUTE_PLANNING_WAIT_PRECONDITIONS_SUFFIX,
+  type RoutePlanningConditionalOpportunityPin,
+  type RoutePlanningConditionalPartyChangePin,
+  type RoutePlanningConditionalPartyPin,
+  type RoutePlanningGroundedFactRefPin,
+  type RoutePlanningHypothesisPin,
+  type RoutePlanningModelProposalStatePin,
+  type RoutePlanningPartyChangePin,
+  type RoutePlanningPlatformPrerequisitePin,
+  type RoutePlanningPlatformWorkPin,
+  type RoutePlanningVerificationPin,
+} from "./agent/routePlanningOpportunityPins.js";
 // The payment-missions observation surface (P18-B; ADR-0011 D1): the
 // platform host's composition root binds the mission-plane channel
 // members behind the pinned PaymentMissionsPort through the mount's

@@ -23,6 +23,7 @@
       "@payswap/capability": ["../capability/src/index.ts"],
       "@payswap/route-compiler": ["../route-compiler/src/index.ts"],
       "@payswap/lab": ["../lab/src/index.ts"],
+      "@payswap/opportunities": ["../opportunities/src/index.ts"],
       "@payswap/trust": ["../trust/src/index.ts"]
     }
   },

@@ -226,9 +226,15 @@ describe("the bridge chains composition (P21-D Gap A — the product engine-adap
     expect(view.availableNow.recipientEligibleRouteIds).toEqual([]);
     expect(view.viewDigest).toMatch(/^fnv1a64:/);
 
-    // (3) THE OLDER-HOST LAW: a channel client WITHOUT the member keeps the
-    // honest EMPTY chain set — and because every derived rail is honestly
-    // excluded, the presented view is BYTE-IDENTICAL to the pre-wiring one.
+    // (3) THE OLDER-HOST LAW (P23-B amended, ADR-0015 D8/D9): a channel
+    // client WITHOUT the member keeps the honest EMPTY chain set — the
+    // available-now truth stays byte-identical (zero ranked, zero eligible,
+    // never a fabricated route). The P21-era WHOLE-VIEW byte-identity is
+    // DELIBERATELY SUPERSEDED: the chained view now carries the derived
+    // repair cards (the reviewer's core finding closed — the exclusions
+    // drive the opportunity emergence), while the absent-member view
+    // honestly derives NONE (no rails → no grounded exclusion facts → no
+    // repairs, the honest empty set, never a guess).
     const absent = composeRoutePlanningBinding({
       services: channelClientOver(service),
       controller: createAgentComposerController({ storage: fakeStorage(), clock: () => T1 }),
@@ -236,7 +242,31 @@ describe("the bridge chains composition (P21-D Gap A — the product engine-adap
     await absent.refresh();
     expect(absent.state.chains).toEqual([]);
     const absentView = sharedRoutePlanningEngine().presentableView({ taskRef: missionId });
-    expect(absentView.viewDigest).toBe(view.viewDigest);
+    expect(absentView.availableNow.ranked).toEqual([]);
+    expect(absentView.availableNow.senderEligibleRouteIds).toEqual([]);
+    expect(absentView.availableNow.recipientEligibleRouteIds).toEqual([]);
+    expect((absentView as unknown as { conditionalOpportunities?: readonly unknown[] }).conditionalOpportunities ?? []).toEqual([]);
+    expect((absentView as unknown as { platformWork?: readonly unknown[] }).platformWork ?? []).toEqual([]);
+    expect((absentView as unknown as { hypotheses?: readonly unknown[] }).hypotheses ?? []).toEqual([]);
+    // The CHAINED view presents the repair cards over the same honest no-route.
+    // NOTE (P23-B): the SERVICE-derived chains carry the bridge's OWN exclusion
+    // facts — the FLW chain's read-only permission state (not the fixture
+    // world's FUNDING_METHOD_NOT_SERVED) — so the GENERAL derivation derives
+    // the repairs THOSE facts support: the sender party change (the permissions
+    // operator) + the intermediary (the honest no-route state). This is the
+    // engine working as designed (the repairs follow the actual facts, never
+    // the hardcoded pattern); the fixture world's P21 three are proven in the
+    // emergence battery over the no-route fixtures.
+    const chainedCards = (view as unknown as { conditionalOpportunities?: readonly { title: string }[] }).conditionalOpportunities ?? [];
+    expect(chainedCards.map((card) => card.title)).toEqual([
+      "the sender completes the provider permissions",
+      "a verified intermediary is introduced",
+    ]);
+    const chainedWork = (view as unknown as { platformWork?: readonly { gapId: string }[] }).platformWork ?? [];
+    expect(chainedWork.length).toBeGreaterThan(0);
+    const chainedHypotheses = (view as unknown as { hypotheses?: readonly { operatorId: string }[] }).hypotheses ?? [];
+    expect(chainedHypotheses.map((card) => card.operatorId)).toContain("repair:intermediary-introduced");
+    expect(absentView.viewDigest).not.toBe(view.viewDigest);
     resetSharedRoutePlanningEngine();
     resetSharedRoutePlanningSession();
   });

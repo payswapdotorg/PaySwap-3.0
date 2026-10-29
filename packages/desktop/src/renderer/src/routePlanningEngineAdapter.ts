@@ -77,6 +77,9 @@ import {
   type RoutePlanningMissionDetail,
   type RoutePlanningMissionSource,
 } from "./routePlanningMissionLinkage.js";
+// (P23-B, ADR-0015 D9) the opportunity-emergence composition — the REAL
+// derivation + hypothesis stage + stage-6 facts/interventions, bound here.
+import { deriveOpportunityEmergence } from "./opportunityEmergenceAdapter.js";
 
 /* --------------- the pinned defaults (transparent, versioned) --------------- */
 
@@ -301,13 +304,54 @@ export function createRealRoutePlanningEngine(
       // Stage 5 — the typed hard gates BEFORE the transparent ranking.
       const gates = evaluateHardGates({ intent: movement, at, candidates: enumeration.candidates });
       const ranking = rankRoutes({ evaluation: gates, policy: compositionDefaultBestExecutionPolicy() as never });
-      // Stage 6 — the REAL Lab machinery over the EMPTY recorded-facts snapshot (the deployment records none).
+      // (P23-B, ADR-0015 D9) THE OPPORTUNITY-EMERGENCE COMPOSITION — the
+      // REAL general derivation + the REAL conditional construction + the
+      // REAL hypothesis stage (bounded by the scenario budget) + the
+      // model-proposal state (the D6 binding law) + stage 6's REAL facts
+      // and interventions. Fail-closed: a composition error leaves the
+      // honest PRESENTED_PLAN without the advisory sections (the pins'
+      // optional-section law), never a fabricated card.
+      let emergence: ReturnType<typeof deriveOpportunityEmergence> | null = null;
+      try {
+        emergence = deriveOpportunityEmergence({
+          senderSnapshot: pair.sender,
+          recipientSnapshot: pair.recipient,
+          hardGates: gates,
+          movement,
+          query,
+          at,
+          evidence: emptyEvidenceBundle(),
+          searchBudget: budgets.searchBudget,
+          scenarioBudget: budgets.scenarioBudget,
+          compilationPort: realCompilationPort(),
+          policy: compositionDefaultBestExecutionPolicy() as never,
+          intentPrincipalRef: movement.principalRef,
+          intentExpiresAt: movement.expiresAt,
+          ...(request.modelSelection !== undefined ? { modelSelection: request.modelSelection } : {}),
+        });
+      } catch {
+        emergence = null;
+      }
+      // Stage 6 — the REAL Lab machinery over the SNAPSHOT-DERIVED recorded
+      // facts + the derived repair interventions (P23-B: the structurally-
+      // empty stage is replaced; the fail-closed fallback is the honest empty
+      // facts when the emergence composition is unavailable).
       const baseProgram: SimulationProgram = { programId: "composition.base", programVersion: "1.0.0", routePreference: [], useNetting: false, useNetworkCredit: false, delayToleranceSteps: 0, fraudScreening: true, privacyBounded: true, authorizationMode: "PROTOCOL_AUTHORIZED" };
       const variantProgram: SimulationProgram = { programId: "composition.variant", programVersion: "1.0.0", routePreference: [], useNetting: false, useNetworkCredit: false, delayToleranceSteps: 0, fraudScreening: true, privacyBounded: true, authorizationMode: "PROTOCOL_AUTHORIZED" };
       const exploration = exploreBoundedScenarios({
         port: realScenarioPort(),
-        baseFacts: recordProductionFacts({ factsId: `composition:${target.id}`, rails: [], pools: [], stepLatencyMs: 250, demands: [], incidents: [] }),
-        interventions: [],
+        baseFacts:
+          emergence !== null
+            ? recordProductionFacts({
+                factsId: emergence.labFacts.factsId,
+                rails: emergence.labFacts.rails as never,
+                pools: [],
+                stepLatencyMs: emergence.labFacts.stepLatencyMs,
+                demands: [],
+                incidents: [],
+              })
+            : recordProductionFacts({ factsId: `composition:${target.id}`, rails: [], pools: [], stepLatencyMs: 250, demands: [], incidents: [] }),
+        interventions: (emergence?.scenarioInterventions ?? []) as never,
         budget: budgets.scenarioBudget,
         baseProgram,
         variantProgram,
@@ -360,6 +404,17 @@ export function createRealRoutePlanningEngine(
             counterfactualDigest: scenario.counterfactualDigest,
           })),
         },
+        // (P23-B, ADR-0015 D8/A.7) the three ADVISORY opportunity-emergence
+        // sections + the model-proposal state — absent (the honest
+        // not-composed notes) when the emergence composition failed closed.
+        ...(emergence !== null
+          ? {
+              conditionalOpportunities: emergence.conditionalOpportunities,
+              platformWork: emergence.platformWork,
+              hypotheses: emergence.hypotheses,
+              modelProposals: emergence.modelProposals,
+            }
+          : {}),
         waiting: {
           proposal: {
             waitId: `wait:${target.id}`,

@@ -10,6 +10,7 @@ import {
   composeModelCatalogBinding,
 } from "./modelCatalogComposition.js";
 import { composeConnectionsActivationBinding } from "./connectionsActivationComposition.js";
+import { chainDerivedWaitRecheckObservations, composeWaitRecheckBinding } from "./waitRecheckComposition.js";
 import { createRoot } from "react-dom/client";
 import { useEffect } from "react";
 import {
@@ -378,6 +379,20 @@ function initializeBusinessRoot(port: MessagePort): void {
     composeConnectionsActivationBinding({ services });
   } catch {
     // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定激活说明。
+  }
+  // P23-B（ADR-0015 D9d）：绑定 wait re-check 面 —— 真实的 P21-C 评估器
+  // （recheckWait）现在通过组合根启动，其 fresh-observation 源映射自现有的
+  // connectionCapabilityChains 成员（能力桥上的发现面 —— 具名后续落地，
+  // 无新宿主成员）；consent 源保持诚实的 NOT-GRANTED 默认（具名后续）。
+  // 顺序法：在 route-planning 组合（最后一个，构造共享 controller）之前
+  // 绑定 —— 面板构造时捕获真实缝隙，给 CDP 探针实测过的 WAIT_RECHECK_
+  // UNBOUND_NOTE 画上句号。
+  try {
+    composeWaitRecheckBinding({
+      observations: chainDerivedWaitRecheckObservations(services),
+    });
+  } catch {
+    // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未接线 re-check 说明。
   }
   // P17-C（ADR-0010 D1/D5）：绑定 REAL 路由规划引擎与会话 —— 组合根消费
   // payswap-desktop 的 mission-plane 成员（P17-A）；失败时保持诚实默认

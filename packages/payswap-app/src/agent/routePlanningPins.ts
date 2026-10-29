@@ -33,6 +33,12 @@
 
 import type { AgentTaskStatusPin } from "../lib/agent-task-pins.js";
 import type { AgentTaskModelSelectionPin } from "../lib/agent-task-pins.js";
+import type {
+  RoutePlanningConditionalOpportunityPin,
+  RoutePlanningHypothesisPin,
+  RoutePlanningModelProposalStatePin,
+  RoutePlanningPlatformWorkPin,
+} from "./routePlanningOpportunityPins.js";
 
 /* ============ the routine identity pins (VALUE pins — byte-identical) ============ */
 
@@ -146,9 +152,15 @@ export interface PaymentIntentPin extends MoneyMovementIntentPin {
 
 /** The DISTINCT panel sections (stage 8: "distinct current routes vs
  * conditional opportunities ... exclusions, metrics, evidence freshness
- * and search coverage"; stage 9b's wait surface). Frozen order = order. */
+ * and search coverage"; stage 9b's wait surface). Frozen order = order.
+ * (P23-B, ADR-0015 A.7) The growth: the three advisory opportunity
+ * sections — conditionalOpportunities, platformWork, hypotheses — land
+ * AFTER the scenarios section and BEFORE the waiting surface (the
+ * available-now FIRST law: the advisory repairs always render after the
+ * real routes, visually distinct). */
 export const ROUTE_PLANNING_SECTION_IDS = Object.freeze([
-  "available-now", "exclusions", "truncation", "scenarios", "waiting",
+  "available-now", "exclusions", "truncation", "scenarios",
+  "conditional-opportunities", "platform-work", "hypotheses", "waiting",
 ] as const);
 export type RoutePlanningSectionId = (typeof ROUTE_PLANNING_SECTION_IDS)[number];
 
@@ -281,6 +293,20 @@ export interface RoutePlanningEngineView {
     readonly coverage: "COMPLETE" | "TRUNCATED";
     readonly outcomes: readonly RoutePlanningScenarioPin[];
   };
+  /**
+   * (P23-B, ADR-0015 D8/A.7) The THREE ADVISORY OPPORTUNITY SECTIONS —
+   * OPTIONAL by construction: an engine view WITHOUT them (the unbound /
+   * web tier — ADR-0010 D7) renders the honest "not composed in this
+   * deployment" note for each, never fabricated data; a composition that
+   * bound the repair-discovery engines carries them (possibly honestly
+   * empty). The pins are the local structural mirrors
+   * (./routePlanningOpportunityPins.ts — zero @payswap imports, product
+   * law P2); the REAL derivation binds at the platform host's composition
+   * root (ADR-0015 D9).
+   */
+  readonly conditionalOpportunities?: readonly RoutePlanningConditionalOpportunityPin[];
+  readonly platformWork?: readonly RoutePlanningPlatformWorkPin[];
+  readonly hypotheses?: readonly RoutePlanningHypothesisPin[];
   /** The engine's PROPOSED wait criteria (from its stage-7 discovery); the user's Wait choice declares them. */
   readonly waiting: { readonly proposal: RoutePlanningWaitCriteriaPin };
   /**
@@ -292,6 +318,13 @@ export interface RoutePlanningEngineView {
    * differs), and no model authored any fact in this view.
    */
   readonly modelSelection?: AgentTaskModelSelectionPin;
+  /**
+   * (P23-B, ADR-0015 D6/D9) The MODEL-PROPOSAL TIER'S COMPOSED STATE —
+   * provenance only, OUTSIDE the digest projection (the modelSelection
+   * precedent): the honest zero-model / no-transport notes or the folded
+   * corroboration counts. Never a fabricated proposal.
+   */
+  readonly modelProposals?: RoutePlanningModelProposalStatePin;
   readonly viewDigest: string;
 }
 
@@ -416,7 +449,7 @@ export const ROUTE_PLANNING_WAIT_NOTE =
 
 /** The honest unbound-engine note (the live-app truth until the host binds the engines). */
 export const ROUTE_PLANNING_ENGINE_UNBOUND_NOTE =
-  "The route-planning engines are not wired in this deployment — no routes are shown because none can be honestly computed here. The composition root binds the real corridor, compiler and opportunities engines; until then this section states the gap instead of inventing routes." as const;
+  "The route-planning engines are not wired in this deployment — no routes are shown because none can be honestly computed here. The composition root binds the real corridor, compiler, opportunities and repair-discovery engines (the conditional opportunities, the platform work items and the multi-hop hypotheses are likewise not composed here); until then this section states the gap instead of inventing routes." as const;
 
 /** The honest no-validated-intent note (the D1 law in people language — rendered VERBATIM). */
 export const ROUTE_PLANNING_NO_INTENT_NOTE = "No validated payment intent yet — route planning starts only from a validated typed intent (a mission whose intake compiled one). Complete the mission preview on the authority surface; this composer never fabricates an intent." as const;
@@ -478,9 +511,12 @@ export function routePlanningContentDigest(value: unknown): string {
 }
 
 /** The deterministic digest over an engine view's PRESENTATION projection
- * (routine + intentRef + every section's pinned surface). Identical
- * engines + inputs → identical digest (the mount's once-per-preview
- * guard and the session's event records bind it). */
+ * (routine + intentRef + every section's pinned surface — the A.7 eight:
+ * the three advisory opportunity sections pin as null when the engine view
+ * does not carry them, so identical engines + inputs → identical digest on
+ * BOTH the composed and the not-composed tiers). Identical engines +
+ * inputs → identical digest (the mount's once-per-preview guard and the
+ * session's event records bind it). */
 export function routePlanningViewDigestOf(view: Omit<RoutePlanningEngineView, "viewDigest">): string {
   return routePlanningContentDigest({
     routine: view.routine,
@@ -490,6 +526,9 @@ export function routePlanningViewDigestOf(view: Omit<RoutePlanningEngineView, "v
     exclusions: view.exclusions,
     truncation: view.truncation,
     scenarios: view.scenarios,
+    conditionalOpportunities: view.conditionalOpportunities ?? null,
+    platformWork: view.platformWork ?? null,
+    hypotheses: view.hypotheses ?? null,
     waiting: view.waiting,
   });
 }
