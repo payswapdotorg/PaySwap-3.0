@@ -17,7 +17,8 @@
     "worker-3": "migration-experience-and-integrations"
   },
   "frontier": [
-    "P22"
+    "P22-A",
+    "P22-C"
   ],
   "active_work_orders": [],
   "completed_work_orders": [
@@ -1140,6 +1141,20 @@
         "P22 unchanged (the operator's Stellar/Paystack provider-combination redo — parked, operator-gated)",
         "the live-provider legs stay operator-gated (the a51a30c receipts remain the accepted live evidence)"
       ]
+    },
+    {
+      "id": "P22-0",
+      "owner": "main (z.ai Code, TL)",
+      "status": "COMPLETE",
+      "session": "web-a95c8999-6661-4553-8cd4-51eedc9f4b24",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "spec/productization/P22-0-GAP-MATRIX-2026-10-29.md (eight requirement families, every row file:line-verified at 7e19526 by the two Explore survey lanes) + docs/architecture-governance/adr/ADR-0016-p22-stellar-corridor-cross-provider.md (D1-D13 + the frozen cross-lane vocabulary appendix) + spec/dependency/P22-DEPENDENCY-GRAPH.json (six work orders) + the work-orders sections + the baseline batteries re-run at registration (the seven exact-matching the P23 closure record: opportunities 22f/317t, route-planning 23f/260t, lab 19f/176t, route-compiler 29f/353t, payswap-app 56f/592t, surface 19f/234t, desktop 56f+1skipped/463t+1skipped; the P22-relevant additions: onchain-domain 14f/197t, onchain-adapters 15f/135t, onchain-extensions 16f/164t, onchain-security 31f/384t, provider-runtime 25f/302t, capability 18f/230t, financial-certification 16f/134t, merchant 25f/353t; the three tsc gates 0/0/0; architecture:check 0/0/0)",
+      "summary": "The Stellar corridor wave registered: the operator's follow-on order (any combination of Stellar/Stripe/Flutterwave/Paystack; the GHS→USDC(Stellar)→KES corridor; a Stellar testnet wallet with contract-deployment) maps to six work orders — the Stellar onchain plane (A), the route vocabulary (C), the host execution plane (H: the Stellar seal/kernel + the Paystack execution lane amendment + the composite dispatch act), the app/renderer composition (B), the TL closure (D). The survey facts: no STELLAR family/environment/adapter; the corridor structurally uncompilable under the nine frozen shapes (the platform:cross-provider-route-shape work item is P22's named deliverable); no deploy vocabulary; the execution matrix Stripe-complete/FLW+Paystack read-only/Stellar-absent; the dispatch law single-leg. The ADR-0016 decisions: the Stellar plane lands on the onchain chain (ADR-0008 D5 preserved); the issuer-scoped asset; the contract-deploy vocabulary; the ONE new corridor shape + the ONE new location pair (observed-middle only, byte-compat-gated); the composite authorization act (one plan-scoped artifact, per-leg commands + idempotency, the partial-failure custody-continuity law); the Paystack amendment (Flutterwave stays read-only); the Stellar seal law (the keypair shapes); the hop-bound law (MOVE/CONVERT, no tenth ask field); the no-bypass extensions; the frozen-file amendment scoped to the composite act only. The honest credential gate: the eleventh reset destroyed secrets/payment-providers.env — the live tiers are operator-gated on re-supply; the lanes proceed credential-free on the scripted tier (the P23 precedent); the closure policy names the live Stellar testnet tier as a gate that either lands inside the closure or stands as the explicit operator action, never a silent pass.",
+      "carry_forward": [
+        "the live-tier operator gate: re-supply secrets/payment-providers.env (Stripe sk_test/whsec, Flutterwave FLWSECK_TEST, Paystack sk_test, the Stellar testnet keypair) to unblock the live probes, the Stripe sandbox, and the REAL Stellar testnet operations (the wallet, the contract deployment, the corridor's onchain leg)",
+        "the P24 candidate list unchanged (the live-model binding, the consent plane, the CLI-agent skill/MCP, the automatic evidence feeds)",
+        "the dispatch: {P22-A (onchain plane) ∥ P22-C (route vocabulary)} → P22-H (host) → P22-B (app/renderer) → P22-D (TL closure)"
+      ]
     }
   ],
   "policies": {
@@ -1641,7 +1656,14 @@
       "detail": "P23-D accepted (commits 19e8310 + 179aa06 + 81ee7ee, PUSHED before the eleventh reset — zero committed work lost; the closure-docs commit follows) and P23 CLOSED: the bridge battery + the no-bypass battery + the CDP card-content E2E (12/12, the machine-verified receipt, the EQUAL-digest persistence proof) + the web tier (tier-1 9/9, tier-2 8/8) + the integrated batteries all green + the tsc gates 0/0/0 + architecture 0/0/0 + the maps reconciled + the acceptance record. Four real defects caught and fixed at source (the rail key, the wire's nested BigInt, the P23-B tsc tail, the P23-B note drift). The frontier returns to P22 (parked, operator-gated); the P24 candidates recorded.",
       "lanes": [],
       "base": "9f7a626"
+    },
+    {
+      "ts": "2026-10-29T12:30:00Z",
+      "actor": "resident-TL",
+      "action": "P22_REGISTERED",
+      "detail": "The Stellar corridor wave registered at 7e19526 (the operator's follow-on order; the gap matrix + ADR-0016 + six work orders + the machine graph + the baselines re-run — the seven exact-matching the P23 closure record plus the eight onchain/provider additions, the three tsc gates 0/0/0, architecture 0/0/0; the eleventh-reset sibling-dist casualty rebuilt and disclosed). Frontier → [P22-A, P22-C] (concurrent, file-disjoint); then P22-H → P22-B → P22-D. The honest credential gate recorded: the live tiers operator-gated on the re-supply of secrets/payment-providers.env; the lanes proceed credential-free on the scripted tier.",
+      "base": "7e19526"
     }
   ],
-  "last_tl_action_at": "2026-10-29T09:56:36.404Z"
+  "last_tl_action_at": "2026-10-29T12:30:00.000Z"
 }
