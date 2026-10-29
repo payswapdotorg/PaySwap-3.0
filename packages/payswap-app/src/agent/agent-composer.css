@@ -643,3 +643,71 @@
   outline: 2px solid var(--ps-focus);
   outline-offset: 2px;
 }
+
+/* ---------- (P23-B, ADR-0015 D8) the opportunity-emergence cards ---------- */
+
+/* The advisory opportunity sections render visually DISTINCT from the
+ * available-now section: the cards carry the advisory tint and a stronger
+ * border, so a real route and a repair candidate never read alike (the
+ * section-order law's visual half). */
+.ps-agent-opportunity-list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ps-agent-opportunity-card {
+  padding: 8px 10px;
+  border: 1px solid var(--ps-border-strong, var(--ps-border));
+  border-left: 3px solid var(--ps-attention);
+  border-radius: 6px;
+  background: var(--ps-surface);
+}
+
+.ps-agent-opportunity-card-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ps-fg);
+}
+
+.ps-agent-opportunity-platform {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border: 1px dashed var(--ps-border);
+  border-radius: 6px;
+}
+
+.ps-agent-opportunity-evidence {
+  margin-top: 6px;
+}
+
+.ps-agent-opportunity-segments {
+  margin-top: 6px;
+}
+
+/* The honest verification badges (A.6): PLANNER_VERIFIED is green-branded
+ * (the planner re-verified over the party-changed view); UNVERIFIED
+ * carries the honest remaining reason in the attention tone, never a
+ * softened success. */
+.ps-agent-opportunity-verified {
+  margin: 6px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ps-accent);
+}
+
+.ps-agent-opportunity-unverified {
+  margin: 6px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ps-attention);
+}
+
+.ps-agent-opportunity-never {
+  margin-top: 4px;
+  color: var(--ps-danger);
+}

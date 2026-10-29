@@ -189,6 +189,11 @@ export default defineConfig(({ mode }) => {
         "@payswap/capability": resolve(__dirname, "../capability/src/index.ts"),
         "@payswap/route-compiler": resolve(__dirname, "../route-compiler/src/index.ts"),
         "@payswap/lab": resolve(__dirname, "../lab/src/index.ts"),
+        // P23-B（ADR-0015 D9d）：opportunities 源码包直连 —— waitRecheck 组合
+        // 自 P21-C 起只在测试层消费该别名；现在组合根启动它（main.tsx），
+        // 构建图首次包含该导入，别名三元组（vite + vitest + mirror-check）
+        // 就此归一。
+        "@payswap/opportunities": resolve(__dirname, "../opportunities/src/index.ts"),
         ...desktopRendererDependencyAliases,
         // Recharts 通过 d3-shape 读取 d3-path 的 Path 导出；hoisted node_modules
         // 里可能残留 d3-shape/node_modules/d3-path@1.x，Vite 预构建会优先命中旧包并报 Missing export。

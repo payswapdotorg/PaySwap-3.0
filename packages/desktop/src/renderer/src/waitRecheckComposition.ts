@@ -106,3 +106,102 @@ export function composeWaitRecheckBinding(options?: {
 
 /** Re-export the app's criteria pin type for composition consumers. */
 export type { RoutePlanningWaitCriteriaPin };
+
+/* ---------------- (P23-B, ADR-0015 D9d) the chains-derived observations source ---------------- */
+
+import { discoverOpportunity } from "@payswap/opportunities";
+import type { FinancialOpportunity } from "@payswap/opportunities";
+import type { PaySwapConnectionCapabilityChainDto } from "./consoleConnectionsWire.js";
+
+/**
+ * The DISCOVERY PLANE over the capability bridge (the named P21 follow-on,
+ * realized renderer-side per ADR-0015 D9d — NO new host member): each ACTIVE
+ * connection's chain becomes ONE honest UNKNOWN-heavy opportunity through
+ * the REAL discoverOpportunity constructor. The mapping is deliberately
+ * conservative: a rail observation is NOT a liquidity/lending/staking/
+ * incentive/arbitrage opportunity — the family is "other" with the honest
+ * policy provenance, the estimates stay UNKNOWN (the zero-rate unverified
+ * component records the observation), and the exit path is UNKNOWN until a
+ * real opportunity plane exists. The consequence is honest: the wait's
+ * criteria (families ["liquidity"], FEES_KNOWN) do NOT match these records —
+ * a match still requires a REAL opportunity with verified fees, never a
+ * rail observation dressed up as one.
+ */
+export function chainDerivedWaitRecheckObservations(
+  services: { readonly payswapDesktopService?: unknown },
+): WaitRecheckObservationsSource {
+  const client = services.payswapDesktopService as unknown as
+    | { connectionCapabilityChains?: () => Promise<readonly PaySwapConnectionCapabilityChainDto[]> }
+    | undefined;
+  const readChains =
+    client !== undefined && typeof client.connectionCapabilityChains === "function"
+      ? client.connectionCapabilityChains.bind(client)
+      : null;
+  return async (): Promise<readonly FinancialOpportunity[]> => {
+    if (readChains === null) {
+      // The member is absent (an older host) — the honest EMPTY set, fail-closed.
+      return [];
+    }
+    let chains: readonly PaySwapConnectionCapabilityChainDto[];
+    try {
+      chains = await readChains();
+    } catch {
+      // The honest read-failure posture: no observations this cycle (never fabricated).
+      return [];
+    }
+    const opportunities: FinancialOpportunity[] = [];
+    for (const chain of chains) {
+      if (chain.instance.authorization.status !== "ACTIVE") {
+        continue;
+      }
+      const asOfMs = Date.parse(chain.observation.observedAt);
+      if (!Number.isSafeInteger(asOfMs) || asOfMs < 0) {
+        continue;
+      }
+      const providerName = chain.instance.providerName;
+      const observation = {
+        family: "other" as const,
+        observationId: `chain-observation:${chain.instance.instanceId}`,
+        observationVersion: chain.observation.observationVersion,
+        venueId: `provider:${providerName}`,
+        railKind: "FIAT" as const,
+        railKey: `fiat:${providerName}`,
+        adapterId: chain.implementation.adapterRef,
+        observerId: `connection-bridge:${chain.observation.provenance.source}`,
+        freshness: { asOfMs, maxAgeMs: 3_600_000 },
+        evidenceRefs: [
+          `connection-chain:${chain.instance.instanceId}:${chain.observation.observationVersion}`,
+        ],
+        title: `the ${providerName} connection rail`,
+        description:
+          "an observed connection rail over the capability bridge — an honest UNKNOWN-tier opportunity record for the wait re-check, never a liquidity claim",
+        exitPath: {
+          status: "UNKNOWN" as const,
+          description: "the exit path is not observed for a rail-connection record",
+          constraints: [],
+        },
+        lockUp: { locked: false, durationMs: null, unlockConditions: [] },
+        smartContractRisk: { level: "UNKNOWN" as const, audited: null, summary: "not observed for a rail-connection record" },
+        oracleBridgeRisk: { level: "UNKNOWN" as const, audited: null, summary: "not observed for a rail-connection record" },
+        returnComponents: [
+          {
+            componentId: `chain-observation:${chain.instance.instanceId}:composition-gap`,
+            kind: "INCENTIVE_YIELD" as const,
+            ratePerYear: { numerator: "0", denominator: "1" },
+            evidenceVerified: false,
+            description:
+              "no return is observed for a rail-connection record — the zero-rate unverified component keeps the estimate UNKNOWN (the honesty law)",
+          },
+        ],
+        policyApprovalRef: "policy:connection-capability-bridge",
+      };
+      try {
+        opportunities.push(discoverOpportunity(observation, asOfMs));
+      } catch {
+        // A chain whose observation cannot construct honestly is skipped —
+        // never fabricated, never a crash of the whole re-check.
+      }
+    }
+    return opportunities;
+  };
+}

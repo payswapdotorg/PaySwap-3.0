@@ -50,6 +50,19 @@ import {
   type RoutePlanningWaitCriteriaPin,
   type RoutePlanningWaitingState,
 } from "./routePlanningPins.js";
+import {
+  ROUTE_PLANNING_CONDITIONAL_PARTIES_PIN,
+  ROUTE_PLANNING_CONDITIONAL_PARTY_CHANGES_PIN,
+  ROUTE_PLANNING_VERIFICATION_STATUSES_PIN,
+  type RoutePlanningConditionalOpportunityPin,
+  type RoutePlanningConditionalPartyChangePin,
+  type RoutePlanningConditionalPartyPin,
+  type RoutePlanningGroundedFactRefPin,
+  type RoutePlanningHypothesisPin,
+  type RoutePlanningModelProposalStatePin,
+  type RoutePlanningPlatformWorkPin,
+  type RoutePlanningVerificationPin,
+} from "./routePlanningOpportunityPins.js";
 
 /* --------------------------- the validators -------------------------- */
 
@@ -120,6 +133,145 @@ function requireTradeOffs(value: unknown): string[] {
 function rejectUnknownKeys(record: Readonly<Record<string, unknown>>, allowed: readonly string[], code: "INVALID_CRITERIA" | "INVALID_MATCH", subject: string): void {
   const unknown = Object.keys(record).filter((key) => !allowed.includes(key));
   if (unknown.length > 0) { fail(code, `${subject} key set is closed — unknown field(s) ${unknown.join(", ")} rejected`); }
+}
+
+/* ------- (P23-B, ADR-0015 D8) the opportunity-section validators ------- */
+
+function requireNonEmptyViewString(value: unknown, subject: string): string {
+  if (typeof value !== "string" || value.length === 0) { fail("INVALID_VIEW", `${subject} must be a non-empty string`); }
+  return value;
+}
+
+function requireStringArray(value: unknown, subject: string): readonly string[] {
+  if (!Array.isArray(value) || !value.every((entry) => typeof entry === "string" && entry.length > 0)) {
+    fail("INVALID_VIEW", `${subject} must be an array of non-empty strings`);
+  }
+  return [...(value as readonly string[])];
+}
+
+function requireVerification(value: unknown, subject: string): RoutePlanningVerificationPin {
+  if (typeof value !== "string" || !(ROUTE_PLANNING_VERIFICATION_STATUSES_PIN as readonly string[]).includes(value)) {
+    fail("INVALID_VIEW", `${subject} must be one of [${ROUTE_PLANNING_VERIFICATION_STATUSES_PIN.join(", ")}] — the A.6 verification pairing is closed`);
+  }
+  return value as RoutePlanningVerificationPin;
+}
+
+function requireGroundedFactRefs(value: unknown, subject: string): readonly RoutePlanningGroundedFactRefPin[] {
+  if (!Array.isArray(value)) { fail("INVALID_VIEW", `${subject} must be an array of verbatim grounded fact refs`); }
+  return (value as readonly unknown[]).map((entry, index) => {
+    if (!isRecord(entry) || (entry["side"] !== "SENDER" && entry["side"] !== "RECIPIENT")) {
+      fail("INVALID_VIEW", `${subject}[${index}] must carry side SENDER or RECIPIENT`);
+    }
+    return {
+      side: entry["side"] as "SENDER" | "RECIPIENT",
+      routeId: requireNonEmptyViewString(entry["routeId"], `${subject}[${index}].routeId`),
+      code: requireNonEmptyViewString(entry["code"], `${subject}[${index}].code`),
+      message: requireNonEmptyViewString(entry["message"], `${subject}[${index}].message`),
+      ...(typeof entry["fundingMethod"] === "string" ? { fundingMethod: entry["fundingMethod"] } : {}),
+    };
+  });
+}
+
+/** Fail-closed validation of the optional conditional-opportunities section (the pinned card shape). */
+function validateConditionalOpportunitySection(value: unknown): readonly RoutePlanningConditionalOpportunityPin[] {
+  if (!Array.isArray(value)) { fail("INVALID_VIEW", "the conditionalOpportunities section, when composed, must be an array of the pinned card shape"); }
+  return (value as readonly unknown[]).map((entry, index) => {
+    if (!isRecord(entry)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}] must be the pinned card record`); }
+    const changes = entry["requiredPartyChanges"];
+    if (!Array.isArray(changes) || changes.length === 0) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].requiredPartyChanges must be a non-empty array (a conditional names WHO must change WHAT)`); }
+    const validatedChanges = (changes as readonly unknown[]).map((change) => {
+      if (!isRecord(change)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].requiredPartyChanges entries must be { party, change }`); }
+      if (!(ROUTE_PLANNING_CONDITIONAL_PARTIES_PIN as readonly string[]).includes(String(change["party"]))) {
+        fail("INVALID_VIEW", `conditionalOpportunities[${index}].requiredPartyChanges party must be one of [${ROUTE_PLANNING_CONDITIONAL_PARTIES_PIN.join(", ")}]`);
+      }
+      if (!(ROUTE_PLANNING_CONDITIONAL_PARTY_CHANGES_PIN as readonly string[]).includes(String(change["change"]))) {
+        fail("INVALID_VIEW", `conditionalOpportunities[${index}].requiredPartyChanges change must be a member of the closed A.1 party-change vocabulary`);
+      }
+      return { party: change["party"] as RoutePlanningConditionalPartyPin, change: change["change"] as RoutePlanningConditionalPartyChangePin };
+    });
+    const prerequisites = entry["platformPrerequisites"];
+    if (!Array.isArray(prerequisites)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].platformPrerequisites must be an array (possibly empty — a party change may suffice)`); }
+    const validatedPrerequisites = (prerequisites as readonly unknown[]).map((prerequisite) => {
+      if (!isRecord(prerequisite)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].platformPrerequisites entries must be { gapId, note }`); }
+      return {
+        gapId: requireNonEmptyViewString(prerequisite["gapId"], `conditionalOpportunities[${index}].platformPrerequisites.gapId`),
+        note: requireNonEmptyViewString(prerequisite["note"], `conditionalOpportunities[${index}].platformPrerequisites.note`),
+      };
+    });
+    const expiresAt = entry["expiresAt"];
+    if (typeof expiresAt !== "number" || !Number.isSafeInteger(expiresAt) || expiresAt < 0) {
+      fail("INVALID_VIEW", `conditionalOpportunities[${index}].expiresAt must be a non-negative integer ms instant (countdown-free honesty)`);
+    }
+    const assumptions = entry["assumptions"];
+    if (!Array.isArray(assumptions)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].assumptions must be an array (possibly empty)`); }
+    return {
+      conditionalId: requireNonEmptyViewString(entry["conditionalId"], `conditionalOpportunities[${index}].conditionalId`),
+      title: requireNonEmptyViewString(entry["title"], `conditionalOpportunities[${index}].title`),
+      description: requireNonEmptyViewString(entry["description"], `conditionalOpportunities[${index}].description`),
+      requiredPartyChanges: Object.freeze(validatedChanges),
+      assumptions: requireStringArray(assumptions, `conditionalOpportunities[${index}].assumptions`),
+      platformPrerequisites: Object.freeze(validatedPrerequisites),
+      expiresAt,
+      verification: requireVerification(entry["verification"], `conditionalOpportunities[${index}].verification`),
+      verificationReason: requireNonEmptyViewString(entry["verificationReason"], `conditionalOpportunities[${index}].verificationReason`),
+    };
+  });
+}
+
+/** Fail-closed validation of the optional platform-work section (the pinned card shape). */
+function validatePlatformWorkSection(value: unknown): readonly RoutePlanningPlatformWorkPin[] {
+  if (!Array.isArray(value)) { fail("INVALID_VIEW", "the platformWork section, when composed, must be an array of the pinned card shape"); }
+  return (value as readonly unknown[]).map((entry, index) => {
+    if (!isRecord(entry)) { fail("INVALID_VIEW", `platformWork[${index}] must be the pinned card record`); }
+    return {
+      workItemId: requireNonEmptyViewString(entry["workItemId"], `platformWork[${index}].workItemId`),
+      gapId: requireNonEmptyViewString(entry["gapId"], `platformWork[${index}].gapId`),
+      title: requireNonEmptyViewString(entry["title"], `platformWork[${index}].title`),
+      requiredByOperatorIds: requireStringArray(entry["requiredByOperatorIds"], `platformWork[${index}].requiredByOperatorIds`),
+      evidenceBasis: requireGroundedFactRefs(entry["evidenceBasis"], `platformWork[${index}].evidenceBasis`),
+    };
+  });
+}
+
+/** Fail-closed validation of the optional hypotheses section (the pinned card shape — never a route). */
+function validateHypothesesSection(value: unknown): readonly RoutePlanningHypothesisPin[] {
+  if (!Array.isArray(value)) { fail("INVALID_VIEW", "the hypotheses section, when composed, must be an array of the pinned card shape"); }
+  return (value as readonly unknown[]).map((entry, index) => {
+    if (!isRecord(entry)) { fail("INVALID_VIEW", `hypotheses[${index}] must be the pinned card record`); }
+    if (entry["neverExecutable"] !== true) { fail("INVALID_VIEW", `hypotheses[${index}].neverExecutable must be the literal true — a hypothesis is NEVER a route`); }
+    if (entry["advisoryOnly"] !== true) { fail("INVALID_VIEW", `hypotheses[${index}].advisoryOnly must be the literal true — the hypothesis tier is advisory only`); }
+    if (typeof entry["wouldCompose"] !== "boolean") { fail("INVALID_VIEW", `hypotheses[${index}].wouldCompose must be a boolean (the honest structural assessment)`); }
+    return {
+      hypothesisId: requireNonEmptyViewString(entry["hypothesisId"], `hypotheses[${index}].hypothesisId`),
+      operatorId: requireNonEmptyViewString(entry["operatorId"], `hypotheses[${index}].operatorId`),
+      assumptionSummary: requireNonEmptyViewString(entry["assumptionSummary"], `hypotheses[${index}].assumptionSummary`),
+      verifiedSegmentIds: requireStringArray(entry["verifiedSegmentIds"], `hypotheses[${index}].verifiedSegmentIds`),
+      assumedSegmentIds: requireStringArray(entry["assumedSegmentIds"], `hypotheses[${index}].assumedSegmentIds`),
+      citedShapeId: requireNonEmptyViewString(entry["citedShapeId"], `hypotheses[${index}].citedShapeId`),
+      blockers: requireGroundedFactRefs(entry["blockers"], `hypotheses[${index}].blockers`),
+      wouldCompose: entry["wouldCompose"] as boolean,
+      verification: requireVerification(entry["verification"], `hypotheses[${index}].verification`),
+      verificationReason: requireNonEmptyViewString(entry["verificationReason"], `hypotheses[${index}].verificationReason`),
+      neverExecutable: true,
+      advisoryOnly: true,
+    };
+  });
+}
+
+/** Fail-closed validation of the optional model-proposal state (provenance only — never a proposal payload). */
+function validateModelProposalState(value: unknown): RoutePlanningModelProposalStatePin {
+  if (!isRecord(value)) { fail("INVALID_VIEW", "the modelProposals state, when present, must be the typed provenance record"); }
+  const kind = value["kind"];
+  if (kind === "UNBOUND_NO_MODEL" || kind === "UNBOUND_NO_TRANSPORT") { return { kind } as RoutePlanningModelProposalStatePin; }
+  if (kind === "BOUND") {
+    return {
+      kind,
+      modelId: requireNonEmptyViewString(value["modelId"], "modelProposals.modelId"),
+      foldedOperatorIds: requireStringArray(value["foldedOperatorIds"], "modelProposals.foldedOperatorIds"),
+      novelProposalIds: requireStringArray(value["novelProposalIds"], "modelProposals.novelProposalIds"),
+    };
+  }
+  fail("INVALID_VIEW", "modelProposals.kind must be UNBOUND_NO_MODEL, UNBOUND_NO_TRANSPORT or BOUND (the closed provenance vocabulary)");
 }
 
 /** Fail-closed wait-criteria validation (prose UNCONSTRUCTIBLE — a string,
@@ -198,12 +350,25 @@ export function validateRoutePlanningEngineView(candidate: unknown): RoutePlanni
     fail("INVALID_VIEW", `the engine view's routine provenance must equal the pinned routine (payment-route-planning v${PINNED_ROUTE_PLANNING_ROUTINE.routineVersion}, skill digest ${PINNED_ROUTE_PLANNING_ROUTINE.skillContentDigest}) — a drifted routine never presents`);
   }
   const view = candidate as unknown as RoutePlanningEngineView;
-  if ([view.availableNow, view.truncation, view.scenarios, view.waiting].some((section) => !isRecord(section)) || !Array.isArray(view.exclusions)) { fail("INVALID_VIEW", "the engine view must carry all five separated sections (availableNow, exclusions, truncation, scenarios, waiting)"); }
+  if ([view.availableNow, view.truncation, view.scenarios, view.waiting].some((section) => !isRecord(section)) || !Array.isArray(view.exclusions)) { fail("INVALID_VIEW", "the engine view must carry all eight separated sections (availableNow, exclusions, truncation, scenarios, conditionalOpportunities, platformWork, hypotheses, waiting) — the five structural sections are mandatory, the three advisory opportunity sections optional (absent = not composed in this deployment)"); }
   if (!Array.isArray(view.availableNow.ranked) || !Array.isArray(view.availableNow.notScored)) { fail("INVALID_VIEW", "availableNow must carry the ranked and notScored lists"); }
   for (const route of view.availableNow.ranked) {
     if (!isRecord(route) || typeof route["planId"] !== "string" || route["planId"].length === 0) { fail("INVALID_VIEW", "every ranked route must carry a non-empty planId"); }
   }
   if (view.scenarios.advisoryOnly !== true) { fail("INVALID_VIEW", "the scenarios section must be advisory-branded (advisoryOnly: true — stage 6 is never production evidence)"); }
+  // (P23-B, ADR-0015 D8) The THREE advisory opportunity sections: OPTIONAL
+  // by construction — present sections are validated fail-closed against
+  // the pinned card shapes (a drifted card never presents); absent sections
+  // stay absent (the honest not-composed notes render, never a repair).
+  if ((view as { conditionalOpportunities?: unknown }).conditionalOpportunities !== undefined) {
+    validateConditionalOpportunitySection((view as { conditionalOpportunities?: unknown }).conditionalOpportunities);
+  }
+  if ((view as { platformWork?: unknown }).platformWork !== undefined) {
+    validatePlatformWorkSection((view as { platformWork?: unknown }).platformWork);
+  }
+  if ((view as { hypotheses?: unknown }).hypotheses !== undefined) {
+    validateHypothesesSection((view as { hypotheses?: unknown }).hypotheses);
+  }
   if (typeof view.presentedAt !== "string" || view.presentedAt.length === 0) { fail("INVALID_VIEW", "presentedAt must be the engine's ISO-8601 UTC evaluation instant (DATA)"); }
   // (P21-B, D4) The optional MODEL STAMP: validated fail-closed when
   // present; deliberately OUTSIDE the digest projection (the digest pins
@@ -214,6 +379,12 @@ export function validateRoutePlanningEngineView(candidate: unknown): RoutePlanni
     } catch {
       fail("INVALID_VIEW", "the engine view's optional modelSelection stamp must be the valid selection record { providerId, modelId, reasoningLevel }");
     }
+  }
+  // (P23-B, ADR-0015 D6/D9) The optional MODEL-PROPOSAL state: validated
+  // fail-closed when present; deliberately OUTSIDE the digest projection
+  // (the model-independent computation digest — the modelSelection precedent).
+  if ((view as { modelProposals?: unknown }).modelProposals !== undefined) {
+    validateModelProposalState((view as { modelProposals?: unknown }).modelProposals);
   }
   validateRoutePlanningWaitCriteria(view.waiting.proposal);
   const expected = routePlanningViewDigestOf(view);
@@ -305,7 +476,13 @@ function previewSummary(view: RoutePlanningEngineView, task: AgentTaskPin): stri
   const stamp = task.modelSelection !== undefined
     ? ` Model ${task.modelSelection.providerId}/${task.modelSelection.modelId} (reasoning ${task.modelSelection.reasoningLevel}) recorded with the task — provenance only; the computation is deterministic and model-independent.`
     : "";
-  return `Route planning preview presented (routine ${view.routine.routineId} v${view.routine.routineVersion}, view ${view.viewDigest}): ${view.availableNow.ranked.length} available-now route(s), ${view.availableNow.notScored.length} retained unscored, ${view.exclusions.length} typed exclusion(s), search coverage ${view.truncation.coverage}, ${view.scenarios.outcomes.length} advisory scenario(s) — discovery only, nothing dispatches.${stamp}`;
+  // (P23-B, ADR-0015 D8) The preview record grows the three advisory
+  // opportunity sections' counts (additive; the existing fields unchanged).
+  // An absent section counts zero (the not-composed tier's honest record).
+  const conditionalCount = view.conditionalOpportunities?.length ?? 0;
+  const platformWorkCount = view.platformWork?.length ?? 0;
+  const hypothesisCount = view.hypotheses?.length ?? 0;
+  return `Route planning preview presented (routine ${view.routine.routineId} v${view.routine.routineVersion}, view ${view.viewDigest}): ${view.availableNow.ranked.length} available-now route(s), ${view.availableNow.notScored.length} retained unscored, ${view.exclusions.length} typed exclusion(s), search coverage ${view.truncation.coverage}, ${view.scenarios.outcomes.length} advisory scenario(s), ${conditionalCount} conditional opportunit${conditionalCount === 1 ? "y" : "ies"}, ${platformWorkCount} platform work item${platformWorkCount === 1 ? "" : "s"}, ${hypothesisCount} hypothes${hypothesisCount === 1 ? "is" : "es"} — discovery only, nothing dispatches.${stamp}`;
 }
 
 function matchSummaryOf(match: RoutePlanningOpportunityMatchPin): string {

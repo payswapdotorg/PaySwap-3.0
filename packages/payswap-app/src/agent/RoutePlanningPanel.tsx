@@ -20,6 +20,11 @@
  */
 
 import { StatusPill } from "@zcode/ui/payswap";
+import { RoutePlanningOpportunityCards } from "./RoutePlanningOpportunityCards.js";
+import {
+  ROUTE_PLANNING_WAIT_PRECONDITIONS_PREFIX,
+  ROUTE_PLANNING_WAIT_PRECONDITIONS_SUFFIX,
+} from "./routePlanningOpportunityPins.js";
 import {
   PINNED_ROUTE_PLANNING_ROUTINE,
   ROUTE_PLANNING_AVAILABLE_NOW_NOTE,
@@ -118,6 +123,20 @@ function waitCriteriaLine(criteria: RoutePlanningWaitCriteriaPin): string {
   return `Waiting for ${criteria.families.join(", ")} opportunities (triggers: ${criteria.categories.join(", ")}) up to ${criteria.maxWaitMs}ms — fallback ${criteria.fallback.kind} on ${criteria.fallback.routeRef}${
     criteria.tradeOffs.length > 0 ? ` — trade-offs: ${criteria.tradeOffs.join(", ")}` : ""
   }`;
+}
+
+/**
+ * (P23-B, ADR-0015 D8) The wait section's CONCRETE-PRECONDITIONS line:
+ * when conditional opportunities exist, the wait names WHAT the corridor
+ * is waiting for (the conditional titles — people language), not just the
+ * trigger categories. Absent conditionals render nothing extra (the
+ * criteria line stands alone, honestly).
+ */
+function waitPreconditionsLine(titles: readonly string[]): string | null {
+  if (titles.length === 0) {
+    return null;
+  }
+  return `${ROUTE_PLANNING_WAIT_PRECONDITIONS_PREFIX} ${titles.join("; ")} ${ROUTE_PLANNING_WAIT_PRECONDITIONS_SUFFIX}`;
 }
 
 /** The waiting section's re-check controls (P21-B, D10 — the pure projection). */
@@ -237,6 +256,9 @@ function RoutePlanningSections({
 }): React.ReactNode {
   const isWaiting = waiting?.status === "WAITING_FOR_OPPORTUNITIES";
   const criteria = waiting?.criteria ?? view.waiting.proposal;
+  // (P23-B, ADR-0015 D8) The wait's CONCRETE preconditions: the derived
+  // conditional opportunities' people-language titles, when any exist.
+  const conditionalTitles = (view.conditionalOpportunities ?? []).map((conditional) => conditional.title);
   return (
     <>
       <div className="ps-agent-route-section" id="ps-agent-route-section-available-now">
@@ -323,9 +345,18 @@ function RoutePlanningSections({
         )}
       </div>
 
+      {/* (P23-B, ADR-0015 D8/A.7) The THREE advisory opportunity sections —
+       * the actionable cards — between the scenarios section and the waiting
+       * surface. A pure projection of the engine view's optional sections:
+       * absent sections render the honest not-composed notes. */}
+      <RoutePlanningOpportunityCards view={view} />
+
       <div className="ps-agent-route-section" id="ps-agent-route-section-waiting">
         <h4 className="ps-agent-route-section-title">Wait for a better opportunity</h4>
         <p className="ps-agent-route-note">{ROUTE_PLANNING_WAIT_NOTE}</p>
+        {conditionalTitles.length > 0 ? (
+          <p className="ps-agent-route-meta">{waitPreconditionsLine(conditionalTitles)}</p>
+        ) : null}
         {isWaiting && waiting !== null ? (
           <>
             <p className="ps-agent-route-meta">{waitCriteriaLine(criteria)}</p>
