@@ -8,6 +8,9 @@
  * battery and is structurally identical (same literals, same required-field
  * couplings). Every operation kind in this vocabulary is a CONSEQUENTIAL
  * WRITE — the authorization link is mandatory on every execution.
+ * P22-A (ADR-0016 D4): grows `onchain.contract_deploy` — a deployment is a
+ * consequential write; its effect is DECLARED (by the certified deployment
+ * capability and the real deployment record), never defaulted.
  */
 
 import { ValidationError } from '../../errors.ts';
@@ -19,6 +22,7 @@ export const ONCHAIN_OPERATION_KINDS = [
   'onchain.swap',
   'onchain.bridge',
   'onchain.intent',
+  'onchain.contract_deploy',
 ] as const;
 
 export type OnchainOperationKind = (typeof ONCHAIN_OPERATION_KINDS)[number];
@@ -155,6 +159,21 @@ export const ONCHAIN_OPERATION_SEMANTICS: Readonly<
       asset: false,
       amount: false,
       protocol: true,
+    }),
+  }),
+  'onchain.contract_deploy': Object.freeze({
+    operation: 'onchain.contract_deploy',
+    description:
+      'Deploy a smart-contract artifact (e.g. a Soroban wasm module) to a chain; the deployment evidence record — tx hash, contract id, source hash, bytecode hash — is the only source of a smart-contract declaration for what the deployment produced (ADR-0016 D4)',
+    financialEffect: 'DECLARED_BY_CERTIFIED_METHOD',
+    reversible: false,
+    consequentialWrite: true,
+    requires: Object.freeze({
+      destination: false,
+      spender: false,
+      asset: false,
+      amount: false,
+      protocol: false,
     }),
   }),
 });

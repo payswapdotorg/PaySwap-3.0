@@ -155,9 +155,21 @@ function validateFeeShape(
       }
       throw new ValidationError(`Invalid UTXO fee semantics: ${errors.join('; ')}`);
     }
+    case 'STELLAR': {
+      requireExactDecimal(record.stroopsPerOperation, 'fee.stroopsPerOperation', errors);
+      if (errors.length > 0) {
+        throw new ValidationError(`Invalid Stellar fee semantics: ${errors.join('; ')}`);
+      }
+      return {
+        family: 'STELLAR',
+        expressible: true,
+        feeModel: 'STROOPS_PER_OPERATION',
+        stroopsPerOperation: record.stroopsPerOperation as string,
+      };
+    }
     default:
       throw new ValidationError(
-        `family '${String(family)}' has no declared semantics shape (declared shapes: EVM, SOLANA, UTXO — fail closed, never guessed)`,
+        `family '${String(family)}' has no declared semantics shape (declared shapes: EVM, SOLANA, UTXO, STELLAR — fail closed, never guessed)`,
       );
   }
 }
@@ -246,6 +258,32 @@ function validateFinalityShape(candidate: unknown, family: ChainFamily): FamilyF
         reorgDetection: 'BLOCK_HASH_OBSERVATION',
       };
     }
+    case 'STELLAR': {
+      requirePositiveInteger(
+        record.ledgerConfirmationTarget,
+        'finality.ledgerConfirmationTarget',
+        errors,
+      );
+      if (record.reorgDetection !== 'NOT_APPLICABLE') {
+        errors.push(
+          "finality.reorgDetection must be 'NOT_APPLICABLE' for Stellar (closed-ledger consensus has no reorg surface — declared honestly, never approximated)",
+        );
+      }
+      if (record.finalityModel !== 'DETERMINISTIC') {
+        errors.push(
+          "finality.finalityModel must be 'DETERMINISTIC' for Stellar (closed-ledger consensus — the ~3-second consensus class)",
+        );
+      }
+      if (errors.length > 0) {
+        throw new ValidationError(`Invalid Stellar finality semantics: ${errors.join('; ')}`);
+      }
+      return {
+        family: 'STELLAR',
+        finalityModel: 'DETERMINISTIC',
+        ledgerConfirmationTarget: record.ledgerConfirmationTarget as number,
+        reorgDetection: 'NOT_APPLICABLE',
+      };
+    }
     default:
       throw new ValidationError(
         `family '${String(family)}' has no declared finality shape (declared shapes: EVM, SOLANA, UTXO)`,
@@ -264,9 +302,14 @@ export function validateFamilySemanticsProfile(candidate: unknown): FamilySemant
   }
   const record = candidate as Readonly<Record<string, unknown>>;
   const family = record.family;
-  if (family !== 'EVM' && family !== 'SOLANA' && family !== 'UTXO') {
+  if (
+    family !== 'EVM' &&
+    family !== 'SOLANA' &&
+    family !== 'UTXO' &&
+    family !== 'STELLAR'
+  ) {
     throw new ValidationError(
-      'semantics profile family must be EVM, SOLANA or UTXO (the declared adapter families — others fail closed)',
+      'semantics profile family must be EVM, SOLANA or UTXO (or STELLAR — P22-A, ADR-0016 D2) — the declared adapter families; others fail closed',
     );
   }
   const fee = validateFeeShape(record.fee, family);

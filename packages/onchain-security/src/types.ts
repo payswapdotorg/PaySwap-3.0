@@ -202,6 +202,56 @@ export interface ContractCallRequest {
   readonly value?: AmountSpec;
 }
 
+/** The declared deployable-artifact kinds (neutral vocabulary — never guessed). */
+export type DeploymentArtifactKind = "WASM" | "BYTECODE" | "PROVIDER_DEFINED";
+
+/**
+ * Contract deployment leg (P22-A, ADR-0016 D4): deploying a smart-contract
+ * artifact is a CONSEQUENTIAL write — the leg carries the deploying account
+ * and the digest-bound artifact identity (the wasm/bytecode hash + the
+ * declared artifact kind). Like the contract-call escape hatch, a deployment
+ * never executes silently: the effect of what the deployment produced is
+ * declared by the REAL deployment record (tx hash, contract id, source
+ * hash, bytecode hash), never defaulted (INV-20's discipline extended).
+ */
+export interface ContractDeploymentRequest {
+  /** The account that signs and submits the deployment (the signer). */
+  readonly deployer: string;
+  /** Content hash of the deployable artifact (the wasm/bytecode hash). */
+  readonly artifactHash: string;
+  /** The declared artifact kind (explicit — WASM, BYTECODE or PROVIDER_DEFINED). */
+  readonly artifactKind: DeploymentArtifactKind;
+}
+
+/**
+ * Validates a deployment leg (fail closed): the deployer is an
+ * address-shaped reference, the artifact hash is a non-empty digest string
+ * and the artifact kind is one of the declared kinds — an unknown
+ * deployment never prepares.
+ */
+export function validateDeploymentRequest(deployment: ContractDeploymentRequest): void {
+  if (typeof deployment.deployer !== "string" || deployment.deployer.length === 0) {
+    throw new IdentityValidationError(
+      "deployment.deployer must be a non-empty account reference (the deploying signer)",
+    );
+  }
+  validateAddress(deployment.deployer, "deployment.deployer");
+  if (typeof deployment.artifactHash !== "string" || deployment.artifactHash.length === 0) {
+    throw new IdentityValidationError(
+      "deployment.artifactHash must be a non-empty digest string (the deployable artifact is digest-bound — ADR-0016 D4)",
+    );
+  }
+  if (
+    deployment.artifactKind !== "WASM" &&
+    deployment.artifactKind !== "BYTECODE" &&
+    deployment.artifactKind !== "PROVIDER_DEFINED"
+  ) {
+    throw new IdentityValidationError(
+      `deployment.artifactKind '${String(deployment.artifactKind)}' must be WASM, BYTECODE or PROVIDER_DEFINED (never guessed)`,
+    );
+  }
+}
+
 /** Binding of a write to the settlement instruction it executes (INV-5). */
 export interface SettlementInstructionBinding {
   readonly instructionId: string;

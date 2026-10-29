@@ -20,6 +20,7 @@ export const CHAIN_FAMILIES = [
   'MOVE',
   'COSMOS',
   'SUBSTRATE',
+  'STELLAR',
   'OTHER',
 ] as const;
 

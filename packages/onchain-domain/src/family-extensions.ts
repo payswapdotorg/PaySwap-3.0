@@ -23,6 +23,31 @@
 import { ValidationError } from "./errors.ts";
 import { isNonEmptyString } from "./shared.ts";
 import type { ChainFamily } from "./family.ts";
+import {
+  stellarAssetIdentitySuffix,
+  validateStellarAssetDescriptor,
+  validateStellarChainDescriptor,
+} from "./family-extensions-stellar.ts";
+import type {
+  StellarAssetDescriptor,
+  StellarChainDescriptor,
+} from "./family-extensions-stellar.ts";
+
+export {
+  STELLAR_STRKEY_ACCOUNT_PATTERN,
+  STELLAR_STRKEY_SECRET_PATTERN,
+  STELLAR_STRKEY_CONTRACT_PATTERN,
+  STELLAR_ASSET_CODE_PATTERN,
+  isStellarStrKeyAccount,
+  isStellarStrKeySecret,
+  isStellarStrKeyContract,
+  isStellarChainDescriptor,
+  stellarAssetIdentitySuffix,
+} from "./family-extensions-stellar.ts";
+export type {
+  StellarChainDescriptor,
+  StellarAssetDescriptor,
+} from "./family-extensions-stellar.ts";
 
 // ---------------------------------------------------------------------------
 // Chain descriptor extensions (optional, family-scoped)
@@ -57,11 +82,16 @@ export interface UtxoChainDescriptor {
   readonly coin?: string;
 }
 
-/** The union of chain-descriptor family extensions (neutral re-export name). */
+/**
+ * The union of chain-descriptor family extensions (neutral re-export name).
+ * P22-A (ADR-0016 D2): grows the STELLAR member (the declared network
+ * passphrase — see ./family-extensions-stellar.ts).
+ */
 export type ChainDescriptorFamilyExtension =
   | EvmChainDescriptor
   | SolanaChainDescriptor
-  | UtxoChainDescriptor;
+  | UtxoChainDescriptor
+  | StellarChainDescriptor;
 
 // ---------------------------------------------------------------------------
 // Chain instance extensions (optional, family-scoped)
@@ -95,8 +125,28 @@ export interface EvmAssetDescriptor {
   readonly tokenStandard: "ERC20" | "ERC721" | "ERC1155" | "PROVIDER_DEFINED";
 }
 
+/**
+ * Asset family extension: STELLAR (P22-A, ADR-0016 D3 — the issuer-scoped
+ * shape: issuing `G…` account + asset code; two issuers of the same code
+ * are two assets). See ./family-extensions-stellar.ts.
+ */
+
 /** The union of asset family extensions (neutral re-export name). */
-export type AssetFamilyExtension = EvmAssetDescriptor;
+export type AssetFamilyExtension = EvmAssetDescriptor | StellarAssetDescriptor;
+
+/**
+ * The issuer-scope suffix a family asset extension contributes to the
+ * canonical asset identity (ADR-0016 D3): `:${issuerAccount}` when the
+ * extension declares an issuer scope, `undefined` otherwise. Family-shape
+ * knowledge stays inside the family-extension modules (INV-16).
+ */
+export function assetFamilyIdentitySuffix(
+  extension: AssetFamilyExtension,
+): string | undefined {
+  return extension.family === "STELLAR"
+    ? stellarAssetIdentitySuffix(extension)
+    : undefined;
+}
 
 // ---------------------------------------------------------------------------
 // The family-discriminant expectation (used by the extension validators)
@@ -106,12 +156,13 @@ export type AssetFamilyExtension = EvmAssetDescriptor;
  * The families for which a chain-descriptor extension shape is DECLARED.
  * Families without a declared extension shape (MOVE, COSMOS, SUBSTRATE,
  * OTHER) reject any extension — an undeclared extension shape is never
- * guessed.
+ * guessed. P22-A (ADR-0016 D2) grows exactly one member: STELLAR.
  */
 export const CHAIN_DESCRIPTOR_EXTENSION_FAMILIES = [
   "EVM",
   "SOLANA",
   "UTXO",
+  "STELLAR",
 ] as const;
 
 /** Canonical decimal chain id format (no leading zeros, exact). */
@@ -185,10 +236,11 @@ export function validateChainDescriptorFamilyExtension(
   if (
     expectedFamily !== "EVM" &&
     expectedFamily !== "SOLANA" &&
-    expectedFamily !== "UTXO"
+    expectedFamily !== "UTXO" &&
+    expectedFamily !== "STELLAR"
   ) {
     throw new ValidationError(
-      `family '${expectedFamily}' has no declared extension shape — extensions are only declared for EVM, SOLANA and UTXO`,
+      `family '${expectedFamily}' has no declared extension shape — extensions are only declared for EVM, SOLANA, UTXO and STELLAR`,
     );
   }
   if (expectedFamily === "EVM") {
@@ -221,6 +273,11 @@ export function validateChainDescriptorFamilyExtension(
       family: "SOLANA",
       ...(cluster !== undefined ? { cluster } : {}),
     };
+  }
+  if (expectedFamily === "STELLAR") {
+    // The Stellar chain-descriptor shape (the declared network passphrase)
+    // is owned by the family-extension module (INV-16).
+    return validateStellarChainDescriptor(candidate);
   }
   const coin = record.coin;
   if (coin !== undefined && !isNonEmptyString(coin)) {
@@ -257,7 +314,8 @@ export function validateChainInstanceFamilyExtension(
 }
 
 /**
- * Validates an asset family extension (the numeric-family token descriptor).
+ * Validates an asset family extension (the numeric-family token descriptor
+ * or the STELLAR issuer-scoped shape — P22-A, ADR-0016 D3).
  * The contract address format is intentionally NOT interpreted here —
  * validation only requires a non-empty opaque string; family adapters own
  * real formats.
@@ -269,9 +327,12 @@ export function validateAssetFamilyExtension(
     throw new ValidationError("asset family extension must be an object");
   }
   const record = candidate as Readonly<Record<string, unknown>>;
+  if (record.family === "STELLAR") {
+    return validateStellarAssetDescriptor(candidate);
+  }
   if (record.family !== "EVM") {
     throw new ValidationError(
-      `asset family extension discriminant '${String(record.family)}' is not supported (supported: EVM)`,
+      `asset family extension discriminant '${String(record.family)}' is not supported (supported: EVM, STELLAR)`,
     );
   }
   if (!isNonEmptyString(record.contractAddress)) {

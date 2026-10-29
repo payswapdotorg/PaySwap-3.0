@@ -33,7 +33,7 @@ export interface PreparePrologueResult {
 export interface PreparePrologueDeps {
   readonly adapterId: string;
   readonly chainKey: string;
-  readonly family: 'EVM' | 'SOLANA' | 'UTXO';
+  readonly family: 'EVM' | 'SOLANA' | 'UTXO' | 'STELLAR';
   readonly environmentClass: RailEnvironmentClass;
   readonly kernel: OnchainSecurityKernelPort;
   readonly evidenceLog: AdapterEvidenceLog;

@@ -32,7 +32,7 @@ export type AssetIdentityResolver = (assetId: string) => ResolvedAssetIdentity;
 export interface WriteTranslationContext {
   readonly adapterId: string;
   readonly chainKey: string;
-  readonly family: 'EVM' | 'SOLANA' | 'UTXO';
+  readonly family: 'EVM' | 'SOLANA' | 'UTXO' | 'STELLAR';
   readonly assertOperationSupported: OperationSupportAssertion;
   readonly resolveAssetIdentity: AssetIdentityResolver;
 }
@@ -83,6 +83,7 @@ export function buildWriteRequest(
   const writeId = `write:${contentDigest({ directive, at: input.at, adapter: context.adapterId })}`;
   const routeHash = `route:${contentDigest(directive)}`;
   const contractCall = buildContractCallLeg(directive);
+  const deployment = buildDeploymentLeg(directive, input.signerAccountRef);
   const writeRequest: OnchainWriteRequest = {
     writeId,
     action: directive.operation,
@@ -124,6 +125,7 @@ export function buildWriteRequest(
           ]
         : [],
     ...(contractCall !== undefined ? { contractCall } : {}),
+    ...(deployment !== undefined ? { deployment } : {}),
     route: {
       routeId: directive.routeRef ?? routeHash,
       routeHash,
@@ -177,5 +179,52 @@ export function buildContractCallLeg(
     ...(typeof payload.value === 'object' && payload.value !== null
       ? { value: payload.value as { currency: string; minorUnits: string } }
       : {}),
+  };
+}
+
+/**
+ * The DEPLOYMENT leg from a contract_deploy directive's family payload
+ * (P22-A, ADR-0016 D4): the directive MUST carry { artifactHash,
+ * artifactKind } (the wasm/contract artifact hash and its declared kind) —
+ * a deploy directive without its digest-bound artifact never prepares
+ * (unknown deployments never execute silently). The deployer is the
+ * directive's signing account.
+ */
+export function buildDeploymentLeg(
+  directive: OnchainExecutionDirective,
+  signerAccountRef: string,
+): OnchainWriteRequest['deployment'] | undefined {
+  if (directive.operation !== 'onchain.contract_deploy') {
+    return undefined;
+  }
+  const payload = directive.familyPayload as
+    | {
+        readonly artifactHash?: unknown;
+        readonly artifactKind?: unknown;
+      }
+    | undefined;
+  if (payload === undefined) {
+    throw new ValidationError(
+      'a contract_deploy directive requires a familyPayload { artifactHash, artifactKind } — the wasm/contract artifact hash is digest-bound at prepare (ADR-0016 D4)',
+    );
+  }
+  if (typeof payload.artifactHash !== 'string' || payload.artifactHash.length === 0) {
+    throw new ValidationError(
+      'a contract_deploy directive requires a non-empty artifactHash (the wasm/contract artifact hash) — unknown deployments never execute silently',
+    );
+  }
+  if (
+    payload.artifactKind !== 'WASM' &&
+    payload.artifactKind !== 'BYTECODE' &&
+    payload.artifactKind !== 'PROVIDER_DEFINED'
+  ) {
+    throw new ValidationError(
+      "a contract_deploy directive requires artifactKind 'WASM', 'BYTECODE' or 'PROVIDER_DEFINED' (the deployable artifact kind is explicit, never guessed)",
+    );
+  }
+  return {
+    deployer: signerAccountRef,
+    artifactHash: payload.artifactHash,
+    artifactKind: payload.artifactKind,
   };
 }

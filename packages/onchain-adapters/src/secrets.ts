@@ -1,3 +1,5 @@
+import { OnchainAdapterError } from "./errors.ts";
+
 /**
  * @payswap/onchain-adapters — the secret boundary (Work Order P4-W3, lane
  * R2-W3; PORT of payswap.org@8a735bf
@@ -26,6 +28,31 @@ export interface SecretBoundaryViolation {
   readonly kind: 'forbidden_key' | 'secret_shaped_value';
   readonly key?: string;
   readonly reason: string;
+}
+
+/**
+ * The TYPED secret-boundary refusal (P22-A, ADR-0016 D9/D10: the Stellar
+ * `S…` StrKey shape joined the scan vocabulary — the refusal is TYPED per
+ * the package's error taxonomy, code + category, the same discipline every
+ * other boundary refusal follows). Message-compatible with the former
+ * plain-Error refusal (the boundary batteries pin the phrase).
+ */
+export class SecretShapeError extends OnchainAdapterError {
+  readonly violations: readonly SecretBoundaryViolation[];
+
+  constructor(label: string, violations: readonly SecretBoundaryViolation[]) {
+    const summary = violations
+      .slice(0, 5)
+      .map((violation) => `${violation.path} [${violation.kind}] ${violation.reason}`)
+      .join('; ');
+    super({
+      code: 'SECRET_MATERIAL_DETECTED',
+      category: 'SECURITY',
+      message: `secret boundary violation in ${label}: ${summary} — secret material never enters agent-facing contracts (rule 25); the value is rejected, never sanitized`,
+      details: { label, violationCount: violations.length },
+    });
+    this.violations = violations;
+  }
 }
 
 /**
@@ -128,6 +155,18 @@ export function isMnemonicShape(value: string): boolean {
   return tokens.every((token) => /^[a-z]{3,8}$/.test(token));
 }
 
+/**
+ * Stellar StrKey SECRET shape (P22-A, ADR-0016 D9): `S` + 55 base32
+ * characters — exactly /^S[A-Z2-7]{55}$/. A value of this shape is a
+ * Stellar secret key wherever it appears in an agent-facing adapter
+ * contract: detected and rejected, never carried (key material lives only
+ * in the host's sealed credential broker). The `G…`/`C…` PUBLIC shapes are
+ * not secret material and are not detected.
+ */
+export function isStellarSecretKeyShape(value: string): boolean {
+  return /^S[A-Z2-7]{55}$/.test(value);
+}
+
 /** Deterministic probe: does the string look like raw key material? */
 export function looksLikeRawKeyMaterial(value: string): boolean {
   if (value.length === 0) {
@@ -163,6 +202,15 @@ function collectViolations(
           path,
           kind: 'secret_shaped_value',
           reason: 'BIP-39 mnemonic-shaped value in a neutral field',
+        });
+        return;
+      }
+      if (isStellarSecretKeyShape(value)) {
+        violations.push({
+          path,
+          kind: 'secret_shaped_value',
+          reason:
+            'Stellar secret key-shaped value (S + 55 base32 characters) in a neutral field — key material lives only inside the sealed credential broker (ADR-0016 D9)',
         });
         return;
       }
@@ -219,12 +267,6 @@ export function assertNoSecretMaterial(value: unknown, label: string): void {
   const violations: SecretBoundaryViolation[] = [];
   collectViolations(value, '', 0, new Set(), violations);
   if (violations.length > 0) {
-    const summary = violations
-      .slice(0, 5)
-      .map((violation) => `${violation.path} [${violation.kind}] ${violation.reason}`)
-      .join('; ');
-    throw new Error(
-      `secret boundary violation in ${label}: ${summary} — secret material never enters agent-facing contracts (rule 25); the value is rejected, never sanitized`,
-    );
+    throw new SecretShapeError(label, violations);
   }
 }

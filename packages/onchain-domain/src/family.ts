@@ -24,6 +24,10 @@ import { ValidationError } from "./errors.ts";
 /**
  * The declared chain families. `OTHER` requires a declared family label on
  * every chain descriptor (an undeclared family is never assumed).
+ *
+ * P22-A (ADR-0016 D2): the vocabulary grows exactly one member — `STELLAR`
+ * (the Stellar corridor wave's onchain plane; `stellar:testnet` is the
+ * registered chain, the environment registry's business).
  */
 export const CHAIN_FAMILIES = [
   "EVM",
@@ -32,6 +36,7 @@ export const CHAIN_FAMILIES = [
   "MOVE",
   "COSMOS",
   "SUBSTRATE",
+  "STELLAR",
   "OTHER",
 ] as const;
 
@@ -78,6 +83,11 @@ export interface ChainFamilySemantics {
  * - COSMOS: account-based, BFT-style deterministic finality;
  * - SUBSTRATE: account-based, hybrid finality gadget, reorgs possible
  *   before finality;
+ * - STELLAR (P22-A, ADR-0016 D2): account-based; closed-ledger consensus
+ *   (the ~3-second consensus class — closed ledgers are agreed, there is no
+ *   reorg surface), so deterministic-style finality with reorg risk NONE
+ *   (the COSMOS BFT-precedent class in this table); the exact values are
+ *   pinned by test/stellar-family.test.ts;
  * - OTHER: conservative default — hybrid model with reorg risk PRESENT.
  */
 export const CHAIN_FAMILY_SEMANTICS: Readonly<
@@ -118,6 +128,12 @@ export const CHAIN_FAMILY_SEMANTICS: Readonly<
     addressModel: "ACCOUNT_BASED",
     finalityModel: "HYBRID",
     reorgRisk: "PRESENT",
+  }),
+  STELLAR: Object.freeze({
+    family: "STELLAR",
+    addressModel: "ACCOUNT_BASED",
+    finalityModel: "DETERMINISTIC",
+    reorgRisk: "NONE",
   }),
   OTHER: Object.freeze({
     family: "OTHER",

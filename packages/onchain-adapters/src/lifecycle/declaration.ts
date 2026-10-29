@@ -32,7 +32,7 @@ export interface ResolvedAssetIdentity {
 export interface BaseAdapterDeclaration {
   readonly adapterId: string;
   readonly chainKey: string;
-  readonly family: 'EVM' | 'SOLANA' | 'UTXO';
+  readonly family: 'EVM' | 'SOLANA' | 'UTXO' | 'STELLAR';
   readonly semantics: FamilySemanticsProfile;
   readonly lifecycle: AdapterStageSupport;
 }
