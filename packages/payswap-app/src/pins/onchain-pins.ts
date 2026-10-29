@@ -44,6 +44,7 @@ export const CHAIN_FAMILIES_PIN = [
   "MOVE",
   "COSMOS",
   "SUBSTRATE",
+  "STELLAR",
   "OTHER",
 ] as const;
 
@@ -76,6 +77,7 @@ export const ONCHAIN_OPERATION_KINDS_PIN = [
   "onchain.swap",
   "onchain.bridge",
   "onchain.intent",
+  "onchain.contract_deploy",
 ] as const;
 
 export type OnchainOperationKindPin = (typeof ONCHAIN_OPERATION_KINDS_PIN)[number];
@@ -205,6 +207,11 @@ export const CHAIN_ENVIRONMENT_REGISTRY_PIN: Readonly<
   "bitcoin:testnet": "TESTNET",
   "bitcoin:signet": "TESTNET",
   "bitcoin:regtest": "REGTEST",
+  // STELLAR family (P22-A, ADR-0016 D2): exactly ONE entry — the testnet.
+  // `stellar:pubnet` is DELIBERATELY NOT REGISTERED (an unregistered key
+  // classifies FAIL CLOSED, never guessed) — mirrors the authority's own
+  // registry comment verbatim in law.
+  "stellar:testnet": "TESTNET",
 });
 
 /* ====================================================================
@@ -214,13 +221,15 @@ export const CHAIN_ENVIRONMENT_REGISTRY_PIN: Readonly<
 /**
  * The declared per-family fee models (GAS_AUCTION = EIP-1559
  * baseFee+priority on EVM; SIGNATURE_FEE on Solana; SATOSHI_PER_VBYTE on
- * UTXO). Fee AMOUNTS are computed downstream from observations — the
- * models are declared semantics, never a quote.
+ * UTXO; STROOPS_PER_OPERATION on Stellar — the P22-A growth, the flat
+ * per-operation fee in exact stroops). Fee AMOUNTS are computed downstream
+ * from observations — the models are declared semantics, never a quote.
  */
 export const ONCHAIN_FEE_MODELS_PIN = [
   "GAS_AUCTION",
   "SIGNATURE_FEE",
   "SATOSHI_PER_VBYTE",
+  "STROOPS_PER_OPERATION",
 ] as const;
 
 export type OnchainFeeModelPin = (typeof ONCHAIN_FEE_MODELS_PIN)[number];

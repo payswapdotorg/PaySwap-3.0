@@ -87,9 +87,11 @@ describe("the onchain rail fold is honest by construction (C3 laws)", () => {
     for (const chain of rail.chains) {
       expect(CHAIN_ENVIRONMENT_REGISTRY[chain.chainKey]).toBe(chain.environmentClass);
     }
-    // The production/testnet split is visible and truthful.
+    // The production/testnet split is visible and truthful. DISCLOSED
+    // RE-PIN (P22-A merge, ADR-0016 D2): the TESTNET count grew 6 -> 7
+    // (stellar:testnet — the corridor wave's one registry entry).
     expect(rail.chains.filter((chain) => chain.environmentClass === "PRODUCTION").length).toBe(3);
-    expect(rail.chains.filter((chain) => chain.environmentClass === "TESTNET").length).toBe(6);
+    expect(rail.chains.filter((chain) => chain.environmentClass === "TESTNET").length).toBe(7);
     expect(rail.chains.filter((chain) => chain.environmentClass === "REGTEST").length).toBe(1);
   });
 
