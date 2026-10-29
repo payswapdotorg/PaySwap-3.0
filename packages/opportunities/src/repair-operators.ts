@@ -279,7 +279,7 @@ export const REPAIR_OPERATORS: readonly RepairOperator[] = Object.freeze([
     "platform:cross-provider-route-shape",
     "PLATFORM_WORK",
     [],
-    "grounded only in the honest no-route state over the cross-provider fiat pair — the frozen route-shape vocabulary has no cross-provider composition (the P21-0 C8 law); the work item cites the corridor's verbatim operator-applicable exclusions",
+    "grounded only in the honest no-route state over the cross-provider fiat pair — P22-C DELIVERED the cross-provider-corridor shape (ADR-0016 D5: the four-leg skeleton over the OBSERVED onchain middle), so the residual gap this row names is the unobserved middle and the H-lane composite execution, never a missing vocabulary; the work item cites the corridor's verbatim operator-applicable exclusions",
     { p21Specific: true, platformGap: "platform:cross-provider-route-shape" },
   ),
   operator(

@@ -16,7 +16,10 @@ describe("@payswap/route-compiler smoke", () => {
     expect(typeof routeCompiler.evaluateComparabilityGate).toBe("function");
     expect(typeof routeCompiler.evaluateNetOutcome).toBe("function");
     expect(typeof routeCompiler.rankScoredPlans).toBe("function");
-    expect(routeCompiler.ROUTE_SHAPE_IDS.length).toBe(9);
+    // DISCLOSED RE-PIN (P22-C, ADR-0016 D5): the frozen route-shape
+    // vocabulary grows its TENTH member — `cross-provider-corridor` (the
+    // fiat -> chain -> fiat corridor over the OBSERVED onchain middle).
+    expect(routeCompiler.ROUTE_SHAPE_IDS.length).toBe(10);
   });
 
   it("exports the engine, record and error-taxonomy surface", () => {
@@ -33,13 +36,16 @@ describe("@payswap/route-compiler smoke", () => {
     expect(typeof routeCompiler.LabTierSettlementRejectedError).toBe("function");
   });
 
-  it("the curated barrel census: exactly 172 runtime exports (131 functions + 41 consts)", () => {
+  it("the curated barrel census: exactly 174 runtime exports (132 functions + 42 consts)", () => {
     const exports = Object.entries(routeCompiler);
     const functions = exports.filter(([, value]) => typeof value === "function");
     const consts = exports.filter(([, value]) => typeof value !== "function");
-    expect(functions.length).toBe(131);
-    expect(consts.length).toBe(41);
-    expect(exports.length).toBe(172);
+    // DISCLOSED RE-PIN (P22-C, ADR-0016 D5): +1 function
+    // (observedCorridorMiddle — the observed-middle law) and +1 const
+    // (CROSS_PROVIDER_CORRIDOR_SHAPE_ID) — the corridor family's surface.
+    expect(functions.length).toBe(132);
+    expect(consts.length).toBe(42);
+    expect(exports.length).toBe(174);
   });
 
   it("the tier + comparability vocabularies are closed and frozen", () => {

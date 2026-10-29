@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   CandidateEnumerationError,
   CatalogueRailRejectedError,
+  CorridorPlanLawError,
   HardGateError,
   isRoutePlanningError,
   PortUnboundError,
@@ -26,6 +27,10 @@ describe("the error taxonomy (stable machine codes)", () => {
       [new CandidateEnumerationError("e"), "CANDIDATE_ENUMERATION_FAILED"],
       [new HardGateError("g"), "HARD_GATE_FAILED"],
       [new RouteRankingError("r"), "ROUTE_RANKING_FAILED"],
+      [
+        new CorridorPlanLawError("k"),
+        "CORRIDOR_PLAN_LAW_FAILED",
+      ],
     ];
     for (const [error, code] of cases) {
       expect(error).toBeInstanceOf(RoutePlanningError);
@@ -68,6 +73,7 @@ describe("the error taxonomy (stable machine codes)", () => {
       "CANDIDATE_ENUMERATION_FAILED",
       "HARD_GATE_FAILED",
       "ROUTE_RANKING_FAILED",
+      "CORRIDOR_PLAN_LAW_FAILED",
     ]);
     const codes = new Set<string>();
     for (const error of [
@@ -79,6 +85,7 @@ describe("the error taxonomy (stable machine codes)", () => {
       new CandidateEnumerationError("e"),
       new HardGateError("g"),
       new RouteRankingError("r"),
+      new CorridorPlanLawError("k"),
     ]) {
       codes.add((error as RoutePlanningError).code);
     }

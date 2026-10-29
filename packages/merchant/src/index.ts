@@ -166,6 +166,13 @@ export {
 } from "./settlement-routes.ts";
 export type { MerchantCryptoSettlementRoute, MerchantCryptoSettlementRouteFamily, NativeStripeCryptoSettlementRoute, ExternalConversionSettlementRoute, StripeSettlementConfirmation } from "./settlement-routes.ts";
 export {
+  PINNED_CORRIDOR_KES_RECEIVING_KIND,
+  PINNED_CORRIDOR_KES_RECEIVING_CURRENCY,
+  PINNED_CORRIDOR_KES_OFFRAMP_PAYOUT_METHOD,
+  defineCorridorKesReceivingContext,
+} from "./kes-receiving.ts";
+export type { CorridorKesReceivingContext } from "./kes-receiving.ts";
+export {
   validateMerchantCapabilityDescriptor,
   stripeNativeCryptoSettlementCapabilityDefinition,
   payswapExternalConversionSettlementCapabilityDefinition,

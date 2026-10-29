@@ -85,7 +85,10 @@ describe("architectural boundary: @payswap/route-compiler (the REWRITTEN zero-si
       }
     }
     expect(offenders.join("\n")).toBe("");
-    expect(sourceFiles.length).toBe(56);
+    // DISCLOSED RE-PIN (P22-C, ADR-0016 D5): +2 src modules
+    // (compiler-corridor.ts — the corridor family; compiler-corridor-legs.ts
+    // — its leg assembly, split under the 400-line file law).
+    expect(sourceFiles.length).toBe(58);
   });
 
   it("no @payswap/* or @zcode/* import appears ANYWHERE in src (the leaf-in-flight pins law)", () => {
@@ -144,8 +147,14 @@ describe("architectural boundary: @payswap/route-compiler (the REWRITTEN zero-si
       }
     }
     expect(offenders.join("\n")).toBe("");
-    expect(testFiles.length).toBe(29);
-    expect(allTestFiles.length).toBe(39);
+    // DISCLOSED RE-PIN (P22-C, ADR-0016 D5): +2 test suites
+    // (route-5-cross-provider-corridor.test.ts — the corridor battery;
+    // byte-compat-p23-fixture-worlds.test.ts — the byte-compat gate) and
+    // +1 test-tier fixture module (corridor-fixtures.ts — the corridor
+    // fixture world), so the census moved 29 -> 31 test suites and
+    // 39 -> 42 all-test .ts files.
+    expect(testFiles.length).toBe(31);
+    expect(allTestFiles.length).toBe(42);
   });
 
   it("the manifest law + tsconfig carries NO paths entries + node.d.ts declares process.cwd as a function exactly once", () => {

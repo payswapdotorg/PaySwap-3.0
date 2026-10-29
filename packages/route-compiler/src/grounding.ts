@@ -23,7 +23,7 @@
 import { InvalidRouteLegContractError } from "./errors.ts";
 import { epochMillisFromIso, isIsoUtcTimestamp } from "./canonical-time.ts";
 import { deepFreeze, requireBoundedString, requireNonNegativeSafeInteger, requireObject, LIMITS, type Fail } from "./canonical.ts";
-import { isPinnedChainKey } from "./pins/onchain.ts";
+import { isPinnedAssetSymbol, isPinnedChainKey } from "./pins/onchain.ts";
 
 const fail: Fail = (message: string) => new InvalidRouteLegContractError(message);
 
@@ -179,8 +179,16 @@ export function validateFundsLocationObservation(
       }
       const accountRef = requireBoundedString(record["accountRef"], "observation.accountRef", LIMITS.refMaxLength, fail);
       const assetId = requireBoundedString(record["assetId"], "observation.assetId", LIMITS.refMaxLength, fail);
-      const symbol = requireBoundedString(record["symbol"], "observation.symbol", 3, fail);
-      const observedAmount = validateObservedAmount(record["observedAmount"]);
+      // P22-C growth (ADR-0016 D3): an onchain position is held in an ASSET,
+      // not an ISO currency — the symbol (and the observed amount's
+      // denomination) validate under the pinned ASSET-SYMBOL law (e.g. the
+      // issuer-scoped `USDC` of `stellar:testnet/asset:USDC:<issuerG>`),
+      // never the three-letter currency-code law.
+      const symbol = requireBoundedString(record["symbol"], "observation.symbol", 32, fail);
+      if (!isPinnedAssetSymbol(symbol)) {
+        throw fail("observation.symbol must be a canonical asset symbol (uppercase-led, 1..32 chars)");
+      }
+      const observedAmount = validateObservedAssetAmount(record["observedAmount"]);
       return deepFreeze({
         observationKind: kind,
         observationRef,
@@ -256,6 +264,28 @@ function validateObservedAmount(
 ): { currency: string; minorUnits: string } {
   const record = requireObject(candidate, "an observed amount", fail);
   const currency = requireBoundedString(record["currency"], "amount.currency", 3, fail);
+  const minorUnits = record["minorUnits"];
+  if (typeof minorUnits !== "string" || !/^(0|[1-9][0-9]*)$/.test(minorUnits)) {
+    throw fail("amount.minorUnits must be a canonical integer string (INV-F01)");
+  }
+  return Object.freeze({ currency, minorUnits });
+}
+
+/**
+ * The ONCHAIN_POSITION observed amount: denominated in the ASSET symbol
+ * (the pinned asset-symbol law — `USDC`, `ETH`, …), never a three-letter
+ * ISO currency code. P22-C growth (ADR-0016 D3): the issuer-scoped
+ * Stellar asset's symbol is four characters and is none the less a
+ * canonical asset denomination.
+ */
+function validateObservedAssetAmount(
+  candidate: unknown,
+): { currency: string; minorUnits: string } {
+  const record = requireObject(candidate, "an observed amount", fail);
+  const currency = requireBoundedString(record["currency"], "amount.currency", 32, fail);
+  if (!isPinnedAssetSymbol(currency)) {
+    throw fail("amount.currency must be a canonical asset symbol (an onchain position is held in an asset, not an ISO currency)");
+  }
   const minorUnits = record["minorUnits"];
   if (typeof minorUnits !== "string" || !/^(0|[1-9][0-9]*)$/.test(minorUnits)) {
     throw fail("amount.minorUnits must be a canonical integer string (INV-F01)");
