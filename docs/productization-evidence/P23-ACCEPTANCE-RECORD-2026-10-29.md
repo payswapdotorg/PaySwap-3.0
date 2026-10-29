@@ -138,9 +138,10 @@ battery + the CDP card-content E2E + the persistence recheck + the web tier
    commits were PUSHED (19e8310, 179aa06, 81ee7ee — zero committed work
    lost; the uncommitted closure-docs edits were redone from the worklog
    record). The repo is publicly clonable — the recovery clone restored
-   main; the final closure-docs push is the operator action (re-supply
-   the PAT or push manually: `git push origin main` from
-   /home/z/payswap-3.0-repo).
+   main; the closure-docs push landed same-day (the operator re-supplied
+   the PAT via `secrets/operator-tokens.env`; `81ee7ee..d379cec
+   main -> main`, parity re-verified by fetch + API: remote HEAD =
+   d379cec4be563cfd8c4c7361d174e86911d4c537).
 
 ## Verdict
 
