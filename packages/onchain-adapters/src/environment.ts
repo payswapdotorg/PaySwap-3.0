@@ -67,6 +67,11 @@ export const CHAIN_ENVIRONMENT_REGISTRY: Readonly<Record<string, RailEnvironment
     'bitcoin:testnet': 'TESTNET',
     'bitcoin:signet': 'TESTNET',
     'bitcoin:regtest': 'REGTEST',
+    // STELLAR family (P22-A, ADR-0016 D2): exactly ONE entry — the testnet.
+    // `stellar:pubnet` is DELIBERATELY NOT REGISTERED: a pubnet wave is a
+    // future operator order and the registry stays minimal and honest
+    // (an unregistered key classifies FAIL CLOSED, never guessed).
+    'stellar:testnet': 'TESTNET',
   });
 
 /**

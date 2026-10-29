@@ -54,6 +54,25 @@ export interface ContractCallRequest {
   readonly value?: AmountSpec;
 }
 
+/** The declared deployable-artifact kinds (neutral vocabulary — never guessed). */
+export type DeploymentArtifactKind = 'WASM' | 'BYTECODE' | 'PROVIDER_DEFINED';
+
+/**
+ * A controlled contract-DEPLOYMENT leg (P22-A, ADR-0016 D4): the deploying
+ * account + the digest-bound artifact identity. A deployment is a
+ * consequential write; what it produced is declared by the REAL deployment
+ * record ({ txHash, contractId, sourceHash, bytecodeHash } — see
+ * ../onchain-domain/deployment.ts), never fabricated.
+ */
+export interface ContractDeploymentRequest {
+  /** The account that signs and submits the deployment (the signer). */
+  readonly deployer: string;
+  /** Content hash of the deployable artifact (the wasm/bytecode hash). */
+  readonly artifactHash: string;
+  /** The declared artifact kind (explicit — WASM, BYTECODE or PROVIDER_DEFINED). */
+  readonly artifactKind: DeploymentArtifactKind;
+}
+
 /** The route a prepared write executes (hash-bound). */
 export interface RouteRef {
   readonly routeId: string;
@@ -78,6 +97,8 @@ export interface OnchainWriteRequest {
   readonly transfer?: OnchainTransferLeg;
   readonly approvals: readonly ApprovalChangeRequest[];
   readonly contractCall?: ContractCallRequest;
+  /** Contract-deployment leg (P22-A, ADR-0016 D4 — the deploy path). */
+  readonly deployment?: ContractDeploymentRequest;
   readonly route: RouteRef;
   /** Absolute expiry (ms). An expired write is BLOCKED at the gates. */
   readonly expiry: number;
@@ -148,10 +169,11 @@ export function validateOnchainWriteRequest(request: OnchainWriteRequest): void 
   if (
     request.transfer === undefined &&
     request.approvals.length === 0 &&
-    request.contractCall === undefined
+    request.contractCall === undefined &&
+    request.deployment === undefined
   ) {
     throw new ValidationError(
-      'a write request must carry at least one effect leg (transfer, approval or contract call) — an empty write never validates',
+      'a write request must carry at least one effect leg (transfer, approval, contract call or contract deployment) — an empty write never validates',
     );
   }
   if (request.transfer !== undefined) {
@@ -212,6 +234,31 @@ export function validateOnchainWriteRequest(request: OnchainWriteRequest): void 
     }
     if (call.value !== undefined) {
       validateAmountSpec(call.value, 'contractCall.value');
+    }
+  }
+  if (request.deployment !== undefined) {
+    const deployment = request.deployment;
+    if (
+      !isNonEmptyString(deployment.deployer) ||
+      /\s/.test(deployment.deployer)
+    ) {
+      throw new ValidationError(
+        'deployment.deployer must be a non-empty whitespace-free account reference',
+      );
+    }
+    if (!isNonEmptyString(deployment.artifactHash)) {
+      throw new ValidationError(
+        'deployment.artifactHash must be a non-empty digest string (the deployable artifact is digest-bound — ADR-0016 D4)',
+      );
+    }
+    if (
+      deployment.artifactKind !== 'WASM' &&
+      deployment.artifactKind !== 'BYTECODE' &&
+      deployment.artifactKind !== 'PROVIDER_DEFINED'
+    ) {
+      throw new ValidationError(
+        "deployment.artifactKind must be 'WASM', 'BYTECODE' or 'PROVIDER_DEFINED' (never guessed)",
+      );
     }
   }
   if (

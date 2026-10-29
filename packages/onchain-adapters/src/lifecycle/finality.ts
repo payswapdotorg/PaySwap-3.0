@@ -30,6 +30,8 @@ export function declaredConfirmationTarget(
       return finality.confirmationDepthTarget;
     case 'SOLANA':
       return finality.slotConfirmationTarget;
+    case 'STELLAR':
+      return finality.ledgerConfirmationTarget;
   }
 }
 

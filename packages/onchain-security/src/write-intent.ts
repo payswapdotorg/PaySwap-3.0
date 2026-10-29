@@ -29,6 +29,7 @@ import type {
   AssetIdentity,
   ChainRef,
   ContractCallRequest,
+  ContractDeploymentRequest,
   ProtocolIdentity,
   SettlementInstructionBinding,
 } from "./types.ts";
@@ -36,6 +37,7 @@ import {
   validateAddress,
   validateAssetIdentity,
   validateChainRef,
+  validateDeploymentRequest,
   validateProtocolIdentity,
 } from "./types.ts";
 
@@ -75,6 +77,8 @@ export interface OnchainWriteRequest {
   readonly transfer?: OnchainTransferLeg;
   readonly approvals: readonly ApprovalChangeRequest[];
   readonly contractCall?: ContractCallRequest;
+  /** Contract-deployment leg (P22-A, ADR-0016 D4 — the deploy path). */
+  readonly deployment?: ContractDeploymentRequest;
   readonly route: RouteRef;
   readonly protocol?: ProtocolIdentity;
   /** Absolute expiry (ms). An expired write is BLOCKED at the gates, never guessed. */
@@ -95,6 +99,7 @@ export interface PreparedWrite {
   readonly transfer?: OnchainTransferLeg;
   readonly approvals: readonly ApprovalChangeRequest[];
   readonly contractCall?: ContractCallRequest;
+  readonly deployment?: ContractDeploymentRequest;
   readonly route: RouteRef;
   readonly protocol?: ProtocolIdentity;
   readonly expiry: number;
@@ -182,9 +187,9 @@ export function prepareWrite(request: OnchainWriteRequest, at: number): Prepared
   }
   validateChainRef(request.chain);
 
-  if (request.transfer === undefined && request.approvals.length === 0 && request.contractCall === undefined) {
+  if (request.transfer === undefined && request.approvals.length === 0 && request.contractCall === undefined && request.deployment === undefined) {
     throw new InvalidWriteError(
-      "a consequential write must move value, change an approval, or call a contract",
+      "a consequential write must move value, change an approval, or call a contract (or deploy a contract artifact — ADR-0016 D4)",
     );
   }
 
@@ -202,6 +207,12 @@ export function prepareWrite(request: OnchainWriteRequest, at: number): Prepared
     if (request.contractCall.value !== undefined) {
       validateAmountSpec(request.contractCall.value);
     }
+  }
+
+  if (request.deployment !== undefined) {
+    // The deployment leg (ADR-0016 D4): the deploying account and the
+    // digest-bound artifact identity are mandatory, fail closed.
+    validateDeploymentRequest(request.deployment);
   }
 
   requireNonEmpty(request.route.routeId, "route.routeId");
@@ -245,6 +256,7 @@ export function prepareWrite(request: OnchainWriteRequest, at: number): Prepared
     transfer: request.transfer,
     approvals: request.approvals,
     contractCall: request.contractCall,
+    deployment: request.deployment,
     route: { routeId: request.route.routeId, routeHash: request.route.routeHash, hops: request.route.hops },
     protocol: request.protocol,
     expiry: request.expiry,
@@ -261,6 +273,9 @@ export function prepareWrite(request: OnchainWriteRequest, at: number): Prepared
     approvals: Object.freeze(request.approvals.map((a) => Object.freeze(a))),
     ...(request.contractCall !== undefined
       ? { contractCall: Object.freeze(request.contractCall) }
+      : {}),
+    ...(request.deployment !== undefined
+      ? { deployment: Object.freeze(request.deployment) }
       : {}),
     route: Object.freeze(request.route),
     ...(request.protocol !== undefined ? { protocol: Object.freeze(request.protocol) } : {}),

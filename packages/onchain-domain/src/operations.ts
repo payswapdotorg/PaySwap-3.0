@@ -27,6 +27,9 @@ import type { PinnedFinancialEffectClass } from "./pins.ts";
 
 /**
  * The declared onchain operation kinds (the consequential-write vocabulary).
+ * P22-A (ADR-0016 D4) grows exactly one kind: `onchain.contract_deploy` —
+ * deploying a smart-contract artifact is a CONSEQUENTIAL write (INV-20's
+ * discipline extends to it; the effect class is declared, never defaulted).
  */
 export const ONCHAIN_OPERATION_KINDS = [
   "onchain.transfer",
@@ -35,6 +38,7 @@ export const ONCHAIN_OPERATION_KINDS = [
   "onchain.swap",
   "onchain.bridge",
   "onchain.intent",
+  "onchain.contract_deploy",
 ] as const;
 
 export type OnchainOperationKind = (typeof ONCHAIN_OPERATION_KINDS)[number];
@@ -42,7 +46,11 @@ export type OnchainOperationKind = (typeof ONCHAIN_OPERATION_KINDS)[number];
 /**
  * Financial-effect marker for the generic contract interaction: the effect
  * is DECLARED BY THE CERTIFIED METHOD of the contract-interaction capability
- * (INV-20) — it is never defaulted here and never guessed.
+ * (INV-20) — it is never defaulted here and never guessed. P22-A
+ * (ADR-0016 D4): the same discipline extends to `onchain.contract_deploy` —
+ * a deployment's effect is declared by the certified deployment capability
+ * and the REAL deployment record, never defaulted (the pinned vocabulary is
+ * frozen; no new effect literal is minted).
  */
 export type CertifiedMethodDeclaredEffect = "DECLARED_BY_CERTIFIED_METHOD";
 
@@ -77,7 +85,11 @@ export interface OnchainOperationSemantics {
  * CONSEQUENTIAL_EXTERNAL_EFFECT; approval was NO_FINANCIAL_EFFECT and is
  * NO_EFFECT (it grants an allowance — security-consequential, reversible by
  * revocation, but no external value moves); contract_call stays
- * DECLARED_BY_CERTIFIED_METHOD (INV-20).
+ * DECLARED_BY_CERTIFIED_METHOD (INV-20). P22-A (ADR-0016 D4) adds
+ * contract_deploy with the SAME declared-by discipline — a deployment
+ * moves no asset at broadcast time but puts consequential code onchain;
+ * its effect is declared by the certified deployment capability and the
+ * real deployment record (./pins-deployment.ts), never defaulted.
  */
 export const ONCHAIN_OPERATION_SEMANTICS: Readonly<
   Record<OnchainOperationKind, OnchainOperationSemantics>
@@ -170,6 +182,21 @@ export const ONCHAIN_OPERATION_SEMANTICS: Readonly<
       asset: false,
       amount: false,
       protocol: true,
+    }),
+  }),
+  "onchain.contract_deploy": Object.freeze({
+    operation: "onchain.contract_deploy",
+    description:
+      "Deploy a smart-contract artifact (e.g. a Soroban wasm module) to a chain; the deployment evidence record — tx hash, contract id, source hash, bytecode hash — is the only source of a smart-contract declaration for what the deployment produced (ADR-0016 D4)",
+    financialEffect: "DECLARED_BY_CERTIFIED_METHOD",
+    reversible: false,
+    consequentialWrite: true,
+    requires: Object.freeze({
+      destination: false,
+      spender: false,
+      asset: false,
+      amount: false,
+      protocol: false,
     }),
   }),
 });

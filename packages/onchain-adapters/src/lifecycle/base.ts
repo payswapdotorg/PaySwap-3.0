@@ -73,7 +73,7 @@ export abstract class BaseChainFamilyAdapter<
 > implements ChainFamilyAdapter<Env, FamilyPlan>
 {
   readonly adapterId: string;
-  readonly family: 'EVM' | 'SOLANA' | 'UTXO';
+  readonly family: 'EVM' | 'SOLANA' | 'UTXO' | 'STELLAR';
   readonly chainKey: string;
   readonly environment: RailEnvironment<Env>;
   readonly lifecycle: AdapterStageSupport;

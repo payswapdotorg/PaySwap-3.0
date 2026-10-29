@@ -24,6 +24,12 @@
  *           opt-in RBF / CPFP — declared with provenance, never assumed),
  *           PROBABILISTIC finality, depth guidance, reorgs detected by
  *           BLOCK_HASH observation.
+ * - STELLAR (P22-A, ADR-0016 D2): STROOPS_PER_OPERATION fee model (the
+ *           flat per-operation fee, observed from the Horizon fee-stats
+ *           feed), closed-ledger consensus (the ~3-second consensus
+ *           class — DETERMINISTIC-class finality, reorg risk NONE, reorg
+ *           detection NOT_APPLICABLE — declared honestly, never
+ *           approximated with another family's shape).
  */
 
 // ---------------------------------------------------------------------------
@@ -80,8 +86,27 @@ export interface UtxoFeeSemantics {
   readonly mempoolPolicy: UtxoMempoolPolicy;
 }
 
+/**
+ * STELLAR fee semantics (P22-A, ADR-0016 D2): STROOPS_PER_OPERATION — the
+ * flat per-operation fee Stellar charges in stroops (1 stroop = 1e-7 XLM,
+ * the exact integer minor unit). The observed fee comes from the Horizon
+ * fee-stats feed (exact decimal text, observed with provenance — never
+ * assumed).
+ */
+export interface StellarFeeSemantics {
+  readonly family: 'STELLAR';
+  readonly expressible: true;
+  readonly feeModel: 'STROOPS_PER_OPERATION';
+  /** Exact fee charged per operation, in stroops (integer decimal string). */
+  readonly stroopsPerOperation: string;
+}
+
 /** The union of family fee semantics. */
-export type FamilyFeeSemantics = EvmFeeSemantics | SolanaFeeSemantics | UtxoFeeSemantics;
+export type FamilyFeeSemantics =
+  | EvmFeeSemantics
+  | SolanaFeeSemantics
+  | UtxoFeeSemantics
+  | StellarFeeSemantics;
 
 /** An inexpressible fee shape: the limitation is RECORDED, never approximated. */
 export interface InexpressibleFeeSemantics {
@@ -122,10 +147,28 @@ export interface UtxoFinalitySemantics {
   readonly reorgDetection: 'BLOCK_HASH_OBSERVATION';
 }
 
+/**
+ * STELLAR finality semantics (P22-A, ADR-0016 D2): closed-ledger consensus
+ * (the ~3-second consensus class) — agreed ledgers are final and there is
+ * NO reorg surface, so the finality model is DETERMINISTIC-class and
+ * reorg detection is NOT APPLICABLE (declared honestly, never approximated
+ * with another family's detection shape). The guidance target is a number
+ * of CLOSED LEDGERS observed beyond the operation's containing ledger.
+ */
+export interface StellarFinalitySemantics {
+  readonly family: 'STELLAR';
+  readonly finalityModel: 'DETERMINISTIC';
+  /** Declared closed-ledger confirmation guidance (ledgers). */
+  readonly ledgerConfirmationTarget: number;
+  /** Stellar closed ledgers do not reorganize — reorg detection is N/A. */
+  readonly reorgDetection: 'NOT_APPLICABLE';
+}
+
 export type FamilyFinalitySemantics =
   | EvmFinalitySemantics
   | SolanaFinalitySemantics
-  | UtxoFinalitySemantics;
+  | UtxoFinalitySemantics
+  | StellarFinalitySemantics;
 
 // ---------------------------------------------------------------------------
 // The family semantics profile (one per family adapter)
@@ -149,7 +192,14 @@ export interface UtxoSemanticsProfile {
   readonly finality: UtxoFinalitySemantics;
 }
 
+export interface StellarSemanticsProfile {
+  readonly family: 'STELLAR';
+  readonly fee: StellarFeeSemantics | InexpressibleFeeSemantics;
+  readonly finality: StellarFinalitySemantics;
+}
+
 export type FamilySemanticsProfile =
   | EvmSemanticsProfile
   | SolanaSemanticsProfile
-  | UtxoSemanticsProfile;
+  | UtxoSemanticsProfile
+  | StellarSemanticsProfile;

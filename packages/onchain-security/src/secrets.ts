@@ -31,6 +31,13 @@
  * realistic secret literal ever appears in this source or its fixtures:
  * tests assemble credential-shaped fixtures at RUNTIME from fragments.
  *
+ * P22-A (ADR-0016 D9/D10): the Stellar StrKey SECRET shape (`S…` — 56
+ * base32 characters) joins the value detectors: a Stellar secret key-shaped
+ * value under any non-derived-identifier field is secret-shaped material
+ * (a key-shaped value in any handle/reference/id is a security incident).
+ * The `G…` account and `C…` contract shapes are PUBLIC identifiers and are
+ * deliberately NOT detected.
+ *
  * Derived public identifiers where a 32-byte hex shape is EXPECTED
  * (hashes, digests, signatures, fingerprints, EIP-712 domain
  * separators/salts, calldata) are value-scan-exempt by key name — they
@@ -199,6 +206,18 @@ export function isMnemonicShape(value: string): boolean {
 }
 
 /**
+ * Stellar StrKey SECRET shape (P22-A, ADR-0016 D9): `S` + 55 base32
+ * characters (56 total) — exactly /^S[A-Z2-7]{55}$/. A value of this shape
+ * is a Stellar secret key wherever it appears in an agent-facing artifact:
+ * detected and rejected, never carried (real key material lives only in
+ * the host's sealed credential broker). The `G…`/`C…` public shapes are
+ * NOT secret material and are not detected.
+ */
+export function isStellarSecretKeyShape(value: unknown): boolean {
+  return typeof value === "string" && /^S[A-Z2-7]{55}$/.test(value);
+}
+
+/**
  * Key-name fragments whose values are DERIVED PUBLIC identifiers where a
  * 32-byte hex shape is the expected form (keccak hashes, digests, EIP-712
  * domain separators, opaque signatures, fingerprints, calldata). These are
@@ -305,6 +324,15 @@ export function scanForSecretMaterial(
           kind: "secret_shaped_value",
           key,
           reason: `value has the BIP-39 mnemonic shape (12/24 lowercase words) under field '${key}'`,
+        });
+        continue;
+      }
+      if (isStellarSecretKeyShape(field)) {
+        violations.push({
+          path: fieldPath,
+          kind: "secret_shaped_value",
+          key,
+          reason: `value has the Stellar secret key shape (S + 55 base32 characters) under a non-derived-identifier field '${key}' — Stellar key material lives only inside the sealed credential broker (ADR-0016 D9)`,
         });
         continue;
       }

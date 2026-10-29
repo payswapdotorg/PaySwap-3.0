@@ -67,10 +67,12 @@ export * from "./errors.ts";
 // their structural validators (the pinned subset of the authority laws).
 export * from "./pins.ts";
 export * from "./pins-smart-contract.ts";
+export * from "./pins-deployment.ts";
 export * from "./pins-settlement.ts";
 export * from "./pins-validation.ts";
 
-// Chain family vocabulary + optional family-scoped extensions.
+// Chain family vocabulary + optional family-scoped extensions (the Stellar
+// family-extension module is re-exported through family-extensions.ts).
 export * from "./family.ts";
 export * from "./family-extensions.ts";
 

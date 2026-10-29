@@ -29,7 +29,7 @@ import { ValidationError } from "./errors.ts";
 import { isNonEmptyString, isRecord } from "./shared.ts";
 import { isValidChainKey } from "./family.ts";
 import type { ProvenanceDescriptorPin } from "./pins.ts";
-import { validateAssetFamilyExtension } from "./family-extensions.ts";
+import { assetFamilyIdentitySuffix, validateAssetFamilyExtension } from "./family-extensions.ts";
 import type { AssetFamilyExtension } from "./family-extensions.ts";
 
 // ---------------------------------------------------------------------------
@@ -89,6 +89,22 @@ export function canonicalAssetRef(chainKey: string, symbol: string): string {
   return `${chainKey}/asset:${symbol}`;
 }
 
+/**
+ * Deterministic ISSUER-SCOPED asset identity (P22-A, ADR-0016 D3):
+ * `${chainKey}/asset:${symbol}:${issuerAccount}` — the canonical form an
+ * AssetDefinition takes when its family extension declares an issuer scope
+ * (the STELLAR issuer-scoped shape). TWO ISSUERS OF THE SAME CODE ARE TWO
+ * ASSETS: the issuer scope is part of the canonical identity, never a
+ * display attribute.
+ */
+export function canonicalIssuerScopedAssetRef(
+  chainKey: string,
+  symbol: string,
+  issuerAccount: string,
+): string {
+  return `${chainKey}/asset:${symbol}:${issuerAccount}`;
+}
+
 /** Canonical asset symbol format. */
 export const SYMBOL_PATTERN = /^[A-Z0-9][A-Z0-9._-]{0,31}$/;
 
@@ -120,7 +136,10 @@ export function isAssetClass(value: unknown): value is AssetClass {
 /**
  * Runtime validation for an asset definition from untyped sources.
  * Deterministic rules:
- * - assetId === canonicalAssetRef(chainKey, symbol) (deterministic identity);
+ * - assetId === the canonical asset identity (deterministic): with an
+ *   issuer-scoped family extension present the identity is
+ *   `${chainKey}/asset:${symbol}:${issuerAccount}` (ADR-0016 D3 — the
+ *   issuer disambiguates); without one it is `${chainKey}/asset:${symbol}`;
  * - minorUnitDigits is an integer 0..18 (exact minor-unit scale);
  * - chainKey is canonical; symbol is canonical;
  * - a declared peg is a well-formed claim;
@@ -191,15 +210,24 @@ export function validateAssetDefinition(candidate: unknown): AssetDefinition {
     );
   }
   const familyExtension = record.familyExtension;
+  let parsedFamilyExtension: AssetFamilyExtension | undefined;
   if (familyExtension !== undefined) {
     try {
-      validateAssetFamilyExtension(familyExtension);
+      parsedFamilyExtension = validateAssetFamilyExtension(familyExtension);
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
     }
   }
   if (isNonEmptyString(record.symbol) && isValidChainKey(record.chainKey)) {
-    const expectedId = canonicalAssetRef(record.chainKey, record.symbol);
+    // Deterministic identity (ADR-0016 D3): an issuer-scoped family
+    // extension contributes its issuer scope to the canonical assetId —
+    // two issuers of the same code are two assets.
+    const identitySuffix =
+      parsedFamilyExtension !== undefined
+        ? assetFamilyIdentitySuffix(parsedFamilyExtension) ?? ""
+        : "";
+    const expectedId =
+      canonicalAssetRef(record.chainKey, record.symbol) + identitySuffix;
     if (record.assetId !== expectedId) {
       errors.push(
         `asset identity is deterministic: assetId must be '${expectedId}' for symbol '${record.symbol}' on chain '${record.chainKey}'`,
@@ -215,8 +243,7 @@ export function validateAssetDefinition(candidate: unknown): AssetDefinition {
     });
   }
 
-  const parsedFamilyExtension =
-    familyExtension !== undefined ? validateAssetFamilyExtension(familyExtension) : undefined;
+  const parsedFamilyExtensionFinal = parsedFamilyExtension;
   return Object.freeze({
     assetId: record.assetId as string,
     symbol: record.symbol as string,
@@ -226,7 +253,9 @@ export function validateAssetDefinition(candidate: unknown): AssetDefinition {
     chainKey: record.chainKey as string,
     provenance: Object.freeze({ ...(record.provenance as ProvenanceDescriptorPin) }),
     ...(parsedPeg !== undefined ? { declaredPeg: Object.freeze(parsedPeg) } : {}),
-    ...(parsedFamilyExtension !== undefined ? { familyExtension: parsedFamilyExtension } : {}),
+    ...(parsedFamilyExtensionFinal !== undefined
+      ? { familyExtension: parsedFamilyExtensionFinal }
+      : {}),
   });
 }
 

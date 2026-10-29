@@ -175,3 +175,22 @@ export class RailUnreachableError extends OnchainAdapterError {
     });
   }
 }
+
+/**
+ * A contract-deployment broadcast was attempted WITHOUT its deployment
+ * grant (P22-A, ADR-0016 D7 — the no-bypass discipline): the authorize stage
+ * (the injected onchain-security kernel — the grant law) never recorded the
+ * write, so the deploy directive is a TYPED refusal at the broadcast
+ * boundary and NEVER reaches a transport. A smuggled deploy directive is
+ * unrepresentable as a submission.
+ */
+export class DeploymentGrantRequiredError extends OnchainAdapterError {
+  constructor(message: string, details?: OnchainAdapterErrorDetails) {
+    super({
+      code: 'DEPLOYMENT_GRANT_REQUIRED',
+      category: 'AUTHORIZATION_REQUIRED',
+      message,
+      ...(details !== undefined ? { details } : {}),
+    });
+  }
+}
