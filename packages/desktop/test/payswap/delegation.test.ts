@@ -123,11 +123,13 @@ describe("delegated money movement laws (P7-W2)", () => {
       // seal, recording the outcome through the authority's own
       // recorder — the ONLY ACTIVE path. Never a money-movement verb;
       // never a caller-asserted activation.)
+      "connectionRunStellarAccountReadProbe",
       "connectionRunVerificationProbe",
       "connectionSeedSetup",
       "connectionStatuses",
       "connectionSubmitFlutterwaveSecretKey",
       "connectionSubmitPaystackSecretKey",
+      "connectionSubmitStellarSecretKey",
       "connectionSubmitStripeRestrictedKey",
       "delegateMoneyMovement",
       "deploymentFacts",

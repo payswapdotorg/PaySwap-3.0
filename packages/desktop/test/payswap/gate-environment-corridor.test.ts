@@ -97,9 +97,12 @@ const DECLARED_QUERY = {
 };
 
 describe("the merchant directory (labeled TEST_DATA — the destination provider)", () => {
-  it("ships exactly merchant:stripe-only-test with the stable identifier + display name + TEST_DATA tier", () => {
+  it("ships the P21 Stripe-only test merchant + the P22-H KES receiving merchant (both TEST_DATA)", () => {
     const entries = listMerchantDirectoryEntries();
-    expect(entries).toHaveLength(1);
+    // P22-H re-pin (ADR-0016 D8, disclosed): the directory grew its
+    // second entry — the corridor's KES off-ramp destination on the
+    // Paystack payout lane (the pinned method mirrors the C lane's).
+    expect(entries).toHaveLength(2);
     const entry = entries[0]!;
     expect(entry.merchantId).toBe("merchant:stripe-only-test");
     expect(entry.displayName).toBe("Merchant X (Stripe-only test)");
@@ -107,8 +110,13 @@ describe("the merchant directory (labeled TEST_DATA — the destination provider
     expect(MERCHANT_DIRECTORY_EVIDENCE_TIER).toBe("TEST_DATA");
     expect(entry.receivingContext.providerId).toBe("stripe");
     expect(entry.receivingContext.receivingCurrency).toBe("USD");
+    const kes = entries[1]!;
+    expect(kes.merchantId).toBe("merchant:kes-paystack-test");
+    expect(kes.receivingContext.providerId).toBe("paystack");
+    expect(kes.receivingContext.receivingCurrency).toBe("KES");
+    expect(kes.receivingContext.payoutMethod).toBe("paystack_kes_bank_transfer");
     // The directory's facts are TEST_DATA, never provider observations.
-    expect(JSON.stringify(entry)).not.toContain("PROVIDER_OBSERVATION");
+    expect(JSON.stringify(entries)).not.toContain("PROVIDER_OBSERVATION");
     expect(findMerchantDirectoryEntry("Merchant X (Stripe-only test)")).toBe(entry);
     expect(findMerchantDirectoryEntry("someone else")).toBeNull();
     // The directory never answers a PARTIAL name (the exactness law).

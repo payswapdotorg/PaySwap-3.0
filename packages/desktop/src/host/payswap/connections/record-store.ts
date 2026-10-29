@@ -14,6 +14,10 @@ import {
   type PinnedConnectionLifecycleState,
   type PinnedProviderFormEntry,
 } from "./provider-pins.js";
+import {
+  PINNED_ONCHAIN_RAIL_CONNECTION_FORMS,
+  type PinnedOnchainRailConnectionForm,
+} from "./onchain-rail-pins.js";
 import type {
   DesktopConnectionStatusView,
   DesktopConnectionTransitionView,
@@ -38,7 +42,7 @@ export interface PersistedConnectionRecord {
 export function findRegistryForm(
   providerId: string,
   useCaseRef: string,
-): PinnedProviderFormEntry | null {
+): PinnedProviderFormEntry | PinnedOnchainRailConnectionForm | null {
   for (const entry of PINNED_PAYMENT_PROVIDER_REGISTRY) {
     if (entry.providerId !== providerId) {
       continue;
@@ -47,6 +51,16 @@ export function findRegistryForm(
       if (form.useCaseRef === useCaseRef) {
         return form;
       }
+    }
+  }
+  // (P22-H, ADR-0016 D2/D9) The ONCHAIN RAIL forms: the Stellar
+  // testnet keypair wallet rides the PROVIDERLESS_RAIL form — its own
+  // fail-closed catalogue, NEVER the PSP registry (ADR-0008 D5's
+  // separation preserved; the rail connection is not a payment
+  // provider and never joins the renderer's PSP catalogue).
+  for (const form of PINNED_ONCHAIN_RAIL_CONNECTION_FORMS) {
+    if (form.providerId === providerId && form.useCaseRef === useCaseRef) {
+      return form;
     }
   }
   return null;

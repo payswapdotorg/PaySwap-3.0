@@ -49,6 +49,36 @@ export interface ExecutionAuthorityRefusal {
   readonly reason: string;
 }
 
+/**
+ * (P22-H, ADR-0016 D6) The corridor LEG payload on a dispatch command:
+ * the leg's OWN facts (its index/kind/lane, its planned amount, its
+ * destination and — for the onchain leg — its issuer-scoped asset and
+ * deployment plan refs). ADDITIVE and OPTIONAL: the N=1 single-leg
+ * command carries NO leg payload byte-identically; only the composite
+ * dispatch orchestration attaches one, and the authorization artifact's
+ * plan digest covers EVERY leg the plan authorizes.
+ */
+export interface PaymentDispatchLegPayload {
+  /** The leg's index in the presented corridor plan ([0, planLegCount)). */
+  readonly legIndex: number;
+  /** The leg's kind (the pinned corridor skeleton member). */
+  readonly legKind:
+    | "FIAT_PSP_COLLECT"
+    | "PSP_STABLECOIN_ISSUANCE"
+    | "ONCHAIN_TRANSFER"
+    | "OFF_RAMP_PAYOUT";
+  /** The leg's lane (a provider or the corridor chain — the C-lane law). */
+  readonly lane: { readonly kind: "PROVIDER" | "ONCHAIN_CHAIN"; readonly id: string };
+  /** The leg's planned amount (its own currency + exact minor units). */
+  readonly plannedAmount: { readonly currency: string; readonly minorUnits: string };
+  /** The leg's destination (opaque — the lane owns meaning). */
+  readonly destinationRef: string;
+  /** The onchain leg's issuer-scoped asset ref (ONCHAIN legs only). */
+  readonly assetRef?: string;
+  /** The deployment leg's plan refs (sourceHash + bytecodeHash — D4's evidence inputs). */
+  readonly deploy?: { readonly sourceHash: string; readonly bytecodeHash: string };
+}
+
 /** The dispatch command (the complete consequential payload). */
 export interface PaymentDispatchCommand {
   readonly attemptId: string;
@@ -70,6 +100,8 @@ export interface PaymentDispatchCommand {
     readonly attemptId: string;
     readonly providerReferences: readonly string[];
   };
+  /** (P22-H, ADR-0016 D6) Present iff this is one leg of an authorized corridor plan. */
+  readonly leg?: PaymentDispatchLegPayload;
 }
 
 /** The authority's answer: an envelope, or a typed refusal. */
@@ -142,5 +174,82 @@ export function validatePaymentDispatchCommand(
       "INVALID_TRANSITION",
       "a dispatch command executionMode must be SANDBOX or LIVE (INV-25 — no default, no third state)",
     );
+  }
+  // (P22-H, ADR-0016 D6) The optional corridor leg payload: when present,
+  // its OWN facts are validated fail-closed (a malformed leg never
+  // dispatches). The N=1 command without a leg skips this byte-identically.
+  if (command.leg !== undefined) {
+    const leg = command.leg;
+    if (
+      typeof leg.legIndex !== "number" ||
+      !Number.isSafeInteger(leg.legIndex) ||
+      leg.legIndex < 0 ||
+      leg.legIndex > 3
+    ) {
+      throw new PaymentMissionError(
+        "INVALID_TRANSITION",
+        "a corridor leg payload requires a safe integer legIndex in [0, 3] (the pinned skeleton is four legs)",
+      );
+    }
+    if (
+      leg.legKind !== "FIAT_PSP_COLLECT" &&
+      leg.legKind !== "PSP_STABLECOIN_ISSUANCE" &&
+      leg.legKind !== "ONCHAIN_TRANSFER" &&
+      leg.legKind !== "OFF_RAMP_PAYOUT"
+    ) {
+      throw new PaymentMissionError(
+        "INVALID_TRANSITION",
+        "a corridor leg payload legKind must be a pinned skeleton member",
+      );
+    }
+    if (
+      (leg.lane.kind !== "PROVIDER" && leg.lane.kind !== "ONCHAIN_CHAIN") ||
+      typeof leg.lane.id !== "string" ||
+      leg.lane.id.length === 0
+    ) {
+      throw new PaymentMissionError(
+        "INVALID_TRANSITION",
+        "a corridor leg payload requires a lane (PROVIDER or ONCHAIN_CHAIN with a non-empty id)",
+      );
+    }
+    if (
+      typeof leg.plannedAmount.currency !== "string" ||
+      !/^[A-Za-z0-9]{3,12}$/.test(leg.plannedAmount.currency) ||
+      typeof leg.plannedAmount.minorUnits !== "string" ||
+      !/^\d+$/.test(leg.plannedAmount.minorUnits)
+    ) {
+      throw new PaymentMissionError(
+        "INVALID_TRANSITION",
+        "a corridor leg payload requires a planned amount (a 3-letter fiat ISO code or a 3-12 char onchain asset code, and exact decimal minor units)",
+      );
+    }
+    if (typeof leg.destinationRef !== "string" || leg.destinationRef.length === 0) {
+      throw new PaymentMissionError(
+        "INVALID_TRANSITION",
+        "a corridor leg payload requires a non-empty destinationRef",
+      );
+    }
+    if (
+      leg.assetRef !== undefined &&
+      (typeof leg.assetRef !== "string" || leg.assetRef.length === 0)
+    ) {
+      throw new PaymentMissionError(
+        "INVALID_TRANSITION",
+        "a corridor leg payload assetRef must be a non-empty string when present",
+      );
+    }
+    if (leg.deploy !== undefined) {
+      if (
+        typeof leg.deploy.sourceHash !== "string" ||
+        leg.deploy.sourceHash.length === 0 ||
+        typeof leg.deploy.bytecodeHash !== "string" ||
+        leg.deploy.bytecodeHash.length === 0
+      ) {
+        throw new PaymentMissionError(
+          "INVALID_TRANSITION",
+          "a corridor deployment payload requires non-empty sourceHash and bytecodeHash (the D4 evidence inputs)",
+        );
+      }
+    }
   }
 }

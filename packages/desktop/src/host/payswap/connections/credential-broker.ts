@@ -49,7 +49,7 @@ export class DurableCredentialBrokerError extends Error {
 /** What the broker records about one sealed credential (metadata only). */
 export interface SealedCredentialMetadata {
   readonly connectionId: string;
-  readonly credentialKind: "API_KEY";
+  readonly credentialKind: "API_KEY" | "STELLAR_KEYPAIR";
   readonly sealedAt: string;
   /** Number of secret strings sealed (audit surface — never the strings). */
   readonly secretCount: number;
@@ -141,6 +141,65 @@ export class DurableConnectionCredentialBroker {
     } catch {
       // The cause is deliberately not stringified into the error —
       // storage errors can echo fragments of the written payload.
+      throw new DurableCredentialBrokerError(
+        "STORAGE_WRITE_FAILED",
+        `the credential store refused the sealed write for connection ${connectionId}`,
+      );
+    }
+    const handle = `payswap-cred:${connectionId}`;
+    this.#handles.set(handle, metadata);
+    return { credentialHandleRef: handle, sealedSecretCount: metadata.secretCount };
+  }
+
+  /**
+   * Seal ONE Stellar keypair for ONE connection (the P22-H D9 entry
+   * verb's core — the keypair as ONE material {publicKey, secretKey}).
+   * The StrKey shapes are validated by the CALLER (the seal verb)
+   * before this call; the broker persists the sealed envelope and
+   * returns the opaque handle ref. Re-sealing replaces (key rotation).
+   * The escape-scan covers BOTH halves (secretStringsOf collects every
+   * ≥8-char string of the material — the publicKey too: a key-shaped
+   * value in any handle/reference/id remains a security incident).
+   */
+  async sealStellarKeypair(
+    connectionId: string,
+    keypair: { readonly publicKey: string; readonly secretKey: string },
+    now: string,
+  ): Promise<{ credentialHandleRef: string; sealedSecretCount: number }> {
+    if (typeof connectionId !== "string" || connectionId.length === 0) {
+      throw new DurableCredentialBrokerError(
+        "MATERIALIZATION_REFUSED",
+        "sealStellarKeypair requires a non-empty connectionId",
+      );
+    }
+    if (
+      typeof keypair?.publicKey !== "string" ||
+      keypair.publicKey.length === 0 ||
+      typeof keypair?.secretKey !== "string" ||
+      keypair.secretKey.length === 0
+    ) {
+      throw new DurableCredentialBrokerError(
+        "MATERIALIZATION_REFUSED",
+        "sealStellarKeypair requires both keypair halves (the host-side secret field supplied an incomplete keypair)",
+      );
+    }
+    const metadata: SealedCredentialMetadata = {
+      connectionId,
+      credentialKind: "STELLAR_KEYPAIR",
+      sealedAt: now,
+      secretCount: 2,
+    };
+    const payload: SealedPayload = {
+      version: 1,
+      materialJson: JSON.stringify({ publicKey: keypair.publicKey, secretKey: keypair.secretKey }),
+      metadata,
+    };
+    try {
+      await this.#credentialService.save(
+        connectionCredentialStorageKey(connectionId),
+        JSON.stringify(payload),
+      );
+    } catch {
       throw new DurableCredentialBrokerError(
         "STORAGE_WRITE_FAILED",
         `the credential store refused the sealed write for connection ${connectionId}`,

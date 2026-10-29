@@ -174,7 +174,17 @@ export interface PaymentMissionRuntime {
     },
   ): Promise<StoredPaymentPreview>;
   /** Mint a pending authorization request bound to the CURRENT presented preview. */
-  requestAuthorization(missionId: string, now: string): Promise<PaymentAuthorizationRequest>;
+  requestAuthorization(
+    missionId: string,
+    now: string,
+    /**
+     * (P22-H, ADR-0016 D6 — the composite growth) The presented plan's
+     * digest + leg count: when supplied, the approval authorizes the
+     * WHOLE multi-leg plan (the COMPOSITE artifact). OPTIONAL: the N=1
+     * request carries no plan facts byte-identically.
+     */
+    plan?: { readonly planDigest: string; readonly planLegCount: number },
+  ): Promise<PaymentAuthorizationRequest>;
   /** Resolve a request (ONLY a PREVIEW_UI_ACT origin can decide). */
   resolveAuthorization(decision: PaymentAuthorizationDecision, now: string): Promise<AuthorizationResolution>;
   artifact(artifactId: string): Promise<PaymentAuthorizationArtifact | undefined>;
@@ -306,7 +316,7 @@ export function createPaymentMissionRuntime(
     cancelMission: (missionId, now) => lifecycle.cancelMission(missionId, now),
     expireMission: (missionId, now) => lifecycle.expireMission(missionId, now),
     presentPreview: (missionId, env, input) => authorization.presentPreview(missionId, env, input),
-    requestAuthorization: (missionId, now) => authorization.requestAuthorization(missionId, now),
+    requestAuthorization: (missionId, now, plan) => authorization.requestAuthorization(missionId, now, plan),
     resolveAuthorization: (decision, now) => authorization.resolveAuthorization(decision, now),
     artifact: (artifactId) => authorization.artifact(artifactId),
     artifactsForMission: (missionId, now) => authorization.artifactsForMission(missionId, now),

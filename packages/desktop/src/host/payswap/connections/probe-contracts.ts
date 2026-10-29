@@ -31,6 +31,29 @@
 export const PAYSWAP_PROBE_PROVIDER_IDS = ["stripe", "flutterwave", "paystack"] as const;
 export type PaySwapProbeProviderId = (typeof PAYSWAP_PROBE_PROVIDER_IDS)[number];
 
+/**
+ * (P22-H, ADR-0016 D2/D9) The ONCHAIN RAIL provider ref the Stellar
+ * account-read probe addresses — NEVER a member of
+ * PAYSWAP_PROBE_PROVIDER_IDS (the PSP vocabulary stays closed; the
+ * Stellar rail is not a payment provider — ADR-0008 D5).
+ */
+export const PINNED_STELLAR_RAIL_PROVIDER_REF = "stellar:testnet" as const;
+
+/** The provider refs a probe-evidence record may carry (the PSP triple + the onchain rail). */
+export type ConnectionProbeProviderRef = PaySwapProbeProviderId | typeof PINNED_STELLAR_RAIL_PROVIDER_REF;
+
+/** The Stellar account-read probe's operation label (people-facing evidence surface). */
+export const STELLAR_ACCOUNT_READ_PROBED_OPERATION = "stellar.account.read" as const;
+
+/**
+ * The honest Stellar account-read scope note (rendered verbatim on the
+ * outcome — the P22-H D9 law: the probe is the Horizon account read,
+ * read-only; an unfunded account is honestly FAILED, never a fabricated
+ * CONFIRMED position).
+ */
+export const STELLAR_ACCOUNT_READ_HONEST_NOTE =
+  "A Stellar account read proves the keypair's account is readable on the Stellar testnet through Horizon — nothing more. An unfunded account fails honestly (fund it on testnet before it can ground a corridor relay); asset positions observed are testnet facts, never live-funds claims (INV-25; the pubnet plane is not offered in this deployment).";
+
 /** The probe outcome vocabulary (the result-envelope mirror, reused). */
 export const CONNECTION_PROBE_OUTCOME_KINDS = ["CONFIRMED", "UNKNOWN", "FAILED"] as const;
 export type ConnectionProbeOutcomeKind = (typeof CONNECTION_PROBE_OUTCOME_KINDS)[number];
@@ -77,7 +100,11 @@ export const CONNECTION_PROBE_HONEST_NOTES: Readonly<Record<PaySwapProbeProvider
     flutterwave:
       "A Flutterwave probe proves read-only balance access on the connected test account — never a send capability. No Flutterwave send or transfer operation exists in this deployment, so this evidence cannot make any outgoing payment eligible.",
     paystack:
-      "A Paystack probe proves read-only transaction-list access on the connected test account — never a send capability. No Paystack send or transfer operation exists in this deployment.",
+      // P22-H amendment (ADR-0016 D8, disclosed): the payout lane EXISTS
+      // now — the note's old claim "no send or transfer operation exists"
+      // is honestly amended to name the SANDBOX payout grant's derivation
+      // point (the execution kernel at dispatch, never this probe).
+      "A Paystack probe proves read-only transaction-list access on the connected test account — never a send capability by itself. The sealed test key may derive the SANDBOX payout grant at dispatch (the corridor's KES off-ramp lane, ADR-0016 D8) — only through the execution kernel's grant law inside the seal, never from this probe's evidence.",
   });
 
 /** One probed connection's secret-free result (the outcome DTO row). */

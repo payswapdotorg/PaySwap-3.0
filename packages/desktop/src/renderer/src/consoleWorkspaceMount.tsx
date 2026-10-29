@@ -56,6 +56,7 @@ import type {
   PaySwapConnectionStatusViewDto,
   PaySwapConnectionSetupOutcomeDto,
   PaySwapCredentialSealReceiptDto,
+  PaySwapStellarAccountReadOutcomeDto,
 } from "./consoleConnectionsWire.js";
 import type { PaySwapSessionModelCatalogEntryDto } from "./consoleSessionModelWire.js";
 
@@ -101,6 +102,8 @@ export type {
   PaySwapCredentialSealReceiptDto,
   PaySwapConnectionProbeResultDto,
   PaySwapConnectionProbeOutcomeDto,
+  PaySwapStellarAccountReadResultDto,
+  PaySwapStellarAccountReadOutcomeDto,
   PaySwapConnectionStatusViewDto,
   PaySwapConnectionSetupOutcomeDto,
   PaySwapConnectionCapabilityDefinitionDto,
@@ -161,6 +164,12 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   "connectionSubmitFlutterwaveSecretKey",
   "connectionSubmitPaystackSecretKey",
   "connectionRunVerificationProbe",
+  // (P22-H, ADR-0016 D9) The onchain-rail members — the Stellar
+  // keypair-entry verb + the host-side REAL Horizon account-read
+  // probe runner (the same seal/probe laws; the rail is never a PSP
+  // provider — ADR-0008 D5).
+  "connectionSubmitStellarSecretKey",
+  "connectionRunStellarAccountReadProbe",
   // (P21-D Gap A, ADR-0014 D6/D12) The bridge-derived corridor
   // capability chains (the engine's stages 2/3 input; capability
   // metadata only — the honest empty set when nothing is ACTIVE).
@@ -404,6 +413,27 @@ export interface IPaySwapDesktopClientService {
    * operation, per-connection results and the honest scope note.
    */
   connectionRunVerificationProbe(providerId: string): Promise<PaySwapConnectionProbeOutcomeDto>;
+  /**
+   * (P22-H, ADR-0016 D9) The Stellar keypair-entry verb — the ONE
+   * material-carrying path for the onchain rail (the keypair as ONE
+   * material; StrKey shapes enforced fail-closed; sealed immediately;
+   * the connection declares the network stellar:testnet, INV-25).
+   */
+  connectionSubmitStellarSecretKey(input: {
+    readonly connectionId: string;
+    readonly publicKey: string;
+    readonly secretKey: string;
+  }): Promise<PaySwapCredentialSealReceiptDto>;
+  /**
+   * (P22-H, ADR-0016 D9) Run the REAL Stellar account-read probe
+   * HOST-SIDE inside the credential seal over the REAL Horizon testnet
+   * transport; the outcome is recorded through the authority's own
+   * recorder (the ONLY ACTIVE path stays probe-CONFIRMED) and the
+   * answer is secret-free: the rail ref, the probed operation, the
+   * per-connection results (positions observed — never the raw account
+   * address) and the honest scope note.
+   */
+  connectionRunStellarAccountReadProbe(): Promise<PaySwapStellarAccountReadOutcomeDto>;
   /**
    * (P21-D Gap A, ADR-0014 D6/D12) The connection-derived corridor
    * capability chains: the four-layer route chains derived HOST-SIDE

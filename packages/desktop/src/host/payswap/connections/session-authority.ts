@@ -143,6 +143,15 @@ export class ConnectionSessionAuthority {
     return this.#verification.submitPaystackSecretKey(input);
   }
 
+  /** The Stellar keypair-entry verb (P22-H, ADR-0016 D9 — the StrKey shape law). */
+  submitStellarSecretKey(input: {
+    readonly connectionId: string;
+    readonly publicKey: string;
+    readonly secretKey: string;
+  }): Promise<DesktopCredentialSealReceipt> {
+    return this.#verification.submitStellarSecretKey(input);
+  }
+
   /** Record a verification-probe outcome (the ONLY ACTIVE path). */
   recordVerificationOutcome(input: {
     readonly connectionId: string;

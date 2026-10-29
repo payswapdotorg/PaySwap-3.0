@@ -123,11 +123,16 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       "connectionRecordVerificationOutcome",
       "connectionRegistry",
       "connectionRevoke",
+      // (P22-H, ADR-0016 D9) The onchain-rail members — the Stellar
+      // keypair verb + the Horizon account-read probe runner (the same
+      // read/input + seal verbs only; never an authority verb).
+      "connectionRunStellarAccountReadProbe",
       "connectionRunVerificationProbe",
       "connectionSeedSetup",
       "connectionStatuses",
       "connectionSubmitFlutterwaveSecretKey",
       "connectionSubmitPaystackSecretKey",
+      "connectionSubmitStellarSecretKey",
       "connectionSubmitStripeRestrictedKey",
       "delegateMoneyMovement",
       "deploymentFacts",

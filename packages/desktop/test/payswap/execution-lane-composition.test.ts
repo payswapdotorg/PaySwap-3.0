@@ -40,7 +40,7 @@ import {
   registerPaySwapDesktopService,
 } from "../../src/host/payswap/index.js";
 import {
-  createLaneAwareStripeExecutionAuthority,
+  createLaneAwareExecutionAuthority,
 } from "../../src/host/payswap/payments/execution-lane-composition.js";
 import { createPaymentMissionRuntime } from "../../src/host/payswap/payments/payment-mission-runtime.js";
 import { openPaymentMissionStore } from "../../src/host/payswap/payments/payment-mission-store.js";
@@ -318,7 +318,7 @@ describe("the lane-aware execution authority (ADR-0014 D8 — the kernel compose
   it("NO_AUTHORITY_WIRED without an eligible lane: zero connections, and no provider call is made", async () => {
     const world = fakeWorld();
     const { ctx } = await probeWorld(world);
-    const authority = createLaneAwareStripeExecutionAuthority({
+    const authority = createLaneAwareExecutionAuthority({
       connectionAuthority: ctx.authority,
       fetchImpl: world.fetchImpl,
       nowMs: () => 1_000_000,
@@ -352,7 +352,7 @@ describe("the lane-aware execution authority (ADR-0014 D8 — the kernel compose
       connectionId: seeded.connectionId,
       secretKey: FAKE_STRIPE_FULL_KEY,
     });
-    const authority = createLaneAwareStripeExecutionAuthority({
+    const authority = createLaneAwareExecutionAuthority({
       connectionAuthority: ctx.authority,
       fetchImpl: world.fetchImpl,
       nowMs: () => 1_000_000,
@@ -378,7 +378,7 @@ describe("the lane-aware execution authority (ADR-0014 D8 — the kernel compose
       world,
       FAKE_STRIPE_FULL_KEY,
     );
-    const authority = createLaneAwareStripeExecutionAuthority({
+    const authority = createLaneAwareExecutionAuthority({
       connectionAuthority,
       fetchImpl: world.fetchImpl,
       nowMs: () => 1_000_000,
@@ -428,7 +428,7 @@ describe("the lane-aware execution authority (ADR-0014 D8 — the kernel compose
     const outcome = await service.connectionRunVerificationProbe("flutterwave");
     if (outcome.results[0]?.state !== "ACTIVE") throw new Error("the FLW connection did not reach ACTIVE");
 
-    const authority = createLaneAwareStripeExecutionAuthority({
+    const authority = createLaneAwareExecutionAuthority({
       connectionAuthority: ctx.authority,
       fetchImpl: world.fetchImpl,
       nowMs: () => 1_000_000,
@@ -454,7 +454,7 @@ describe("the lane-aware execution authority (ADR-0014 D8 — the kernel compose
       world,
       FAKE_STRIPE_RESTRICTED_KEY,
     );
-    const authority = createLaneAwareStripeExecutionAuthority({
+    const authority = createLaneAwareExecutionAuthority({
       connectionAuthority,
       fetchImpl: world.fetchImpl,
       nowMs: () => 1_000_000,

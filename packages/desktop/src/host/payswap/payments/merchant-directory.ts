@@ -16,7 +16,15 @@
  * destination capture resolves against this directory by EXACT display
  * name; if no merchant matches, the intake ASKS (never invents) — this
  * module only ANSWERS lookups, it never writes captures.
+ *
+ * (P22-H, ADR-0016 D8) The KES RECEIVING GROWTH: the directory's second
+ * entry maps the corridor's KES off-ramp destination onto the Paystack
+ * payout lane — the receiving context carries the pinned payout method
+ * (paystack_kes_bank_transfer, the C lane's pin mirrored by value —
+ * never imported; the layer law).
  */
+
+import { PINNED_CORRIDOR_KES_OFFRAMP_PAYOUT_METHOD } from "../connections/onchain-rail-pins.js";
 
 /** The directory's evidence tier (the label law — never a provider observation). */
 export const MERCHANT_DIRECTORY_EVIDENCE_TIER = "TEST_DATA" as const;
@@ -30,16 +38,21 @@ export interface MerchantDirectoryEntry {
   readonly evidenceTier: typeof MERCHANT_DIRECTORY_EVIDENCE_TIER;
   /** The merchant's receiving context (which rail the merchant receives on). */
   readonly receivingContext: {
-    readonly providerId: "stripe";
+    /** (P22-H, ADR-0016 D8) Stripe or the Paystack KES off-ramp lane. */
+    readonly providerId: "stripe" | "paystack";
     /** The receiving currency (the test corridor's destination currency). */
     readonly receivingCurrency: string;
+    /** (P22-H, D8) The corridor payout method pin (the KES bank-transfer lane). */
+    readonly payoutMethod?: typeof PINNED_CORRIDOR_KES_OFFRAMP_PAYOUT_METHOD;
     readonly summary: string;
   };
 }
 
 /**
- * The directory (frozen): one entry this wave — Merchant X, the
- * Stripe-only test merchant of the operator's ordered journey.
+ * The directory (frozen): the P21 Stripe-only test merchant + the P22-H
+ * KES receiving merchant (the corridor's off-ramp destination — the
+ * paystack_kes_bank_transfer lane, ADR-0016 D8 + the C lane's pinned
+ * method, mirrored by value).
  */
 const MERCHANT_DIRECTORY: readonly MerchantDirectoryEntry[] = Object.freeze([
   Object.freeze({
@@ -51,6 +64,18 @@ const MERCHANT_DIRECTORY: readonly MerchantDirectoryEntry[] = Object.freeze([
       receivingCurrency: "USD",
       summary:
         "Merchant X receives on a Stripe test-mode account (labeled TEST_DATA — a declared directory fixture, not a provider observation). The receiving context maps onto the connected Stripe test account; merchant acceptance facts come only from this directory.",
+    }),
+  }),
+  Object.freeze({
+    merchantId: "merchant:kes-paystack-test",
+    displayName: "Merchant Y (Paystack KES bank-transfer test)",
+    evidenceTier: MERCHANT_DIRECTORY_EVIDENCE_TIER,
+    receivingContext: Object.freeze({
+      providerId: "paystack" as const,
+      receivingCurrency: "KES",
+      payoutMethod: PINNED_CORRIDOR_KES_OFFRAMP_PAYOUT_METHOD,
+      summary:
+        "Merchant Y receives KES bank transfers through the Paystack test-mode payout lane (labeled TEST_DATA — a declared directory fixture, not a provider observation; the paystack_kes_bank_transfer method pin mirrors the merchant package's KES receiving context). The receiving context maps onto the connected Paystack test account at bridge time; merchant acceptance facts come only from this directory.",
     }),
   }),
 ]);

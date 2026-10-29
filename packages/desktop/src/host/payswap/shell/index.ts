@@ -92,10 +92,10 @@ export {
   type DeclaredTestCorridorInput,
 } from "../connections/gate-environment.js";
 export {
-  createLaneAwareStripeExecutionAuthority,
+  createLaneAwareExecutionAuthority,
   createLaneAwareStripeReadBack,
   LANE_NOT_WIRED_REASON_PREFIX,
-  type LaneAwareStripeExecutionAuthorityOptions,
+  type LaneAwareExecutionAuthorityOptions,
   type LaneAwareConnectionSeam,
 } from "../payments/execution-lane-composition.js";
 // (P21-A, ADR-0014 D6) The labeled TEST_DATA merchant directory.

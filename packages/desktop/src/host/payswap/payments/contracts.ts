@@ -292,6 +292,14 @@ export interface PaymentAttemptRecord {
   readonly connectionRef: string;
   /** INV-25: every attempt record is branded with its execution mode. */
   readonly executionMode: PaymentExecutionMode;
+  /**
+   * (P22-H, ADR-0016 D6 — the composite growth) Present iff this attempt
+   * is ONE LEG of an authorized corridor plan: the leg's index in the
+   * presented plan (the idempotency key embeds it; the custody-continuity
+   * law projects the per-leg outcome vector from it). ADDITIVE: the N=1
+   * attempt carries no legIndex byte-identically.
+   */
+  readonly legIndex?: number;
   readonly authorizationArtifactId: string;
   readonly startedAt: string;
   /** Present once the authority answered; the envelope is never mutated. */

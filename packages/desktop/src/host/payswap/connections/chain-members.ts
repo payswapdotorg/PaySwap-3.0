@@ -27,6 +27,7 @@ import type { ConnectionSessionAuthority } from "./session-authority.js";
 import type { ProbeEvidenceStore } from "./probe-evidence.js";
 import { deriveConnectionCapabilityBridge } from "./capability-bridge.js";
 import { chainsFromBridge, type ConnectionCapabilityRouteChain } from "./chain-from-bridge.js";
+import { onchainsFromPlanes } from "./onchain-chain-derivation.js";
 import type { IPaySwapDesktopService } from "../shell/contracts.js";
 import { ConnectionPlaneNotConfiguredError } from "../shell/plane-errors.js";
 
@@ -75,12 +76,20 @@ export function createConnectionCapabilityChainChannelMembers(
         deps.resolveAuthority().connectionStatuses(),
         deps.resolveEvidenceStore().latestProbeEvidence(),
       ]);
-      const chains = chainsFromBridge(
+      // (P22-H, ADR-0016 D2/D5) The PSP bridge chains + the ONCHAIN RAIL
+      // chains: the corridor's relay chain derives from the onchain
+      // plane's own four-layer hierarchy (never a PSP probe id —
+      // ADR-0008 D5 preserved); the two derivations are DISJOINT by
+      // construction (the bridge skips the rail's provider ref; the
+      // onchain derivation skips the PSP records).
+      const bridgeChains = chainsFromBridge(
         deriveConnectionCapabilityBridge({ statuses, evidence }),
       );
+      const onchainChains = onchainsFromPlanes({ statuses, evidence });
+      const chains = Object.freeze([...bridgeChains, ...onchainChains]);
       deps.log(
         "info",
-        `payswap-desktop: ${String(chains.length)} connection capability chain(s) derived from the connection bridge (capability metadata only — no credentials, no secret material, no authorization artifacts)`,
+        `payswap-desktop: ${String(chains.length)} connection capability chain(s) derived (${String(bridgeChains.length)} PSP bridge + ${String(onchainChains.length)} onchain rail — capability metadata only — no credentials, no secret material, no authorization artifacts)`,
       );
       return chains;
     },

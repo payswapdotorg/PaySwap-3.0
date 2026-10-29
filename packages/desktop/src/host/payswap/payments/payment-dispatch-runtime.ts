@@ -36,7 +36,15 @@ import {
 import type { PaymentMissionCore } from "./payment-mission-runtime.js";
 import { projectAttemptVerification } from "./attempt-verification.js";
 import type { StripeReadBackPort } from "./stripe-read-back.js";
-import { compiledIntentDigest, confirmedCreateAttempt, missionHasUnresolvedAttempt, planInterruptionRecovery, type InterruptionRecoveryItem } from "./mission-execution.js";
+import {
+  compiledIntentDigest,
+  confirmedCreateAttempt,
+  corridorLegDispatchPermitted,
+  corridorLegOutcomes,
+  missionHasUnresolvedAttempt,
+  planInterruptionRecovery,
+  type InterruptionRecoveryItem,
+} from "./mission-execution.js";
 import {
   PAYMENT_OPERATION_SCOPES,
   beginIdempotency,
@@ -47,7 +55,7 @@ import {
   paymentIdempotencyRecordScopeKey,
   type PaymentIdempotencyRecord,
 } from "./idempotency.js";
-import type { ExecutionAuthorityRefusal } from "./execution-authority.js";
+import type { ExecutionAuthorityRefusal, PaymentDispatchLegPayload } from "./execution-authority.js";
 import { validatePaymentDispatchCommand } from "./execution-authority.js";
 
 /** What a dispatch consumes (the user-approved key + the wiring facts). */
@@ -57,6 +65,21 @@ export interface PaymentDispatchInput {
   readonly connectionRef: string;
   /** INV-25: the mode this dispatch runs under (SANDBOX or LIVE). */
   readonly executionMode: PaymentExecutionMode;
+  /**
+   * (P22-H, ADR-0016 D6 — the composite growth) Present iff this dispatch
+   * is ONE LEG of an authorized corridor plan: the leg's index (the
+   * per-leg idempotency key + the custody-continuity gate key) and the
+   * leg's OWN facts (the kernel's lane payload). ADDITIVE + OPTIONAL:
+   * the N=1 dispatch carries neither byte-identically.
+   */
+  readonly legIndex?: number;
+  readonly leg?: PaymentDispatchLegPayload;
+  /**
+   * (P22-H, D6) The digest of the plan this leg belongs to (computed by
+   * the corridor orchestration over EVERY leg) — must equal the COMPOSITE
+   * artifact's planDigest (a leg of a different plan is a typed mismatch).
+   */
+  readonly planDigest?: string;
 }
 
 /** The typed dispatch outcome. */
@@ -222,8 +245,31 @@ export function createPaymentDispatchSlice(core: PaymentMissionCore): PaymentDis
           );
         }
 
+        // (P22-H, ADR-0016 D6 — the composite growth) THE CUSTODY-
+        // CONTINUITY GATE: a corridor leg dispatch first projects the
+        // mission's per-leg outcome vector and refuses typed when any
+        // EARLIER leg is not exactly CONFIRMED (UNKNOWN blocks pending
+        // reconciliation; FAILED blocks with the chain stopped honestly;
+        // UNRECORDED blocks — legs never silently skip). Leg 0 has no
+        // prior leg — the gate passes byte-identically for the N=1 path
+        // (no legIndex at all skips this whole block).
+        if (input.legIndex !== undefined) {
+          const priorOutcomes = corridorLegOutcomes(mission0, input.legIndex + 1);
+          const verdict = corridorLegDispatchPermitted(input.legIndex, priorOutcomes);
+          if (!verdict.permitted) {
+            throw new PaymentMissionError("CORRIDOR_LEG_BLOCKED", verdict.reason, {
+              missionId,
+              reasons: [`legIndex:${String(input.legIndex)}`],
+            });
+          }
+        }
+
         // The artifact law: single-use, bound to THIS mission, the
         // CURRENT presented preview and the compiled intent digest.
+        // (P22-H, D6) A corridor leg dispatch consumes the COMPOSITE
+        // artifact's leg SHARE (the leg domain + the per-leg single-use
+        // law live in the gate's consumeArtifact); the N=1 path consumes
+        // exactly as before.
         const digest = compiledIntentDigest(mission0.intent);
         const artifact = core.getGate().artifact(input.authorizationArtifactId);
         if (artifact === undefined) {
@@ -247,9 +293,39 @@ export function createPaymentDispatchSlice(core: PaymentMissionCore): PaymentDis
             { missionId },
           );
         }
+        if (input.legIndex !== undefined) {
+          // THE COMPOSITE BINDING: a leg dispatch requires the COMPOSITE
+          // artifact over the presented plan — a leg dispatch against an
+          // N=1 artifact is a typed mismatch (the D7 no-bypass law), and
+          // the dispatched plan's digest must EQUAL the artifact's (a
+          // leg of a different plan is never a dispatch).
+          if (artifact.planDigest === undefined || artifact.planLegCount === undefined) {
+            throw new PaymentMissionError(
+              "AUTHORIZATION_MISMATCH",
+              `Authorization artifact '${input.authorizationArtifactId}' is not a composite multi-leg artifact — a corridor leg dispatch requires the two-act approval over the presented plan (never a single-leg artifact)`,
+              { missionId },
+            );
+          }
+          if (input.planDigest === undefined || input.planDigest !== artifact.planDigest) {
+            throw new PaymentMissionError(
+              "AUTHORIZATION_MISMATCH",
+              `The dispatched corridor plan's digest does not match the authorized artifact's plan digest — a leg outside the authorized plan is never a dispatch (the artifact's digest covers every leg of the approved plan)`,
+              { missionId },
+            );
+          }
+          if (input.legIndex >= artifact.planLegCount) {
+            throw new PaymentMissionError(
+              "AUTHORIZATION_MISMATCH",
+              `Corridor leg ${String(input.legIndex)} is outside the authorized plan (${String(artifact.planLegCount)} legs) — a leg outside the authorized plan is never a dispatch`,
+              { missionId },
+            );
+          }
+        }
 
         // The idempotency decision (pure, over the persisted records).
-        const idempotencyKey = paymentIdempotencyKey(missionId, operation, digest);
+        // (P22-H, D6) A corridor leg's key embeds its legIndex —
+        // (mission, operation, legIndex, intentDigest), the appendix law.
+        const idempotencyKey = paymentIdempotencyKey(missionId, operation, digest, input.legIndex);
         const hashPayload = {
           operation,
           intent: mission0.intent,
@@ -283,7 +359,7 @@ export function createPaymentDispatchSlice(core: PaymentMissionCore): PaymentDis
             );
           }
           const gateBefore = core.getGate().exportState();
-          const consumed = core.getGate().consumeArtifact(input.authorizationArtifactId, now);
+          const consumed = core.getGate().consumeArtifact(input.authorizationArtifactId, now, input.legIndex);
           try {
             await store.commit((state) => {
               const mission = core.requireMission(state, missionId);
@@ -325,7 +401,7 @@ export function createPaymentDispatchSlice(core: PaymentMissionCore): PaymentDis
         const commandId = `pmt-cmd:${mintRandom()}`;
         const correlationId = `pmt-corr:${mintRandom()}`;
         const gateBefore = core.getGate().exportState();
-        core.getGate().consumeArtifact(input.authorizationArtifactId, now);
+        core.getGate().consumeArtifact(input.authorizationArtifactId, now, input.legIndex);
         if (begin.mutation === undefined) {
           throw new PaymentMissionError("IDEMPOTENCY_CONFLICT", "the idempotency begin produced no mutation");
         }
@@ -342,6 +418,9 @@ export function createPaymentDispatchSlice(core: PaymentMissionCore): PaymentDis
           ...(reversalTarget !== undefined
             ? { reversalOf: { attemptId: reversalTarget.attemptId, providerReferences: reversalTarget.envelope?.providerReferences ?? [] } }
             : {}),
+          // (P22-H, ADR-0016 D6) the corridor leg payload rides the
+          // command (the kernel's lane facts); absent for the N=1 path.
+          ...(input.leg !== undefined ? { leg: input.leg } : {}),
         } as const;
         validatePaymentDispatchCommand(command);
         try {
@@ -360,6 +439,9 @@ export function createPaymentDispatchSlice(core: PaymentMissionCore): PaymentDis
                   correlationId,
                   connectionRef: input.connectionRef,
                   executionMode: input.executionMode,
+                  // (P22-H, D6) the leg attempt carries its legIndex (the
+                  // custody-continuity projection's key); absent for N=1.
+                  ...(input.legIndex !== undefined ? { legIndex: input.legIndex } : {}),
                   authorizationArtifactId: input.authorizationArtifactId,
                   startedAt: now,
                 },
@@ -435,8 +517,24 @@ export function createPaymentDispatchSlice(core: PaymentMissionCore): PaymentDis
               providerReferences: envelope.providerReferences,
               now: toEpochMs(now, "now"),
             });
+            // (P22-H, ADR-0016 D6) THE COMPOSITE COMPLETION LAW: a
+            // corridor leg's confirmation completes the mission ONLY
+            // when EVERY leg of the authorized plan is CONFIRMED (the
+            // per-leg outcome vector projected after this attempt
+            // lands); the N=1 path completes exactly as before.
+            let nextStatus = operation === "CREATE_EXTERNAL_EFFECT" ? "COMPLETED" : mission.status;
+            if (input.legIndex !== undefined && artifact.planLegCount !== undefined) {
+              const legCount = artifact.planLegCount;
+              const projected = corridorLegOutcomes(
+                { ...mission, attempts },
+                legCount,
+              );
+              nextStatus = projected.every((outcome) => outcome === "CONFIRMED")
+                ? "COMPLETED"
+                : mission.status;
+            }
             missionNext = core.appendEvent(
-              { ...missionNext, attempts, status: operation === "CREATE_EXTERNAL_EFFECT" ? "COMPLETED" : mission.status },
+              { ...missionNext, attempts, status: nextStatus },
               "ATTEMPT_CONFIRMED",
               operation === "CREATE_EXTERNAL_EFFECT"
                 ? `Effect CONFIRMED by the execution authority (provider references: ${envelope.providerReferences.join(", ") || "none acknowledged"}). The mission is complete — an acknowledgement is not finality; the recorded envelope is the evidence.`

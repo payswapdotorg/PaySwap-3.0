@@ -286,6 +286,37 @@ export interface IPaySwapDesktopService extends IPaySwapDesktopPaymentMissionMem
   }): Promise<import("../connections/contracts.js").DesktopCredentialSealReceipt>;
 
   /**
+   * (P22-H, ADR-0016 D9) The Stellar keypair-entry verb — the ONE
+   * material-carrying path for the onchain rail: the keypair as ONE
+   * material {publicKey G…, secretKey S…} (StrKey shapes enforced
+   * fail-closed; sealed immediately as ONE material; the connection
+   * declares the network stellar:testnet; a pubnet-shaped execution
+   * target is never offered, INV-25). Never called by the
+   * composer/agent plane — the chat law.
+   */
+  connectionSubmitStellarSecretKey(input: {
+    readonly connectionId: string;
+    readonly publicKey: string;
+    readonly secretKey: string;
+  }): Promise<import("../connections/contracts.js").DesktopCredentialSealReceipt>;
+
+  /**
+   * (P22-H, ADR-0016 D9) Run the REAL Stellar account-read probe
+   * HOST-SIDE inside the credential seal over the REAL Horizon testnet
+   * transport, and record the outcome through the authority's own
+   * recordVerificationOutcome (the ONLY ACTIVE path stays
+   * probe-CONFIRMED). The probe addresses the stellar:testnet
+   * connections only — never a PSP provider id (ADR-0008 D5). The
+   * outcome is secret-free: the account ref, the issuer-scoped asset
+   * positions observed, per-connection results and the honest scope
+   * note (an unfunded account fails honestly — never a fabricated
+   * CONFIRMED position).
+   */
+  connectionRunStellarAccountReadProbe(): Promise<
+    import("../connections/stellar-members.js").StellarAccountReadOutcomeDto
+  >;
+
+  /**
    * (P21-A, ADR-0014 D5 — THE CALLER-TRUST FIX) Run the REAL
    * verification probe HOST-SIDE inside the credential seal over the
    * real HTTPS transport, and record the outcome through the

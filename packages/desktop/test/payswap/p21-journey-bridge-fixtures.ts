@@ -34,7 +34,7 @@ import {
   createPaymentMissionRuntime,
   type PaymentMissionRuntime,
 } from "../../src/host/payswap/payments/payment-mission-runtime.js";
-import { createLaneAwareStripeExecutionAuthority } from "../../src/host/payswap/payments/execution-lane-composition.js";
+import { createLaneAwareExecutionAuthority } from "../../src/host/payswap/payments/execution-lane-composition.js";
 import { deriveConnectionCapabilityBridge } from "../../src/host/payswap/connections/capability-bridge.js";
 import type { BridgeDerivation } from "../../src/host/payswap/connections/capability-bridge.js";
 export { BRIDGE_PROVIDER_OBSERVATION_TIER } from "../../src/host/payswap/connections/capability-bridge.js";
@@ -170,7 +170,7 @@ export async function composeJourneyService(
   });
   const runtime = createPaymentMissionRuntime({
     store,
-    executionAuthority: createLaneAwareStripeExecutionAuthority({
+    executionAuthority: createLaneAwareExecutionAuthority({
       connectionAuthority: authority,
       fetchImpl: world.fetchImpl,
       nowMs: () => NOW_MS,

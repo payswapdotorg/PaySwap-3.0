@@ -33,7 +33,11 @@
  */
 
 import type { DesktopConnectionStatusView } from "./contracts.js";
-import type { ConnectionProbeKeyClass, PaySwapProbeProviderId } from "./probe-contracts.js";
+import type {
+  ConnectionProbeKeyClass,
+  PaySwapProbeProviderId,
+  PINNED_STELLAR_RAIL_PROVIDER_REF,
+} from "./probe-contracts.js";
 import type { ProbeEvidenceRecord } from "./probe-evidence.js";
 import {
   listMerchantDirectoryEntries,
@@ -89,7 +93,8 @@ export interface BridgeConnectedInstance {
   readonly credentialScope: {
     /** The OPAQUE connection reference — never credential material (INV-19). */
     readonly credentialRef: string;
-    readonly credentialKind: "API_KEY";
+    /** (P22-H, ADR-0016 D9) The API keys or the Stellar keypair — both opaque. */
+    readonly credentialKind: "API_KEY" | "STELLAR_KEYPAIR";
   };
   readonly geography: { readonly countries: readonly string[] };
   readonly currencies: readonly string[];
@@ -102,7 +107,8 @@ export interface BridgeConnectedInstance {
   readonly configuration: Readonly<Record<string, string | number | boolean>>;
   // ---- the bridge's own evidence fields ----
   readonly connectionRef: string;
-  readonly providerId: PaySwapProbeProviderId;
+  /** (P22-H, ADR-0016 D2/D9) The PSP triple or the onchain rail's chain key. */
+  readonly providerId: PaySwapProbeProviderId | typeof PINNED_STELLAR_RAIL_PROVIDER_REF;
   readonly evidenceTier: typeof BRIDGE_PROVIDER_OBSERVATION_TIER;
   /** The provider-referenced account refs (the Stripe account id; the FLW currency wallets). */
   readonly accountRefs: readonly string[];
@@ -321,22 +327,47 @@ export function deriveConnectionCapabilityBridge(input: {
         );
       }
     }
+    // (P22-H, ADR-0016 D8) The PAYSTACK FUNDING FOLD — honest about what
+    // the probe derives: the transactions prove the account TRANSACTS in
+    // these currencies, so each observed currency grounds a funding
+    // LOCATION (the account as a place funds flow through) — NEVER a
+    // balance claim (balances are not part of the Paystack read
+    // surface; the display name says exactly what was observed).
+    if (providerId === "paystack") {
+      for (const currency of record.balanceCurrencies) {
+        fundingSources.push(
+          Object.freeze({
+            locationRef: `${status.connectionId}:transactions:${currency}`,
+            currency,
+            observationRef: `probe:${status.connectionId}:${currency}`,
+            displayName: `Paystack test account (transaction-observed ${currency})`,
+          }),
+        );
+      }
+    }
   }
 
   // The merchant-directory destinations (TEST_DATA tier — the tiers
   // never mix: the provenance is the DIRECTORY ref, never a probe ref).
+  // (P22-H, ADR-0016 D8) The rail ref law: the Paystack read surface
+  // carries no account id — its destination rail ref is the CONNECTION
+  // reference (the honest ref the registry owns), while the Stripe rail
+  // keeps its account ref exactly as before.
   const destinations: ObservedDestination[] = [];
   for (const entry of listMerchantDirectoryEntries()) {
     const rail = instances.find(
       (instance) =>
-        instance.providerId === entry.receivingContext.providerId && instance.accountRef !== "",
+        instance.providerId === entry.receivingContext.providerId &&
+        (entry.receivingContext.providerId === "stripe" ? instance.accountRef !== "" : true),
     );
     if (rail === undefined) {
       continue;
     }
+    const railRef =
+      rail.accountRef !== "" ? rail.accountRef : rail.connectionRef;
     destinations.push(
       Object.freeze({
-        locationRef: `${entry.merchantId}@${rail.accountRef}`,
+        locationRef: `${entry.merchantId}@${railRef}`,
         currency: entry.receivingContext.receivingCurrency,
         observationRef: `merchant-directory:${entry.merchantId}`,
         displayName: entry.displayName,

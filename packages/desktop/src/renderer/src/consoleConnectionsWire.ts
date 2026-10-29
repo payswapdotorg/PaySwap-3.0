@@ -65,6 +65,36 @@ export interface PaySwapConnectionProbeOutcomeDto {
   readonly note: string;
 }
 
+/**
+ * (P22-H, ADR-0016 D9) One probed Stellar connection's secret-free
+ * result (mirrors StellarAccountReadResultDto — the positions observed,
+ * never the raw account address).
+ */
+export interface PaySwapStellarAccountReadResultDto {
+  readonly connectionId: string;
+  readonly outcome: PaySwapConnectionProbeOutcome;
+  /** The issuer-scoped asset refs observed (the raw G… address never appears). */
+  readonly providerReferences: readonly string[];
+  /** The connection state AFTER the outcome was recorded through the authority. */
+  readonly state: string;
+  /** People-language summary (no envelope internals, no key material). */
+  readonly summary: string;
+  /** Present iff FAILED — the failure code, never verbatim provider text. */
+  readonly failureCode?: string;
+}
+
+/**
+ * (P22-H, ADR-0016 D9) The secret-free outcome of one Stellar
+ * account-read probe run (mirrors StellarAccountReadOutcomeDto).
+ */
+export interface PaySwapStellarAccountReadOutcomeDto {
+  readonly providerRef: "stellar:testnet";
+  readonly probedOperation: "stellar.account.read";
+  readonly results: readonly PaySwapStellarAccountReadResultDto[];
+  readonly evidenceTier: PaySwapConnectionProbeEvidenceTier;
+  readonly note: string;
+}
+
 /** One connection's status view (mirrors DesktopConnectionStatusView — the fields the renderer consumes). */
 export interface PaySwapConnectionStatusViewDto {
   readonly connectionId: string;

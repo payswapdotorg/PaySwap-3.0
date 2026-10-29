@@ -27,6 +27,10 @@
     "test/payswap/attempt-verification.test.ts",
     "test/payswap/payment-verify-plane.test.ts",
     "test/payswap/payment-verify-plane-fixtures.ts",
-    "test/payswap/product-connection-composition.test.ts"
+    "test/payswap/product-connection-composition.test.ts",
+    "test/payswap/connections-stellar-plane.test.ts",
+    "test/payswap/payment-corridor-kernels.test.ts",
+    "test/payswap/payment-corridor-dispatch.test.ts",
+    "test/payswap/onchain-corridor-chain.test.ts"
   ]
 }

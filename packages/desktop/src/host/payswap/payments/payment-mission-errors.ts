@@ -39,7 +39,17 @@ export type PaymentMissionErrorKind =
    * authoritative read-back itself was ambiguous / disagreed with the
    * recorded confirmation. ONE kind, many honest reasons in the message.
    */
-  | "VERIFICATION_REFUSED";
+  | "VERIFICATION_REFUSED"
+  /**
+   * (P22-H, ADR-0016 D6 — the composite growth) The corridor
+   * custody-continuity law's typed refusal: a later leg NEVER dispatches
+   * after an earlier leg's non-CONFIRMED outcome (UNKNOWN blocks with
+   * the per-leg attempt pending reconciliation; FAILED blocks with the
+   * chain stopped honestly; UNRECORDED blocks — legs never silently
+   * skip). The message names the FIRST blocking leg, never a vague
+   * refusal (the C-lane corridor-leg-laws mirror).
+   */
+  | "CORRIDOR_LEG_BLOCKED";
 
 /** The one typed error family of the payment-mission runtime. */
 export class PaymentMissionError extends Error {

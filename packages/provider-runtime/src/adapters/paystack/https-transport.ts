@@ -1,6 +1,6 @@
 /**
  * @payswap/provider-runtime — the REAL Paystack HTTPS transport (P14-C,
- * ADR-0008 D5).
+ * ADR-0008 D5; the endpoint map GROWN by P22-H, ADR-0016 D8).
  *
  * The transport.ts law: NO SDK, no ambient fetch in unit-testable paths —
  * the fetch binding is INJECTED at the composition edge. transportClass
@@ -9,6 +9,12 @@
  *
  * Endpoint mapping (Paystack's public REST surface, api.paystack.co):
  * - 'paystack.transactions.read' → GET /transaction
+ * - 'paystack.transfer.initiate' → POST /transfer (the D8 payout lane)
+ * - 'paystack.transfer.finalize' → POST /transfer/finalize_transfer
+ * - 'paystack.transfer.verify' → GET /transfer/{id} (path-parameter)
+ * The GET-only law of the P14-C slice is RELAXED by ADR-0016 D8 to the
+ * operation-endpoint map: each operation carries its own method; the
+ * read surface stays GET, the transfer surface POSTs a JSON body.
  * Unknown operation ids are REFUSED BEFORE DISPATCH (fail-closed).
  *
  * SECRETS: the Authorization header (the sealed key) exists only inside
@@ -36,8 +42,9 @@ export interface PaystackFetchResponse {
 export type PaystackFetch = (
   url: string,
   init: {
-    readonly method: 'GET';
+    readonly method: 'GET' | 'POST';
     readonly headers: Readonly<Record<string, string>>;
+    readonly body?: string;
     readonly signal?: AbortSignal;
   },
 ) => Promise<PaystackFetchResponse>;
@@ -53,9 +60,20 @@ export interface PaystackHttpsTransportOptions {
 
 const DEFAULT_TIMEOUT_MS = 15_000;
 
+/** One endpoint of the operation → endpoint mapping. */
+export interface PaystackEndpointSpec {
+  readonly method: 'GET' | 'POST';
+  readonly path: string;
+  /** When set, this params key is embedded as a PATH SEGMENT (not a query field). */
+  readonly pathParam?: string;
+}
+
 /** The operation → endpoint mapping (frozen evidence surface). */
-const OPERATION_ENDPOINTS: ReadonlyMap<string, { method: 'GET'; path: string }> = new Map([
+export const PAYSTACK_OPERATION_ENDPOINTS: ReadonlyMap<string, PaystackEndpointSpec> = new Map([
   ['paystack.transactions.read', { method: 'GET', path: '/transaction' }],
+  ['paystack.transfer.initiate', { method: 'POST', path: '/transfer' }],
+  ['paystack.transfer.finalize', { method: 'POST', path: '/transfer/finalize_transfer' }],
+  ['paystack.transfer.verify', { method: 'GET', path: '/transfer', pathParam: 'id' }],
 ]);
 
 function isAbortLikeError(error: unknown): boolean {
@@ -116,7 +134,7 @@ export class PaystackHttpsTransport implements ProviderTransport {
     if (call === null || typeof call !== 'object') {
       throw new ValidationError('a ProviderTransportCall object is required');
     }
-    const endpoint = OPERATION_ENDPOINTS.get(call.operationId);
+    const endpoint = PAYSTACK_OPERATION_ENDPOINTS.get(call.operationId);
     if (endpoint === undefined) {
       // Fail-closed: unknown operations NEVER reach the wire.
       return undeliveredResponse(
@@ -127,15 +145,41 @@ export class PaystackHttpsTransport implements ProviderTransport {
     if (typeof call.params !== 'object' || call.params === null || Array.isArray(call.params)) {
       throw new ValidationError('transport call params must be a plain record');
     }
-    const url = `${this.#baseUrl}${endpoint.path}${queryStringOf(call.params)}`;
+    // The path-parameter law (the transfer verify's real endpoint shape):
+    // the named params key is embedded as ONE path segment — validated
+    // non-empty and slash-free, never string-concatenated unescaped.
+    let pathSegment = '';
+    const queryParams: Record<string, unknown> = { ...call.params };
+    if (endpoint.pathParam !== undefined) {
+      const raw = (call.params as Record<string, unknown>)[endpoint.pathParam];
+      if (typeof raw !== 'string' || raw.length === 0 || raw.includes('/')) {
+        return undeliveredResponse(
+          'REFUSED_BEFORE_DISPATCH',
+          `the '${call.operationId}' operation requires a non-empty slash-free '${endpoint.pathParam}' path parameter`,
+        );
+      }
+      pathSegment = `/${encodeURIComponent(raw)}`;
+      delete queryParams[endpoint.pathParam];
+    }
+    const url =
+      endpoint.method === 'GET'
+        ? `${this.#baseUrl}${endpoint.path}${pathSegment}${queryStringOf(queryParams)}`
+        : `${this.#baseUrl}${endpoint.path}${pathSegment}`;
     // The caller's headers spread verbatim (the sealed Bearer key exists
-    // only inside the caller's frame); nothing here logs.
+    // only inside the caller's frame); nothing here logs. A POST carries
+    // the JSON-encoded params as the request body.
     const headers: Record<string, string> = { ...call.headers };
+    let requestBody: string | undefined;
+    if (endpoint.method === 'POST') {
+      headers['Content-Type'] = 'application/json';
+      requestBody = JSON.stringify(queryParams);
+    }
     let response: PaystackFetchResponse;
     try {
       response = await this.#fetchImpl(url, {
         method: endpoint.method,
         headers,
+        ...(requestBody !== undefined ? { body: requestBody } : {}),
         signal: AbortSignal.timeout(this.#timeoutMs),
       });
     } catch (error) {

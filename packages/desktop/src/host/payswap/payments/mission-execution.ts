@@ -118,3 +118,91 @@ export function planInterruptionRecovery(
 export function missionHasUnresolvedAttempt(mission: PaymentMissionRecord): boolean {
   return mission.attempts.some((attempt) => attemptIsUnresolved(attempt));
 }
+
+// ---------------------------------------------------------------------------
+// (P22-H, ADR-0016 D6) The corridor leg-outcome projection — the pure
+// input of the custody-continuity law (the C-lane corridor-leg-laws
+// mirror, pinned by value in onchain-rail-pins.js).
+// ---------------------------------------------------------------------------
+
+/** One corridor leg's recorded outcome (or undefined = UNRECORDED). */
+export type CorridorLegOutcomeProjection = "CONFIRMED" | "UNKNOWN" | "FAILED" | undefined;
+
+/**
+ * Project the index-aligned per-leg outcome vector of a mission's
+ * corridor attempts (pure, deterministic): for each legIndex in
+ * [0, legCount), the LAST attempt of that leg carrying a definitive
+ * answer (an envelope outcome, or a reconciliation's resolvedTo —
+ * reconciliation wins as the later evidence); a leg with only refused
+ * attempts (or no attempt at all) is UNRECORDED (undefined) — a refused
+ * attempt is definitively no-effect, never a passed leg.
+ */
+export function corridorLegOutcomes(
+  mission: PaymentMissionRecord,
+  legCount: number,
+): readonly CorridorLegOutcomeProjection[] {
+  const outcomes: CorridorLegOutcomeProjection[] = new Array<CorridorLegOutcomeProjection>(legCount).fill(undefined);
+  for (const attempt of mission.attempts) {
+    if (attempt.legIndex === undefined) {
+      continue; // the N=1 attempts are not corridor legs
+    }
+    if (attempt.legIndex < 0 || attempt.legIndex >= legCount) {
+      continue; // outside the projected domain (the dispatch law refused it already)
+    }
+    let outcome: CorridorLegOutcomeProjection;
+    if (attempt.reconciliation !== undefined) {
+      outcome = attempt.reconciliation.resolvedTo;
+    } else if (attempt.envelope !== undefined) {
+      outcome = attempt.envelope.outcome;
+    } else {
+      outcome = undefined; // refused or never answered — not a passed leg
+    }
+    // Later attempts of the same leg overwrite earlier ones ONLY when
+    // they carry a definitive answer; a later refusal does not erase a
+    // recorded outcome (append-only evidence).
+    if (outcome !== undefined) {
+      outcomes[attempt.legIndex] = outcome;
+    }
+  }
+  return Object.freeze(outcomes);
+}
+
+/**
+ * THE CUSTODY-CONTINUITY DISPATCH VERDICT (D6, the C-lane
+ * corridor-leg-laws mirror, pinned by value): may leg `legIndex`
+ * dispatch given the index-aligned recorded outcomes of every EARLIER
+ * leg? A later leg dispatches ONLY when every earlier leg's outcome is
+ * exactly CONFIRMED — an earlier UNKNOWN blocks (pending
+ * reconciliation); an earlier FAILED blocks (the chain stops honestly);
+ * an earlier UNRECORDED blocks (legs never silently skip). The FIRST
+ * blocking leg is named — never a vague refusal. The refused verdict
+ * throws nothing here (pure data); the caller maps it to the typed
+ * CORRIDOR_LEG_BLOCKED.
+ */
+export function corridorLegDispatchPermitted(
+  legIndex: number,
+  priorOutcomes: readonly CorridorLegOutcomeProjection[],
+): { readonly permitted: true } | { readonly permitted: false; readonly reason: string } {
+  for (let index = 0; index < legIndex; index += 1) {
+    const outcome = priorOutcomes[index];
+    if (outcome === undefined) {
+      return {
+        permitted: false,
+        reason: `corridor leg ${String(index)}'s outcome is UNRECORDED — legs never silently skip; an unrecorded leg is not a passed leg (the chain waits for its outcome, honestly)`,
+      };
+    }
+    if (outcome === "UNKNOWN") {
+      return {
+        permitted: false,
+        reason: `corridor leg ${String(index)}'s outcome is UNKNOWN — the mission goes OUTCOME_UNKNOWN with the per-leg attempt pending reconciliation; a later leg NEVER dispatches after an earlier leg's non-CONFIRMED outcome`,
+      };
+    }
+    if (outcome === "FAILED") {
+      return {
+        permitted: false,
+        reason: `corridor leg ${String(index)}'s outcome is FAILED — the mission stays open with the legs before it as recorded facts; the chain stops honestly (custody continuity)`,
+      };
+    }
+  }
+  return { permitted: true };
+}

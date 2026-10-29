@@ -115,4 +115,8 @@ export * from './adapters/paystack/declaration.ts';
 export * from './adapters/paystack/capabilities.ts';
 export * from './adapters/paystack/https-transport.ts';
 export * from './adapters/paystack/verification-probe.ts';
+// P22-H (ADR-0016 D8): the Paystack transfer execution surface — the
+// SANDBOX payout grant derivation + the initiate/finalize/verify paths
+// (the corridor's KES off-ramp lane).
+export * from './adapters/paystack/transfer-execution.ts';
 export * from './adapters/mtn-momo/declaration.ts';

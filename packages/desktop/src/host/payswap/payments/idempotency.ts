@@ -149,13 +149,31 @@ export function canonicalJson(value: unknown): string {
   return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(",")}}`;
 }
 
-/** The deterministic per-mission idempotency key (mission+operation+intent digest). */
+/**
+ * The deterministic per-mission idempotency key (mission+operation+intent digest).
+ * (P22-H, ADR-0016 D6 — the composite growth): a corridor LEG dispatch
+ * additionally embeds its legIndex — the key is
+ * (mission, operation, legIndex, intentDigest), the pinned appendix law.
+ * The legIndex is OPTIONAL and ADDITIVE: without it the key is
+ * byte-identical to the P13-C shape (the N=1 degenerate case).
+ */
 export function paymentIdempotencyKey(
   missionId: string,
   operation: "CREATE_EXTERNAL_EFFECT" | "CANCEL_OR_REVERSE_EFFECT",
   intentDigest: string,
+  legIndex?: number,
 ): string {
-  return `pmt:${missionId}:${operation === "CREATE_EXTERNAL_EFFECT" ? "create" : "cancel"}:${intentDigest}`;
+  const op = operation === "CREATE_EXTERNAL_EFFECT" ? "create" : "cancel";
+  if (legIndex === undefined) {
+    return `pmt:${missionId}:${op}:${intentDigest}`;
+  }
+  if (!Number.isSafeInteger(legIndex) || legIndex < 0) {
+    throw new PaymentMissionError(
+      "IDEMPOTENCY_CONFLICT",
+      "a corridor leg idempotency key requires a non-negative safe integer legIndex",
+    );
+  }
+  return `pmt:${missionId}:${op}:leg${String(legIndex)}:${intentDigest}`;
 }
 
 // ---------------------------------------------------------------------------

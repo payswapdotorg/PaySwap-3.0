@@ -54,6 +54,15 @@ export interface PaymentAuthorizationScope {
   readonly destinationSummary: string;
   /** The digest of the compiled intent the approval covers (material-change binding). */
   readonly intentDigest: string;
+  /**
+   * (P22-H, ADR-0016 D6 — the composite growth) The digest of the
+   * presented MULTI-LEG corridor plan the approval covers, covering
+   * EVERY leg. ADDITIVE + OPTIONAL: the N=1 scope carries neither
+   * field byte-identically.
+   */
+  readonly planDigest?: string;
+  /** (P22-H, D6) The authorized plan's leg count (the artifact's leg domain). */
+  readonly planLegCount?: number;
 }
 
 /** A pending authorization request (created by requestAuthorization). */
@@ -79,6 +88,17 @@ export interface PaymentAuthorizationArtifact {
   readonly expiresAt: string;
   readonly singleUse: true;
   readonly consumedAt: string | null;
+  /**
+   * (P22-H, ADR-0016 D6 — the composite growth) Present iff this is a
+   * COMPOSITE artifact over a multi-leg corridor plan: the plan digest
+   * (covering every leg) + the plan's leg count. The artifact's
+   * single-use consumption is then per-leg SHARES (consumedLegs) —
+   * consumedAt stamps the FIRST share; a leg outside [0, planLegCount)
+   * never consumes (the D7 typed AUTHORIZATION_MISMATCH law).
+   */
+  readonly planDigest?: string;
+  readonly planLegCount?: number;
+  readonly consumedLegs?: readonly number[];
 }
 
 /** The typed decision input (a host-received principal action). */
@@ -176,7 +196,7 @@ export interface PaymentAuthorizationGate {
    * checks stay UNCHANGED) and never mutates gate state.
    */
   artifactsForMission(missionId: string, now: string): readonly MissionAuthorizationArtifactSnapshot[];
-  consumeArtifact(artifactId: string, now: string): PaymentAuthorizationArtifact;
+  consumeArtifact(artifactId: string, now: string, legIndex?: number): PaymentAuthorizationArtifact;
   exportState(): PaymentAuthorizationGateState;
 }
 
@@ -310,6 +330,17 @@ export function createAuthorizationGate(
         expiresAt: request.expiresAt,
         singleUse: true,
         consumedAt: null,
+        // (P22-H, ADR-0016 D6) The composite growth: an approval over a
+        // presented MULTI-LEG plan mints the COMPOSITE artifact (the
+        // planDigest covers every leg); the N=1 artifact carries neither
+        // field byte-identically.
+        ...(request.scope.planDigest !== undefined && request.scope.planLegCount !== undefined
+          ? {
+              planDigest: request.scope.planDigest,
+              planLegCount: request.scope.planLegCount,
+              consumedLegs: Object.freeze([]) as readonly number[],
+            }
+          : {}),
       });
       artifacts.set(artifact.artifactId, artifact);
       return {
@@ -349,7 +380,7 @@ export function createAuthorizationGate(
         }));
     },
 
-    consumeArtifact(artifactId, now) {
+    consumeArtifact(artifactId, now, legIndex) {
       const artifact = artifacts.get(artifactId);
       if (artifact === undefined) {
         throw new PaymentMissionError(
@@ -357,16 +388,65 @@ export function createAuthorizationGate(
           `No authorization artifact '${artifactId}' exists — artifacts are minted only by an explicit user act on a presented preview.`,
         );
       }
-      if (artifact.consumedAt !== null) {
-        throw new PaymentMissionError(
-          "AUTHORIZATION_CONSUMED",
-          `Authorization artifact '${artifactId}' was already consumed at ${artifact.consumedAt} — artifacts are single-use; a new preview and a new explicit approval are required.`,
-        );
-      }
       if (now >= artifact.expiresAt) {
         throw new PaymentMissionError(
           "AUTHORIZATION_EXPIRED",
           `Authorization artifact '${artifactId}' expired at ${artifact.expiresAt} — approval never outlives its scope.`,
+        );
+      }
+      // (P22-H, ADR-0016 D6 — the composite growth) The per-leg SHARE
+      // law: a composite artifact is consumed leg-by-leg — consumedAt
+      // stamps the FIRST share; a leg's share is single-use; a leg
+      // outside the authorized plan NEVER consumes (the D7 typed
+      // AUTHORIZATION_MISMATCH law — a leg outside the authorized plan
+      // is never a dispatch). The N=1 artifact consumes exactly as
+      // before (a leg-indexed consumption of an N=1 artifact — or a
+      // planless consumption of a composite artifact — is a typed
+      // mismatch, never a fallback).
+      const composite = artifact.planDigest !== undefined && artifact.planLegCount !== undefined;
+      if (legIndex !== undefined) {
+        if (!composite) {
+          throw new PaymentMissionError(
+            "AUTHORIZATION_MISMATCH",
+            `Authorization artifact '${artifactId}' is not a composite multi-leg artifact — a leg-indexed consumption requires an approval over a presented corridor plan`,
+          );
+        }
+        if (
+          typeof legIndex !== "number" ||
+          !Number.isSafeInteger(legIndex) ||
+          legIndex < 0 ||
+          legIndex >= (artifact.planLegCount ?? 0)
+        ) {
+          throw new PaymentMissionError(
+            "AUTHORIZATION_MISMATCH",
+            `Corridor leg ${String(legIndex)} is outside the authorized plan (${String(artifact.planLegCount)} legs) — a leg outside the authorized plan is never a dispatch.`,
+          );
+        }
+        const consumedLegs = artifact.consumedLegs ?? [];
+        if (consumedLegs.includes(legIndex)) {
+          throw new PaymentMissionError(
+            "AUTHORIZATION_CONSUMED",
+            `Authorization artifact '${artifactId}' already consumed its share for corridor leg ${String(legIndex)} at ${String(artifact.consumedAt)} — each leg's share is single-use; a fresh preview and a fresh explicit approval are required.`,
+          );
+        }
+        const consumed = Object.freeze({
+          ...artifact,
+          consumedAt: artifact.consumedAt ?? now,
+          consumedLegs: Object.freeze([...consumedLegs, legIndex]),
+        });
+        artifacts.set(artifactId, consumed);
+        return consumed;
+      }
+      if (composite) {
+        throw new PaymentMissionError(
+          "AUTHORIZATION_MISMATCH",
+          `Authorization artifact '${artifactId}' is a composite multi-leg artifact — it is consumed leg-by-leg through the corridor dispatch, never as one planless single consumption.`,
+        );
+      }
+      if (artifact.consumedAt !== null) {
+        throw new PaymentMissionError(
+          "AUTHORIZATION_CONSUMED",
+          `Authorization artifact '${artifactId}' was already consumed at ${artifact.consumedAt} — artifacts are single-use; a new preview and a new explicit approval are required.`,
         );
       }
       const consumed = Object.freeze({ ...artifact, consumedAt: now });

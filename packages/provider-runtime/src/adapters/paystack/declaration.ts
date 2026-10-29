@@ -1,8 +1,9 @@
 /**
  * @payswap/provider-runtime — the Paystack registry declaration (P14-C,
- * ADR-0008 D5). The vertical slice in the P13-B shape: ONE configured
- * form — the own-store test-mode secret key through the host-side
- * credential broker, verified by a read-only transactions probe.
+ * ADR-0008 D5; the operation surface GROWN by P22-H, ADR-0016 D8). The
+ * vertical slice in the P13-B shape: ONE configured form — the own-store
+ * test-mode secret key through the host-side credential broker, verified
+ * by a read-only transactions probe.
  *
  * Paystack's credential vocabulary (public documentation):
  * - Secret keys: `sk_test_…` (test) / `sk_live_…` (live) — the
@@ -13,6 +14,13 @@
  * - Provenance: the endpoint is Paystack's public REST surface
  *   (api.paystack.co, GET /transaction) — NO SDK is used or required
  *   (the transport.ts law).
+ *
+ * THE PAYOUT LANE (ADR-0016 D8): the SAME sealed test key derives the
+ * SANDBOX payout grant at DISPATCH time (the kernel's derivation — the
+ * Stripe precedent; never a connection-scope growth): the transfer
+ * surface's operation ids are pinned below and the read-only form
+ * declaration is UNCHANGED (the connection's use-case scope stays
+ * read-only; the probe stays the only path to ACTIVE).
  *
  * LAWS (identical to the Stripe U1 slice):
  * - The ONLY path to ACTIVE is the read-only verification probe through
@@ -30,8 +38,18 @@ export const PAYSTACK_PROVIDER_ID = 'paystack' as const;
 /** Paystack REST API base URL (test and live share the host; keys select mode). */
 export const PAYSTACK_API_BASE_URL = 'https://api.paystack.co' as const;
 
-/** The transport operation ids the Paystack adapter maps (evidence surface). */
-export const PAYSTACK_OPERATION_IDS = ['paystack.transactions.read'] as const;
+/**
+ * The transport operation ids the Paystack adapter maps (evidence
+ * surface). GROWN by ADR-0016 D8: the transfer surface (the corridor's
+ * KES off-ramp lane) — initiate/finalize/verify, the transfer API's
+ * real shapes.
+ */
+export const PAYSTACK_OPERATION_IDS = [
+  'paystack.transactions.read',
+  'paystack.transfer.initiate',
+  'paystack.transfer.finalize',
+  'paystack.transfer.verify',
+] as const;
 export type PaystackOperationId = (typeof PAYSTACK_OPERATION_IDS)[number];
 
 /**

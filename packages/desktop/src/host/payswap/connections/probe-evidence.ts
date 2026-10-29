@@ -34,13 +34,13 @@ import type {
   ConnectionProbeEvidenceTier,
   ConnectionProbeKeyClass,
   ConnectionProbeOutcomeKind,
-  PaySwapProbeProviderId,
+  ConnectionProbeProviderRef,
 } from "./probe-contracts.js";
 
 /** One structured, secret-free probe-evidence record (the bridge's input). */
 export interface ProbeEvidenceRecord {
   readonly connectionId: string;
-  readonly providerId: PaySwapProbeProviderId;
+  readonly providerId: ConnectionProbeProviderRef;
   readonly probedOperation: string;
   readonly outcome: ConnectionProbeOutcomeKind;
   /** Provider references the probe read (currency wallets / the account ref / transaction refs). */
@@ -53,6 +53,13 @@ export interface ProbeEvidenceRecord {
   readonly keyClass: ConnectionProbeKeyClass;
   /** The balance currencies the probe read (the Stripe balance denominations; may be empty). */
   readonly balanceCurrencies: readonly string[];
+  /**
+   * (P22-H, ADR-0016 D9) The issuer-scoped asset positions the Stellar
+   * account read observed — canonical asset refs
+   * (`stellar:testnet/asset:USDC:<issuerG>`), secret-free, ADDITIVE:
+   * the PSP records never carry it.
+   */
+  readonly assetPositions?: readonly string[];
   readonly transportId: string;
   readonly executionMode: string;
   /** ISO-8601 UTC — the freshness stamp (declared data, never an ambient clock). */
@@ -102,7 +109,7 @@ function parseRecord(candidate: unknown): ProbeEvidenceRecord | null {
   }
   return {
     connectionId: record.connectionId,
-    providerId: record.providerId as PaySwapProbeProviderId,
+    providerId: record.providerId as ConnectionProbeProviderRef,
     probedOperation: record.probedOperation,
     outcome: record.outcome as ConnectionProbeOutcomeKind,
     providerReferences: Object.freeze([...record.providerReferences]),
@@ -113,6 +120,9 @@ function parseRecord(candidate: unknown): ProbeEvidenceRecord | null {
     balanceCurrencies: Array.isArray(record.balanceCurrencies)
       ? Object.freeze([...record.balanceCurrencies])
       : [],
+    ...(Array.isArray(record.assetPositions)
+      ? { assetPositions: Object.freeze([...record.assetPositions]) }
+      : {}),
     transportId: typeof record.transportId === "string" ? record.transportId : "",
     executionMode: typeof record.executionMode === "string" ? record.executionMode : "",
     observedAt: record.observedAt,
@@ -171,6 +181,9 @@ export async function openProbeEvidenceStore(input: {
         ...record,
         providerReferences: Object.freeze([...record.providerReferences]),
         balanceCurrencies: Object.freeze([...record.balanceCurrencies]),
+        ...(Array.isArray(record.assetPositions)
+          ? { assetPositions: Object.freeze([...record.assetPositions]) }
+          : {}),
         observationVersion: (previous?.observationVersion ?? 0) + 1,
       });
       latest.set(record.connectionId, versioned);

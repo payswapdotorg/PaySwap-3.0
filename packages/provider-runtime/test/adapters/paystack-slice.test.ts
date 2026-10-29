@@ -13,7 +13,10 @@ import {
   paystackReadOnlyScope,
   refuseConsequentialPaystackGrant,
   paystackUseCaseScope,
+  derivePaystackSandboxPayoutGrant,
+  paystackSandboxPayoutScope,
   PAYSTACK_READ_ONLY_OPERATION_CLASSES,
+  PAYSTACK_SANDBOX_PAYOUT_OPERATION_CLASSES,
 } from '../../src/adapters/paystack/capabilities.ts';
 import { findPaymentProviderForm } from '../../src/adapters/registry-declaration.ts';
 
@@ -22,6 +25,11 @@ import { findPaymentProviderForm } from '../../src/adapters/registry-declaration
  * capabilities — the vertical slice in the P13-B shape, with the
  * key-prefix law IDENTICAL in shape to Stripe's. Fake keys are
  * non-contiguously constructed test material ONLY.
+ *
+ * P22-H AMENDMENT (ADR-0016 D8, disclosed): the payout-lane facts grew —
+ * the operation-id surface now carries the transfer ops, and the payout
+ * grant derivation exists beside the unchanged read-only slice. The
+ * amended assertions below carry the D8 re-pin comments.
  */
 
 const FAKE_TEST_KEY = 'sk' + '_test_FAKE51keyDoNotUse0005';
@@ -65,7 +73,14 @@ describe('the Paystack registry entry (P14-C, the P13-B slice shape)', () => {
     expect(() =>
       findPaymentProviderForm([PAYSTACK_REGISTRY_ENTRY], 'paystack', 'DELEGATED_OAUTH'),
     ).toThrow(ValidationError);
-    expect(PAYSTACK_OPERATION_IDS).toEqual(['paystack.transactions.read']);
+    // P22-H re-pin (ADR-0016 D8): the operation surface grew the transfer
+    // ops — the read op stays first, the transfer surface follows.
+    expect(PAYSTACK_OPERATION_IDS).toEqual([
+      'paystack.transactions.read',
+      'paystack.transfer.initiate',
+      'paystack.transfer.finalize',
+      'paystack.transfer.verify',
+    ]);
   });
 });
 
@@ -108,7 +123,12 @@ describe('the Paystack read-only scope (fail-closed)', () => {
     expect(Object.isFrozen(scope)).toBe(true);
   });
 
-  it('refuses any consequential grant (no Paystack execution surface in this wave)', () => {
+  it('refuses any consequential grant from the READ-ONLY slice (the D8 amendment narrows, never widens)', () => {
+    // P22-H re-pin (ADR-0016 D8, disclosed): the payout lane EXISTS now —
+    // but the read-only slice's refusal law is unchanged: the slice never
+    // grows a write class; the payout grant derives ONLY through
+    // derivePaystackSandboxPayoutGrant (the test name's old claim "no
+    // Paystack execution surface in this wave" is honestly amended).
     expect(() => refuseConsequentialPaystackGrant('CREATE_EXTERNAL_EFFECT')).toThrow(ValidationError);
     expect(() => refuseConsequentialPaystackGrant('CANCEL_OR_REVERSE_EFFECT')).toThrow(ValidationError);
     expect(() => refuseConsequentialPaystackGrant('READ_PROVIDER_STATE')).not.toThrow();
@@ -123,5 +143,36 @@ describe('the Paystack read-only scope (fail-closed)', () => {
     expect(() =>
       paystackUseCaseScope({ apiKey: FAKE_TEST_KEY }, 'SANDBOX', ['CREATE_EXTERNAL_EFFECT']),
     ).toThrow(ValidationError);
+  });
+});
+
+describe('the Paystack SANDBOX payout grant (P22-H, ADR-0016 D8 — the KES off-ramp lane)', () => {
+  it('an sk_test_ key bound to SANDBOX derives the payout grant (CREATE_EXTERNAL_EFFECT only, never CANCEL)', () => {
+    const scope = derivePaystackSandboxPayoutGrant(FAKE_TEST_KEY, 'SANDBOX');
+    expect([...scope.allowedOperations]).toEqual([...PAYSTACK_SANDBOX_PAYOUT_OPERATION_CLASSES]);
+    expect(scope.allowedOperations).toContain('CREATE_EXTERNAL_EFFECT');
+    expect(scope.allowedOperations).not.toContain('CANCEL_OR_REVERSE_EFFECT');
+    expect(scope.allowedEffectClasses).toContain('STATE_CHANGING');
+    expect(scope.allowedDataClasses).toContain('TRANSFER_WRITE');
+    expect(Object.isFrozen(scope)).toBe(true);
+    expect(() => derivePaystackSandboxPayoutGrant(FAKE_LIVE_KEY, 'SANDBOX')).toThrow(
+      SandboxLiveBoundaryError,
+    );
+  });
+
+  it('the derivation is SANDBOX-only by name and by law (a live payout lane is never derived)', () => {
+    expect(() => derivePaystackSandboxPayoutGrant(FAKE_TEST_KEY, 'LIVE')).toThrow(
+      SandboxLiveBoundaryError,
+    );
+    expect(() => derivePaystackSandboxPayoutGrant(FAKE_LIVE_KEY, 'LIVE')).toThrow(
+      SandboxLiveBoundaryError,
+    );
+  });
+
+  it('the payout scope is distinct from the read-only scope (the read surface never widens)', () => {
+    const payout = paystackSandboxPayoutScope();
+    const readOnly = paystackReadOnlyScope();
+    expect(readOnly.allowedOperations).not.toContain('CREATE_EXTERNAL_EFFECT');
+    expect(payout.allowedOperations).toContain('READ_PROVIDER_STATE');
   });
 });

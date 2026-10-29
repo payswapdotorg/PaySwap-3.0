@@ -44,6 +44,7 @@ import type {
   BridgeConnectedInstance,
   BridgeDerivation,
 } from "./capability-bridge.js";
+import type { PaySwapProbeProviderId } from "./probe-contracts.js";
 import {
   connectionCapabilityDefinitionOf,
   pinnedConnectionAdapterRef,
@@ -172,7 +173,13 @@ function implementationOf(
     capabilityId: definition.id,
     capabilityVersion: definition.version,
     version: "1.0.0",
-    adapterRef: pinnedConnectionAdapterRef(instance.providerId),
+    // (P22-H, ADR-0016 D2) The PSP adapter-ref table addresses PSP ids
+    // only — the onchain rail's adapter ref is pinned by its OWN
+    // derivation (onchain-chain-derivation.ts), never this bridge fold.
+    adapterRef:
+      instance.providerId === "stellar:testnet"
+        ? "adapter:stellar/horizon@1"
+        : pinnedConnectionAdapterRef(instance.providerId as PaySwapProbeProviderId),
     corridors:
       instance.currencies.length > 0
         ? Object.freeze([Object.freeze({ currencies: Object.freeze([...instance.currencies]) })])
@@ -192,6 +199,14 @@ function implementationOf(
 export function chainsFromBridge(bridge: BridgeDerivation): readonly ConnectionCapabilityRouteChain[] {
   const chains: ConnectionCapabilityRouteChain[] = [];
   for (const instance of bridge.instances) {
+    // (P22-H, ADR-0016 D2) The PSP definition catalogue addresses PSP
+    // ids only — the onchain rail chain derives from its OWN four-layer
+    // hierarchy (onchain-chain-derivation.ts), never this bridge fold;
+    // the rail instance (if one ever reached the bridge) is skipped
+    // here honestly (its chain comes from the other derivation).
+    if (instance.providerId === "stellar:testnet") {
+      continue;
+    }
     const definition = connectionCapabilityDefinitionOf(instance.providerId, instance.keyClass);
     if (definition === undefined) {
       continue;

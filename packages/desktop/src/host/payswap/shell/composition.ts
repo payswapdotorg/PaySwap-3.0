@@ -40,7 +40,7 @@ import {
   type PaymentMissionRuntime,
 } from "../payments/payment-mission-runtime.js";
 import { createUnwiredExecutionAuthority } from "../payments/execution-authority.js";
-import { createLaneAwareStripeExecutionAuthority } from "../payments/execution-lane-composition.js";
+import { createLaneAwareExecutionAuthority } from "../payments/execution-lane-composition.js";
 import type { ConnectionSessionAuthority } from "../connections/session-authority.js";
 import type { HostFetch } from "../connections/host-https-transports.js";
 
@@ -127,7 +127,7 @@ export async function composePaymentMissionRuntime(
   const runtime = createPaymentMissionRuntime({
     store,
     executionAuthority: laneAware
-      ? createLaneAwareStripeExecutionAuthority({
+      ? createLaneAwareExecutionAuthority({
           connectionAuthority: options!.connectionAuthority!,
           fetchImpl: options!.fetchImpl!,
           log,

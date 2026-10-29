@@ -24,6 +24,8 @@
  * may have landed, so the outcome is UNKNOWN upstream, never FAILED.
  */
 
+import { STELLAR_HORIZON_TESTNET_BASE_URL } from "./onchain-rail-pins.js";
+
 /** The minimal fetch-response shape the transports need (fake-friendly). */
 export interface HostFetchResponse {
   readonly status: number;
@@ -216,6 +218,13 @@ function createHostTransport(options: {
   readonly extraHeaders?: Readonly<Record<string, string>>;
   readonly errorReader: (body: unknown) => { code: string; message: string } | null;
   readonly bindIdempotencyHeader: boolean;
+  /**
+   * (P22-H, ADR-0016 D8) The POST body encoding: "form" (the Stripe
+   * precedent, urlencoded) or "json" (the Paystack transfer surface's
+   * canonical encoding). Defaults to "form" — the existing transports
+   * stay byte-identical.
+   */
+  readonly postBodyFormat?: "form" | "json";
 }): HostTransport {
   return {
     transportId: options.transportId,
@@ -251,11 +260,16 @@ function createHostTransport(options: {
       };
       let requestBody: string | undefined;
       if (endpoint.method === "POST") {
-        headers["Content-Type"] = "application/x-www-form-urlencoded";
+        if ((options.postBodyFormat ?? "form") === "json") {
+          headers["Content-Type"] = "application/json";
+          requestBody = JSON.stringify(rest);
+        } else {
+          headers["Content-Type"] = "application/x-www-form-urlencoded";
+          requestBody = queryStringOf(rest).replace(/^\?/, "");
+        }
         if (options.bindIdempotencyHeader && typeof call.idempotencyKey === "string" && call.idempotencyKey.length > 0) {
           headers["Idempotency-Key"] = call.idempotencyKey;
         }
-        requestBody = queryStringOf(rest).replace(/^\?/, "");
       }
       let response: HostFetchResponse;
       try {
@@ -346,12 +360,19 @@ export function createFlutterwaveHostTransport(fetchImpl: HostFetch): HostTransp
 
 const PAYSTACK_API_BASE_URL = "https://api.paystack.co";
 
-/** The Paystack endpoint map (mirrors PAYSTACK_OPERATION_IDS). */
+/**
+ * The Paystack endpoint map (mirrors PAYSTACK_OPERATION_IDS — the D8
+ * growth: the transfer surface). The POST bodies are JSON (the Paystack
+ * transfer API's canonical encoding — the canonical transport's law).
+ */
 const PAYSTACK_ENDPOINTS: ReadonlyMap<string, EndpointSpec> = new Map([
   ["paystack.transactions.read", { method: "GET", path: "/transaction" }],
+  ["paystack.transfer.initiate", { method: "POST", path: "/transfer" }],
+  ["paystack.transfer.finalize", { method: "POST", path: "/transfer/finalize_transfer" }],
+  ["paystack.transfer.verify", { method: "GET", path: "/transfer/{id}" }],
 ]);
 
-/** The REAL Paystack transport (mirror of PaystackHttpsTransport). */
+/** The REAL Paystack transport (mirror of PaystackHttpsTransport — the D8-grown endpoint map). */
 export function createPaystackHostTransport(fetchImpl: HostFetch): HostTransport {
   return createHostTransport({
     transportId: "paystack-https",
@@ -361,5 +382,56 @@ export function createPaystackHostTransport(fetchImpl: HostFetch): HostTransport
     timeoutMs: DEFAULT_TIMEOUT_MS,
     errorReader: (body) => readWordedError(body, "PAYSTACK_ERROR"),
     bindIdempotencyHeader: false,
+    postBodyFormat: "json",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// The Stellar Horizon transport (P22-H, ADR-0016 D2/D9 — the onchain rail)
+// ---------------------------------------------------------------------------
+
+/**
+ * Read Horizon's canonical error envelope ({type, title, status}) — the
+ * account-not-found 404 carries type "https://stellar.org/horizon-errors/not_found".
+ */
+function readHorizonError(body: unknown): { code: string; message: string } | null {
+  if (body === null || typeof body !== "object" || Array.isArray(body)) {
+    return null;
+  }
+  const record = body as { type?: unknown; title?: unknown; status?: unknown };
+  const type = typeof record.type === "string" && record.type.length > 0 ? record.type : null;
+  const title = typeof record.title === "string" && record.title.length > 0 ? record.title : null;
+  if (type === null && title === null) {
+    return null;
+  }
+  return {
+    code: type ?? (typeof record.status === "number" ? `HTTP_${String(record.status)}` : "HORIZON_ERROR"),
+    message: title ?? "horizon answered with an error status",
+  };
+}
+
+/**
+ * The Stellar Horizon TESTNET endpoint map (mirrors STELLAR_HOST_OPERATION_IDS).
+ * The base URL is the TESTNET Horizon — the pubnet URL NEVER appears in
+ * this deployment (ADR-0016 D2; INV-25).
+ */
+const STELLAR_HORIZON_ENDPOINTS: ReadonlyMap<string, EndpointSpec> = new Map([
+  ["stellar.account.read", { method: "GET", path: "/accounts/{accountId}" }],
+  ["stellar.transaction.read", { method: "GET", path: "/transactions/{txHash}" }],
+  ["stellar.operations.read", { method: "GET", path: "/transactions/{txHash}/operations" }],
+  ["stellar.transaction.submit", { method: "POST", path: "/transactions" }],
+]);
+
+/** The REAL Stellar Horizon testnet transport (the onchain rail's REST seam). */
+export function createStellarHorizonHostTransport(fetchImpl: HostFetch): HostTransport {
+  return createHostTransport({
+    transportId: "stellar-horizon-https",
+    fetchImpl,
+    baseUrl: STELLAR_HORIZON_TESTNET_BASE_URL,
+    endpoints: STELLAR_HORIZON_ENDPOINTS,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+    errorReader: readHorizonError,
+    bindIdempotencyHeader: false,
+    postBodyFormat: "json",
   });
 }

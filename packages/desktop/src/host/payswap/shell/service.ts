@@ -53,6 +53,7 @@ import type { ProbeEvidenceStore } from "../connections/probe-evidence.js";
 import type { HostFetch } from "../connections/host-https-transports.js";
 import type { ZCodeSessionSettingsState } from "@zcode/shared";
 import { createConnectionProbeChannelMembers } from "../connections/probe-members.js";
+import { createConnectionStellarChannelMembers } from "../connections/stellar-members.js";
 import {
   createAbsentConnectionCapabilityChainChannelMembers,
   createConnectionCapabilityChainChannelMembers,
@@ -264,6 +265,36 @@ export function createPaySwapDesktopService(
           },
         };
 
+  // (P22-H, ADR-0016 D2/D9) The ONCHAIN RAIL members — the Stellar
+  // keypair-entry verb + the host-side REAL Horizon account-read probe
+  // runner (the probe-members pattern applied to the rail; the PSP
+  // vocabulary is never touched — ADR-0008 D5).
+  const connectionStellarMembers =
+    connectionAuthority !== undefined && connectionProbe !== undefined
+      ? createConnectionStellarChannelMembers({
+          resolveAuthority: resolveConnectionAuthority,
+          resolveEvidenceStore: resolveProbeEvidenceStore,
+          fetchImpl: connectionProbe.fetchImpl,
+          nowMs: connectionProbe.nowMs ?? Date.now,
+          log: seamLog,
+        })
+      : {
+          async connectionSubmitStellarSecretKey(input: {
+            readonly connectionId: string;
+            readonly publicKey: string;
+            readonly secretKey: string;
+          }): Promise<DesktopCredentialSealReceipt> {
+            return resolveConnectionAuthority().submitStellarSecretKey(input);
+          },
+          async connectionRunStellarAccountReadProbe() {
+            // The probe runner is REAL or absent — never a caller-asserted
+            // outcome (the absent-plane postures throw the typed errors).
+            resolveConnectionAuthority();
+            resolveProbeEvidenceStore();
+            throw new ConnectionPlaneNotConfiguredError();
+          },
+        };
+
   // (P21-D Gap A, ADR-0014 D6/D12) The connection-capability-chains
   // member: the corridor route chains derived from the REAL bridge over
   // the SAME fail-closed resolvers (the probe-members pattern — the
@@ -439,6 +470,10 @@ export function createPaySwapDesktopService(
     // probe-CONFIRMED outcome recorded through the authority's own
     // recorder; the outcome never echoes key material).
     ...connectionProbeMembers,
+
+    // (P22-H, ADR-0016 D2/D9) The ONCHAIN RAIL members — the Stellar
+    // keypair verb + the Horizon account-read probe runner.
+    ...connectionStellarMembers,
 
     // (P21-D Gap A, ADR-0014 D6/D12) The connection-capability-chains
     // member — the bridge-derived corridor route chains (capability

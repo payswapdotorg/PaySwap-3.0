@@ -43,7 +43,20 @@ export interface MissionAuthorizationService {
       readonly compensationFor?: string;
     },
   ): Promise<StoredPaymentPreview>;
-  requestAuthorization(missionId: string, now: string): Promise<PaymentAuthorizationRequest>;
+  requestAuthorization(
+    missionId: string,
+    now: string,
+    /**
+     * (P22-H, ADR-0016 D6 — the composite growth) The presented
+     * MULTI-LEG corridor plan facts: when supplied, the authorization
+     * scope carries the plan digest (covering every leg) + the leg
+     * count — the approval authorizes the PLAN (the artifact mints as
+     * the COMPOSITE artifact; the dispatch consumes it leg-by-leg).
+     * ADDITIVE + OPTIONAL: the N=1 request carries no plan facts
+     * byte-identically.
+     */
+    plan?: { readonly planDigest: string; readonly planLegCount: number },
+  ): Promise<PaymentAuthorizationRequest>;
   resolveAuthorization(decision: PaymentAuthorizationDecision, now: string): Promise<AuthorizationResolution>;
   artifact(artifactId: string): Promise<PaymentAuthorizationArtifact | undefined>;
   /**
@@ -182,15 +195,22 @@ export function createMissionAuthorizationService(core: PaymentMissionCore): Mis
       return preview;
     },
 
-    async requestAuthorization(missionId, now) {
+    async requestAuthorization(missionId, now, plan) {
       const state = await core.store.load();
       const mission = requireActive(core.requireMission(state, missionId));
       const preview = requirePreview(state, missionId);
       const scope = authorizationScope(mission, preview);
+      // (P22-H, ADR-0016 D6) The composite growth: the presented plan's
+      // digest + leg count ride the scope (the artifact mints as the
+      // COMPOSITE artifact — the approval authorizes the WHOLE plan).
+      const compositeScope =
+        plan !== undefined
+          ? { ...scope, planDigest: plan.planDigest, planLegCount: plan.planLegCount }
+          : scope;
       const gateBefore = core.getGate().exportState();
       let request: PaymentAuthorizationRequest;
       try {
-        request = core.getGate().requestAuthorization(preview, scope, now);
+        request = core.getGate().requestAuthorization(preview, compositeScope, now);
       } catch (error) {
         core.resetGate(gateBefore);
         throw error;

@@ -277,6 +277,12 @@ export function createHostPaystackVerificationProbe(
       );
     }
     const references: string[] = [];
+    // (P22-H, ADR-0016 D8) The TRANSACTION-OBSERVED CURRENCIES: the
+    // honest funding-fold input — the fold derives a Paystack funding
+    // LOCATION per currency the transactions prove the account transacts
+    // in (never a balance claim: balances are NOT part of the Paystack
+    // read surface, and the fold stays honest about what it derives).
+    const transactionCurrencies: string[] = [];
     for (const transaction of data) {
       if (transaction === null || typeof transaction !== "object" || Array.isArray(transaction)) {
         continue;
@@ -288,6 +294,14 @@ export function createHostPaystackVerificationProbe(
           references.push(reference);
         }
       }
+      const currency = (transaction as { currency?: unknown }).currency;
+      if (
+        typeof currency === "string" &&
+        /^[A-Za-z]{3}$/.test(currency) &&
+        !transactionCurrencies.includes(currency)
+      ) {
+        transactionCurrencies.push(currency);
+      }
     }
     if (references.length === 0 && data.length > 0) {
       return buildResult(
@@ -297,7 +311,12 @@ export function createHostPaystackVerificationProbe(
       );
     }
     return buildResult(
-      { outcome: "CONFIRMED", keyClass, providerReferences: references },
+      {
+        outcome: "CONFIRMED",
+        keyClass,
+        providerReferences: references,
+        balanceCurrencies: transactionCurrencies,
+      },
       deps,
       dispatchedAt,
     );

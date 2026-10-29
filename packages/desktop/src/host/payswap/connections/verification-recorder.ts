@@ -20,6 +20,10 @@ import type {
 import { recordViewOf, type PersistedConnectionRecord } from "./record-store.js";
 import type { PinnedConnectionLifecycleState } from "./provider-pins.js";
 import {
+  PINNED_STELLAR_STRKEY_ACCOUNT_PATTERN,
+  PINNED_STELLAR_STRKEY_SECRET_PATTERN,
+} from "./onchain-rail-pins.js";
+import {
   EVIDENCE_PROBE_CONFIRMED,
   EVIDENCE_PROBE_FAILED,
   EVIDENCE_PROBE_UNKNOWN,
@@ -92,6 +96,63 @@ export class VerificationRecorder {
       providerLabel: "Paystack",
       expectedShape: "sk_test_…",
     });
+  }
+
+  /**
+   * The Stellar keypair-entry verb (P22-H, ADR-0016 D9): the ONE
+   * material-carrying path for the onchain rail — the keypair as ONE
+   * material {publicKey, secretKey}. THE STRKEY SHAPE LAW: the public
+   * key MUST match ^G[A-Z2-7]{55}$ and the secret ^S[A-Z2-7]{55}$
+   * (fail-closed; anything else is refused, never sealed). The keypair
+   * is network-agnostic by shape — the CONNECTION declares the network
+   * (stellar:testnet); the mode gate is at execution (SANDBOX only,
+   * INV-25), never a shape guess.
+   */
+  async submitStellarSecretKey(input: {
+    readonly connectionId: string;
+    readonly publicKey: string;
+    readonly secretKey: string;
+  }): Promise<DesktopCredentialSealReceipt> {
+    const record = await this.#port.getRecord(input.connectionId);
+    if (record === null) {
+      throw new ConnectionSessionError(
+        "UNKNOWN_CONNECTION",
+        `No connection '${input.connectionId}' exists — the keypair entry is refused`,
+      );
+    }
+    if (
+      typeof input.publicKey !== "string" ||
+      !PINNED_STELLAR_STRKEY_ACCOUNT_PATTERN.test(input.publicKey) ||
+      typeof input.secretKey !== "string" ||
+      !PINNED_STELLAR_STRKEY_SECRET_PATTERN.test(input.secretKey)
+    ) {
+      throw new ConnectionSessionError(
+        "CREDENTIAL_REQUIRED",
+        "The supplied keypair is not a canonical Stellar StrKey keypair (expected a G… 56-char public key and an S… 56-char secret key, base32). The connection declares the network (stellar:testnet); a pubnet-shaped execution target is never offered (INV-25).",
+      );
+    }
+    const { credentialHandleRef, sealedSecretCount } = await this.#port.broker.sealStellarKeypair(
+      record.connectionId,
+      { publicKey: input.publicKey, secretKey: input.secretKey },
+      this.#port.nowIso(),
+    );
+    const updated = this.#port.transition(
+      record,
+      "PENDING_VERIFICATION",
+      "CREDENTIAL_SEALED",
+      EVIDENCE_SEALED,
+    );
+    const next: PersistedConnectionRecord = {
+      ...updated,
+      credentialHandleRef,
+    };
+    await this.#port.setRecord(next);
+    return {
+      connectionId: record.connectionId,
+      credentialHandleRef,
+      sealedSecretCount,
+      nextState: next.state,
+    };
   }
 
   /**
