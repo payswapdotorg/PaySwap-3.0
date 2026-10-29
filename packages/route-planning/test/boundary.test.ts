@@ -171,14 +171,17 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
     // splits pins/repairs + pins/hypotheses under the 400-line file law) and
     // five NEW test-tier files (the four batteries exclusion-repair /
     // hypothetical-views / hypothesis-stage / lab-facts + the catalogue
-    // fixture), so the census moved 18 -> 25 src, 17 -> 22 test suites and
-    // 21 -> 27 all-test .ts files (the fifth suite is the compat-gate battery
+    // fixture), so the census moved 18 -> 25 src, 17 -> 23 test suites and
+    // 21 -> 28 all-test .ts files (the fifth suite is the compat-gate battery
     // conditional-compat.test.ts, split from conditional-stage.test.ts under
-    // the 400-line file law). The pins stay EXACT toBe (never loosened
-    // to ranges) — the census law's strength is unchanged.
+    // the 400-line file law; the sixth is the TL's MERGE-TIME pin-fidelity
+    // gate merge-fidelity.test.ts, which exists only on the merged tree —
+    // it proves pin == the grown lane-A authority byte-identically per
+    // ADR-0015 D11). The pins stay EXACT toBe (never loosened to ranges) —
+    // the census law's strength is unchanged.
     expect(sourceFiles.length).toBe(25);
-    expect(testFiles.length).toBe(22);
-    expect(allTestFiles.length).toBe(27);
+    expect(testFiles.length).toBe(23);
+    expect(allTestFiles.length).toBe(28);
   });
 
   it("the manifest law + tsconfig carries EXACTLY the one documented type-only paths mapping + a single node.d.ts process declaration", () => {
