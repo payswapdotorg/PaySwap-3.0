@@ -250,18 +250,26 @@ applicable exclusion codes):**
 | `repair:bridge-via-intermediary-rail` | MULTI_HOP | SOURCE/DESTINATION_COUNTRY_NOT_SERVED, the no-route state |
 | `repair:split-below-maximum` | MULTI_HOP | AMOUNT_ABOVE_MAXIMUM |
 | `platform:connector-operation` | PLATFORM_WORK | NOT_EXECUTABLE_CAPABILITY, IMPLEMENTATION_SCOPE_NOT_SERVED, INSTANCE_INELIGIBLE |
-| `platform:provider-integration` | PLATFORM_WORK | SOURCE/DESTINATION_COUNTRY_NOT_SERVED, SOURCE/DESTINATION_CURRENCY_NOT_SUPPORTED, CUSTOMER_TYPE_NOT_SERVED, RECIPIENT_TYPE_NOT_SERVED |
+| `platform:provider-integration` | PLATFORM_WORK | SOURCE/DESTINATION_COUNTRY_NOT_SERVED, SOURCE/DESTINATION_CURRENCY_NOT_SUPPORTED, CUSTOMER_TYPE_NOT_SERVED, RECIPIENT_TYPE_NOT_SERVED, INSTANCE_GEOGRAPHY_NOT_SERVED, INSTANCE_CURRENCY_NOT_SUPPORTED |
 | `platform:permission-model` | PLATFORM_WORK | MISSING_PERMISSIONS (where the credential model cannot express the grant) |
 | `platform:cross-provider-route-shape` (P21) | PLATFORM_WORK | the cross-provider fiat pair gap |
 | `platform:flutterwave-send-operation` (P21) | PLATFORM_WORK | the FLW send-operation gap |
 
 **A.4 The non-operator rows (honest non-repairs, total over the 26 codes):**
-`STALE_OBSERVATION`, `AVAILABILITY_UNKNOWN`, `OBSERVATION_ELIGIBILITY_UNKNOWN` →
-recheck triggers (the wait-recheck plane); `AVAILABILITY_UNAVAILABLE`,
+`STALE_OBSERVATION`, `AVAILABILITY_UNKNOWN`, `OBSERVATION_ELIGIBILITY_UNKNOWN`,
+`OBSERVATION_NOT_ELIGIBLE` → recheck triggers (the wait-recheck plane);
+`AVAILABILITY_UNAVAILABLE`,
 `QUOTA_EXHAUSTED`, `CUTOFF_PASSED`, `AMOUNT_BELOW_MINIMUM` → wait triggers (bounded
 in time, never a repair card); `MISSING_REQUIRED_FIELDS` → the intake ask loop;
 `AMOUNT_CURRENCY_MISMATCH` → the revise path; `AMOUNT_BELOW_MINIMUM` /
 `AMOUNT_ABOVE_MAXIMUM` → the split operator / the wait trigger as listed.
+
+*(Amended at dispatch, 2026-10-29: the initial table left three codes unassigned
+— `INSTANCE_GEOGRAPHY_NOT_SERVED` and `INSTANCE_CURRENCY_NOT_SUPPORTED` join the
+platform:provider-integration operator row; `OBSERVATION_NOT_ELIGIBLE` joins the
+recheck triggers. The A.3 operator-applicable set is now 16 codes, the A.4
+non-operator set is 10 — 26 total, the totality law exact. The lanes pin against
+these amended values.)*
 
 **A.5 The hypothetical augmentation kinds:** `ADD_ASSUMED_RAIL`,
 `ADD_ASSUMED_CONVERSION_ASSET`, `ADD_ASSUMED_CONNECTOR_OPERATION`.
