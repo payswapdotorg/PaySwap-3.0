@@ -59,9 +59,15 @@ const ROUTINE_STAGE_PANEL_UNBOUND_NOTE =
 /**
  * The route-planning section's honest unbound-engine note — VERBATIM from
  * packages/payswap-app/src/agent/routePlanningPins.ts (ROUTE_PLANNING_ENGINE_UNBOUND_NOTE).
+ * (P23-D, 2026-10-29: the P23-B wave GREW this note — "and repair-discovery
+ * engines (the conditional opportunities, the platform work items and the
+ * multi-hop hypotheses are likewise not composed here)" — but this spec's
+ * verbatim pin was not updated, so the tier-1 suite had been RED since the
+ * P23-B acceptance (the drift the closure re-run caught; the pin now matches
+ * the grown source byte-for-byte).
  */
 const ROUTE_PLANNING_ENGINE_UNBOUND_NOTE =
-  "The route-planning engines are not wired in this deployment — no routes are shown because none can be honestly computed here. The composition root binds the real corridor, compiler and opportunities engines; until then this section states the gap instead of inventing routes.";
+  "The route-planning engines are not wired in this deployment — no routes are shown because none can be honestly computed here. The composition root binds the real corridor, compiler, opportunities and repair-discovery engines (the conditional opportunities, the platform work items and the multi-hop hypotheses are likewise not composed here); until then this section states the gap instead of inventing routes.";
 
 /** The composer dock label (the shared entrypoint on every surface). */
 const DOCK_LABEL = "PaySwap agent";
@@ -220,6 +226,48 @@ test("[J24] the task-tier record survives a full page reload — the browser-pro
 
   await expectZeroConsoleDefects(record);
   await evidenceShot(page, "p21-j24-reload-resume.png");
+});
+
+test("[J24] the opportunity-emergence surface stays honest on web (P23-D, ADR-0015 D10's web tier): the unbound-engine truth renders and ZERO opportunity cards, ZERO advisory sections, ZERO preconditions text — nothing is fabricated", async ({ page }) => {
+  const record = trackConsole(page);
+  await page.goto(CONTRACT_ROUTES.console);
+
+  const panel = await openComposer(page);
+  await sendText(page, "Pay merchant X");
+  await expect(panel.locator(".ps-agent-task")).toHaveCount(1);
+
+  // The route-planning section: the honest unbound-engine note VERBATIM —
+  // the web deployment composes NO emergence (the repair-discovery
+  // composition requires the platform host's engines: the corridor chains,
+  // the repair catalogue, the conditional construction and the hypothesis
+  // stage — all platform-host bindings absent from the web deployment BY
+  // DESIGN; the desktop CDP journey carries the bound card-content tier).
+  const route = page.locator(".ps-agent-route");
+  await expect(route).toBeVisible();
+  await expect(route).toContainText(ROUTE_PLANNING_ENGINE_UNBOUND_NOTE);
+
+  // ZERO opportunity-card elements (the three advisory sections' testid
+  // surfaces — the SAME selectors the desktop CDP journey asserts content
+  // through): a card on web would be a FABRICATION.
+  await expect(page.locator("[data-testid^='ps-agent-conditional-']")).toHaveCount(0);
+  await expect(page.locator("[data-testid^='ps-agent-platform-work-']")).toHaveCount(0);
+  await expect(page.locator("[data-testid^='ps-agent-hypothesis-']")).toHaveCount(0);
+
+  // ZERO advisory-section chrome and ZERO people-language card vocabulary
+  // (the D8 contract's surfaces render ONLY over a composed engine view —
+  // the not-composed notes belong to the DESKTOP's composed-but-unbound
+  // tier, never to web's never-composed tier).
+  await expect(page.locator("#ps-agent-route-section-conditional-opportunities")).toHaveCount(0);
+  await expect(page.locator("#ps-agent-route-section-platform-work")).toHaveCount(0);
+  await expect(page.locator("#ps-agent-route-section-hypotheses")).toHaveCount(0);
+  await expect(page.getByText("What would need to change")).toHaveCount(0);
+  await expect(page.getByText("What PaySwap itself would need to build")).toHaveCount(0);
+  await expect(page.getByText("Waiting for:")).toHaveCount(0);
+  await expect(page.getByText("Model-assisted repair proposals")).toHaveCount(0);
+  await expect(page.getByText("A hypothesis is never a route")).toHaveCount(0);
+
+  await expectZeroConsoleDefects(record);
+  await evidenceShot(page, "p23-j24-opportunity-honesty.png");
 });
 
 test("[J24] responsive 390×844: the core composer controls are usable — the dock, the input, the task board and the honest unbound-catalog note", async ({ page }) => {
