@@ -37,6 +37,7 @@ import {
   type PaymentMissionsDispatchWiring,
   type PaymentMissionsExecLane,
 } from "./paymentMissionsDispatchPins.js";
+import { PAYMENT_MISSIONS_COMPOSITE_ACT_NOTE } from "../pins/corridor-pins.js";
 
 export interface PaymentMissionsArmedCardProps {
   readonly missionId: string;
@@ -98,6 +99,11 @@ function PaymentMissionsLaneRow({
       <span className="ps-agent-missions-lane-text">
         <strong>{lane.label}</strong> — provider <span className="ps-num">{lane.providerId}</span> ·
         lane <span className="ps-num">{lane.connectionRef}</span>
+        {lane.leg !== undefined ? (
+          <>
+            {" "}· corridor leg <span className="ps-num">{lane.leg.legIndex + 1} of 4 ({lane.leg.legKind})</span>
+          </>
+        ) : null}
         {ineligible ? ` — not eligible: ${lane.ineligible.reason}` : ""}
       </span>
     </label>
@@ -150,8 +156,21 @@ function PaymentMissionsArmedScopeCard({
             <li>
               <strong>intent digest:</strong> <span className="ps-num">{effect.scope.intentDigest}</span>
             </li>
+            {effect.scope.planDigest !== undefined && effect.scope.planLegCount !== undefined ? (
+              <li data-testid="ps-agent-missions-armed-plan">
+                <strong>plan:</strong>{" "}
+                <span className="ps-num">
+                  {effect.scope.planLegCount}-leg plan · digest{" "}
+                  {effect.scope.planDigest}
+                </span>
+              </li>
+            ) : null}
           </ul>
-          <p className="ps-agent-missions-note">{PAYMENT_MISSIONS_ARMED_BINDING_NOTE}</p>
+          {effect.scope.planDigest !== undefined ? (
+            <p className="ps-agent-missions-note">{PAYMENT_MISSIONS_COMPOSITE_ACT_NOTE}</p>
+          ) : (
+            <p className="ps-agent-missions-note">{PAYMENT_MISSIONS_ARMED_BINDING_NOTE}</p>
+          )}
         </>
       ) : null}
       <fieldset className="ps-agent-missions-lanes">

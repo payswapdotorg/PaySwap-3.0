@@ -4,14 +4,16 @@
  * §6 + the P13 UX reference (Connections → Stripe), composed to the
  * operator's attached concept (p13-stripe-connection-concept.svg):
  *
- * - the PROVIDER CATALOGUE row: the registry-declared Stripe card
- *   (highlighted — the one connectable provider, ADR-0007 D5) whose
- *   Connect action seeds the ONE shared typed-intent orchestration,
- *   plus the concept's other provider cards (PayPal, Adyen, blockchain
- *   wallet) as DECLARED-UX-SURFACE entries: their "Explore setup"
- *   actions open the embedded agent panel with a provider mention in
- *   the draft — the deterministic router then answers HONESTLY (only
- *   Stripe is declared; it never guesses a provider);
+ * - the PROVIDER CATALOGUE row: the registry-declared connect cards —
+ *   Stripe (highlighted — the first registry entry, ADR-0007 D5),
+ *   Paystack and the Stellar testnet onchain rail (the P22-B mention
+ *   entries, ADR-0016 D8/D9) — whose Connect actions seed the ONE
+ *   shared typed-intent orchestration, plus the concept's other
+ *   provider cards (PayPal, Adyen, blockchain wallet) as
+ *   DECLARED-UX-SURFACE entries: their "Explore setup" actions open
+ *   the embedded agent panel with a provider mention in the draft —
+ *   the deterministic router then answers HONESTLY (it never guesses
+ *   a provider);
  * - the SECURE PROVIDER SETUP panel: the concept's structure verbatim —
  *   the expected-domain badge, the Stripe-hosted-onboarding toolbar,
  *   the illustrative authorized-session card ("Continue with Stripe" +
@@ -43,10 +45,11 @@ import {
   REFERENCE_SECTION_ANCHORS,
 } from "../section-vocabulary.js";
 import type { PaySwapNavigation } from "../../shell/navigation.js";
-import { agentProviderSetupCards } from "../../lib/agent-provider-entries.js";
+import { AGENT_PROVIDER_SETUP_ENTRIES, agentProviderSetupCards } from "../../lib/agent-provider-entries.js";
 import { sharedAgentComposerController } from "../../agent/agentComposerController.js";
 import { AgentComposerEmbed } from "../../agent/AgentComposerEmbed.js";
 import { ConnectionsActivationPanel } from "./ConnectionsActivationPanel.js";
+import { DeclaredProviderCards, DeclaredSurfaceProviderCards } from "./DeclaredProviderCards.js";
 import { Button, Card, StatusPill } from "@zcode/ui/payswap";
 import {
   ConsoleEmptyStateView,
@@ -61,47 +64,6 @@ const CONNECTIONS_SEED_AREA = "connections";
 /** The embedded panel's scroll target (the concept's in-page agent panel). */
 const AGENT_PANEL_ANCHOR_ID = "ps-connections-agent-panel";
 
-/**
- * The P13 concept's other provider surfaces — DECLARED UX surfaces only.
- * ADR-0007 D5 declares Stripe alone in the registry; these entries name
- * the concept's provider-card slots with its honest catalogue lines.
- * Their "Explore setup" action opens the embedded agent panel with a
- * provider mention in the draft — the deterministic router answers
- * honestly (it never guesses an undeclared provider).
- */
-const DECLARED_SURFACE_PROVIDERS: readonly {
-  readonly id: string;
-  readonly label: string;
-  readonly mark: string;
-  readonly markKind: "paypal" | "adyen" | "blockchain";
-  readonly line: string;
-  readonly exploreDraft: string;
-}[] = [
-  {
-    id: "paypal",
-    label: "PayPal",
-    mark: "P",
-    markKind: "paypal",
-    line: "Shown as catalogue entry until verified.",
-    exploreDraft: "connect PayPal",
-  },
-  {
-    id: "adyen",
-    label: "Adyen",
-    mark: "A",
-    markKind: "adyen",
-    line: "Provider-specific prerequisites shown.",
-    exploreDraft: "connect Adyen",
-  },
-  {
-    id: "blockchain",
-    label: "Blockchain wallet",
-    mark: "⬡",
-    markKind: "blockchain",
-    line: "Separate wallet and signing permissions.",
-    exploreDraft: "connect a blockchain wallet",
-  },
-];
 
 /** The P13 journey-1 step ladder (the concept's vertical timeline). */
 const SETUP_DRAFT_STEPS: readonly { readonly title: string; readonly line: string }[] = [
@@ -175,6 +137,11 @@ export function ConnectionsSection({
   // mode — the highlighted card; the qualifier forms stay reachable
   // through the agent's guided integration-type question).
   const primaryCard = agentProviderSetupCards()[0];
+  // The P22-B declared-provider entries after the primary — ONE card per
+  // provider, the DEFAULT form (Paystack own-store test mode, the Stellar
+  // testnet keypair rail; the qualifier forms stay reachable through
+  // the agent's guided question — the primary card's own law).
+  const declaredEntries = AGENT_PROVIDER_SETUP_ENTRIES.slice(1);
   const controller = sharedAgentComposerController();
 
   /** Seed the shared orchestration; the embedded panel is the surface. */
@@ -190,6 +157,26 @@ export function ConnectionsSection({
         useCaseRef: primaryCard.useCaseRef,
       },
       originNote: primaryCard.cardActionLabel,
+      area: CONNECTIONS_SEED_AREA,
+      openPanel: false,
+    });
+    revealAgentPanel();
+  };
+
+  /** The same seed for the other declared providers (P22-B). */
+  const seedDeclaredEntry = (entryIndex: number): void => {
+    const entry = declaredEntries[entryIndex];
+    if (entry === undefined) {
+      return;
+    }
+    void controller.seedFromSurface({
+      intent: {
+        kind: "CONNECTION_SETUP",
+        providerId: entry.providerId,
+        form: entry.form,
+        useCaseRef: entry.useCaseRef,
+      },
+      originNote: entry.cardActionLabel,
       area: CONNECTIONS_SEED_AREA,
       openPanel: false,
     });
@@ -264,37 +251,19 @@ export function ConnectionsSection({
                 </div>
               </Card>
             ) : null}
-            {DECLARED_SURFACE_PROVIDERS.map((provider) => (
-              <Card key={provider.id} className="ps-console-card ps-connections-card">
-                <div className="ps-connections-card-head">
-                  <span
-                    className={`ps-connections-mark ps-connections-mark--${provider.markKind}`}
-                    aria-hidden="true"
-                  >
-                    {provider.mark}
-                  </span>
-                  <div className="ps-connections-card-titles">
-                    <h3 className="ps-connections-card-title">{provider.label}</h3>
-                    <StatusPill tone="disabled">Not connected</StatusPill>
-                  </div>
-                </div>
-                <p className="ps-connections-card-line">{provider.line}</p>
-                <div className="ps-connections-card-actions">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => exploreProvider(provider.exploreDraft)}
-                  >
-                    Explore setup
-                  </Button>
-                </div>
-              </Card>
-            ))}
+            {/* The P22-B declared-provider cards (ONE card per provider,
+                the default form — the extracted component). */}
+            <DeclaredProviderCards
+              declaredEntries={declaredEntries}
+              onSeedEntry={(entryIndex) => seedDeclaredEntry(entryIndex)}
+            />
+            <DeclaredSurfaceProviderCards onExplore={exploreProvider} />
           </div>
           <p className="ps-connections-registry-note">
-            The provider registry declares Stripe alone (ADR-0007 D5) — the other
-            providers are shown as catalogue entries until they are declared and
-            verified.
+            The provider registry declares Stripe (ADR-0007 D5), Paystack
+            (ADR-0008 D5) and the Stellar testnet onchain rail (ADR-0016 D9) —
+            the other providers are shown as catalogue entries until they are
+            declared and verified.
           </p>
         </section>
 

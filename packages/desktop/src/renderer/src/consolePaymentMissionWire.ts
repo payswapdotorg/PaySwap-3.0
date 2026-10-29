@@ -190,13 +190,22 @@ export interface PaySwapPaymentPlanSelectionInputDto {
 // plane; the origin + principal are pinned host-side at the channel edge)
 // ---------------------------------------------------------------------------
 
-/** The authorization scope on the wire (the exact terms an approval covers). */
+/** The authorization scope on the wire (the exact terms an approval covers).
+ * (P22-B, ADR-0016 D6) `planDigest`/`planLegCount` mirror the host
+ * authorization-gate's additive composite-act fields — the host's
+ * scope projection spreads the internal scope, so a plan-scoped
+ * (composite) approval crosses with them at runtime; the renderer
+ * mirror declares them so the composed scope card can present the
+ * plan facts. Optional: absent on every N=1 approval. */
 export interface PaySwapPaymentAuthorizationScopeDto {
   readonly missionId: string;
   readonly direction: PaySwapPaymentMissionDirection;
   readonly amount: PaySwapPaymentAmountDto;
   readonly destinationSummary: string;
   readonly intentDigest: string;
+  /** Present only on a plan-scoped (composite) approval — never fabricated. */
+  readonly planDigest?: string;
+  readonly planLegCount?: number;
 }
 
 /**

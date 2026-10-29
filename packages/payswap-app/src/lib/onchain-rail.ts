@@ -152,7 +152,7 @@ export function foldOnchainRail(input?: {
         id: "fee-provenance",
         label: "Fee provenance",
         state: "REFERENCE",
-        line: "Fee semantics are declared per family (EVM gas auction EIP-1559 base fee + priority; Solana signature fees; UTXO satoshi-per-vbyte) and fail closed when a fee cannot be expressed. No live fee observation exists — a fee line never renders without one.",
+        line: "Fee semantics are declared per family (EVM gas auction EIP-1559 base fee + priority; Solana signature fees; UTXO satoshi-per-vbyte; Stellar stroops-per-operation) and fail closed when a fee cannot be expressed. No live fee observation exists — a fee line never renders without one.",
       },
       {
         id: "scoped-signing",

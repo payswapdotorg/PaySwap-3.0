@@ -26,6 +26,8 @@
  * instant arrives on a DTO.
  */
 
+import type { CorridorPlanDigest, CorridorPlanLegCount } from "../pins/corridor-pins.js";
+
 /* ==== the mission vocabulary pins (directions, statuses, intake fields) ==== */
 
 /** Mirrors PAYMENT_MISSION_DIRECTIONS / PAYMENT_TASK_STATUSES / PAYMENT_INTAKE_FIELD_IDS
@@ -226,13 +228,20 @@ export interface PaymentMissionsPreview {
 
 /* ============ the two-act approval pins (ADR-0011 D2 — the scope echo) ============ */
 
-/** The approval scope (mirrors PaymentAuthorizationScope — verbatim; the material-change intentDigest binding). */
+/** The approval scope (mirrors PaymentAuthorizationScope — verbatim; the material-change intentDigest binding).
+ * (P22-B, ADR-0016 D6) `planDigest`/`planLegCount` are the additive
+ * composite-act growth: a plan-scoped approval carries the plan digest +
+ * the disclosed leg count (mirroring the host authorization-gate's
+ * additive fields by value, flat). */
 export interface PaymentMissionsApprovalScope {
   readonly missionId: string;
   readonly direction: PaymentMissionsDirection;
   readonly amount: PaymentMissionsAmount;
   readonly destinationSummary: string;
   readonly intentDigest: string;
+  /** Present only on a plan-scoped (composite) approval — never fabricated. */
+  readonly planDigest?: CorridorPlanDigest;
+  readonly planLegCount?: CorridorPlanLegCount;
 }
 
 /** The approval request (mirrors PaymentAuthorizationRequestDto): the scoped

@@ -22,6 +22,7 @@
  * a DTO.
  */
 
+import type { CorridorLaneLegAttributionPin } from "../pins/corridor-pins.js";
 import type { PaymentMissionsApprovalScope, PaymentMissionsPort } from "./paymentMissionsPins.js";
 
 /* ==== the execution-lane + armed-effect pins (ADR-0012 D1/D2) ==== */
@@ -30,12 +31,17 @@ import type { PaymentMissionsApprovalScope, PaymentMissionsPort } from "./paymen
  * the Connections section shows the operator — no credentials, no
  * credential handles, no secrets ever appear. A lane listed with
  * `ineligible` stays VISIBLE but is not a choice (its reason renders,
- * never silently hidden). */
+ * never silently hidden).
+ * (P22-B, ADR-0016 D6) `leg` is the additive per-leg attribution: a
+ * composite plan's lane rows name the corridor leg they would ride
+ * (leg index + kind + lane kind) — the per-leg dispatch surface. */
 export interface PaymentMissionsExecLane {
   readonly connectionRef: string;
   readonly label: string;
   readonly providerId: string;
   readonly ineligible?: { readonly reason: string };
+  /** Present only on a composite (plan-scoped) mission's lane — never fabricated. */
+  readonly leg?: CorridorLaneLegAttributionPin;
 }
 
 /** The armed effect (mirrors the ADR-0012 D1 read): when an unconsumed,

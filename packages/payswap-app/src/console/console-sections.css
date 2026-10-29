@@ -505,6 +505,16 @@
   font-size: 16px;
 }
 
+/* P22-B: the declared Paystack + Stellar testnet rail marks. */
+.ps-connections-mark--paystack {
+  background: #14665c;
+}
+
+.ps-connections-mark--stellar {
+  background: #7c5cbf;
+  font-size: 16px;
+}
+
 .ps-connections-card-title {
   margin: 0;
   font-size: var(--ps-text-base);

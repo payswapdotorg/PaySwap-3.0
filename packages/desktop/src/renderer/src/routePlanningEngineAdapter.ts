@@ -80,6 +80,7 @@ import {
 // (P23-B, ADR-0015 D9) the opportunity-emergence composition — the REAL
 // derivation + hypothesis stage + stage-6 facts/interventions, bound here.
 import { deriveOpportunityEmergence } from "./opportunityEmergenceAdapter.js";
+import { corridorPlanPresentationOf } from "./corridorPlanProjection.js";
 
 /* --------------- the pinned defaults (transparent, versioned) --------------- */
 
@@ -369,20 +370,34 @@ export function createRealRoutePlanningEngine(
         intentRef: trigger.intentId,
         presentedAt: new Date(at).toISOString(),
         availableNow: {
-          ranked: ranking.ranked.map((candidate) => ({
-            planId: candidate.metrics.planId,
-            shapeId: candidate.metrics.shapeId,
-            rank: candidate.rank,
-            netNumeraireMinorUnits: candidate.metrics.score!.netNumeraireMinorUnits,
-            numeraire: ranking.numeraire,
-            hopCount: candidate.metrics.hopCount,
-            railCrossings: candidate.metrics.railCrossings,
-            ...(candidate.metrics.riskClass !== undefined ? { riskClass: candidate.metrics.riskClass } : {}),
-            ...(candidate.metrics.estimatedSettlementMs !== undefined ? { estimatedSettlementMs: candidate.metrics.estimatedSettlementMs } : {}),
-            unknownDimensions: [...candidate.metrics.unknownDimensions],
-            paretoNonDominated: candidate.paretoNonDominated,
-            dominatedBy: [...candidate.dominatedBy],
-          })),
+          ranked: ranking.ranked.map((candidate) => {
+            // (P22-B, ADR-0016 D5) The corridor plan presentation: when the
+            // ranked candidate's compiled plan IS the cross-provider
+            // corridor, the four-leg presentation derives through the REAL
+            // leg-law derivation (fail-closed — no projection, no card).
+            const compiledPlan = enumeration.candidates.find(
+              (plan) => plan.planId === candidate.metrics.planId,
+            );
+            const corridorPlan =
+              compiledPlan !== undefined
+                ? corridorPlanPresentationOf(compiledPlan, query)
+                : undefined;
+            return {
+              planId: candidate.metrics.planId,
+              shapeId: candidate.metrics.shapeId,
+              rank: candidate.rank,
+              netNumeraireMinorUnits: candidate.metrics.score!.netNumeraireMinorUnits,
+              numeraire: ranking.numeraire,
+              hopCount: candidate.metrics.hopCount,
+              railCrossings: candidate.metrics.railCrossings,
+              ...(candidate.metrics.riskClass !== undefined ? { riskClass: candidate.metrics.riskClass } : {}),
+              ...(candidate.metrics.estimatedSettlementMs !== undefined ? { estimatedSettlementMs: candidate.metrics.estimatedSettlementMs } : {}),
+              unknownDimensions: [...candidate.metrics.unknownDimensions],
+              paretoNonDominated: candidate.paretoNonDominated,
+              dominatedBy: [...candidate.dominatedBy],
+              ...(corridorPlan !== undefined ? { corridorPlan } : {}),
+            };
+          }),
           notScored: ranking.notScored.map((candidate) => ({ ...candidate, unknownDimensions: [...candidate.unknownDimensions] })),
           senderEligibleRouteIds: [...pair.sender.eligibleRouteIds],
           recipientEligibleRouteIds: [...pair.recipient.eligibleRouteIds],

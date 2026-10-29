@@ -21,6 +21,7 @@
 
 import { StatusPill } from "@zcode/ui/payswap";
 import { RoutePlanningOpportunityCards } from "./RoutePlanningOpportunityCards.js";
+import { RoutePlanningRouteRow } from "./RoutePlanningRouteRow.js";
 import {
   ROUTE_PLANNING_WAIT_PRECONDITIONS_PREFIX,
   ROUTE_PLANNING_WAIT_PRECONDITIONS_SUFFIX,
@@ -35,7 +36,6 @@ import {
   ROUTE_PLANNING_WAIT_NOTE,
   type RoutePlanningEngineView,
   type RoutePlanningPanelView,
-  type RoutePlanningRankedRoutePin,
   type RoutePlanningWaitCriteriaPin,
   type RoutePlanningWaitingState,
 } from "./routePlanningPins.js";
@@ -70,52 +70,6 @@ export interface RoutePlanningPanelProps {
   readonly onReplan?: () => void;
   /** (P21-B, D10) Wired only by a host that can expire a wait whose declared bound passed. */
   readonly onExpireWait?: () => void;
-}
-
-/** One ranked-route row: rank, plan, net + the transparent metric line. */
-function RoutePlanningRouteRow({
-  route,
-  onProceed,
-}: {
-  readonly route: RoutePlanningRankedRoutePin;
-  readonly onProceed?: (planId: string) => void;
-}): React.ReactNode {
-  const metrics = [
-    `net ${route.netNumeraireMinorUnits} ${route.numeraire}`,
-    `${route.hopCount} hops`,
-    `${route.railCrossings} rail crossings`,
-    `risk ${route.riskClass ?? "UNKNOWN"}`,
-    route.estimatedSettlementMs !== undefined ? `settlement ~${route.estimatedSettlementMs}ms` : "settlement UNKNOWN",
-  ].join(" · ");
-  return (
-    <li className="ps-agent-route-item">
-      <p className="ps-agent-route-item-head ps-num">
-        #{route.rank} · {route.planId} · shape {route.shapeId}
-      </p>
-      <p className="ps-agent-route-item-meta ps-num">{metrics}</p>
-      {route.unknownDimensions.length > 0 ? (
-        <p className="ps-agent-route-unknown">
-          Unknown dimensions (retained, never guessed): {route.unknownDimensions.join(", ")}
-        </p>
-      ) : null}
-      <p className="ps-agent-route-pareto">
-        {route.paretoNonDominated
-          ? "On the trade-off front — no other candidate dominates it on the known dimensions."
-          : `Dominated by ${route.dominatedBy.join(", ")} on the known dimensions — retained for transparency.`}
-      </p>
-      {onProceed !== undefined ? (
-        <button
-          type="button"
-          className="ps-agent-route-choice"
-          data-ps-route-choice="PROCEED"
-          data-testid={`ps-agent-route-proceed-${route.planId}`}
-          onClick={() => onProceed(route.planId)}
-        >
-          Proceed with {route.planId} — request only
-        </button>
-      ) : null}
-    </li>
-  );
 }
 
 /** The waiting section's criteria line (people language, no invention). */

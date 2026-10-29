@@ -128,18 +128,27 @@ export {
 // tier binds nothing — the honest unbound note).
 export {
   CONNECTIONS_ACTIVATION_PROVIDERS,
+  CONNECTIONS_ACTIVATION_RAILS,
   CONNECTIONS_ACTIVATION_SEAL_NOTE,
+  CONNECTIONS_ACTIVATION_STELLAR_SEAL_NOTE,
+  CONNECTIONS_ACTIVATION_STELLAR_UNAVAILABLE_NOTE,
   CONNECTIONS_ACTIVATION_TIER_NOTE,
   CONNECTIONS_ACTIVATION_UNBOUND_NOTE,
   CONNECTIONS_PROBE_EVIDENCE_TIER,
   CONNECTIONS_PROBE_OUTCOMES,
+  CONNECTIONS_STELLAR_PROBED_OPERATION,
+  isConnectionsStellarRailPort,
   type ConnectionsActivationPort,
   type ConnectionsActivationProviderId,
+  type ConnectionsActivationRailId,
+  type ConnectionsActivationPortWithStellarRail,
   type ConnectionsProbeOutcomeKind,
   type ConnectionsProbeOutcomePin,
   type ConnectionsProbeResultPin,
   type ConnectionsSealReceiptPin,
   type ConnectionsSeedOutcomePin,
+  type ConnectionsStellarAccountReadOutcomePin,
+  type ConnectionsStellarAccountReadResultPin,
   type ConnectionsStatusPin,
 } from "./console/connectionsActivationPins.js";
 export {
@@ -148,6 +157,12 @@ export {
   sharedConnectionsActivationPlane,
 } from "./console/connectionsActivationShared.js";
 export { ConnectionsActivationPanel } from "./console/sections/ConnectionsActivationPanel.js";
+// (P22-B, ADR-0016) The corridor pins — the app-side structural mirror of
+// the cross-provider corridor vocabulary (the route authority + the
+// presentation authority, both pinned BY VALUE; the mirror test verifies
+// them test-only through relative imports). Re-exported wholesale to keep
+// the barrel inside the file law (the named block grew it past 400).
+export * from "./pins/corridor-pins.js";
 // (P21-B, ADR-0014 D4) The model/difficulty controls surface: the catalog
 // port + the pinned budget mapping the desktop composition derives its
 // REAL engine budgets from; the web tier binds nothing — the honest

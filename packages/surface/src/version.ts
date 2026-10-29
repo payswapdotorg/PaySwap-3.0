@@ -26,6 +26,11 @@
  * — drift is detectable at build time, not discovered in production.
  *
  * Version history (append-only, newest first):
+ * - 1.6.0 (P22-B): the additive corridor-plan presentation contract — the
+ *   corridor-plan module (the four-leg cross-provider corridor plan fold:
+ *   leg lanes, the custody chain, the issuer-scoped relay asset, per-leg
+ *   people-language prerequisites, the leg count disclosed). Old consumers
+ *   keep compiling.
  * - 1.5.0 (P21-B): the additive routine-stage contract — the ROUTINE_PINNED
  *   event kind (stage 0), the optional AgentTask.modelSelection field +
  *   validation (the model/difficulty law), and the agent-routine-stages
@@ -40,7 +45,7 @@
  * - 1.3.0 (P13-0): the shared agent-task contract (agent-tasks.ts +
  *   agent-task-validation.ts), additive + experimental.
  */
-export const SURFACE_API_VERSION = "1.5.0" as const;
+export const SURFACE_API_VERSION = "1.6.0" as const;
 
 /** Which parts of the surface are covered by which stability class. */
 export type SurfaceStability =

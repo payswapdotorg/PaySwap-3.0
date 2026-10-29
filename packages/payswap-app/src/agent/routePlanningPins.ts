@@ -33,6 +33,7 @@
 
 import type { AgentTaskStatusPin } from "../lib/agent-task-pins.js";
 import type { AgentTaskModelSelectionPin } from "../lib/agent-task-pins.js";
+import type { CorridorPlanPresentationPin } from "../pins/corridor-pins.js";
 import type {
   RoutePlanningConditionalOpportunityPin,
   RoutePlanningHypothesisPin,
@@ -232,7 +233,13 @@ export interface RoutePlanningOpportunityMatchPin {
 
 /* ============ the engine view (stage 8's presentable projection) ============ */
 
-/** One available-now ranked route (stage 5's transparent metrics, carried). */
+/**
+ * (P22-B, ADR-0016 D5/D6) The optional corridor-plan projection a
+ * cross-provider-corridor route carries: the four-leg presentation
+ * (leg lanes, custody chain, the issuer-scoped relay asset, per-leg
+ * people-language prerequisites, the leg count disclosed). Absent on
+ * every other shape — never fabricated.
+ */
 export interface RoutePlanningRankedRoutePin {
   readonly planId: string; readonly shapeId: string; readonly rank: number;
   /** Exact-money net in minor units (a canonical integer string, never a float). */
@@ -242,6 +249,8 @@ export interface RoutePlanningRankedRoutePin {
   readonly riskClass?: string; readonly estimatedSettlementMs?: number;
   readonly unknownDimensions: readonly string[];
   readonly paretoNonDominated: boolean; readonly dominatedBy: readonly string[];
+  /** (P22-B) Present only when shapeId is the cross-provider corridor. */
+  readonly corridorPlan?: CorridorPlanPresentationPin;
 }
 
 /** An unscored-but-hard-eligible candidate: RETAINED and disclosed. */

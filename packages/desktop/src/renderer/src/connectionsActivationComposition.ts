@@ -29,6 +29,7 @@ import {
   bindSharedConnectionsActivationPlane,
   resetSharedConnectionsActivationPlane,
   type ConnectionsActivationPort,
+  type ConnectionsActivationPortWithStellarRail,
 } from "@payswap/app";
 import type { DesktopConsoleChannelServices } from "./consoleWorkspaceMount.js";
 import type {
@@ -36,6 +37,7 @@ import type {
   PaySwapConnectionSetupOutcomeDto,
   PaySwapConnectionStatusViewDto,
   PaySwapCredentialSealReceiptDto,
+  PaySwapStellarAccountReadOutcomeDto,
 } from "./consoleConnectionsWire.js";
 
 /* -------- the channel client surface this composition rides -------- */
@@ -43,6 +45,10 @@ import type {
 /**
  * The activation members the port rides (the channel client's surface —
  * the drift-tested member set; see consoleWorkspaceMount.tsx).
+ * (P22-B, ADR-0016 D9) The two Stellar rail members: the keypair submit
+ * (BOTH halves cross once as ONE material) and the Horizon account-read
+ * probe (the rail's own ACTIVE path — the PSP vocabulary is NEVER
+ * touched host-side).
  */
 export interface ConnectionsActivationChannelClient {
   connectionStatuses(): Promise<readonly PaySwapConnectionStatusViewDto[]>;
@@ -63,6 +69,12 @@ export interface ConnectionsActivationChannelClient {
     readonly secretKey: string;
   }): Promise<PaySwapCredentialSealReceiptDto>;
   connectionRunVerificationProbe(providerId: string): Promise<PaySwapConnectionProbeOutcomeDto>;
+  connectionSubmitStellarSecretKey(input: {
+    readonly connectionId: string;
+    readonly publicKey: string;
+    readonly secretKey: string;
+  }): Promise<PaySwapCredentialSealReceiptDto>;
+  connectionRunStellarAccountReadProbe(): Promise<PaySwapStellarAccountReadOutcomeDto>;
 }
 
 /**
@@ -74,17 +86,21 @@ export interface ConnectionsActivationChannelClient {
 export function composeConnectionsActivationBinding(
   services: DesktopConsoleChannelServices,
 ): {
-  readonly plane: ConnectionsActivationPort;
+  readonly plane: ConnectionsActivationPort & ConnectionsActivationPortWithStellarRail;
   readonly reset: () => void;
 } {
   const client = services.payswapDesktopService as unknown as ConnectionsActivationChannelClient;
-  const plane: ConnectionsActivationPort = {
+  const plane: ConnectionsActivationPort & ConnectionsActivationPortWithStellarRail = {
     statuses: () => client.connectionStatuses(),
     seedSetup: (input) => client.connectionSeedSetup(input),
     submitStripeKey: (input) => client.connectionSubmitStripeRestrictedKey(input),
     submitFlutterwaveSecretKey: (input) => client.connectionSubmitFlutterwaveSecretKey(input),
     submitPaystackSecretKey: (input) => client.connectionSubmitPaystackSecretKey(input),
     runVerificationProbe: (providerId) => client.connectionRunVerificationProbe(providerId),
+    // (P22-B) The Stellar rail members — the keypair crosses once; the
+    // account read runs host-side inside the seal.
+    submitStellarSecretKey: (input) => client.connectionSubmitStellarSecretKey(input),
+    runStellarAccountReadProbe: () => client.connectionRunStellarAccountReadProbe(),
   };
   bindSharedConnectionsActivationPlane(plane);
   return { plane, reset: resetSharedConnectionsActivationPlane };

@@ -149,7 +149,9 @@ describe("boundary law (contracts grade)", () => {
       expect((index as Record<string, unknown>)[anchor], `missing export: ${anchor}`).toBeDefined();
     }
     expect(index.PACKAGE_NAME).toBe("@payswap/surface");
-    expect(index.SURFACE_API_VERSION).toBe("1.5.0");
+    // P22-B re-pin (disclosed): 1.5.0 -> 1.6.0 — the additive corridor-plan
+    // presentation contract (the MINOR bump law in version.ts).
+    expect(index.SURFACE_API_VERSION).toBe("1.6.0");
   });
 });
 

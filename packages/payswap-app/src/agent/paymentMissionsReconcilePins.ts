@@ -24,6 +24,7 @@
  * DTO.
  */
 
+import type { PinnedCorridorLegKind } from "../pins/corridor-pins.js";
 import type { PaymentMissionsPort } from "./paymentMissionsPins.js";
 
 /* ==== the frozen reconciliation vocabularies (ADR-0013 D2) ==== */
@@ -68,13 +69,19 @@ export const PAYMENT_MISSIONS_RECONCILIATION_SOURCE_LABELS: Readonly<
 
 /** One pending attempt on the read (mirrors the ADR-0013 D1 pending
  * entry): attempt facts only — NO envelope internals, NO idempotency /
- * command / correlation ids, NO connectionRef, NO artifact ids. */
+ * command / correlation ids, NO connectionRef, NO artifact ids.
+ * (P22-B, ADR-0016 D6) `legIndex`/`legKind` are the additive per-leg
+ * attribution: a corridor leg UNKNOWN shows the pending-reconciliation
+ * card NAMING the leg (the partial-failure presentation). */
 export interface PaymentMissionsPendingAttempt {
   readonly attemptId: string;
   readonly startedAt: string;
   readonly operation: string;
   readonly executionMode: "SANDBOX" | "LIVE";
   readonly summary: string;
+  /** Present only on a corridor leg's attempt — never fabricated. */
+  readonly legIndex?: number;
+  readonly legKind?: PinnedCorridorLegKind;
 }
 
 /** The pending-reconciliation card (mirrors the ADR-0013 D1 read): the

@@ -113,6 +113,15 @@ import { discoverOpportunity } from "@payswap/opportunities";
 import type { PaySwapConnectionCapabilityChainDto } from "./consoleConnectionsWire.js";
 
 /**
+ * VALUE PIN — authority: the host's onchain chain derivation
+ * (src/host/payswap/connections/onchain-chain-derivation.ts — the
+ * definition id `capability:onchain-rail:<chainKey>`; P22-H landed
+ * exactly ONE: the stellar:testnet rail). The marker that selects the
+ * ONCHAIN branch of the rail-key law below.
+ */
+const ONCHAIN_RAIL_DEFINITION_ID = "capability:onchain-rail:stellar:testnet" as const;
+
+/**
  * The DISCOVERY PLANE over the capability bridge (the named P21 follow-on,
  * realized renderer-side per ADR-0015 D9d — NO new host member): each ACTIVE
  * connection's chain becomes ONE honest UNKNOWN-heavy opportunity through
@@ -158,29 +167,43 @@ export function chainDerivedWaitRecheckObservations(
         continue;
       }
       const providerName = chain.instance.providerName;
+      // (P22-B, ADR-0016 D5/D9) THE ONCHAIN RAIL BRANCH: the stellar:testnet
+      // chain derives from the onchain plane's own four-layer hierarchy —
+      // its definition id is the pinned rail marker and its instance
+      // providerName IS the chain key ("stellar:testnet" — a valid rail key
+      // on its own, never a "fiat:" prefix). The rail rides railKind
+      // "ONCHAIN" (the corridor relay rail); the PSP branch below stays
+      // untouched for every payment-provider chain.
+      const isOnchainRail = chain.definition.id === ONCHAIN_RAIL_DEFINITION_ID;
+      const railKind = isOnchainRail ? ("ONCHAIN" as const) : ("FIAT" as const);
       // The canonical rail-key law (PINNED_RAIL_KEY_PATTERN — lowercase
       // namespace:network): the provider's display name is title-cased
       // ("Flutterwave"), so the provider-scoped fiat rail key lowercases it
       // (the bridge battery's catch: an uppercase rail key is rejected by
       // discoverOpportunity and the record was silently skipped — the
       // source returned the empty set while the chains were ACTIVE).
-      const providerRailKey = `fiat:${providerName.toLowerCase()}`;
+      const railKey = isOnchainRail
+        ? providerName
+        : `fiat:${providerName.toLowerCase()}`;
       const observation = {
         family: "other" as const,
         observationId: `chain-observation:${chain.instance.instanceId}`,
         observationVersion: chain.observation.observationVersion,
         venueId: `provider:${providerName}`,
-        railKind: "FIAT" as const,
-        railKey: providerRailKey,
+        railKind,
+        railKey,
         adapterId: chain.implementation.adapterRef,
         observerId: `connection-bridge:${chain.observation.provenance.source}`,
         freshness: { asOfMs, maxAgeMs: 3_600_000 },
         evidenceRefs: [
           `connection-chain:${chain.instance.instanceId}:${chain.observation.observationVersion}`,
         ],
-        title: `the ${providerName} connection rail`,
-        description:
-          "an observed connection rail over the capability bridge — an honest UNKNOWN-tier opportunity record for the wait re-check, never a liquidity claim",
+        title: isOnchainRail
+          ? `the ${providerName} onchain rail (the corridor's relay)`
+          : `the ${providerName} connection rail`,
+        description: isOnchainRail
+          ? "an observed onchain rail over the capability bridge — the corridor's relay chain, an honest UNKNOWN-tier opportunity record for the wait re-check, never a liquidity claim"
+          : "an observed connection rail over the capability bridge — an honest UNKNOWN-tier opportunity record for the wait re-check, never a liquidity claim",
         exitPath: {
           status: "UNKNOWN" as const,
           description: "the exit path is not observed for a rail-connection record",

@@ -1,16 +1,24 @@
 /**
- * @payswap/app — the AGENT PROVIDER SETUP ENTRIES (app-side, P13-A).
+ * @payswap/app — the AGENT PROVIDER SETUP ENTRIES (app-side, P13-A;
+ * GROWN by P22-B, ADR-0016 — the Paystack + Stellar onchain-rail
+ * mention entries).
  *
  * The typed data the Connections area's agent-led setup cards and the
  * intent router's provider mentions project from — the app-side
- * projection of the Stripe integration types ADR-0007 D1 declares and
- * D5 names as the payment-PSP registry's first entries:
+ * projection of the integration types the registries declare:
  *
- * - U1 own-store payment acceptance (SCOPED_API_CREDENTIAL, test mode —
- *   the P13-B vertical slice; needs NO operator platform registration);
- * - U2 existing-account grant (DELEGATED_OAUTH — declared with the
- *   EXACT missing operator configuration);
- * - U3 marketplace onboarding (CONNECTED_ACCOUNT — ditto).
+ * - Stripe (ADR-0007 D1/D5): U1 own-store payment acceptance
+ *   (SCOPED_API_CREDENTIAL, test mode); U2 existing-account grant
+ *   (DELEGATED_OAUTH); U3 marketplace onboarding (CONNECTED_ACCOUNT);
+ * - Paystack (P14-C registry + ADR-0016 D8): the own-store test-mode
+ *   secret key (SCOPED_API_CREDENTIAL) — the connection's use-case
+ *   scope stays read-only; the corridor's Kenya bank-transfer payout
+ *   lane derives its own SANDBOX grant from the same sealed test key
+ *   at dispatch time (never a connection-scope growth);
+ * - the Stellar testnet onchain rail (P22-H, ADR-0016 D9): the
+ *   PROVIDERLESS_RAIL keypair wallet (the host catalogue's one rail
+ *   entry — "testnet-keypair-wallet"; a pubnet-shaped target is never
+ *   offered).
  *
  * HONESTY LAWS (ADR-0007 D1/D5 + the UX reference):
  * - An entry is a DECLARATION, never a connection, never a fabricated
@@ -20,8 +28,9 @@
  * - The connection-plane runtime is NOT wired in this deployment; these
  *   entries seed typed setup TASKS (demand-side orchestration records
  *   only — ADR-0007 D7: the composer/router hold ZERO authority).
- * - No other provider is declared anywhere in this repository — the
- *   mention table therefore contains Stripe alone (never a guess).
+ * - The mention table contains EXACTLY the declared providers — Stripe,
+ *   Paystack and the Stellar testnet rail (never a guess; every other
+ *   provider mention stays UNKNOWN with the honest reply).
  */
 
 import type { AgentTaskConnectionFormPin } from "./agent-task-pins.js";
@@ -58,7 +67,12 @@ export interface AgentProviderSetupEntry {
   }[];
 }
 
-/** The ADR-0007-declared first registry entries (Stripe U1/U2/U3). */
+/**
+ * The declared provider setup entries (Stripe U1/U2/U3, ADR-0007; the
+ * Paystack own-store slice, P14-C + ADR-0016 D8; the Stellar testnet
+ * onchain rail, ADR-0016 D9). Append-only: Stripe stays first (the
+ * registry's first entry — the deterministic first-match fold).
+ */
 export const AGENT_PROVIDER_SETUP_ENTRIES: readonly AgentProviderSetupEntry[] = [
   {
     providerId: "stripe",
@@ -103,6 +117,30 @@ export const AGENT_PROVIDER_SETUP_ENTRIES: readonly AgentProviderSetupEntry[] = 
         cardActionLabel: "Connect Stripe — existing account grant",
       },
     ],
+  },
+  {
+    providerId: "paystack",
+    label: "Paystack",
+    mentionTokens: ["paystack"],
+    form: "SCOPED_API_CREDENTIAL",
+    useCaseRef: "own-store-test-mode",
+    cardTitle: "Paystack — own-store payments (test mode)",
+    cardLine:
+      "Observe payments through your own Paystack business account: a test-mode secret key (sk_test_…) entered through the host-side credential broker — never in chat — and verified by a read-only transactions probe. The connection's scope stays read-only; the corridor's Kenya bank-transfer payout lane derives its own sandbox grant from the same sealed test key at dispatch time (never a connection-scope growth).",
+    cardActionLabel: "Connect Paystack — own-store (test mode)",
+    qualifiers: [],
+  },
+  {
+    providerId: "stellar:testnet",
+    label: "Stellar testnet (onchain rail)",
+    mentionTokens: ["stellar"],
+    form: "PROVIDERLESS_RAIL",
+    useCaseRef: "testnet-keypair-wallet",
+    cardTitle: "Stellar testnet — onchain rail wallet (keypair)",
+    cardLine:
+      "Connect your own Stellar testnet wallet with a keypair (a G… public key + an S… secret key). Both halves are entered in a host-side secret field once, sealed immediately as ONE material, and verified by a read-only Horizon account read. The connection declares the network (stellar:testnet); a pubnet-shaped target is never offered.",
+    cardActionLabel: "Connect Stellar testnet — keypair wallet",
+    qualifiers: [],
   },
 ];
 

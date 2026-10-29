@@ -27,6 +27,29 @@ describe("connection routing — the declared providers", () => {
     });
   });
 
+  it("routes 'connect Paystack' to the Paystack setup intent (P22-B — the honest declared entry)", () => {
+    expect(routeAgentText("connect Paystack")).toEqual({
+      kind: "CONNECTION_SETUP",
+      providerId: "paystack",
+      providerLabel: "Paystack",
+      form: "SCOPED_API_CREDENTIAL",
+      useCaseRef: "own-store-test-mode",
+    });
+    // Case- and punctuation-insensitive, like Stripe.
+    expect(routeAgentText("Connect PAYSTACK!").providerId ?? "").toBe("paystack");
+  });
+
+  it("routes 'connect Stellar' to the onchain-rail setup intent (P22-B — the PROVIDERLESS_RAIL keypair wallet)", () => {
+    expect(routeAgentText("connect Stellar")).toEqual({
+      kind: "CONNECTION_SETUP",
+      providerId: "stellar:testnet",
+      providerLabel: "Stellar testnet (onchain rail)",
+      form: "PROVIDERLESS_RAIL",
+      useCaseRef: "testnet-keypair-wallet",
+    });
+    expect(routeAgentText("link my Stellar testnet wallet").kind).toBe("CONNECTION_SETUP");
+  });
+
   it("is case- and punctuation-insensitive ('Connect STRIPE!')", () => {
     expect(routeAgentText("Connect STRIPE!").kind).toBe("CONNECTION_SETUP");
     expect(routeAgentText("Connect STRIPE!").providerId).toBe("stripe");
@@ -170,14 +193,18 @@ describe("UNKNOWN — the honest never-guessing law", () => {
       const routed = routeAgentText(text);
       expect(routed.kind, text).toBe("UNKNOWN");
       if (routed.kind === "UNKNOWN") {
-        expect(routed.reply).toContain("Stripe is the one provider declared in this deployment");
+        expect(routed.reply).toContain(
+          "the declared providers are Stripe, Paystack and the Stellar testnet rail",
+        );
       }
     }
   });
 
-  it("a setup verb without any provider, and a provider mention without a setup verb, stay UNKNOWN", () => {
+  it("a provider mention without a setup verb, and a setup verb without any provider, stay UNKNOWN", () => {
     expect(routeAgentText("connect a provider").kind).toBe("UNKNOWN");
     expect(routeAgentText("stripe").kind).toBe("UNKNOWN");
+    expect(routeAgentText("paystack").kind).toBe("UNKNOWN");
+    expect(routeAgentText("stellar").kind).toBe("UNKNOWN");
     expect(routeAgentText("tell me about Stripe pricing").kind).toBe("UNKNOWN");
   });
 

@@ -110,6 +110,34 @@ function scriptedChannel(): {
         note: "A confirmed probe proves read-only access only.",
       };
     },
+    // (P22-B) The two Stellar rail members — scripted like the PSP members.
+    connectionSubmitStellarSecretKey: async (input) => {
+      calls.push({ kind: "connectionSubmitStellarSecretKey", input });
+      return {
+        connectionId: input.connectionId,
+        credentialHandleRef: "handle:opaque-stellar-1",
+        sealedSecretCount: 2,
+        nextState: "PENDING_VERIFICATION",
+      };
+    },
+    connectionRunStellarAccountReadProbe: async () => {
+      calls.push({ kind: "connectionRunStellarAccountReadProbe", input: undefined });
+      return {
+        providerRef: "stellar:testnet",
+        probedOperation: "stellar.account.read",
+        results: [
+          {
+            connectionId: "conn:stellar:test-1",
+            outcome: "CONFIRMED",
+            providerReferences: ["stellar:testnet/asset:USDC:GDFQSZ5XEGJFPEYHSRTWQU3GQTL2FQZI5AZYW3EEHHIFC2T6SRDJJ7W3"],
+            state: "ACTIVE",
+            summary: "The Horizon testnet account read answered inside the seal.",
+          },
+        ],
+        evidenceTier: "PROVIDER_OBSERVATION",
+        note: "A confirmed account read proves read-only observability only.",
+      };
+    },
   };
   return { client, calls };
 }

@@ -60,10 +60,18 @@ function PendingAttemptFacts({
   readonly attempt: PaymentMissionsPendingAttempt;
 }): React.ReactNode {
   return (
-    <li>
+    <li data-testid={`ps-agent-missions-pending-${attempt.attemptId}`}>
       <span className="ps-num">{attempt.attemptId}</span> —{" "}
       {PAYMENT_MISSIONS_ATTEMPT_OPERATION_LABELS[attempt.operation] ?? "an operation"} (
       {attempt.executionMode.toLowerCase()} mode), started {attempt.startedAt}: {attempt.summary}
+      {attempt.legIndex !== undefined && attempt.legKind !== undefined ? (
+        <>
+          {" "}
+          — <strong>corridor leg {attempt.legIndex + 1} of 4 ({attempt.legKind})</strong>: this leg
+          returned UNKNOWN, so the mission holds as OUTCOME_UNKNOWN pending this reconciliation and
+          the later legs never dispatched.
+        </>
+      ) : null}
     </li>
   );
 }

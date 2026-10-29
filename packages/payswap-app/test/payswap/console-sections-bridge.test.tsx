@@ -157,7 +157,14 @@ describe("the P13 connections composition (the operator's concept, honest)", () 
   it("renders the concept's four provider cards — Stripe highlighted + the catalogue entries", () => {
     render(<PaySwapConsoleSections sectionId="connections" />);
     // The four concept cards, by name.
-    for (const label of ["Stripe", "PayPal", "Adyen", "Blockchain wallet"]) {
+    for (const label of [
+      "Stripe",
+      "Paystack",
+      "Stellar testnet (onchain rail)",
+      "PayPal",
+      "Adyen",
+      "Blockchain wallet",
+    ]) {
       expect(screen.getByRole("heading", { level: 3, name: label })).toBeDefined();
     }
     // The concept card lines, verbatim.
@@ -169,9 +176,23 @@ describe("the P13 connections composition (the operator's concept, honest)", () 
     expect(document.querySelector(".ps-connections-card--primary")).not.toBeNull();
     expect(screen.getByRole("button", { name: "Connect Stripe" })).toBeDefined();
     expect(screen.getByRole("button", { name: "Continue securely" })).toBeDefined();
+    // The P22-B declared-provider cards: the honest typed-prerequisite
+    // connect cards (never a connected state).
+    expect(
+      screen.getByRole("button", { name: "Connect Paystack" }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole("button", { name: "Connect Stellar testnet" }),
+    ).toBeDefined();
+    expect(
+      screen.getByText(/verified by a read-only transactions probe/i),
+    ).toBeDefined();
+    expect(
+      screen.getByText(/verified by a read-only Horizon account read/i),
+    ).toBeDefined();
     // The registry honesty note.
     expect(
-      screen.getByText(/registry declares Stripe alone \(ADR-0007 D5\)/),
+      screen.getByText(/registry declares Stripe \(ADR-0007 D5\), Paystack/),
     ).toBeDefined();
   });
 
@@ -197,7 +218,9 @@ describe("the P13 connections composition (the operator's concept, honest)", () 
       fireEvent.submit(input.closest("form")!);
     });
     expect(
-      await screen.findByText(/Stripe is the one provider declared in this deployment/i),
+      await screen.findByText(
+        /the declared providers are Stripe, Paystack and the Stellar testnet rail/i,
+      ),
     ).toBeDefined();
     expect(screen.getByText(/I never guess a provider or a direction/i)).toBeDefined();
   });

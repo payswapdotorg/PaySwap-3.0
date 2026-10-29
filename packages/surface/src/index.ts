@@ -129,6 +129,27 @@ export {
 } from "./corridor-coverage.ts";
 
 export {
+  type CorridorPlanLegKind,
+  type CorridorPlanDirectionClass,
+  type CorridorPlanLaneKind,
+  type CorridorPlanLegLane,
+  type CorridorPlanLegCustody,
+  type CorridorPlanLegSource,
+  type CorridorPlanSource,
+  type CorridorPlanLegView,
+  type CorridorPlanPresentation,
+  CORRIDOR_PLAN_SHAPE_ID,
+  CORRIDOR_PLAN_LEG_SKELETON,
+  CORRIDOR_PLAN_DIRECTION_CLASSES,
+  CORRIDOR_PLAN_ASSET_SYMBOL_PATTERN,
+  CORRIDOR_PLAN_STELLAR_ISSUER_STRKEY_PATTERN,
+  CORRIDOR_PLAN_LEG_PEOPLE_LABELS,
+  isIssuerScopedCorridorAssetRef,
+  InvalidCorridorPlanError,
+  foldCorridorPlan,
+} from "./corridor-plan.ts";
+
+export {
   type GatePresentationTone,
   type GateBlockReason,
   type GateAllowCheck,

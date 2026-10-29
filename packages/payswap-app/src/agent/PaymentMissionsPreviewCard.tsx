@@ -33,6 +33,7 @@ import {
   type PaymentMissionsApprovalState,
   type PaymentMissionsPreview,
 } from "./paymentMissionsPins.js";
+import { PAYMENT_MISSIONS_COMPOSITE_ACT_NOTE } from "../pins/corridor-pins.js";
 
 export interface PaymentMissionsPreviewCardProps {
   readonly missionId: string;
@@ -83,8 +84,22 @@ function PaymentMissionsScopeCard({
         <li>
           <strong>intent digest:</strong> <span className="ps-num">{request.scope.intentDigest}</span>
         </li>
+        {request.scope.planDigest !== undefined && request.scope.planLegCount !== undefined ? (
+          <li data-testid="ps-agent-missions-scope-plan">
+            <strong>plan:</strong>{" "}
+            <span className="ps-num">
+              {request.scope.planLegCount}-leg plan · digest{" "}
+              {request.scope.planDigest}
+            </span>{" "}
+            — this approval covers the whole presented plan, not one hop
+          </li>
+        ) : null}
       </ul>
-      <p className="ps-agent-missions-note">{PAYMENT_MISSIONS_SCOPE_BINDING_NOTE}</p>
+      {request.scope.planDigest !== undefined ? (
+        <p className="ps-agent-missions-note">{PAYMENT_MISSIONS_COMPOSITE_ACT_NOTE}</p>
+      ) : (
+        <p className="ps-agent-missions-note">{PAYMENT_MISSIONS_SCOPE_BINDING_NOTE}</p>
+      )}
       {resolving ? (
         <p className="ps-agent-missions-empty" role="status">
           Recording your decision…

@@ -30,12 +30,12 @@
 
 /**
  * The surface contract version this product compiled against (mirrors
- * packages/surface/src/version.ts SURFACE_API_VERSION — "1.5.0"; bumped by
- * P21-B's additive routine-stage contract — the ROUTINE_PINNED event kind +
- * the stage contract, ADR-0014 D3).
+ * packages/surface/src/version.ts SURFACE_API_VERSION — "1.6.0"; bumped by
+ * P22-B's additive corridor-plan presentation contract — the four-leg
+ * fold, ADR-0016; previously "1.5.0" by P21-B's routine-stage contract).
  * Drift is detectable by the mirror test, not discovered in production.
  */
-export const PINNED_SURFACE_API_VERSION = "1.5.0" as const;
+export const PINNED_SURFACE_API_VERSION = "1.6.0" as const;
 
 /** Mirrors surface's SurfaceContractProvenance (version.ts). */
 export interface SurfaceProvenancePin {

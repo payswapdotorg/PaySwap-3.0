@@ -27,11 +27,14 @@ import {
   CONNECTIONS_ACTIVATION_SEAL_NOTE,
   CONNECTIONS_ACTIVATION_TIER_NOTE,
   CONNECTIONS_ACTIVATION_UNBOUND_NOTE,
+  isConnectionsStellarRailPort,
   type ConnectionsProbeOutcomePin,
   type ConnectionsSealReceiptPin,
   type ConnectionsActivationProviderId,
+  type ConnectionsStellarAccountReadOutcomePin,
 } from "../connectionsActivationPins.js";
 import { sharedConnectionsActivationPlane } from "../connectionsActivationShared.js";
+import { STELLAR_RAIL, StellarRailActivationCard } from "./StellarRailActivationCard.js";
 
 /** One provider's activation card view-state (no key material — ever). */
 interface ProviderActivationState {
@@ -94,8 +97,16 @@ function stateTone(state: string | undefined): "ok" | "attention" | "disabled" {
 
 export function ConnectionsActivationPanel(): React.ReactElement | null {
   const plane = sharedConnectionsActivationPlane();
-  const [states, setStates] = useState<Record<string, ProviderActivationState>>({});
+  // (P22-B) The rail's card state rides the SAME record under its rail id
+  // (the stellar slice is the card component's own shape — structurally
+  // compatible with the provider slice plus its probe fields).
+  const [states, setStates] = useState<Record<string, ProviderActivationState & { stellarProbe?: ConnectionsStellarAccountReadOutcomePin }>>({});
   const [keyDrafts, setKeyDrafts] = useState<Record<string, string>>({});
+  // (P22-B) The stellar keypair drafts — BOTH halves (public + secret); they
+  // clear together on submit (the one-material law).
+  const [stellarPublicDraft, setStellarPublicDraft] = useState("");
+  const [stellarSecretDraft, setStellarSecretDraft] = useState("");
+  const stellarRail = plane !== undefined && isConnectionsStellarRailPort(plane) ? plane : null;
 
   useEffect(() => {
     const planeNow = sharedConnectionsActivationPlane();
@@ -228,6 +239,93 @@ export function ConnectionsActivationPanel(): React.ReactElement | null {
     [],
   );
 
+  // (P22-B) The Stellar rail flow: seed (the same seed member, the rail's
+  // own catalogue) → the keypair submit (BOTH halves once as ONE material)
+  // → the Horizon account read (the rail's own probe).
+  const seedRail = useCallback(async (): Promise<void> => {
+    const planeNow = sharedConnectionsActivationPlane();
+    if (planeNow === undefined) {
+      return;
+    }
+    setStates((prev) => ({ ...prev, [STELLAR_RAIL.id]: { ...(prev[STELLAR_RAIL.id] ?? IDLE_STATE), busy: "seeding", error: undefined } }));
+    try {
+      const outcome = await planeNow.seedSetup({
+        providerId: STELLAR_RAIL.id,
+        useCaseRef: STELLAR_RAIL.useCaseRef,
+      });
+      setStates((prev) => ({
+        ...prev,
+        [STELLAR_RAIL.id]:
+          outcome.kind === "REFUSED"
+            ? { ...(prev[STELLAR_RAIL.id] ?? IDLE_STATE), busy: "idle", error: outcome.reason }
+            : {
+                ...(prev[STELLAR_RAIL.id] ?? IDLE_STATE),
+                busy: "idle",
+                connectionId: outcome.connectionId,
+                connectionState: outcome.state,
+              },
+      }));
+    } catch (error) {
+      setStates((prev) => ({
+        ...prev,
+        [STELLAR_RAIL.id]: { ...(prev[STELLAR_RAIL.id] ?? IDLE_STATE), busy: "idle", error: String(error) },
+      }));
+    }
+  }, []);
+
+  const submitStellarKeypair = useCallback(async (): Promise<void> => {
+    const rail = sharedConnectionsActivationPlane();
+    if (rail === undefined || !isConnectionsStellarRailPort(rail)) {
+      return;
+    }
+    const current = states[STELLAR_RAIL.id] ?? IDLE_STATE;
+    if (current.connectionId === undefined) {
+      return;
+    }
+    const publicKey = stellarPublicDraft;
+    const secretKey = stellarSecretDraft;
+    if (publicKey.length === 0 || secretKey.length === 0) {
+      return;
+    }
+    setStates((prev) => ({ ...prev, [STELLAR_RAIL.id]: { ...current, busy: "submitting", error: undefined } }));
+    // THE ONE MATERIAL PATH (the keypair law): BOTH halves cross once and
+    // clear from this page's state BEFORE the receipt renders.
+    setStellarPublicDraft("");
+    setStellarSecretDraft("");
+    try {
+      const receipt = await rail.submitStellarSecretKey({ connectionId: current.connectionId, publicKey, secretKey });
+      setStates((prev) => ({
+        ...prev,
+        [STELLAR_RAIL.id]: { ...(prev[STELLAR_RAIL.id] ?? IDLE_STATE), busy: "idle", receipt },
+      }));
+    } catch (error) {
+      setStates((prev) => ({
+        ...prev,
+        [STELLAR_RAIL.id]: { ...(prev[STELLAR_RAIL.id] ?? IDLE_STATE), busy: "idle", error: String(error) },
+      }));
+    }
+  }, [states, stellarPublicDraft, stellarSecretDraft]);
+
+  const runStellarProbe = useCallback(async (): Promise<void> => {
+    const rail = sharedConnectionsActivationPlane();
+    if (rail === undefined || !isConnectionsStellarRailPort(rail)) {
+      return;
+    }
+    setStates((prev) => ({ ...prev, [STELLAR_RAIL.id]: { ...(prev[STELLAR_RAIL.id] ?? IDLE_STATE), busy: "probing", error: undefined } }));
+    try {
+      const outcome = await rail.runStellarAccountReadProbe();
+      setStates((prev) => ({
+        ...prev,
+        [STELLAR_RAIL.id]: { ...(prev[STELLAR_RAIL.id] ?? IDLE_STATE), busy: "idle", stellarProbe: outcome },
+      }));
+    } catch (error) {
+      setStates((prev) => ({
+        ...prev,
+        [STELLAR_RAIL.id]: { ...(prev[STELLAR_RAIL.id] ?? IDLE_STATE), busy: "idle", error: String(error) },
+      }));
+    }
+  }, []);
+
   if (plane === undefined) {
     return (
       <Card className="ps-console-card ps-connections-activation-unbound" data-testid="ps-connections-activation-unbound">
@@ -326,6 +424,22 @@ export function ConnectionsActivationPanel(): React.ReactElement | null {
           </Card>
         );
       })}
+      {/* (P22-B) The Stellar testnet onchain-rail card — the keypair wallet
+          (the extracted component; a port without the rail members renders
+          the honest unavailable note, never a simulated activation). */}
+      <StellarRailActivationCard
+        stellarRail={stellarRail}
+        state={states[STELLAR_RAIL.id] ?? { busy: "idle" }}
+        publicDraft={stellarPublicDraft}
+        secretDraft={stellarSecretDraft}
+        onPublicDraftChange={setStellarPublicDraft}
+        onSecretDraftChange={setStellarSecretDraft}
+        actions={{
+          onSeedRail: () => void seedRail(),
+          onSubmitKeypair: () => void submitStellarKeypair(),
+          onRunProbe: () => void runStellarProbe(),
+        }}
+      />
     </div>
   );
 }

@@ -144,7 +144,11 @@ export interface PaySwapConnectionCapabilityDefinitionDto extends Readonly<Recor
   readonly nonExecutableReason?: string;
 }
 
-/** The chain's provider-implementation layer (the host pin's own surface; opaque to route-planning). */
+/** The chain's provider-implementation layer (the host pin's own surface; opaque to route-planning).
+ * (P22-B, ADR-0016 D5) `assets` mirrors the onchain chain derivation's
+ * issuer-scoped corridor assets (the host sends them on the onchain
+ * implementation's corridors — e.g. stellar:testnet/asset:USDC:<issuerG>).
+ * Optional: absent on every PSP implementation corridor. */
 export interface PaySwapConnectionCapabilityImplementationDto {
   readonly implementationId: string;
   readonly providerName: string;
@@ -157,6 +161,8 @@ export interface PaySwapConnectionCapabilityImplementationDto {
     readonly fromCountries?: readonly string[];
     readonly toCountries?: readonly string[];
     readonly currencies?: readonly string[];
+    /** (P22-B) The issuer-scoped onchain assets the corridor carries. */
+    readonly assets?: readonly string[];
   }[];
   readonly knownDeviations: readonly { readonly aspect: string; readonly deviation: string; readonly documented: true }[];
 }
@@ -176,10 +182,13 @@ export interface PaySwapConnectionCapabilityInstanceDto {
     readonly revokedAt?: string;
     readonly authorizationRef?: string;
   };
-  /** The OPAQUE connection reference — never credential material (INV-19). */
+  /** The OPAQUE connection reference — never credential material (INV-19).
+   * (P22-B, ADR-0016 D9) `STELLAR_KEYPAIR` mirrors the onchain instance's
+   * credential kind (the host sends it on the stellar:testnet instance —
+   * ONE sealed material, both halves). */
   readonly credentialScope: {
     readonly credentialRef: string;
-    readonly credentialKind: "API_KEY" | "OAUTH" | "DELEGATED_TOKEN" | "SESSION" | "PROVIDER_DEFINED";
+    readonly credentialKind: "API_KEY" | "OAUTH" | "DELEGATED_TOKEN" | "SESSION" | "PROVIDER_DEFINED" | "STELLAR_KEYPAIR";
   };
   readonly geography: { readonly countries: readonly string[]; readonly regions?: readonly string[] };
   readonly currencies: readonly string[];

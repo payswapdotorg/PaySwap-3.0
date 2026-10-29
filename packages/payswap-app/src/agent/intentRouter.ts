@@ -33,7 +33,7 @@ import type {
 
 /** The honest reply for unresolvable text (names what the router can do). */
 export const AGENT_INTENT_UNKNOWN_REPLY =
-  "I can route payment and connection requests; for everything else I have no route yet. For a payment, name one direction — pay, receive, move or convert (for example: \"pay the supplier\"). For a connection, name a declared provider with a setup verb (for example: \"connect Stripe\" — Stripe is the one provider declared in this deployment). I never guess a provider or a direction." as const;
+  "I can route payment and connection requests; for everything else I have no route yet. For a payment, name one direction — pay, receive, move or convert (for example: \"pay the supplier\"). For a connection, name a declared provider with a setup verb (for example: \"connect Stripe\" — the declared providers are Stripe, Paystack and the Stellar testnet rail). I never guess a provider or a direction." as const;
 
 /** The routing result: one typed intent, or the honest UNKNOWN. */
 export type RoutedAgentIntent =
