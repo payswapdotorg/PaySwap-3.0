@@ -294,11 +294,17 @@ describe("architectural boundary: @payswap/opportunities (the REWRITTEN zero-sib
     // DISCLOSED RE-PIN (P21-C, ADR-0014 D9): the lane added four NEW src
     // modules (conditional, conditional-publication, conditional-lifecycle,
     // wait-recheck) and two NEW test files (conditional, wait-recheck),
-    // so the census moved 31 -> 35 src and 21 -> 23 test. The pins stay
-    // EXACT toBe (never loosened to ranges) — the census law's strength
-    // is unchanged.
-    expect(srcCount).toBe(35);
-    expect(testCount).toBe(23);
+    // so the census moved 31 -> 35 src and 21 -> 23 test.
+    // DISCLOSED RE-PIN (P23-A, ADR-0015 D2/D4/D6): the lane added eight NEW
+    // src modules (canonical, repair-facts, repair-operators,
+    // repair-classifications, platform-work, repair-proposals,
+    // repair-proposal-validation, repair-proposal-fold) and three NEW test
+    // files (repair-operators, platform-work, repair-proposals), so the
+    // census moved 35 -> 43 src and 23 -> 26 test. The pins stay EXACT
+    // toBe (never loosened to ranges) — the census law's strength is
+    // unchanged.
+    expect(srcCount).toBe(43);
+    expect(testCount).toBe(26);
     expect(maxLines).toBeLessThanOrEqual(400);
     expect(maxFile.length).toBeGreaterThan(0);
   });

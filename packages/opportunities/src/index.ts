@@ -84,6 +84,25 @@ export * from "./conditional-publication.ts";
 export * from "./conditional-lifecycle.ts";
 export * from "./wait-recheck.ts";
 
+// The canonical helpers (ADR-0009 D4 — the one digest flavor, re-declared
+// locally under the leaf-in-flight law; the deterministic identities of
+// the P23-A surfaces compute over it).
+export * from "./canonical.ts";
+
+// The P23-A repair-discovery foundations (ADR-0015 D2/D4/D6): the typed
+// repair-operator catalogue over the pinned 26-code corridor exclusion
+// vocabulary + the honest non-operator classifications + the totality law;
+// the first-class platform work items; the bounded, grounded model-proposal
+// interface with its strict validation, budget truncation receipts and the
+// dedup fold. Advisory only, never execution.
+export * from "./repair-facts.ts";
+export * from "./repair-operators.ts";
+export * from "./repair-classifications.ts";
+export * from "./platform-work.ts";
+export * from "./repair-proposals.ts";
+export * from "./repair-proposal-validation.ts";
+export * from "./repair-proposal-fold.ts";
+
 // The secret-free law (runtime scrubber, hard law 5).
 export * from "./secret-free.ts";
 

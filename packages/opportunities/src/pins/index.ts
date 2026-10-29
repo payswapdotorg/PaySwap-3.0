@@ -23,8 +23,11 @@
  * - ./capability.ts     — @payswap/capability (P2-W1): the observation
  *                         discipline (monotonic per-source observation
  *                         VERSIONS, the two-axis availability law,
- *                         ELIGIBLE/NOT_ELIGIBLE/UNKNOWN) and the
- *                         INV-13 catalogue-never-authorizes law.
+ *                         ELIGIBLE/NOT_ELIGIBLE/UNKNOWN), the INV-13
+ *                         catalogue-never-authorizes law and the corridor
+ *                         exclusion vocabulary (corridor-types.ts — the
+ *                         26 stable machine codes the P23-A repair-operator
+ *                         catalogue is TOTAL over; ADR-0015 D2).
  * - ./economic.ts       — @payswap/economic (P1-W1): AmountSpec (the
  *                         pinned cross-lane money wire shape), the
  *                         versioned-economic-input envelope discipline
