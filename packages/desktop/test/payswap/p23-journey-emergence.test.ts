@@ -250,16 +250,21 @@ async function driveEmergenceJourney(): Promise<JourneyEmergenceOutcome> {
     // ---- THE VERIFIED/UNVERIFIED DISTINCTION (A.6, the honest pairing) ----
     // The full no-route world verifies nothing TODAY: the party changes
     // without a re-run carry the no-rerun reason; the paired intermediary
-    // conditional + both hypotheses name the remaining REAL exclusions.
+    // conditional + both hypotheses stay honestly UNVERIFIED — the P23
+    // correctness patch (2026-10-29) requires the BRIDGE PROOF (the exact
+    // assumed element provably participating), and this world's remaining
+    // blockers (the read-only FLW rail, the unserved funding method, the
+    // stale observations) are NOT answered by an assumed rail's existence.
     expect(emergence.conditionalOpportunities[0]!.verification).toBe("UNVERIFIED");
     expect(emergence.conditionalOpportunities[0]!.verificationReason).toContain("no hypothetical re-run exists");
     expect(emergence.conditionalOpportunities[1]!.verification).toBe("UNVERIFIED");
     expect(emergence.conditionalOpportunities[1]!.verificationReason).toContain("no hypothetical re-run exists");
     expect(emergence.conditionalOpportunities[2]!.verification).toBe("UNVERIFIED");
-    expect(emergence.conditionalOpportunities[2]!.verificationReason).toContain("the re-run verified no rank-eligible segment");
+    expect(emergence.conditionalOpportunities[2]!.verificationReason).toContain("no bridge proof was returned");
     for (const card of emergence.hypotheses) {
       expect(card.verification).toBe("UNVERIFIED");
-      expect(card.verificationReason).toContain("the re-run verified no rank-eligible segment");
+      expect(card.verificationReason).toContain("no bridge proof was returned");
+      expect(card.verificationReason).toContain("NOT_EXECUTABLE_CAPABILITY");
     }
 
     // ---- stage 6's REAL facts + the derived interventions (the existing Lab kinds) ----

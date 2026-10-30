@@ -41,10 +41,22 @@ export const ROUTE_HYPOTHESIS_STAGE = "stage-7:derive-route-hypotheses" as const
 /**
  * The pinned result of the REAL planner re-run: the rank-eligible plan ids
  * over the REAL sub-views (ids only — a hypothesis never carries compiled
- * plans) + the remaining REAL exclusions (verbatim grounded facts).
+ * plans) + the remaining REAL exclusions (verbatim grounded facts) + THE
+ * BRIDGE PROOF's plan ids (the P23 correctness patch, 2026-10-29).
  */
 export interface PlannerReRunResult {
   readonly rankedEligible: readonly string[];
+  /**
+   * THE BRIDGE PROOF (the P23 correctness patch): the plan ids over the
+   * AUGMENTED view that PROVABLY incorporate the EXACT assumed element —
+   * PLANNER_VERIFIED requires at least one. A re-run that cannot prove
+   * the assumed element's participation returns the EMPTY set and the
+   * hypothesis stays UNVERIFIED: the badge never means merely that some
+   * real route was eligible. The ids are ADVISORY candidate identities
+   * (the proof machinery namespaces them `hypothesis-plan:`), never
+   * compiled RoutePlan ids.
+   */
+  readonly assumedElementPlanIds: readonly string[];
   readonly exclusions: readonly GroundedExclusionFact[];
 }
 
@@ -166,6 +178,29 @@ function validatedReRunResult(result: unknown): PlannerReRunResult {
   if (!Array.isArray(rankedEligible) || !rankedEligible.every((id) => isNonEmptyString(id)) || new Set(rankedEligible).size !== rankedEligible.length) {
     throw new RouteHypothesisError("the re-run result's rankedEligible must be an array of unique non-empty plan ids");
   }
+  const assumedElementPlanIds = record["assumedElementPlanIds"];
+  if (
+    !Array.isArray(assumedElementPlanIds) ||
+    !assumedElementPlanIds.every((id) => isNonEmptyString(id)) ||
+    new Set(assumedElementPlanIds).size !== assumedElementPlanIds.length
+  ) {
+    throw new RouteHypothesisError(
+      "the re-run result's assumedElementPlanIds must be an array of unique non-empty plan ids (the bridge proof's advisory candidate identities — the empty set is the honest unproven answer)",
+    );
+  }
+  // THE DISJOINTNESS LAW (the P23 correctness patch): a plan compiled over
+  // the UNCHANGED real sub-views can never incorporate an element that does
+  // not exist there — an id appearing in BOTH sets is a lying port and
+  // fails closed (never a fabricated participation proof).
+  const realIds = new Set(rankedEligible);
+  for (const id of assumedElementPlanIds) {
+    if (realIds.has(id)) {
+      throw new RouteHypothesisError(
+        `the re-run result claims the plan id '${id}' both as a real rank-eligible plan over the unchanged sub-views AND as incorporating the assumed element — a plan over the real views can never incorporate an element that does not exist there (a lying port never composes)`,
+        { planId: id },
+      );
+    }
+  }
   const exclusions = record["exclusions"];
   if (!Array.isArray(exclusions)) {
     throw new RouteHypothesisError("the re-run result's exclusions must be an array of grounded exclusion facts");
@@ -199,9 +234,15 @@ export interface RouteHypothesisDerivationInput {
  * rank-eligible ids) and the hypothetical segments (the assumed element),
  * carry the remaining REAL exclusions verbatim as blockers, and compute
  * the honest structural assessment — `wouldCompose` is TRUE only when the
- * verified segments cover the real sides AND the assumed element bridges
- * them (conservative; UNKNOWN is never guessed into true). The output is
- * deep-frozen, advisory-branded and self-checked by the structural guard.
+ * re-run's BRIDGE PROOF compiled a typed candidate PROVABLY incorporating
+ * the EXACT assumed element (`assumedElementPlanIds` non-empty). The
+ * pre-patch law (any real rank-eligible segment + any assumed element)
+ * let a valid real route and an UNRELATED assumed element coexist into a
+ * false PLANNER_VERIFIED — that compatibility defect is closed here: a
+ * re-run that cannot prove the assumed element's participation returns
+ * the empty proof set and the hypothesis stays UNVERIFIED (conservative;
+ * UNKNOWN is never guessed into true). The output is deep-frozen,
+ * advisory-branded and self-checked by the structural guard.
  */
 export function deriveRouteHypothesis(input: RouteHypothesisDerivationInput): PinnedRouteHypothesis {
   const request = requireObject(input, "the route-hypothesis derivation request");
@@ -237,17 +278,18 @@ export function deriveRouteHypothesis(input: RouteHypothesisDerivationInput): Pi
   ]);
   const blockers = Object.freeze([...reRun.exclusions]);
 
-  // The honest structural assessment: conservative — TRUE only when the
-  // re-run verified REAL rank-eligible segments over the real sub-views AND
-  // the assumed element exists to bridge them; anything less is FALSE,
-  // never guessed into true.
-  const wouldCompose = verifiedSegments.length > 0 && hypotheticalSegments.length > 0;
+  // The honest structural assessment (the P23 correctness patch law):
+  // TRUE only when the re-run's bridge proof compiled a typed candidate
+  // PROVABLY incorporating the EXACT assumed element. The verified real
+  // segments alone NEVER verify — a valid real route plus an unrelated
+  // assumed element is exactly the case that must stay UNVERIFIED.
+  const wouldCompose = reRun.assumedElementPlanIds.length > 0;
   const verification = wouldCompose ? ("PLANNER_VERIFIED" as const) : ("UNVERIFIED" as const);
   const verificationReason = wouldCompose
-    ? "the REAL planner re-run composed a rank-eligible route over the real sub-views; the assumed element is the hypothetical bridge (advisory — the composition is never claimed)"
+    ? `the re-run's bridge proof compiled a typed candidate incorporating the EXACT assumed element (${reRun.assumedElementPlanIds.join(", ")}) — the element provably participates in an eligible composed candidate, never merely that some real route was eligible (advisory — the composition is never claimed executable)`
     : blockers.length > 0
-      ? `the re-run verified no rank-eligible segment over the real sub-views — the remaining REAL exclusions block the corridor (${blockers.map((blocker) => blocker.code).join(", ")})`
-      : "the re-run verified no rank-eligible segment over the real sub-views (nothing was guessed into true)";
+      ? `the re-run proved NO typed candidate incorporating the assumed element — no bridge proof was returned (the element does not provably span the corridor's declared pair, or a remaining blocker is not answered by its augmentation kind); the remaining REAL exclusions block the corridor (${blockers.map((blocker) => blocker.code).join(", ")})`
+      : "the re-run proved NO typed candidate incorporating the assumed element — no bridge proof was returned and nothing was guessed into true";
 
   const hypothesisDigest = contentDigest({
     hypothesisId: view.variantId,
@@ -257,6 +299,7 @@ export function deriveRouteHypothesis(input: RouteHypothesisDerivationInput): Pi
     hypotheticalSegments,
     citedShapeSkeleton,
     blockers,
+    assumedElementPlanIds: reRun.assumedElementPlanIds,
     wouldCompose,
     neverExecutable: true,
     derivedAt: at,

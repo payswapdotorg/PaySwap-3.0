@@ -19,11 +19,15 @@
  *   NEVER dispatches, never enters available-now, never feeds eligibility;
  *   the only route onward is fresh planning, preview and NEW explicit
  *   authorization (the frozen never-executable literals).
- * - HONEST VERIFICATION (A.6): the verification pairing is
- *   `PLANNER_VERIFIED | UNVERIFIED` — PLANNER_VERIFIED asserts only that the
- *   REAL planner re-run composed a rank-eligible route over the
- *   party-changed view; UNVERIFIED carries the honest remaining reason
- *   VERBATIM, never a softened guess.
+ * - HONEST VERIFICATION (A.6, amended by the P23 correctness patch
+ *   2026-10-29): the verification pairing is
+ *   `PLANNER_VERIFIED | UNVERIFIED` — PLANNER_VERIFIED asserts that the
+ *   REAL planner re-run's BRIDGE PROOF compiled a typed candidate
+ *   incorporating the EXACT assumed element over the party-changed view
+ *   (the element provably spans the corridor's declared pair and every
+ *   remaining blocker is answered by its augmentation kind); it NEVER
+ *   means merely that some real route was eligible. UNVERIFIED carries
+ *   the honest remaining reason VERBATIM, never a softened guess.
  * - The platform prerequisites (gapId + note) are DISTINCT from the party
  *   prerequisites (the ADR-0014 D9 labeling law, first-class here): what
  *   PaySwap itself would need to build is never conflated with what a party

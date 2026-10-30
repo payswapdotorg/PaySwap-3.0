@@ -37,11 +37,15 @@ const CITED_SKELETON = Object.freeze({
   legKindSequence: Object.freeze(["FIAT_PSP_COLLECT", "PSP_STABLECOIN_ISSUANCE", "BANK_SETTLEMENT"] as const),
 }) as unknown as import("../src/pins/hypotheses.ts").PinnedCitedShapeSkeleton;
 
-function stubReRun(rankedEligible: readonly string[], exclusions: readonly { side: "SENDER" | "RECIPIENT"; routeId: string; code: string; message: string }[]): PlannerReRunPort {
+function stubReRun(
+  rankedEligible: readonly string[],
+  exclusions: readonly { side: "SENDER" | "RECIPIENT"; routeId: string; code: string; message: string }[],
+  assumedElementPlanIds: readonly string[] = [],
+): PlannerReRunPort {
   return {
     compileCorridorView(view) {
       void view;
-      return { rankedEligible, exclusions };
+      return { rankedEligible, assumedElementPlanIds, exclusions };
     },
   };
 }
@@ -49,7 +53,7 @@ function stubReRun(rankedEligible: readonly string[], exclusions: readonly { sid
 function hypothesisInput(overrides: Partial<RouteHypothesisDerivationInput> = {}): RouteHypothesisDerivationInput {
   return {
     view: assumedRailView(),
-    reRunPort: stubReRun(["plan:sender-segment-1"], []),
+    reRunPort: stubReRun(["plan:sender-segment-1"], [], ["hypothesis-plan:fixture-bridge"]),
     citedShapeSkeleton: CITED_SKELETON,
     operatorId: OPERATOR_ID,
     at: NOW,
@@ -106,15 +110,56 @@ describe("the multi-hop hypothesis stage (P23-C, ADR-0015 D5)", () => {
     expect(hypothesis.hypothesisId).toBe(assumedRailView().variantId);
   });
 
-  it("the verified/hypothetical labeling: real rank-eligible ids are VERIFIED, the assumed element is ASSUMED", () => {
+  it("the verified/hypothetical labeling: real rank-eligible ids are VERIFIED, the assumed element is ASSUMED; the bridge proof verifies", () => {
     const hypothesis = deriveRouteHypothesis(hypothesisInput());
     expect(hypothesis.verifiedSegments).toEqual([{ segmentId: "plan:sender-segment-1", label: "VERIFIED" }]);
     expect(hypothesis.hypotheticalSegments).toEqual([{ segmentId: "assumed-rail:fixture-intermediary", label: "ASSUMED" }]);
     expect(hypothesis.wouldCompose).toBe(true);
     expect(hypothesis.verification).toBe("PLANNER_VERIFIED");
+    expect(hypothesis.verificationReason).toContain("hypothesis-plan:fixture-bridge");
+    expect(hypothesis.verificationReason).toContain("never merely that some real route was eligible");
   });
 
-  it("wouldCompose honesty: a re-run that verifies NOTHING stays UNVERIFIED with the honest remaining reason (never guessed into true)", () => {
+  it("THE P23 CORRECTNESS REGRESSION (the handoff §2.2 law): a valid real route and an UNRELATED assumed element NEVER verify — the badge cannot mean merely that some real route was eligible", () => {
+    // A real rank-eligible route exists (rankedEligible non-empty) and the
+    // re-run honestly returns NO bridge proof for the assumed element
+    // (the default empty set — the element does not provably participate).
+    // The pre-patch law computed wouldCompose from
+    // `verifiedSegments.length > 0 && hypotheticalSegments.length > 0` and
+    // produced a FALSE PLANNER_VERIFIED here; the patched law requires the
+    // proof and stays UNVERIFIED.
+    const hypothesis = deriveRouteHypothesis(hypothesisInput({ reRunPort: stubReRun(["plan:real-eligible-route-1"], []) }));
+    expect(hypothesis.verifiedSegments).toEqual([{ segmentId: "plan:real-eligible-route-1", label: "VERIFIED" }]);
+    expect(hypothesis.hypotheticalSegments).toEqual([{ segmentId: "assumed-rail:fixture-intermediary", label: "ASSUMED" }]);
+    expect(hypothesis.wouldCompose).toBe(false);
+    expect(hypothesis.verification).toBe("UNVERIFIED");
+    expect(hypothesis.verificationReason).toContain("no bridge proof was returned");
+  });
+
+  it("the bridge proof alone verifies even with NO real rank-eligible segment — the assumed element is what composes the corridor (the honest positive direction)", () => {
+    const hypothesis = deriveRouteHypothesis(
+      hypothesisInput({ reRunPort: stubReRun([], [], ["hypothesis-plan:fixture-bridge"]) }),
+    );
+    expect(hypothesis.verifiedSegments).toEqual([]);
+    expect(hypothesis.wouldCompose).toBe(true);
+    expect(hypothesis.verification).toBe("PLANNER_VERIFIED");
+    expect(hypothesis.verificationReason).toContain("hypothesis-plan:fixture-bridge");
+  });
+
+  it("the disjointness law: a port claiming ONE id as both a real rank-eligible plan AND a bridge-proof plan is a lying port and fails closed", () => {
+    expect(() =>
+      deriveRouteHypothesis(
+        hypothesisInput({ reRunPort: stubReRun(["plan:claimed-both"], [], ["plan:claimed-both"]) }),
+      ),
+    ).toThrow(RouteHypothesisError);
+    expect(() =>
+      deriveRouteHypothesis(
+        hypothesisInput({ reRunPort: stubReRun(["plan:a"], [], ["hypothesis-plan:b", "hypothesis-plan:b"]) }),
+      ),
+    ).toThrow(RouteHypothesisError);
+  });
+
+  it("wouldCompose honesty: a re-run that proves NOTHING stays UNVERIFIED with the honest remaining reason (never guessed into true)", () => {
     const blockers = [
       { side: "RECIPIENT" as const, routeId: "route:recipient-1", code: "FUNDING_METHOD_NOT_SERVED", message: "the funding method is not served" },
     ];

@@ -129,6 +129,27 @@ remains the named platform work item; a hypothesis cites existing skeletons only
 A hypothesis is never a `RoutePlan`, never enters available-now, never feeds
 eligibility — structural typing plus the D7 battery.
 
+*(Corrected 2026-10-29, the P23 correctness patch: the shipped `wouldCompose`
+computation — `verifiedSegments.length > 0 && hypotheticalSegments.length > 0` —
+combined with the desktop re-run port's enumeration over the UNCHANGED real
+snapshots let a valid real route and an UNRELATED assumed rail/asset/connector
+coexist into a false `PLANNER_VERIFIED` (the badge meant "some real route was
+eligible", not "the assumed element participates"). The corrected law: the
+re-run returns `assumedElementPlanIds` — the plan ids over the AUGMENTED view
+that PROVABLY incorporate the EXACT assumed element — and `wouldCompose` is TRUE
+only when that set is non-empty. The proof is the NEW `bridge-proof.ts` typed
+deterministic compile: exact-element binding, pair connectivity (the element
+spans the corridor's declared currency pair) and bridge-worthiness (every
+remaining REAL blocker's code is answered by the element's augmentation kind —
+the frozen per-kind answerable sets mirroring the A.3 operator semantics). A
+port that cannot prove participation returns the empty set and the hypothesis
+stays UNVERIFIED. The plan ids are namespaced `hypothesis-plan:` advisories,
+never compiled RoutePlan ids, and the disjointness law (a real-plan id can never
+appear in the proof set) fails a lying port closed. Regression + positive
+control batteries pin both directions: a real route + an unrelated element
+NEVER verifies; a country-blocked corridor whose only blockers the element
+answers DOES verify through the full composition.)*
+
 **D6 — the bounded, grounded model-proposal interface.** `@payswap/opportunities`
 gains NEW `repair-proposals.ts`: the `ModelProposalPort` (injected, fail-closed
 unbound default) and the STRICT validation contract. A model (LLM) may PROPOSE
@@ -276,7 +297,9 @@ these amended values.)*
 
 **A.6 The verification vocabulary:** `PLANNER_VERIFIED | UNVERIFIED` (the pairing
 type on the derivation output; the opportunities record shape is unchanged —
-byte-compat).
+byte-compat). *(Corrected 2026-10-29: `PLANNER_VERIFIED` means the D5 re-run's
+BRIDGE PROOF compiled a typed candidate incorporating the EXACT assumed element
+— never merely that a real route was rank-eligible. See the D5 correction note.)*
 
 **A.7 The engine-view section ids growth** (`ROUTE_PLANNING_SECTION_IDS`):
 `availableNow, exclusions, truncation, scenarios, conditionalOpportunities,

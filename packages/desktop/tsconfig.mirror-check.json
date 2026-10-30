@@ -69,6 +69,7 @@
     "test/payswap/wait-recheck-composition.test.ts",
     "test/payswap/p22b-corridor-composition.test.ts",
     "test/payswap/p23-emergence-fixtures.ts",
+    "test/payswap/p23-bridge-proof-worlds.ts",
     "test/payswap/p23-opportunity-emergence.test.ts",
     "test/payswap/p23-journey-emergence.test.ts",
     "test/payswap/p23-no-bypass.test.ts",
@@ -84,6 +85,7 @@
     "../opportunities/test/fixtures.ts",
     "../route-planning/test/no-route-fixtures.ts",
     "../route-planning/test/fixtures.ts",
+    "../route-planning/test/compiler-evidence.ts",
     "../capability/src",
     "../provider-runtime/src",
     "../trust/src"

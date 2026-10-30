@@ -106,7 +106,11 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
     // + corridor-leg-laws + pins/corridor + pins/route-compiler-input) on top of
     // the P23-C 25 (exclusion-repair + exclusion-validation + hypothetical-views
     // + hypothesis-stage + lab-facts + pins/repairs + pins/hypotheses).
-    expect(sourceFiles.length).toBe(29);
+    // DISCLOSED RE-PIN (the P23 correctness patch, 2026-10-29): +1 src module
+    // (bridge-proof — the typed deterministic bridge proof for the hypothesis
+    // stage; the PLANNER_VERIFIED badge now requires the assumed element's
+    // provable participation, never merely a real eligible route).
+    expect(sourceFiles.length).toBe(30);
   });
 
   it("no @payswap/* or @zcode/* import appears ANYWHERE in src (the pin-only law)", () => {
@@ -180,9 +184,14 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
     // it proves pin == the grown lane-A authority byte-identically per
     // ADR-0015 D11). The pins stay EXACT toBe (never loosened to ranges) —
     // the census law's strength is unchanged.
-    expect(sourceFiles.length).toBe(29);
-    expect(testFiles.length).toBe(25);
-    expect(allTestFiles.length).toBe(30);
+    // DISCLOSED RE-PIN (the P23 correctness patch, 2026-10-29): +1 src module
+    // (bridge-proof.ts) +1 test suite (bridge-proof.test.ts) — the typed
+    // deterministic bridge proof that closes the hypothesis-verification
+    // compatibility defect (a valid real route + an unrelated assumed
+    // element coexisting into a false PLANNER_VERIFIED).
+    expect(sourceFiles.length).toBe(30);
+    expect(testFiles.length).toBe(26);
+    expect(allTestFiles.length).toBe(31);
   });
 
   it("the manifest law + tsconfig carries EXACTLY the one documented type-only paths mapping + a single node.d.ts process declaration", () => {

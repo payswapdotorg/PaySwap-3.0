@@ -27,6 +27,7 @@ export * from "./exclusion-repair.ts";
 export * from "./exclusion-validation.ts";
 export * from "./hypothetical-views.ts";
 export * from "./hypothesis-stage.ts";
+export * from "./bridge-proof.ts";
 export * from "./corridor-plan.ts";
 export * from "./corridor-leg-laws.ts";
 export * from "./pins/economic.ts";

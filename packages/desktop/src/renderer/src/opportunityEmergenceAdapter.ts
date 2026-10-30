@@ -22,8 +22,12 @@
  *   planner path — the SAME stage-4/5 machinery the engine adapter runs
  *   (enumerateRouteCandidates + evaluateHardGates + rankRoutes re-run over
  *   the real sub-views), returning the rank-eligible ids + the remaining
- *   REAL exclusions. BOUNDED: at most the scenario budget's maxScenarios
- *   hypotheses (an honest overflow truncates WITH a receipt).
+ *   REAL exclusions + THE BRIDGE PROOF (the P23 correctness patch,
+ *   2026-10-29: `compileAssumedElementBridge` proves — or honestly fails
+ *   to prove — that the view's EXACT assumed element provably
+ *   participates; PLANNER_VERIFIED requires the proof, never merely a
+ *   real eligible route). BOUNDED: at most the scenario budget's
+ *   maxScenarios hypotheses (an honest overflow truncates WITH a receipt).
  * - (d) THE MODEL-PROPOSAL COMPOSITION (D6): the ModelProposalPort binds
  *   ONLY when a session model is selected AND the substrate's
  *   model-provider transport seam is supplied (the live-model binding is a
@@ -44,6 +48,7 @@
  */
 
 import {
+  compileAssumedElementBridge,
   corridorViewDigest,
   deriveConditionalOpportunities,
   deriveExclusionRepairs,
@@ -147,7 +152,15 @@ const NO_RERUN_REASON =
  * corridor view the hypothetical view was derived over — the digest is
  * re-verified, never assumed), returning the rank-eligible plan ids over
  * the real sub-views (the segments verifiable TODAY) + the remaining REAL
- * exclusions (the corridor's verbatim typed facts).
+ * exclusions (the corridor's verbatim typed facts) + THE BRIDGE PROOF
+ * (the P23 correctness patch, 2026-10-29): `compileAssumedElementBridge`
+ * over the view's EXACT assumed element — the proof holds only when the
+ * element spans the corridor's declared pair AND every remaining blocker
+ * is answered by its augmentation kind; otherwise the proof is empty and
+ * the hypothesis honestly stays UNVERIFIED. The pre-patch port ignored
+ * the view's augmentation entirely, so a valid real route and an
+ * unrelated assumed element coexisted into a false PLANNER_VERIFIED —
+ * that compatibility defect is closed here.
  */
 export function realPlannerReRunPort(context: {
   readonly movement: MoneyMovementIntentPin;
@@ -182,12 +195,25 @@ export function realPlannerReRunPort(context: {
       });
       const gates = evaluateHardGates({ intent: context.movement, at: context.at, candidates: enumeration.candidates });
       const ranking = rankRoutes({ evaluation: gates, policy: context.policy });
+      const exclusions = [
+        ...groundedFactsOf("SENDER", context.senderSnapshot),
+        ...groundedFactsOf("RECIPIENT", context.recipientSnapshot),
+      ];
+      // THE BRIDGE PROOF (the P23 correctness patch): the deterministic
+      // typed proof that the view's EXACT assumed element participates —
+      // over the corridor query + the SAME remaining REAL blockers the
+      // re-run reports. An element that does not span the declared pair,
+      // or a blocker the element's augmentation kind cannot answer, is
+      // honestly unproven (the empty plan-id set -> UNVERIFIED).
+      const bridge = compileAssumedElementBridge({
+        view,
+        corridorQuery: context.query,
+        blockers: exclusions,
+      });
       return {
         rankedEligible: ranking.ranked.map((candidate) => candidate.metrics.planId),
-        exclusions: [
-          ...groundedFactsOf("SENDER", context.senderSnapshot),
-          ...groundedFactsOf("RECIPIENT", context.recipientSnapshot),
-        ],
+        assumedElementPlanIds: bridge.assumedElementPlanIds,
+        exclusions,
       };
     },
   };

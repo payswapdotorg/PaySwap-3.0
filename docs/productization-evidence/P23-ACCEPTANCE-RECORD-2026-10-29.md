@@ -157,3 +157,37 @@ documentation-only or test-count-only closure was the named impossibility;
 the closure gates (the no-bypass battery + the CDP card-content E2E) are
 both green. The frontier returns to P22 (parked, operator-gated) with the
 P24 candidates recorded.
+
+## Correction appendix (2026-10-29, later the same day — the hypothesis-verification defect)
+
+The 2026-10-29 north-star implementation handoff (§2.2) identified a source-level
+correctness defect in what this record accepted: `deriveRouteHypothesis`
+computed `wouldCompose` as `verifiedSegments.length > 0 &&
+hypotheticalSegments.length > 0` while the desktop re-run port enumerated
+candidates over the UNCHANGED real sender/recipient snapshots — the assumed
+augmentation never became part of the compiled candidate. A valid real route and
+an unrelated assumed rail/asset/connector could therefore coexist and
+incorrectly produce `PLANNER_VERIFIED`. The green batteries cited above did not
+catch it because the stage-level stub tests ignored the view (the exact gap the
+handoff names).
+
+The defect is closed by the P23 correctness patch (see ADR-0015's D5/A.6
+correction notes and the worklog's Task 162 entry): the re-run now returns
+`assumedElementPlanIds` — the plan ids over the AUGMENTED view that PROVABLY
+incorporate the EXACT assumed element, compiled by the NEW typed deterministic
+bridge proof (`packages/route-planning/src/bridge-proof.ts`: exact-element
+binding + pair connectivity + per-kind answerable-blocker semantics) — and
+`wouldCompose` is TRUE only when that proof set is non-empty. Regression
+batteries pin the handoff's exact case (a real route + an unrelated assumed
+element NEVER verifies) and positive controls pin the honest direction (a
+country-blocked corridor whose only blockers the element answers DOES verify
+through the full composition).
+
+**Honest scope of this appendix:** everything else this record accepted — the
+26-code catalogue, the operator directory, the platform work items, the
+model-proposal interface, the no-bypass battery, the CDP card-content E2E, the
+web honest-presentation tier — is unaffected and re-verified green at the patch
+commit (route-planning 26f/302t, desktop 63f/513t, payswap-app 58f/612t,
+architecture 0/0/0, the three scoped desktop tsc gates 0/0/0, oxlint 0 errors
+on the changed surfaces). The P23 lane's CLOSED status stands; the badge's
+MEANING is what was corrected.
