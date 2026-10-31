@@ -90,9 +90,13 @@ function merchantRailOf(bridge: BridgeDerivation): BridgeConnectedInstance | und
   );
 }
 
-/** The D7 honest no-route text (rendered verbatim in the exclusion). */
+/** The D7 honest no-route text (rendered verbatim in the exclusion — the
+ * P22-D six-fact separation: the IMPLEMENTATION fact names what PaySwap's
+ * adapter implements; the provider's documented transfer API is disclosed
+ * as a capability input this deployment has not implemented, entitled or
+ * observed — never a claim about the provider's own nature). */
 const NO_ROUTE_FOR_CORRIDOR_MESSAGE =
-  "No route composes this corridor in this deployment: the declared test corridor covers US→US USD only, and no frozen route shape composes a cross-provider fiat payment — a Flutterwave-funded send has no send operation (Flutterwave is read-only by construction, so a successful read-only probe never establishes send capability; an FLW transfer terminates at bank or mobile-money destinations and never creates a Flutterwave→Stripe route).";
+  "No route composes this corridor in this deployment: the declared test corridor covers US→US USD only, and no frozen route shape composes a cross-provider fiat payment — a Flutterwave-funded send has no send operation in this deployment (PaySwap's adapter implements read-only balance access only, so a successful read-only probe never establishes send capability; Flutterwave's documented API offers secret-key transfers including test-mode bank and mobile-money destinations — a provider-capability input this deployment has not implemented, entitled or observed — and no Flutterwave→Stripe route exists here).";
 
 const NO_CONNECTED_MERCHANT_RAIL_MESSAGE =
   "No connected merchant receiving rail exists — the merchant directory's receiving context maps onto a connected Stripe test account, and no ACTIVE Stripe connection with confirmed probe evidence exists. The merchant's receiving rail is never fabricated.";

@@ -207,7 +207,8 @@ export function stripeKeyClassOf(apiKey: string, executionMode: string): Connect
   throw new Error("the sealed Stripe key does not carry a canonical test-mode key prefix");
 }
 
-/** The Flutterwave key-class law (read-only by construction — F3). */
+/** The Flutterwave key-class law (read-only classes in PaySwap's adapter — F3,
+ * the implementation fact; never a claim about the provider's own nature). */
 export function flutterwaveKeyClassOf(apiKey: string, executionMode: string): ConnectionProbeKeyClass {
   if (executionMode !== "SANDBOX") {
     throw new Error(

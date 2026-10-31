@@ -184,7 +184,8 @@ async function driveJourney(): Promise<{ readonly missionStore: string; readonly
   expect(outcomeA.results).toHaveLength(1);
   expect(outcomeA.results[0]?.outcome).toBe("REFUSED");
   expect(outcomeA.results[0]?.summary).toContain("NO_AUTHORITY_WIRED");
-  expect(outcomeA.results[0]?.summary).toContain("Flutterwave is read-only by construction");
+  expect(outcomeA.results[0]?.summary).toContain("PaySwap implements no Flutterwave send operation");
+  expect(outcomeA.results[0]?.summary).toContain("the six facts stay separate");
   // A later leg NEVER silently skips (leg 0 UNRECORDED — the typed custody block).
   await expect(
     runtime.dispatch.dispatch(

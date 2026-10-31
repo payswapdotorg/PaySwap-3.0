@@ -146,8 +146,8 @@ describe("the repair catalogue's cross-provider row records the P22-C delivery h
     );
     expect(row).toBeDefined();
     expect(row!.kind).toBe("PLATFORM_WORK");
-    expect(row!.evidenceLaw).toContain("P22-C DELIVERED the cross-provider-corridor shape");
-    expect(row!.evidenceLaw).toContain("the unobserved middle and the H-lane composite execution");
+    expect(row!.evidenceLaw).toContain("P22-C/P22-D DELIVERED the cross-provider-corridor shape and its composite execution");
+    expect(row!.evidenceLaw).toContain("the unobserved middle and the ENGINE-TIER corridor composition");
     // The stale P21-0 claim is gone.
     expect(row!.evidenceLaw).not.toContain("has no cross-provider composition");
     // The advisory laws are unchanged.

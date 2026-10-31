@@ -405,7 +405,8 @@ describe("the per-provider kernel table (D8 — the lane composition generalizat
     expect(answer.refusal.kind).toBe("NO_AUTHORITY_WIRED");
     // F3 stays byte-identical in substance: Flutterwave is read-only by
     // construction; the Paystack payout lane + the rail are the named growths.
-    expect(answer.refusal.reason).toContain("Flutterwave is read-only by construction");
+    expect(answer.refusal.reason).toContain("PaySwap implements no Flutterwave send operation");
+    expect(answer.refusal.reason).toContain("the six facts stay separate");
     expect(answer.refusal.reason).toContain("Paystack payout lane");
   });
 });

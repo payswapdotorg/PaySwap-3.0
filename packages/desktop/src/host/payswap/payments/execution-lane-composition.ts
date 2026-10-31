@@ -21,9 +21,15 @@
  * provider carries a kernel in THIS deployment's table — stripe, the
  * Paystack payout lane (ADR-0016 D8: the amendment this wave IS), and
  * the stellar:testnet onchain rail (ADR-0016 D2/D9). FLUTTERWAVE STAYS
- * READ-ONLY byte-identically (F3 — its transfers terminate at
- * bank/MOMO; that finding is not amended by this wave; no FLW kernel
- * exists, so no authority can ever wire an FLW lane). The grant checks
+ * NON-EXECUTING byte-identically (F3 — PaySwap's adapter implements
+ * read-only classes only and no FLW kernel exists, so no authority can
+ * ever wire an FLW lane; the provider's documented transfer API is a
+ * capability input this deployment has not implemented, entitled or
+ * observed — the P22-D six-fact separation: provider capability,
+ * PaySwap implementation, account entitlement, environment, observed
+ * health and PaySwap authorization are SEPARATE facts, and the GHS
+ * collection leg is not asserted executable until its exact operation
+ * and read-back are implemented and proved). The grant checks
  * happen INSIDE the credential seal on every dispatch (each kernel's
  * own law — the single enforcement point).
  *
@@ -134,7 +140,7 @@ function laneNotWiredReason(lane: { providerId: string; state: string; execution
   if (lane.executionMode !== "SANDBOX") {
     return `${LANE_NOT_WIRED_REASON_PREFIX}. The chosen ${lane.providerId} connection runs in ${lane.executionMode} mode — live execution requires the live-grant derivation this deployment does not perform (INV-25: SANDBOX only).`;
   }
-  return `${LANE_NOT_WIRED_REASON_PREFIX}. The chosen ${lane.providerId} connection is ACTIVE SANDBOX but carries no consequential operation surface in this deployment — Flutterwave is read-only by construction (its transfers terminate at bank/MOMO; F3), so no FLW kernel exists (the Paystack payout lane and the stellar:testnet onchain rail are the P22-H growths, ADR-0016 D8/D2).`;
+  return `${LANE_NOT_WIRED_REASON_PREFIX}. The chosen ${lane.providerId} connection is ACTIVE SANDBOX but carries no consequential operation surface in this deployment — PaySwap implements no Flutterwave send operation and its adapter grants read-only classes only (F3 — the implementation and authorization facts; the provider's documented transfer API is a capability input this deployment has not implemented, entitled or observed — the six facts stay separate), so no FLW kernel exists (the Paystack payout lane and the stellar:testnet onchain rail are the P22-H growths, ADR-0016 D8/D2).`;
 }
 
 /**

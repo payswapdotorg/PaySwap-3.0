@@ -279,14 +279,14 @@ export const REPAIR_OPERATORS: readonly RepairOperator[] = Object.freeze([
     "platform:cross-provider-route-shape",
     "PLATFORM_WORK",
     [],
-    "grounded only in the honest no-route state over the cross-provider fiat pair — P22-C DELIVERED the cross-provider-corridor shape (ADR-0016 D5: the four-leg skeleton over the OBSERVED onchain middle), so the residual gap this row names is the unobserved middle and the H-lane composite execution, never a missing vocabulary; the work item cites the corridor's verbatim operator-applicable exclusions",
+    "grounded only in the honest no-route state over the cross-provider fiat pair — P22-C/P22-D DELIVERED the cross-provider-corridor shape and its composite execution (ADR-0016 D5/D12: the four-leg skeleton over the OBSERVED onchain middle, proven by the bridge battery + the machine-verified CDP receipt), so the residual gap this row names is the unobserved middle and the ENGINE-TIER corridor composition (the chains-to-evidence derivation the CDP journey's honest scope names as the carry-forward), never a missing vocabulary; the work item cites the corridor's verbatim operator-applicable exclusions",
     { p21Specific: true, platformGap: "platform:cross-provider-route-shape" },
   ),
   operator(
     "platform:flutterwave-send-operation",
     "PLATFORM_WORK",
     [],
-    "grounded only in the verbatim corridor exclusions proving the FLW receiving-method gap — P21 implements no Flutterwave send operation, so the party change alone cannot make the corridor real; the work item cites the funding-decline facts",
+    "grounded only in the verbatim corridor exclusions proving the FLW receiving-method gap — PaySwap implements no Flutterwave send operation (the implementation fact; the provider's documented transfer API is a capability input this deployment has not implemented, entitled or observed — the six facts stay separate, and the GHS collection leg is not asserted executable until its exact operation and read-back are implemented and proved), so the party change alone cannot make the corridor real; the work item cites the funding-decline facts",
     { p21Specific: true, platformGap: "platform:flutterwave-send-operation" },
   ),
 ]);

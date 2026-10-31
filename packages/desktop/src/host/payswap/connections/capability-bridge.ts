@@ -175,7 +175,8 @@ function operationClassesOf(providerId: PaySwapProbeProviderId, keyClass: Connec
     // it (the kernel re-checks inside the seal on every dispatch).
     return BRIDGE_STRIPE_SANDBOX_EXECUTION_OPERATION_CLASSES;
   }
-  // F3/C9: Flutterwave + Paystack are read-only by construction; a
+  // F3/C9: Flutterwave + Paystack derive read-only classes in PaySwap's
+  // adapters (the implementation fact — the P22-D six-fact separation; a
   // RESTRICTED Stripe key never derives an execution grant from the key
   // alone. NO send/transfer class is ever derived for these.
   return BRIDGE_READ_ONLY_OPERATION_CLASSES;

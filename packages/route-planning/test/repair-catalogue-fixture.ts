@@ -21,9 +21,9 @@ import { PINNED_NO_ROUTE_STATE_KEY } from "../src/pins/repairs.ts";
 
 /** The P21 byte-compat platform-prerequisite notes (verbatim from the P21 hardcode). */
 const FLW_SEND_GAP_NOTE =
-  "an FLW receiving method makes the corridor real only when a Flutterwave send operation exists in the capability model — the platform gap, distinct from the party prerequisite (P21 implements no FLW send; ADR-0014 D7)";
+  "an FLW receiving method makes the corridor real only when PaySwap implements a Flutterwave send operation and proves its exact read-back — the platform gap, distinct from the party prerequisite and from the provider's documented transfer capability (the six facts stay separate; PaySwap implements no FLW send today)";
 const CROSS_PROVIDER_SHAPE_NOTE =
-  "a verified intermediary makes the corridor real only when a frozen route shape composes the cross-provider pair — a governance-level vocabulary change, never manufactured this wave (ADR-0014 D7)";
+  "a verified intermediary makes the corridor real only when a frozen route shape composes the cross-provider pair — the cross-provider-corridor shape is DELIVERED (P22-C/P22-D, ADR-0016 D5/D12) and composes over the OBSERVED onchain middle; the residual gap is the unobserved middle, never a missing vocabulary";
 
 /** The 15 frozen operators (A.3, amended) with full proposal payloads. */
 export const FIXTURE_REPAIR_OPERATORS = ([
