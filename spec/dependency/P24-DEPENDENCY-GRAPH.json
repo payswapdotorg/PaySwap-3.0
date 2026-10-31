@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "wave": "P24",
+  "title": "The Stripe conversational connector and the New Task selected-model tool loop (the Stripe wave)",
+  "source": {
+    "handoff": "upload/PaySwap_Stripe_Connector_TL_Handoff_2026-10-31.md (operator upload, 31 Oct 2026)",
+    "gap_matrix": "spec/productization/P24-0-GAP-MATRIX-2026-10-31.md",
+    "adr": "docs/architecture-governance/adr/ADR-0017-p24-stripe-conversational-connector.md",
+    "catalogue_pin": "packages/provider-runtime/src/adapters/stripe/catalogue/spec-pin.ts"
+  },
+  "registration_commit_base": "e2578c24c028ca9617421c91760696079cca8298",
+  "policy": "Register only. No P24 implementation beyond P24-0's registration deliverables (the pinned catalogue, the census battery, the frozen host contracts) is claimed by the graph. The wave's honest scope reading (ADR-0017 D1): the native OpenAPI-generated connector is canonical and the official Stripe MCP server is a wrapped optional input, never the authority; the overlay's DENY law means breadth arrives operation-by-operation as workers test — PLANNED_P24_INITIAL_RELEASE is not dispatchable; INV-25 (live refusal) is preserved untouched and live-mode expansion is a separate future ADR with operator authorization. The initial release is Sandbox-real for the handoff §14 surface; every one of the 644 census operations carries an honest support state at all times.",
+  "work_orders": [
+    {
+      "id": "P24-0",
+      "owner": "TL",
+      "status": "COMPLETE",
+      "depends_on": [],
+      "lane_scope": "The source-backed gap matrix (spec/productization/P24-0-GAP-MATRIX-2026-10-31.md — R1-R8 verified at e2578c2) + THE PINNED CATALOGUE (stripe/openapi v2596 @ aab1dee, public GA spec 2026-09-30.endive, SHA-256 9119e72c7ff8ad142e94f7efa9cf49d8e6eec69df3592e17e8fba15099726ed7; 644 operations, v1 612 + v2 32; the handoff's 2026-10-28.endive claim reconciled to the SDK-spec family — ADR-0017 D2) + the pure generator (digest-seam injected, the F-2 precedent) + the committed deterministic artifact operations.json + the TOTAL 149-family resource-pack table (Packs A-K) + the effect-class overlay (rule engine + the reviewed P24 initial-release surface + UNKNOWN=DENY) + the census reader (the single join point) + the census battery (14 assertions; provider-runtime 27f/330t green at registration, +14) + THE FROZEN HOST CONTRACTS (StripePreparedAction + StripeActionAuthorization + StripeActionExecutionOutcome[INV-04] + the executor seam) + ADR-0017 (D1-D15, incl. the official-MCP evaluation and the P24 carry-forward reconciliation) + this graph + the current-state registration."
+    },
+    {
+      "id": "P24-1",
+      "owner": "worker-1",
+      "status": "OPEN",
+      "depends_on": ["P24-0"],
+      "lane_scope": "packages/provider-runtime/src/adapters/stripe/** only: the schema-validation layer (oneOf/anyOf/allOf/$ref preserved; unknown fields rejected) + the v1/v2 protocol transports (form vs JSON; the two pagination contracts; DELETE; per-operation idempotency; UNKNOWN-after-dispatch) + the initial-release pack implementations behind the overlay (states flip to IMPLEMENTED per-operation with tests) + the deterministic fake-transport suite + the Sandbox harness (operator-gated on credentials; scripted tier credential-free) + the pin-diff path for future releases."
+    },
+    {
+      "id": "P24-2",
+      "owner": "worker-2",
+      "status": "OPEN",
+      "depends_on": ["P24-0"],
+      "lane_scope": "packages/desktop/src/host/payswap/stripe/** + packages/desktop/src/host/payswap/connections/** only (file-disjoint from P24-1/P24-3): the RAK operation-level permission binding + the U1 lifecycle extension (rotation, scope refresh, re-probe) + THE PREPARED-ACTION IMPLEMENTATION over the frozen contracts (prepare/validate/preview-bind/authorize/execute/read-back/reconcile + append-only audit) + the event plane (destinations, sealed whsec_, raw-bytes verification, durable inbox, dedup by event-id AND object-id+type, out-of-order tolerance, snapshot/thin, version provenance) + the per-connection API-version state (the migration law)."
+    },
+    {
+      "id": "P24-3",
+      "owner": "worker-3",
+      "status": "OPEN",
+      "depends_on": ["P24-0"],
+      "lane_scope": "packages/payswap-app/src/agent/** only (file-disjoint): the real selected-model invocation through the substrate model runtime + the bounded tool-call loop (streamed text, tool-call state, results, budgets, timeouts, cancellation, resume; append-only events; no hidden chain-of-thought) + the Stripe tool registry + progressive discovery (never elevating permission) + the preview/confirmation UX (digest-bound approval; tiered confirmation) + the account/environment selector + resume/reconcile cards."
+    },
+    {
+      "id": "P24-D",
+      "owner": "TL",
+      "status": "OPEN",
+      "depends_on": ["P24-1", "P24-2", "P24-3"],
+      "lane_scope": "The TL integration and acceptance: Journeys A-E on the tier available (real Sandbox where credentials exist, OPERATOR_GATED markers otherwise — scripted receipts never renamed live) + the merged-tree batteries + the census flip review (every IMPLEMENTED state has its test) + the JOURNEY-MAP/FEATURE-MAP P24 rows + the graph/state closure + PUSH + the bundle archive + the evidence bundle."
+    }
+  ],
+  "frontier_after_registration": ["P24-1", "P24-2", "P24-3"],
+  "closure_policy": "P24 closes only when P24-1/2/3/D are all accepted on main with their batteries green at the tip AND at least one genuine end-to-end conversational Stripe flow is proven on the tier available (the handoff §13.5/§16 law: no test-count-only closure; a scripted transport receipt is a separate tier from real Sandbox evidence; every unsupported family stays visibly classified with an exact reason). INV-25 live refusal must remain effective at the tip; secrets must be absent from model context, renderer, transcript, tool output, task records, logs and receipts (the secret-scan battery).",
+  "wave_status": "OPEN — P24-0 COMPLETE (the registration: the pinned 644-operation catalogue + the census battery + the frozen prepared-action contracts + ADR-0017 + the gap matrix + this graph); the frontier is P24-1 ∥ P24-2 ∥ P24-3 (file-disjoint, concurrent); P24-D waits on all three."
+}

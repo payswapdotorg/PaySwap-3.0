@@ -120,3 +120,12 @@ export * from './adapters/paystack/verification-probe.ts';
 // (the corridor's KES off-ramp lane).
 export * from './adapters/paystack/transfer-execution.ts';
 export * from './adapters/mtn-momo/declaration.ts';
+
+// P24-0 (ADR-0017): the Stripe OpenAPI catalogue lane — pin, generator,
+// census, overlay and resource packs. The census is the single source of
+// operation truth for the host, the tool registry and the tests.
+export * from './adapters/stripe/catalogue/spec-pin.ts';
+export * from './adapters/stripe/catalogue/generator.ts';
+export * from './adapters/stripe/catalogue/resource-packs.ts';
+export * from './adapters/stripe/catalogue/overlay.ts';
+export * from './adapters/stripe/catalogue/census.ts';
