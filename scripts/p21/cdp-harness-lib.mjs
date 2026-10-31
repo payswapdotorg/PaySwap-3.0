@@ -198,6 +198,11 @@ export function scanForSecretShapes(text) {
     /whsec_[A-Za-z0-9]{10,}/,
     /Bearer\s+[A-Za-z0-9._-]{20,}/,
     /-----BEGIN [A-Z ]*PRIVATE KEY-----/,
+    // (P22-D, ADR-0016 D10 — the G4 fix) the Stellar StrKey SECRET shape
+    // (S + 55 base32 chars, the seal's own fail-closed pattern) and the
+    // Flutterwave secret-key prefix — a finding FAILS the receipt.
+    /\bS[A-Z2-7]{55}\b/,
+    /FLWSECK(_TEST)?-[A-Za-z0-9]{10,}/,
   ];
   const findings = patterns.filter((pattern) => pattern.test(text)).map((pattern) => pattern.source);
   return findings;

@@ -291,7 +291,7 @@ try {
   const receiptText = JSON.stringify(receipt, null, 2);
   const scanFindings = scanForSecretShapes(receiptText);
   receipt.secretScan = {
-    patterns: ["sk_live_*", "sk_test_*", "pk_live_*", "pk_test_*", "whsec_*", "Bearer *", "PRIVATE KEY blocks"],
+    patterns: ["sk_live_*", "sk_test_*", "pk_live_*", "pk_test_*", "whsec_*", "Bearer *", "PRIVATE KEY blocks", "Stellar S… StrKey (56-char base32)", "FLWSECK-*"],
     findings: scanFindings,
     result: scanFindings.length === 0 ? "CLEAN (no secret-shaped material in this receipt)" : "FAILED",
   };
