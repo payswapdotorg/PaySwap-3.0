@@ -76,15 +76,17 @@ function parseSpecTests(spec: string): ParsedTest[] {
 test("no-orphans law: the manifest, the registry and the spec files agree in both directions", async ({ page }) => {
   expect(page).toBeDefined();
 
-  // The map itself is the canonical J1–J24 (24 unique, ordered — the
+  // The map itself is the canonical J1–J25 (25 unique, ordered — the
   // P12 wave added J16–J19 (§5), the P13 wave J20–J23 (§6), the P21-D
   // web-tier E2E lane added J24 (ADR-0014 D10 — the task-tier journey +
-  // the honest unbound notes; the JOURNEY-MAP.md row is the TL's closure
-  // item, recorded in the manifest integrationNote)).
+  // the honest unbound notes), and the P22-D corridor lane added J25
+  // (ADR-0016 D10/D12 — the corridor's honest web-tier state; the
+  // JOURNEY-MAP.md §10 row is the TL's closure item, recorded in the
+  // manifest integrationNote)).
   expect(JOURNEY_IDS).toEqual(
-    Array.from({ length: 24 }, (_, index) => `J${index + 1}` as JourneyId),
+    Array.from({ length: 25 }, (_, index) => `J${index + 1}` as JourneyId),
   );
-  expect(new Set(JOURNEY_IDS).size).toBe(24);
+  expect(new Set(JOURNEY_IDS).size).toBe(25);
 
   const onDisk = readdirSync(SPECS_DIR)
     .filter((name) => name.endsWith(".spec.ts"))
@@ -207,8 +209,9 @@ test("no-orphans law: the manifest, the registry and the spec files agree in bot
     // shell (every pathname boots the substrate Root — the composer
     // mounts on all of it).
     "J20", "J21", "J22", "J23",
-    // J24 (the P21-D web tier) is TIER 1 — the composer surfaces are
-    // landed in the merged tree, so it needs base-green coverage only.
+    // J24 (the P21-D web tier) and J25 (the P22-D corridor web tier) are
+    // TIER 1 — the composer surfaces are landed in the merged tree, so
+    // they need base-green coverage only.
   ]);
   for (const row of tier2Only) {
     expect(
