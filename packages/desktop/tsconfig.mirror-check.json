@@ -74,6 +74,7 @@
     "test/payswap/p23-journey-emergence.test.ts",
     "test/payswap/p23-no-bypass.test.ts",
     "test/payswap/p23-cdp-seeder.test.ts",
+    "test/payswap/p22-cdp-seeder.test.ts",
     "test/payswap/p23-rpc-bigint-wire.test.ts",
     "test/payswap/p23-cdp-receipt-verification.test.ts",
     "test/payswap/p22d-corridor-journey-fixtures.ts",
