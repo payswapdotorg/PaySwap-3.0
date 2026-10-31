@@ -41,6 +41,16 @@ import {
 /** The structural hop bound for a direct single-leg payment demand. */
 export const DIRECT_PAYMENT_MAX_ROUTE_HOPS = 1;
 
+/**
+ * (P22-D, ADR-0016 D11 — the hop-bound law) The corridor demand's
+ * structural hop bound: the MOVE/CONVERT direction classes ride the
+ * corridor (the canonical 1..8 vocabulary's corridor allocation — the
+ * pinned corridor demand's own bound, route-compiler/test/corridor-
+ * fixtures.ts route5Intent). PAY (and RECEIVE) keep the direct bound
+ * byte-identically — a direct demand never silently widens.
+ */
+export const CORRIDOR_MAX_ROUTE_HOPS = 6;
+
 /** An observed funding source — a REFERENCE, never a balance (INV-7). */
 export interface ObservedFundingSource {
   readonly locationRef: string;
@@ -60,6 +70,8 @@ export interface ObservedDestination {
 /** The compile input (everything explicit; nothing ambient, nothing defaulted). */
 export interface CompileMissionIntentInput {
   readonly missionId: string;
+  /** The mission's direction class (the D11 hop-bound derivation's input). */
+  readonly direction: "PAY" | "RECEIVE" | "MOVE" | "CONVERT";
   readonly captured: PaymentIntakeCaptures;
   /** The principal reference (opaque; the trust plane owns identity). */
   readonly principalRef: string;
@@ -158,7 +170,13 @@ export function compileMissionIntent(
     arrivalCurrency: input.captured.countryCorridor.destinationCurrency,
     constraints: Object.freeze({
       maxSettlementMs,
-      maxRouteHops: DIRECT_PAYMENT_MAX_ROUTE_HOPS,
+      // (P22-D, ADR-0016 D11) The hop-bound law: the corridor classes
+      // (MOVE/CONVERT) ride the corridor's structural bound; every other
+      // direction keeps the direct single-leg bound byte-identically.
+      maxRouteHops:
+        input.direction === "MOVE" || input.direction === "CONVERT"
+          ? CORRIDOR_MAX_ROUTE_HOPS
+          : DIRECT_PAYMENT_MAX_ROUTE_HOPS,
     }),
     intentAuthorizationRef: `pmt-mission:${input.missionId}`,
     declaredAt: declaredAtMs,

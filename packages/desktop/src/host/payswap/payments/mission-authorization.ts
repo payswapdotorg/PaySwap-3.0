@@ -139,6 +139,7 @@ export function createMissionAuthorizationService(core: PaymentMissionCore): Mis
         if (input.compensationFor === undefined) {
           const compile = compileMissionIntent({
             missionId: mission.id,
+            direction: mission.direction,
             captured: capturedFields(mission),
             principalRef: core.principalRef,
             observedFunding: gates.resolvedFunding,

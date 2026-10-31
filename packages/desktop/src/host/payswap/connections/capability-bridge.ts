@@ -93,8 +93,13 @@ export interface BridgeConnectedInstance {
   readonly credentialScope: {
     /** The OPAQUE connection reference — never credential material (INV-19). */
     readonly credentialRef: string;
-    /** (P22-H, ADR-0016 D9) The API keys or the Stellar keypair — both opaque. */
-    readonly credentialKind: "API_KEY" | "STELLAR_KEYPAIR";
+    /**
+     * (P22-H, ADR-0016 D9) The API keys or the Stellar keypair — both
+     * opaque. (P22-D, 2026-10-31) PROVIDER_DEFINED is the capability
+     * model's closed-vocabulary bucket the onchain rail's instance maps
+     * its keypair onto — the host vocabulary stays its own layer.
+     */
+    readonly credentialKind: "API_KEY" | "STELLAR_KEYPAIR" | "PROVIDER_DEFINED";
   };
   readonly geography: { readonly countries: readonly string[] };
   readonly currencies: readonly string[];

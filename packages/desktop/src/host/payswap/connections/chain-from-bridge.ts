@@ -96,6 +96,12 @@ export interface ConnectionCapabilityImplementation {
     readonly fromCountries?: readonly string[];
     readonly toCountries?: readonly string[];
     readonly currencies?: readonly string[];
+    /**
+     * (P22-D, 2026-10-31) The onchain rail's advisory asset scope — the
+     * issuer-scoped asset refs the account read observed (an onchain rail
+     * restricts by asset, not by fiat currency; the PSP chains carry none).
+     */
+    readonly assets?: readonly string[];
   }[];
   readonly knownDeviations: readonly { readonly aspect: string; readonly deviation: string; readonly documented: true }[];
 }

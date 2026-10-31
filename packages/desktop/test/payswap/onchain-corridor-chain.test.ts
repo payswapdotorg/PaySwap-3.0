@@ -124,14 +124,23 @@ describe("the onchain rail chain derivation (D2/D5 — the four-layer law)", () 
     expect(chain.definition.id).toBe(`capability:onchain-rail:${PINNED_STELLAR_CHAIN_KEY}`);
     expect(chain.definition.executable).toBe(true);
     expect(stellarRailCapabilityDefinition().id).not.toContain("connected-account");
-    // Layer 2: the implementation — ONLY the observed currencies + assets.
+    // Layer 2: the implementation — ONLY the observed issuer-scoped assets,
+    // NO fiat-currency claim (the 2026-10-31 CDP finding: the asset codes
+    // like "USDC" are not ISO-3 currency codes and the REAL implementation
+    // validator rejects them — the currencies dimension stays ABSENT and
+    // the assets carry the observed truth; the P22-D correction).
     expect(chain.implementation.providerName).toBe(PINNED_STELLAR_CHAIN_KEY);
     expect(chain.implementation.adapterRef).toBe("adapter:stellar/horizon@1");
-    expect(chain.implementation.corridors[0]?.currencies).toContain("USDC");
-    // Layer 3: the instance — the OPAQUE connection ref + the keypair kind.
+    expect(chain.implementation.corridors[0]?.currencies).toBeUndefined();
+    expect(chain.implementation.corridors[0]?.assets).toContain(
+      `stellar:testnet/asset:USDC:${FAKE_G_ISSUER}`,
+    );
+    // Layer 3: the instance — the OPAQUE connection ref + the capability
+    // model's closed vocabulary (PROVIDER_DEFINED — the keypair's bucket;
+    // the connection plane's STELLAR_KEYPAIR vocabulary stays its own).
     expect(chain.instance.connectionRef).toBe("conn:stellar-relay");
     expect(chain.instance.credentialScope.credentialRef).toBe("conn:stellar-relay");
-    expect(chain.instance.credentialScope.credentialKind).toBe("STELLAR_KEYPAIR");
+    expect(chain.instance.credentialScope.credentialKind).toBe("PROVIDER_DEFINED");
     expect(chain.instance.providerId).toBe(PINNED_STELLAR_CHAIN_KEY);
     // Layer 4: the observation — the two-axis law (CONFIRMED ⇒ AVAILABLE).
     expect(chain.observation.availability).toBe("AVAILABLE");

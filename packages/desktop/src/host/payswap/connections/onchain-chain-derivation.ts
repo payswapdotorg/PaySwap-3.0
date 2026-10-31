@@ -51,7 +51,12 @@ const STELLAR_RAIL_DEFINITION_ID = `capability:onchain-rail:${PINNED_STELLAR_CHA
 /**
  * Layer 1 — the pinned Stellar rail capability definition (fail-closed
  * catalogue of ONE: the testnet keypair wallet rail; executable in
- * SANDBOX only, INV-25).
+ * SANDBOX only, INV-25). THE FULL CAPABILITY-MODEL SHAPE (the 2026-10-31
+ * CDP finding: the corridor projection's REAL validators reject a thin
+ * definition — capabilityClass, conditions, cost, risk, provenance,
+ * economicAccountability, proofRequirements and the fourteen-part
+ * execution declaration are all mandatory for an executable rail; the
+ * stripeSandboxExecutableDefinition pattern, chain-definitions.ts).
  */
 export function stellarRailCapabilityDefinition(): PinnedConnectionCapabilityDefinition {
   return Object.freeze({
@@ -60,6 +65,32 @@ export function stellarRailCapabilityDefinition(): PinnedConnectionCapabilityDef
     displayName: "Stellar Testnet Onchain Rail",
     summary:
       "The Stellar testnet onchain rail (stellar:testnet): account-based, deterministic finality, no reorgs. The relay wallet connection rides the PROVIDERLESS_RAIL form with a sealed keypair; the corridor chain derives from the onchain plane's own four-layer hierarchy (ADR-0008 D5), never a PSP probe id.",
+    capabilityClass: "rail_movement",
+    conditions: [
+      {
+        kind: "jurisdiction",
+        description:
+          "SANDBOX on stellar:testnet only — a pubnet-shaped target is never offered (INV-25; the pubnet plane is not registered in this deployment)",
+        hardConstraint: true,
+      },
+    ],
+    cost: [],
+    risk: {
+      riskClass: "settlement",
+      severity: "low",
+      mitigations: ["deterministic finality — no reorgs on stellar:testnet", "authoritative read-backs over Horizon"],
+    },
+    provenance: {
+      declaredBy: "payswap:desktop-onchain-plane",
+      artifactRef: `onchain:${PINNED_STELLAR_CHAIN_KEY}/horizon-rest@1`,
+      contentHash: "fnv1a64:p22d-onchain-rail-stellar-testnet@1",
+    },
+    economicAccountability: {
+      accountablePartyRef: `onchain:${PINNED_STELLAR_CHAIN_KEY}`,
+      ledgerAccountRef: `ledger:onchain/${PINNED_STELLAR_CHAIN_KEY}`,
+      recoursePolicyRef: "policy:recourse/onchain-observation",
+    },
+    proofRequirements: [{ proofLevel: "P1", scope: "observation" }],
     executable: true,
     operationClasses: Object.freeze([
       "READ_PROVIDER_STATE",
@@ -74,12 +105,83 @@ export function stellarRailCapabilityDefinition(): PinnedConnectionCapabilityDef
         summary: "SANDBOX on stellar:testnet only — a pubnet-shaped target is never offered (INV-25; the pubnet plane is not registered in this deployment).",
       }),
     ]),
+    execution: {
+      contractVersion: "1.0.0",
+      semantics: {
+        summary: "Stellar testnet payment-operation transfer",
+        effectDescription: "Moves the issuer-scoped stablecoin between accounts on stellar:testnet (the corridor's onchain relay leg)",
+      },
+      stateMachine: {
+        initial: "CREATED",
+        states: [
+          { name: "CREATED", isTerminal: false },
+          { name: "SETTLED", isTerminal: true },
+        ],
+        transitions: [{ from: "CREATED", to: "SETTLED", trigger: "transaction-success" }],
+      },
+      preconditions: [
+        {
+          preconditionId: "pre:onchain-asset-observed",
+          description: "The transferred asset position is observed on the rail (the issuer-scoped asset, never a bare code)",
+          confirmedBy: "PROVIDER",
+        },
+      ],
+      // The required scope names the rail's OWN operation-class vocabulary
+      // (the instance's permissionState.granted set — the 2026-10-31 CDP
+      // finding: the corridor evaluation checks requiredScopes against the
+      // granted operation classes, so the scope must be that vocabulary).
+      authorizationRequirements: { requiredScopes: ["CREATE_EXTERNAL_EFFECT"], requiresHumanApproval: false },
+      financialEffectClass: "CONSEQUENTIAL_EXTERNAL_EFFECT",
+      idempotency: {
+        keyScope: "ENDPOINT_SPECIFIC",
+        carriesProviderKey: true,
+        retryPolicy: "NEVER_RETRY_AFTER_AMBIGUITY",
+        reconciliationRequired: true,
+      },
+      compensation: {
+        cancellable: false,
+        refundable: false,
+        compensationMechanism:
+          "none at the leg tier — the ledger's effect is final; the corridor's compensation plane operates at the mission level (the custody-block + lawful-CANCEL laws)",
+        lateReturnRepresentable: false,
+      },
+      partialExecution: { supported: false, semantics: "single atomic payment operation per leg" },
+      userActions: [],
+      providerStateMapping: { preservedInEnvelope: true, consequentialFamilies: ["capture"] },
+      externalReferences: { carriesExternalIds: true, revisionTracking: "PROVIDER_REVISIONS", correlationIdRequired: true },
+      evidenceRequirements: [{ evidenceKind: "FUNDING", required: true }],
+      economicTerms: { termsRef: "terms:stellar-testnet", termsVersion: "1.0.0", pricingModel: "none (testnet rail — no fee is charged or claimed)" },
+      jurisdictionEligibility: {
+        declaredVia: "RESTRICTION_SET",
+        restrictionSet: {
+          restrictionSetId: `rs:onchain-${PINNED_STELLAR_CHAIN_KEY}-relay`,
+          version: "1.0.0",
+          currencies: ["GHS", "KES"],
+          customerTypes: ["PERSONAL", "BUSINESS"],
+          requiredFields: [
+            {
+              fieldId: "onchain.relay_account",
+              description: "The corridor relay wallet's StrKey account on the rail",
+              appliesTo: "SENDER",
+            },
+          ],
+          cutoffs: [],
+          terms: { termsRef: "terms:stellar-testnet", termsVersion: "1.0.0", deliveryEstimateLabel: "INDICATIVE" },
+          declaredBy: "payswap:desktop-onchain-plane",
+        },
+      },
+      executionModes: ["PASS_THROUGH_NATIVE"],
+    },
   } as PinnedConnectionCapabilityDefinition);
 }
 
-/** Layer 2 — the rail's adapter implementation record (Horizon REST, no SDK). */
+/** Layer 2 — the rail's adapter implementation record (Horizon REST, no SDK).
+ * The advisory corridor scope carries the OBSERVED ASSETS (the issuer-
+ * scoped refs) and NO fiat-currency claim — an onchain rail moves assets,
+ * not fiat, so the currencies dimension stays ABSENT (unrestricted; the
+ * 2026-10-31 CDP finding: the asset codes like "USDC" are not ISO-3
+ * currency codes and the REAL implementation validator rejects them). */
 function stellarRailImplementation(
-  observedCurrencies: readonly string[],
   observedAssetRefs: readonly string[],
 ): ConnectionCapabilityImplementation {
   return Object.freeze({
@@ -91,18 +193,23 @@ function stellarRailImplementation(
     version: "1",
     adapterRef: `adapter:stellar/horizon@1`,
     corridors: Object.freeze([
-      Object.freeze({
-        // ADVISORY claims ONLY: the currencies + issuer-scoped assets the
-        // account read observed — never a country, never an invention.
-        currencies: Object.freeze([...observedCurrencies]),
-        assets: Object.freeze([...observedAssetRefs]),
-      }),
+      Object.freeze(
+        observedAssetRefs.length > 0
+          ? { assets: Object.freeze([...observedAssetRefs]) }
+          : {},
+      ),
     ]),
     knownDeviations: Object.freeze([]),
   } as ConnectionCapabilityImplementation);
 }
 
-/** Layer 3 — the rail connection as the instance (the opaque-connection law, INV-19). */
+/** Layer 3 — the rail connection as the instance (the opaque-connection law, INV-19).
+ * The capability model's closed vocabularies (the 2026-10-31 CDP findings):
+ * accountRef is the registry's own CONNECTION reference (the bridge's own
+ * law — the rail carries no provider account id; the opaque ref is the
+ * honest one), and credentialKind is PROVIDER_DEFINED (the model's bucket
+ * for provider-specific credential forms — the keypair; the connection
+ * plane's STELLAR_KEYPAIR vocabulary stays its own). */
 function stellarRailInstance(
   status: DesktopConnectionStatusView,
   record: ProbeEvidenceRecord,
@@ -113,12 +220,12 @@ function stellarRailInstance(
     implementationId: `implementation:onchain:${PINNED_STELLAR_CHAIN_KEY}`,
     providerName: PINNED_STELLAR_CHAIN_KEY,
     providerVersion: "horizon-rest-1",
-    accountRef: "",
+    accountRef: status.connectionId,
     tenantRef: "payswap-test",
     authorization: Object.freeze({ status: "ACTIVE" as const, grantedAt: record.observedAt }),
     credentialScope: Object.freeze({
       credentialRef: status.connectionId,
-      credentialKind: "STELLAR_KEYPAIR" as const,
+      credentialKind: "PROVIDER_DEFINED" as const,
     }),
     geography: Object.freeze({ countries: Object.freeze([]) }),
     currencies: Object.freeze([...record.balanceCurrencies]),
@@ -202,10 +309,7 @@ export function onchainsFromPlanes(
     chains.push(
       Object.freeze({
         definition: stellarRailCapabilityDefinition(),
-        implementation: stellarRailImplementation(
-          [...new Set([...record.balanceCurrencies, ...assetRefs.map((ref) => ref.split(":")[2] ?? "").filter((code) => code !== "")])],
-          assetRefs,
-        ),
+        implementation: stellarRailImplementation(assetRefs),
         instance: stellarRailInstance(status, record),
         observation: stellarRailObservation(record),
       } as ConnectionCapabilityRouteChain),

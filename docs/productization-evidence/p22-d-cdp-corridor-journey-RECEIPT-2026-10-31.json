@@ -1,0 +1,134 @@
+{
+  "harness": "scripts/p22/desktop-cdp-corridor-journey.mjs + scripts/p21/cdp-harness-lib.mjs (the P22-D Electron CDP corridor journey — the E2E law's desktop half, ADR-0016 D10/D12)",
+  "ranAt": "2026-10-31T04:40:42.304Z",
+  "durationMs": 79861,
+  "appRuntime": {
+    "tier": "the desktop dev-tier runtime (tsup-built main/host/preload + the vite-built renderer over file://)",
+    "launchRecipe": "electron . --no-sandbox --disable-dev-shm-usage --open-workspace <workspace> (CDP 9229, Xvfb :99, isolated ZCODE_DESKTOP_USER_DATA_DIR)",
+    "isolatedUserDataDir": "<journey-scoped>",
+    "workspace": "/home/z/payswap-e2e-workspace"
+  },
+  "honestScope": "ZERO live provider credentials: the 3-provider corridor plane (FLW GHS + Paystack KES + the Stellar testnet rail observing the issuer-scoped USDC) PRE-SEEDED through the REAL member path over the SCRIPTED provider transport (the p22-cdp-seeder's eight scripted answers); the probes that confirmed the connections ran over the scripted answers, and NO live provider was contacted or is claimed. The REAL app derives its bridge, chains, exclusions and advisory cards from that state. The channel-tier preview honestly BLOCKS (the declared test corridor covers US→US USD only) and THE BLOCKED PREVIEW NEVER ARMS at this tier — the approval engage is refused typed (GATES_BLOCKED) and the composite-act surfaces never render. THE FOUR-LEG CORRIDOR PLAN CARD, the composite approval and the per-leg scripted dispatch are the IN-REPO bridge battery's proof (e8106d4): at the REAL app tier the route-planning engine's evidence bundle honestly carries no location observations, conversion rules or routing hints derived from the chains, so the corridor compile honestly yields NO_COMPILABLE_ROUTE — the engine-tier corridor composition (the chains-to-evidence derivation) is the NAMED CARRY-FORWARD this receipt records. The live-dispatch tier stays the standing operator action (no provider keys on this station).",
+  "steps": [
+    {
+      "id": "seed-1",
+      "name": "the 3-provider corridor-plane seeder drives the REAL member path over the scripted transport (FLW GHS + Paystack KES + the Stellar testnet rail observing the issuer-scoped USDC: seed → seal → probe → CONFIRMED → ACTIVE)",
+      "status": "PASS",
+      "detail": "/tmp/p22-cdp-seed-1793421642310/connections (the scripted test world, disclosed — never a live-probe claim)"
+    },
+    {
+      "id": "run1-1",
+      "name": "the composer opens with the honest zero-financial-authority note",
+      "status": "PASS",
+      "detail": "the capability note renders verbatim"
+    },
+    {
+      "id": "run1-2",
+      "name": "the nine-field corridor intake completes (the exact FLW GHS wallet funding match + the Merchant Y Paystack KES directory destination)",
+      "status": "PASS",
+      "detail": "distinctAnswered=9/9 pendingRemaining=false seeded=true"
+    },
+    {
+      "id": "run1-3",
+      "name": "the structured preview presents the honest typed BLOCK with the no-route reason verbatim (the declared test corridor covers US→US USD only) while the intent COMPILES on the D11 corridor hop bound (the MOVE direction's own allocation — never the direct-payment bound)",
+      "status": "PASS",
+      "detail": "BLOCKED + NO_ROUTE_FOR_CORRIDOR rendered verbatim; the compiled intent carries 'at most 6 hops'"
+    },
+    {
+      "id": "run1-4",
+      "name": "the honest no-route view displays (launch 1): the route-planning view presents the honest NO-ROUTE state over the 3-provider corridor plane — the typed exclusions (the pair honestly ungrounded), the corridor-derived conditional opportunity (the verified intermediary), the platform work items and the never-executable hypotheses — with ZERO corridor card surfaces (the engine's evidence bundle honestly derives no location observations, conversion rules or routing hints from the chains; the four-leg corridor plan card is the in-repo bridge battery's scripted-tier proof — the engine-tier corridor composition is the named carry-forward)",
+      "status": "PASS",
+      "detail": "conditional=1 platform=3 hypotheses=2 corridorSurfaces=0 view=fnv1a64:dad9c2c05290f629"
+    },
+    {
+      "id": "run1-5",
+      "name": "the Wait choice lands (WAITING_FOR_OPPORTUNITIES under the engine-proposed criteria)",
+      "status": "PASS",
+      "detail": "the waiting controls render (the re-check + the cancel)"
+    },
+    {
+      "id": "run1-6",
+      "name": "the re-check over fresh observations surfaces the honest consent-gated typed refusal (the named carry-forward, never masked, never a fabricated match)",
+      "status": "PASS",
+      "detail": "the consent-gate refusal rendered"
+    },
+    {
+      "id": "run1-7",
+      "name": "THE NO-BYPASS LAW OBSERVED LIVE: engaging the approval on the blocked preview is REFUSED by the host (GATES_BLOCKED — a blocked preview can never arm authorization); the refusal surfaces verbatim on the flow-error line and the composite-act surfaces (the scope card, the armed card, the lane radios, the send) NEVER render — the composite act's scripted-tier dispatch + read-backs are the in-repo bridge battery's proof",
+      "status": "PASS",
+      "detail": "the typed refusal rendered verbatim; scope=0 armed=0 engage-dispatch=0 send=0"
+    },
+    {
+      "id": "run1-8",
+      "name": "the persisted records carry the corridor journey (the mission store: the goal, the presented preview, the D11 corridor-bound compiled intent)",
+      "status": "PASS",
+      "detail": "missionStore=true"
+    },
+    {
+      "id": "run2-1",
+      "name": "PERSISTENCE: the task + the conversation survive the app quit/relaunch on the same profile",
+      "status": "PASS",
+      "detail": "task=true, conversation=true"
+    },
+    {
+      "id": "run2-4",
+      "name": "PERSISTENCE: the honest no-route view survives relaunch (the same advisory cards re-derive): the route-planning view presents the honest NO-ROUTE state over the 3-provider corridor plane — the typed exclusions (the pair honestly ungrounded), the corridor-derived conditional opportunity (the verified intermediary), the platform work items and the never-executable hypotheses — with ZERO corridor card surfaces (the engine's evidence bundle honestly derives no location observations, conversion rules or routing hints from the chains; the four-leg corridor plan card is the in-repo bridge battery's scripted-tier proof — the engine-tier corridor composition is the named carry-forward)",
+      "status": "PASS",
+      "detail": "conditional=1 platform=3 hypotheses=2 corridorSurfaces=0 view=fnv1a64:dad9c2c05290f629"
+    },
+    {
+      "id": "run2-3",
+      "name": "the re-derived view digest EQUALS launch 1's (the byte-identical deterministic re-derivation over the persisted mission + connections)",
+      "status": "PASS",
+      "detail": "launch1=fnv1a64:dad9c2c05290f629 launch2=fnv1a64:dad9c2c05290f629"
+    },
+    {
+      "id": "run2-7",
+      "name": "THE NO-BYPASS LAW OBSERVED LIVE: engaging the approval on the blocked preview is REFUSED by the host (GATES_BLOCKED — a blocked preview can never arm authorization); the refusal surfaces verbatim on the flow-error line and the composite-act surfaces (the scope card, the armed card, the lane radios, the send) NEVER render — the composite act's scripted-tier dispatch + read-backs are the in-repo bridge battery's proof",
+      "status": "PASS",
+      "detail": "the typed refusal rendered verbatim; scope=0 armed=0 engage-dispatch=0 send=0"
+    },
+    {
+      "id": "run2-5",
+      "name": "the no-bypass refusal law recomputes after relaunch (the blocked preview still never arms; the composite surfaces still never render)",
+      "status": "PASS",
+      "detail": "refusal=true"
+    }
+  ],
+  "screenshots": [
+    "p22-d-cdp-run1-2-intake-complete.png",
+    "p22-d-cdp-run1-3-blocked-preview.png",
+    "p22-d-cdp-run1-4-no-route-view.png",
+    "p22-d-cdp-run1-4b-advisory-cards.png",
+    "p22-d-cdp-run1-5-waiting.png",
+    "p22-d-cdp-run1-6-recheck-refusal.png",
+    "p22-d-cdp-run1-7-approval-refused.png",
+    "p22-d-cdp-run2-1-persisted-composer.png",
+    "p22-d-cdp-run2-4-no-route-view.png",
+    "p22-d-cdp-run2-4b-advisory-cards.png",
+    "p22-d-cdp-run2-7-approval-refused.png",
+    "p22-d-cdp-run2-4-rederived-view.png"
+  ],
+  "journeySummary": {
+    "corridorAsk": "the nine-field corridor intake over the seeded 3-provider plane (the exact FLW GHS wallet + Merchant Y Paystack KES matches)",
+    "previewOutcome": "BLOCKED (NO_ROUTE_FOR_CORRIDOR — the honest no-route with the intent compiled on the D11 corridor hop bound)",
+    "planningOutcome": "the honest NO-ROUTE state with the corridor-derived advisory sections (the conditionals, the platform work, the hypotheses) and ZERO corridor card surfaces — the four-leg card is the bridge battery's scripted tier; the engine-tier composition is the named carry-forward",
+    "refusalOutcome": "GATES_BLOCKED surfaced verbatim (the no-bypass law live: the blocked preview never arms; the composite surfaces never render)",
+    "persistence": "SURVIVED (the same advisory view + the same view digest fnv1a64:dad9c2c05290f629)"
+  },
+  "secretScan": {
+    "patterns": [
+      "sk_live_*",
+      "sk_test_*",
+      "pk_live_*",
+      "pk_test_*",
+      "whsec_*",
+      "Bearer *",
+      "PRIVATE KEY blocks",
+      "Stellar S… StrKey (56-char base32)",
+      "FLWSECK-*"
+    ],
+    "findings": [],
+    "result": "CLEAN (no secret-shaped material in this receipt)"
+  }
+}
