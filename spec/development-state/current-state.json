@@ -16,9 +16,7 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [
-    "P22-D"
-  ],
+  "frontier": [],
   "active_work_orders": [],
   "completed_work_orders": [
     {
@@ -1188,6 +1186,19 @@
       "session": "web-a95c8999-6661-4553-8cd4-51eedc9f4b24",
       "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
       "acceptance_evidence": "commit f0e45b0: the app + renderer composition lane of the Stellar corridor wave — the provider mention entries (Paystack + the Stellar onchain rail, honest labels, the router never guessing; the unknown-reply honestly re-named to the three declared providers), the corridor journey surfaces (the surface 1.6.0 corridor-plan fold contract; the app corridor pins mirroring the route + presentation authorities test-only; the CorridorPlanCard four-leg presentation under a corridor-shaped route row — the leg lanes, the custody chain, the issuer-scoped USDC relay asset, the per-leg prerequisites in people language, the leg count disclosed; the engine adapter deriving the presentation through the REAL corridorPlanLegLaws, fail-closed), the composite-act UI (the plan-scoped two-act approval carrying the host-shaped planDigest/planLegCount; the leg-attributed dispatch lanes; the leg-named pending-reconciliation card on a leg UNKNOWN; the N=1 laws byte-pinned unchanged), and the renderer growths (the wire mirrors declaring what the host sends — the composite scope fields, the onchain implementation assets, the STELLAR_KEYPAIR credential kind; the activation composition binding the two stellar members behind the pinned port extension with the rail card; the wait-recheck ONCHAIN rail-key branch fixing the stellar silent-skip). Batteries: surface 20f/247t · app 58f/612t · desktop 62f+1sk/510t+1sk · the twelve untouched siblings exact-match · the three scoped tsc gates 0/0/0 · architecture 0/0/0 · desktop oxlint 0 errors (the app lint improved — one pre-existing file-law error fixed; one pre-existing error + three pre-existing warnings remain, disclosed). Web keeps the honest unbound notes (the ADR-0010 D7 analogue)."
+    },
+    {
+      "id": "P22-D",
+      "owner": "main (z.ai Code, TL)",
+      "status": "COMPLETE",
+      "session": "web-a95c8999-6661-4553-8cd4-51eedc9f4b24",
+      "chat_id": "31007aa4-a27f-408a-8da2-871cbf878596",
+      "acceptance_evidence": "commits e8106d4 + cd81cc8 + 2240be3 (wave 1, the fifteenth-reset rebuild) + de331a5 + 48c1b6a + 9b893fe + 8a1b1fb (wave 2): the corridor bridge battery (the full journey through the REAL channel over the scripted transports — the honest NO_ROUTE preview, the four-leg compile, the composite two-act approval, PROOF A the honest FLW refusal + PROOF B the kernel-served completion with the authoritative read-backs, the deterministic replay) + the no-bypass consolidation (every new surface refuses typed at its own gate, zero transport before refusal) + the corridor CDP seeder + THE CDP CORRIDOR JOURNEY (14/14 steps, the machine-verified secret-free receipt + the 6-test verification battery; the no-bypass law observed live — the blocked preview never arms, scope=0 armed=0 engage-dispatch=0 send=0; the D11 hop bound rendered) with THE FOUR E2E CATCHES fixed at source (the onchain rail's full fourteen-part capability definition; the asset-scoped advisory corridors; the closed-vocabulary instance refs; the D11 hop-bound law in the REAL intent compiler) + the J25 browser row (the corridor's honest web tier, tier 1, two tests; the manifest's file-law split with the façade preserved) + THE FLUTTERWAVE SIX-FACT RECLASSIFICATION (the operator's north-star order: provider capability, PaySwap implementation, account entitlement, environment, observed health and PaySwap authorization are SEPARATE facts; the GHS collection leg not asserted executable until its exact operation and read-back are implemented and proved) + the live-tier harness (the operator-gated live Stellar testnet READ tier; exit 2 verified live — no keys on this station). Gates at the tip: desktop 65f+2sk/536t+2sk · the three scoped tsc gates 0/0/0 · oxlint 0 errors · architecture:check 0/0/0 · route-planning 302 · payswap-app 612 · opportunities 325 · journey-verification tier-1 11/11 + tier-2 8/8.",
+      "carry_forward": [
+        "THE LIVE TIERS stay the standing operator action (the live Stellar testnet READ tier harness is in place at scripts/p22/rail-evidence-live-stellar.ts — run it on key re-supply; the live PSP tiers stay the a51a30c rail-evidence receipt's)",
+        "THE ENGINE-TIER CORRIDOR COMPOSITION (the chains-to-evidence derivation — location observations, conversion rules, routing hints from the observed chains) is the named carry-forward the CDP receipt records: the four-leg corridor plan card, the composite approval and the per-leg dispatch are the in-repo bridge battery's scripted-tier proof (e8106d4); at the REAL app tier the engine's evidence bundle honestly derives none of these from the chains yet",
+        "the P24 candidates unchanged (the live-model binding follow-on; the consent plane; the CLI-agent skill/MCP; the automatic evidence feeds; the north-star wave registration) — P22's closure does not open P24"
+      ]
     }
   ],
   "policies": {
@@ -1714,7 +1725,13 @@
       "actor": "resident-TL",
       "action": "P22_B_ACCEPTED",
       "detail": "P22-B (the app + renderer composition lane) accepted at commit f0e45b0 — the provider mention entries (Paystack + the Stellar onchain rail), the corridor journey surfaces (the four-leg plan presentation over the surface corridor-plan fold + the REAL leg-law derivation in the engine adapter), the composite-act UI (the plan-scoped approval + the per-leg dispatch surfaces + the leg-named pending-reconciliation card), the renderer ONCHAIN growths (the wire mirrors + the activation stellar members + the wait-recheck ONCHAIN branch). The integrated batteries green; the three scoped tsc gates 0/0/0; architecture 0/0/0. The frontier is P22-D (the TL closure: the bridge battery + the no-bypass consolidation + the E2E law + the maps reconciliation)."
+    },
+    {
+      "ts": "2026-10-31T06:20:00Z",
+      "actor": "resident-TL",
+      "action": "P22_D_ACCEPTED_AND_P22_CLOSED",
+      "detail": "P22-D (the TL closure) accepted and P22 CLOSED at commit 8a1b1fb — the bridge battery + the no-bypass consolidation (wave 1, e8106d4/cd81cc8/2240be3) + the CDP corridor journey with the machine-verified receipt + the four E2E catches fixed at source + the J25 browser row + the Flutterwave six-fact reclassification + the operator-gated live-tier harness (wave 2, de331a5/48c1b6a/9b893fe/8a1b1fb). Every gate green at the tip. The live tiers stay the standing operator action; the engine-tier corridor composition is the named carry-forward; the P24 candidates stay unregistered."
     }
   ],
-  "last_tl_action_at": "2026-10-29T21:50:00Z"
+  "last_tl_action_at": "2026-10-31T06:20:00Z"
 }

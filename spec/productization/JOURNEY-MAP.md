@@ -503,3 +503,96 @@ across both projects; web tier-2 = the composer laws J20–J23 — 8/8 green;
 the desktop tier = the P21 CDP journey (9/9) + the P23-D CDP emergence
 journey (12/12) + the bridge battery + the no-bypass battery (the ADR-0015
 D7 gate) + the emergence battery + the receipt machine-verification.
+
+## 10. The P22-D reconciliation (2026-10-31) — the Stellar corridor journeys
+
+REGISTERED by the resident TL at the P22-D closure (ADR-0016 D10/D12 —
+the E2E law's desktop half over the seeded 3-provider corridor plane +
+the browser tier's honest J-row; the wave's lane scope named this
+reconciliation). The Stellar corridor wave grew the journey surface with
+the cross-provider corridor, and this section reconciles the map with
+the journeys that now exist:
+
+- **J25 IS REGISTERED (tier 1, web)** — the corridor journey's honest
+  web tier: a corridor-shaped ask (the MOVE stem — "Move one thousand
+  cedis to a Kenyan bank account over the corridor") lands ONE task on
+  the composer's board with its honest draft status; the mission tier's
+  unbound note renders VERBATIM (no nine-field corridor intake is
+  simulated on web); the route-planning section's unbound-engine note
+  renders VERBATIM with ZERO corridor vocabulary — no corridor plan
+  card, no leg rows, no custody chain, no issuer-scoped relay-asset
+  sentence, no proceed control (the corridor composition is a
+  platform-host binding absent from the web deployment BY DESIGN); the
+  record survives a full reload. Two tests in
+  specs/agent-corridor-tier-journey.spec.ts; the manifest's ordered pin
+  grown 24→25 with the no-orphans law green in both directions.
+- **THE DESKTOP CDP CORRIDOR JOURNEY (scripts/p22/desktop-cdp-corridor-journey.mjs,
+  the p23 pattern)**: the 3-provider corridor plane (FLW GHS + Paystack
+  KES + the Stellar testnet rail observing the issuer-scoped USDC)
+  pre-seeded through the REAL member path over the scripted transport;
+  the nine-field intake over the exact display-name matches; the honest
+  typed BLOCK with the D11 corridor hop bound rendered ("at most 6
+  hops" — the MOVE direction's own structural allocation); the
+  remounted view's honest NO-ROUTE state over the seeded plane (the
+  typed exclusions + the corridor-derived conditional + the platform
+  work + the never-executable hypotheses); the wait + the consent-gated
+  re-check refusal; THE NO-BYPASS LAW OBSERVED LIVE (the approval
+  engage on the blocked preview refused GATES_BLOCKED verbatim —
+  scope=0 armed=0 engage-dispatch=0 send=0); the persistence law (the
+  byte-identical view digest across relaunch). 14/14 steps with the
+  machine-verified secret-free receipt (the 6-test verification
+  battery).
+- **THE E2E LAW'S CATCHES (fixed at source, each a real integration gap
+  the scripted-tier batteries could not see)**: (1) the onchain rail's
+  capability definition was the thin connection-plane shape — now the
+  FULL fourteen-part capability-model declaration; (2) the
+  implementation's advisory corridors carried the asset codes as ISO
+  currencies ("USDC" is not 3-letter) — now the asset-scoped truth with
+  the currencies dimension absent; (3) the instance's refs were outside
+  the closed vocabularies — now the registry's own connection ref +
+  PROVIDER_DEFINED; (4) THE D11 HOP-BOUND LAW was never implemented in
+  the REAL intent compiler (every direction got the direct-payment
+  bound 1) — now MOVE/CONVERT ride CORRIDOR_MAX_ROUTE_HOPS=6.
+- **THE HONEST TIER SPLIT (recorded, never blurred)**: the four-leg
+  corridor plan card, the composite two-act approval and the per-leg
+  scripted dispatch are the IN-REPO bridge battery's proof (e8106d4) —
+  at the REAL app tier the route-planning engine's evidence bundle
+  honestly derives no location observations, conversion rules or routing
+  hints from the chains, so the corridor compile honestly yields
+  NO_COMPILABLE_ROUTE and the no-route state IS the real-app truth.
+  THE ENGINE-TIER CORRIDOR COMPOSITION (the chains-to-evidence
+  derivation) is the NAMED CARRY-FORWARD the receipt records.
+- **THE FLUTTERWAVE SIX-FACT RECLASSIFICATION (the operator's
+  north-star order, landed)**: provider capability, PaySwap
+  implementation, account entitlement, environment, observed health and
+  PaySwap authorization are SEPARATE facts. Every live surface that
+  claimed Flutterwave is read-only "by its own nature" now names the
+  IMPLEMENTATION fact (PaySwap's adapter implements read-only classes
+  only) and discloses the provider's documented transfer API as a
+  capability input this deployment has not implemented, entitled or
+  observed. The GHS collection leg is not asserted executable until its
+  exact operation and read-back are implemented and proved. The
+  historical records (ADR-0014 D7, the P21/P22 gap matrices, the P21
+  acceptance record, the on-disk receipts) stay untouched — the
+  reclassification lands as the live-surface correction + this record.
+- **THE PLATFORM WORK ITEM platform:cross-provider-route-shape IS
+  DELIVERED (the docs-tier flip)**: the cross-provider-corridor shape
+  (P22-C) + its composite execution (P22-D) compose over the OBSERVED
+  onchain middle; the residual gap the row names is the unobserved
+  middle and the ENGINE-TIER corridor composition (the carry-forward),
+  never a missing vocabulary. The code-side record stays OPEN by design
+  (advisory-only).
+- **THE LIVE TIERS stay the standing operator action** (the closure
+  policy's named gate): the live Stellar testnet READ tier harness is
+  in place at scripts/p22/rail-evidence-live-stellar.ts (operator-gated
+  on STELLAR_TESTNET_PUBLIC_KEY + STELLAR_TESTNET_SECRET_KEY — exit 2
+  verified live with no keys on this station); the live PSP tiers stay
+  the a51a30c rail-evidence receipt's. Never a silent pass.
+
+The living suites after P22-D: web tier-1 = J24 (4 tests) + J25 (2
+tests) + the manifest enforcement — 11/11 green across both projects;
+web tier-2 = the composer laws J20–J23 — 8/8 green; the desktop tier =
+the P21 CDP journey (9/9) + the P23-D CDP emergence journey (12/12) +
+the P22-D CDP corridor journey (14/14) + the corridor bridge battery +
+the no-bypass battery (the ADR-0016 D7 gate) + the receipt
+machine-verification (the p23 + p22d batteries).
