@@ -30,3 +30,12 @@ export * from "./gate-environment.js";
 export * from "./chain-definitions.js";
 export * from "./chain-from-bridge.js";
 export * from "./chain-members.js";
+// (P24-2, ADR-0017 D5/D7/D2) The Stripe connection-side planes: the
+// RAK operation-level permission binding, the verified-evidence
+// account-context resolver, the U1 lifecycle service and the
+// per-connection API-version state (the migration law).
+export * from "./stripe-rak-permissions.js";
+export * from "./stripe-grant-derivation.js";
+export * from "./stripe-account-context.js";
+export * from "./stripe-u1-lifecycle.js";
+export * from "./stripe-api-version-state.js";

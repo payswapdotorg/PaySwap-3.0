@@ -23,6 +23,11 @@
 
 import { AGENT_TASK_EVENT_KINDS_PIN, type AgentTaskEventPin, type AgentTaskPin } from "../lib/agent-task-pins.js";
 import { validatePinnedAgentTask } from "../lib/agent-task-validation.js";
+import {
+  validateConversationLogInput,
+  type AgentConversationLogEvent,
+  type AgentConversationLogInput,
+} from "./conversationLogEvents.js";
 import { AgentTaskSessionError } from "./taskSessionPort.js";
 
 /* ------------------------ the storage seam -------------------------- */
@@ -57,6 +62,10 @@ export interface TaskSnapshot {
   readonly nextTaskNumber: number;
   readonly nextEventNumber: number;
   readonly tasks: readonly AgentTaskPin[];
+  /** (P24-3) The append-only conversation logs, keyed by task id (absent in pre-P24-3 snapshots → empty). */
+  readonly conversations?: Readonly<Record<string, readonly AgentConversationLogEvent[]>>;
+  /** (P24-3) The conversation-event id counter (monotonic, never reused). */
+  readonly nextConversationEventNumber?: number;
 }
 
 export const EMPTY_SNAPSHOT: TaskSnapshot = {
@@ -113,7 +122,7 @@ export function loadTaskSnapshot(storage: AgentTaskSessionStorage): LoadedTaskSn
       quarantined += 1;
     }
   }
-  const numbers = candidate as { nextTaskNumber?: unknown; nextEventNumber?: unknown };
+  const numbers = candidate as { nextTaskNumber?: unknown; nextEventNumber?: unknown; conversations?: unknown; nextConversationEventNumber?: unknown };
   return {
     snapshot: {
       version: 1,
@@ -126,9 +135,67 @@ export function loadTaskSnapshot(storage: AgentTaskSessionStorage): LoadedTaskSn
           ? numbers.nextEventNumber
           : 1,
       tasks,
+      // (P24-3) Backward compatible: a snapshot without conversation
+      // logs loads with an empty map; malformed log entries are dropped
+      // from the replay (the health report's quarantine counts records,
+      // the conversation replay fails closed per event at the writer).
+      conversations: loadConversations(numbers.conversations),
+      nextConversationEventNumber:
+        typeof numbers.nextConversationEventNumber === "number" && numbers.nextConversationEventNumber >= 1
+          ? numbers.nextConversationEventNumber
+          : countConversationEvents(numbers.conversations) + 1,
     },
     quarantined,
   };
+}
+
+/** Load the conversations map (absent/malformed → empty; events validated). */
+function loadConversations(
+  candidate: unknown,
+): Readonly<Record<string, readonly AgentConversationLogEvent[]>> {
+  if (candidate === null || typeof candidate !== "object" || Array.isArray(candidate)) {
+    return {};
+  }
+  const conversations: Record<string, AgentConversationLogEvent[]> = {};
+  for (const [taskId, events] of Object.entries(candidate as Record<string, unknown>)) {
+    if (!Array.isArray(events)) {
+      continue;
+    }
+    const loaded: AgentConversationLogEvent[] = [];
+    for (const event of events) {
+      try {
+        const record = event as { id?: unknown; taskId?: unknown; at?: unknown; event?: unknown };
+        if (typeof record.id !== "string" || record.taskId !== taskId || typeof record.at !== "string") {
+          continue;
+        }
+        loaded.push({
+          id: record.id,
+          taskId,
+          at: record.at,
+          event: validateConversationLogInput(record.event),
+        });
+      } catch {
+        // A malformed persisted event is excluded from replay (never
+        // rendered, never silently rewritten).
+        continue;
+      }
+    }
+    conversations[taskId] = loaded;
+  }
+  return conversations;
+}
+
+function countConversationEvents(candidate: unknown): number {
+  if (candidate === null || typeof candidate !== "object" || Array.isArray(candidate)) {
+    return 0;
+  }
+  let count = 0;
+  for (const events of Object.values(candidate as Record<string, unknown>)) {
+    if (Array.isArray(events)) {
+      count += events.length;
+    }
+  }
+  return count;
 }
 
 /** Serialize a snapshot for persistence (the adapter wraps the write). */
@@ -192,6 +259,36 @@ export function mintTaskEvent(
 /** The bump that accompanies a minted event when the write persists. */
 export function advanceEventNumber(snapshot: TaskSnapshot): TaskSnapshot {
   return { ...snapshot, nextEventNumber: snapshot.nextEventNumber + 1 };
+}
+
+/** (P24-3) Mint one append-only CONVERSATION event (ids monotonic per store). */
+export function mintConversationEvent(
+  snapshot: TaskSnapshot,
+  taskId: string,
+  event: AgentConversationLogInput,
+  now: string,
+): AgentConversationLogEvent {
+  const validated = validateConversationLogInput(event);
+  return {
+    id: `conv:${snapshot.nextConversationEventNumber ?? 1}`,
+    taskId,
+    at: now,
+    event: validated,
+  };
+}
+
+/** (P24-3) The snapshot with one conversation event appended (pure). */
+export function appendConversationToSnapshot(
+  snapshot: TaskSnapshot,
+  event: AgentConversationLogEvent,
+): TaskSnapshot {
+  const conversations = { ...snapshot.conversations };
+  conversations[event.taskId] = [...(conversations[event.taskId] ?? []), event];
+  return {
+    ...snapshot,
+    conversations,
+    nextConversationEventNumber: (snapshot.nextConversationEventNumber ?? 1) + 1,
+  };
 }
 
 /** Revise a task with an appended event (append-only; updatedAt = event at). */

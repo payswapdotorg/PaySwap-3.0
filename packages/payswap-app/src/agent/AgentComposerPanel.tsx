@@ -20,6 +20,7 @@ import { StatusPill } from "@zcode/ui/payswap";
 import { AGENT_TASK_VOICE_UNSUPPORTED_STATEMENT_PIN } from "../lib/agent-task-pins.js";
 import type { AgentComposerController, AgentComposerState, AgentComposerTranscriptEntry } from "./agentComposerController.js";
 import { RoutePlanningMount } from "./RoutePlanningMount.js";
+import { AgentConversationSection } from "./AgentConversationSection.js";
 import {
   AGENT_TASK_MODEL_DISCLOSURE_NOTE_PIN,
   MODEL_CATALOG_UNBOUND_NOTE,
@@ -383,6 +384,11 @@ export function AgentComposerPanel({
           state.entries.map((entry) => <AgentComposerLine key={entry.id} entry={entry} />)
         )}
       </div>
+
+      {/* (P24-3) The selected-model conversation section: transcript,
+       * prepared-action preview/confirmation, account context and the
+       * honest unbound tier (UNBOUND renders the gap, never a fake). */}
+      <AgentConversationSection state={state} controller={controller} />
 
       <div className="ps-agent-tasks">
         <h3 className="ps-agent-tasks-title">Tasks</h3>

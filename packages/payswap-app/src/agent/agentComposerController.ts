@@ -38,6 +38,11 @@ import { MISSION_INTAKE_UNBOUND_STATE } from "./missionIntakePins.js";
 import { MODEL_CONTROLS_UNBOUND_STATE, type ModelControlsState } from "./taskModelPins.js";
 import { createAgentComposerModelWiring, type AgentComposerModelWiring } from "./agentComposerModelControls.js";
 import {
+  AGENT_CONVERSATION_UNBOUND_STATE,
+  createAgentConversationWiring,
+  type AgentConversationWiring,
+} from "./agentConversationWiring.js";
+import {
   bindUiStorage,
   readUiSnapshot,
   writeUiSnapshot,
@@ -140,6 +145,7 @@ export function createAgentComposerController(
     uiPersistence,
     missionIntake: MISSION_INTAKE_UNBOUND_STATE,
     modelControls: MODEL_CONTROLS_UNBOUND_STATE,
+    conversation: AGENT_CONVERSATION_UNBOUND_STATE,
   };
 
   const listeners = new Set<() => void>();
@@ -173,6 +179,28 @@ export function createAgentComposerController(
       await reloadTasks();
     },
   });
+
+  // (P24-3, ADR-0017 D8) The selected-model conversation wiring (the
+  // intake/modelControls pattern): the send-path ownership after the
+  // deterministic router seeds the task, the UNKNOWN follow-up path,
+  // the resume fold and the user-gesture confirm/refuse/bind verbs.
+  // An absent plane keeps the honest UNBOUND tier — never a simulated
+  // conversation (the web honesty law).
+  const conversationWiring: AgentConversationWiring = createAgentConversationWiring(
+    options?.conversationPlane,
+    {
+      session: () => resolveSession(),
+      clock: () => clock(),
+      setConversation: (next) => {
+        state = { ...state, conversation: next };
+      },
+      getConversation: () => state.conversation,
+      refreshTasks: async () => {
+        await reloadTasks();
+      },
+      emit: () => emit(),
+    },
+  );
 
   /** Best-effort UI-state persistence (an honest downgrade on failure). */
   const persistUi = (): void => {
@@ -285,6 +313,14 @@ export function createAgentComposerController(
 
       const routed = route(text);
       if (routed.kind === "UNKNOWN") {
+        // (P24-3) An ACTIVE conversation owns UNKNOWN text as a
+        // follow-up turn on its task; without one the deterministic
+        // honest reply stands (the router stays the intake helper).
+        if (await conversationWiring.handleFollowUpText(text)) {
+          await reloadTasks();
+          setState({ sendPhase: "idle" });
+          return;
+        }
         appendEntries([{ kind: "AGENT_REPLY", text: routed.reply }], clock());
         setState({ sendPhase: "idle" });
         return;
@@ -315,6 +351,13 @@ export function createAgentComposerController(
           clock(),
         );
         await intake.attachForSeed(outcome.task);
+        // (P24-3) The selected-model conversation turn for the seeded
+        // task — only when the mission intake is not mid-ask (its ask
+        // loop owns the user's next text); the wiring surfaces the honest
+        // no-selection note when no model is recorded yet.
+        if (state.missionIntake.pendingAsk === undefined) {
+          await conversationWiring.startTurnForTask(outcome.task, text);
+        }
       }
       await reloadTasks();
       setState({ sendPhase: "idle" });
@@ -404,6 +447,10 @@ export function createAgentComposerController(
           await intake.resume(record);
         }
       }
+      // (P24-3) The conversation resume: replay the public history,
+      // the pending states (expiry-marked, never auto-executed) and
+      // the reconcile cards for the newest resumable task.
+      await conversationWiring.resumeFromTasks();
       emit();
     },
 
@@ -419,6 +466,24 @@ export function createAgentComposerController(
 
     async selectModel(selection: AgentTaskModelSelectionPin): Promise<void> {
       await modelWiring.selectModel(selection);
+    },
+
+    // (P24-3) The conversation user-gesture verbs — thin delegations to
+    // the ONE wiring (zero financial authority in the controller).
+    async confirmPreparedAction(preparedActionId: string): Promise<void> {
+      await conversationWiring.confirmPreparedAction(preparedActionId);
+    },
+
+    async refusePreparedAction(preparedActionId: string): Promise<void> {
+      await conversationWiring.refusePreparedAction(preparedActionId);
+    },
+
+    async bindAccountContext(connectionId: string): Promise<void> {
+      await conversationWiring.bindAccountContext(connectionId);
+    },
+
+    cancelConversation(): void {
+      conversationWiring.cancelRunning();
     },
   };
 }

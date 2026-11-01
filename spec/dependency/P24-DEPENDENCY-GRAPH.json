@@ -21,33 +21,47 @@
     {
       "id": "P24-1",
       "owner": "worker-1",
-      "status": "OPEN",
-      "depends_on": ["P24-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P24-0"
+      ],
       "lane_scope": "packages/provider-runtime/src/adapters/stripe/** only: the schema-validation layer (oneOf/anyOf/allOf/$ref preserved; unknown fields rejected) + the v1/v2 protocol transports (form vs JSON; the two pagination contracts; DELETE; per-operation idempotency; UNKNOWN-after-dispatch) + the initial-release pack implementations behind the overlay (states flip to IMPLEMENTED per-operation with tests) + the deterministic fake-transport suite + the Sandbox harness (operator-gated on credentials; scripted tier credential-free) + the pin-diff path for future releases."
     },
     {
       "id": "P24-2",
       "owner": "worker-2",
-      "status": "OPEN",
-      "depends_on": ["P24-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P24-0"
+      ],
       "lane_scope": "packages/desktop/src/host/payswap/stripe/** + packages/desktop/src/host/payswap/connections/** only (file-disjoint from P24-1/P24-3): the RAK operation-level permission binding + the U1 lifecycle extension (rotation, scope refresh, re-probe) + THE PREPARED-ACTION IMPLEMENTATION over the frozen contracts (prepare/validate/preview-bind/authorize/execute/read-back/reconcile + append-only audit) + the event plane (destinations, sealed whsec_, raw-bytes verification, durable inbox, dedup by event-id AND object-id+type, out-of-order tolerance, snapshot/thin, version provenance) + the per-connection API-version state (the migration law)."
     },
     {
       "id": "P24-3",
       "owner": "worker-3",
-      "status": "OPEN",
-      "depends_on": ["P24-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P24-0"
+      ],
       "lane_scope": "packages/payswap-app/src/agent/** only (file-disjoint): the real selected-model invocation through the substrate model runtime + the bounded tool-call loop (streamed text, tool-call state, results, budgets, timeouts, cancellation, resume; append-only events; no hidden chain-of-thought) + the Stripe tool registry + progressive discovery (never elevating permission) + the preview/confirmation UX (digest-bound approval; tiered confirmation) + the account/environment selector + resume/reconcile cards."
     },
     {
       "id": "P24-D",
       "owner": "TL",
       "status": "OPEN",
-      "depends_on": ["P24-1", "P24-2", "P24-3"],
+      "depends_on": [
+        "P24-1",
+        "P24-2",
+        "P24-3"
+      ],
       "lane_scope": "The TL integration and acceptance: Journeys A-E on the tier available (real Sandbox where credentials exist, OPERATOR_GATED markers otherwise — scripted receipts never renamed live) + the merged-tree batteries + the census flip review (every IMPLEMENTED state has its test) + the JOURNEY-MAP/FEATURE-MAP P24 rows + the graph/state closure + PUSH + the bundle archive + the evidence bundle."
     }
   ],
-  "frontier_after_registration": ["P24-1", "P24-2", "P24-3"],
+  "frontier_after_registration": [
+    "P24-1",
+    "P24-2",
+    "P24-3"
+  ],
   "closure_policy": "P24 closes only when P24-1/2/3/D are all accepted on main with their batteries green at the tip AND at least one genuine end-to-end conversational Stripe flow is proven on the tier available (the handoff §13.5/§16 law: no test-count-only closure; a scripted transport receipt is a separate tier from real Sandbox evidence; every unsupported family stays visibly classified with an exact reason). INV-25 live refusal must remain effective at the tip; secrets must be absent from model context, renderer, transcript, tool output, task records, logs and receipts (the secret-scan battery).",
-  "wave_status": "OPEN — P24-0 COMPLETE (the registration: the pinned 644-operation catalogue + the census battery + the frozen prepared-action contracts + ADR-0017 + the gap matrix + this graph); the frontier is P24-1 ∥ P24-2 ∥ P24-3 (file-disjoint, concurrent); P24-D waits on all three."
+  "wave_status": "OPEN — P24-0, P24-1, P24-2 and P24-3 COMPLETE on the merged tree (the three file-disjoint worker lanes accepted 2026-11-01: the schema layer + v1/v2 transports + 46 IMPLEMENTED operations with the mechanically-verified flip law; the prepared-action executor + RAK binding + event plane over the byte-untouched frozen contracts; the bounded conversation loop + tool registry + prepared-action UX with all D8/D9/D10/D11 laws tested). The frontier is P24-D (the TL closure): the desktop composition binding — the renderer-tier conversation plane (the model-plane binding is the named integration: the substrate has no product-side model invocation client today; the honest unbound note stands until it lands) + Journeys A-E at the real tier (OPERATOR_GATED on Stripe Sandbox credentials; the scripted-tier integration suites are the separate honest tier, never renamed) + the JOURNEY-MAP journey rows + the final graph/state closure + PUSH + bundle archive."
 }

@@ -51,18 +51,11 @@ import {
   type RoutePlanningWaitingState,
 } from "./routePlanningPins.js";
 import {
-  ROUTE_PLANNING_CONDITIONAL_PARTIES_PIN,
-  ROUTE_PLANNING_CONDITIONAL_PARTY_CHANGES_PIN,
-  ROUTE_PLANNING_VERIFICATION_STATUSES_PIN,
-  type RoutePlanningConditionalOpportunityPin,
-  type RoutePlanningConditionalPartyChangePin,
-  type RoutePlanningConditionalPartyPin,
-  type RoutePlanningGroundedFactRefPin,
-  type RoutePlanningHypothesisPin,
-  type RoutePlanningModelProposalStatePin,
-  type RoutePlanningPlatformWorkPin,
-  type RoutePlanningVerificationPin,
-} from "./routePlanningOpportunityPins.js";
+  validateConditionalOpportunitySection,
+  validateHypothesesSection,
+  validateModelProposalState,
+  validatePlatformWorkSection,
+} from "./routePlanningSectionValidators.js";
 
 /* --------------------------- the validators -------------------------- */
 
@@ -135,144 +128,9 @@ function rejectUnknownKeys(record: Readonly<Record<string, unknown>>, allowed: r
   if (unknown.length > 0) { fail(code, `${subject} key set is closed — unknown field(s) ${unknown.join(", ")} rejected`); }
 }
 
-/* ------- (P23-B, ADR-0015 D8) the opportunity-section validators ------- */
-
-function requireNonEmptyViewString(value: unknown, subject: string): string {
-  if (typeof value !== "string" || value.length === 0) { fail("INVALID_VIEW", `${subject} must be a non-empty string`); }
-  return value;
-}
-
-function requireStringArray(value: unknown, subject: string): readonly string[] {
-  if (!Array.isArray(value) || !value.every((entry) => typeof entry === "string" && entry.length > 0)) {
-    fail("INVALID_VIEW", `${subject} must be an array of non-empty strings`);
-  }
-  return [...(value as readonly string[])];
-}
-
-function requireVerification(value: unknown, subject: string): RoutePlanningVerificationPin {
-  if (typeof value !== "string" || !(ROUTE_PLANNING_VERIFICATION_STATUSES_PIN as readonly string[]).includes(value)) {
-    fail("INVALID_VIEW", `${subject} must be one of [${ROUTE_PLANNING_VERIFICATION_STATUSES_PIN.join(", ")}] — the A.6 verification pairing is closed`);
-  }
-  return value as RoutePlanningVerificationPin;
-}
-
-function requireGroundedFactRefs(value: unknown, subject: string): readonly RoutePlanningGroundedFactRefPin[] {
-  if (!Array.isArray(value)) { fail("INVALID_VIEW", `${subject} must be an array of verbatim grounded fact refs`); }
-  return (value as readonly unknown[]).map((entry, index) => {
-    if (!isRecord(entry) || (entry["side"] !== "SENDER" && entry["side"] !== "RECIPIENT")) {
-      fail("INVALID_VIEW", `${subject}[${index}] must carry side SENDER or RECIPIENT`);
-    }
-    return {
-      side: entry["side"] as "SENDER" | "RECIPIENT",
-      routeId: requireNonEmptyViewString(entry["routeId"], `${subject}[${index}].routeId`),
-      code: requireNonEmptyViewString(entry["code"], `${subject}[${index}].code`),
-      message: requireNonEmptyViewString(entry["message"], `${subject}[${index}].message`),
-      ...(typeof entry["fundingMethod"] === "string" ? { fundingMethod: entry["fundingMethod"] } : {}),
-    };
-  });
-}
-
-/** Fail-closed validation of the optional conditional-opportunities section (the pinned card shape). */
-function validateConditionalOpportunitySection(value: unknown): readonly RoutePlanningConditionalOpportunityPin[] {
-  if (!Array.isArray(value)) { fail("INVALID_VIEW", "the conditionalOpportunities section, when composed, must be an array of the pinned card shape"); }
-  return (value as readonly unknown[]).map((entry, index) => {
-    if (!isRecord(entry)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}] must be the pinned card record`); }
-    const changes = entry["requiredPartyChanges"];
-    if (!Array.isArray(changes) || changes.length === 0) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].requiredPartyChanges must be a non-empty array (a conditional names WHO must change WHAT)`); }
-    const validatedChanges = (changes as readonly unknown[]).map((change) => {
-      if (!isRecord(change)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].requiredPartyChanges entries must be { party, change }`); }
-      if (!(ROUTE_PLANNING_CONDITIONAL_PARTIES_PIN as readonly string[]).includes(String(change["party"]))) {
-        fail("INVALID_VIEW", `conditionalOpportunities[${index}].requiredPartyChanges party must be one of [${ROUTE_PLANNING_CONDITIONAL_PARTIES_PIN.join(", ")}]`);
-      }
-      if (!(ROUTE_PLANNING_CONDITIONAL_PARTY_CHANGES_PIN as readonly string[]).includes(String(change["change"]))) {
-        fail("INVALID_VIEW", `conditionalOpportunities[${index}].requiredPartyChanges change must be a member of the closed A.1 party-change vocabulary`);
-      }
-      return { party: change["party"] as RoutePlanningConditionalPartyPin, change: change["change"] as RoutePlanningConditionalPartyChangePin };
-    });
-    const prerequisites = entry["platformPrerequisites"];
-    if (!Array.isArray(prerequisites)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].platformPrerequisites must be an array (possibly empty — a party change may suffice)`); }
-    const validatedPrerequisites = (prerequisites as readonly unknown[]).map((prerequisite) => {
-      if (!isRecord(prerequisite)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].platformPrerequisites entries must be { gapId, note }`); }
-      return {
-        gapId: requireNonEmptyViewString(prerequisite["gapId"], `conditionalOpportunities[${index}].platformPrerequisites.gapId`),
-        note: requireNonEmptyViewString(prerequisite["note"], `conditionalOpportunities[${index}].platformPrerequisites.note`),
-      };
-    });
-    const expiresAt = entry["expiresAt"];
-    if (typeof expiresAt !== "number" || !Number.isSafeInteger(expiresAt) || expiresAt < 0) {
-      fail("INVALID_VIEW", `conditionalOpportunities[${index}].expiresAt must be a non-negative integer ms instant (countdown-free honesty)`);
-    }
-    const assumptions = entry["assumptions"];
-    if (!Array.isArray(assumptions)) { fail("INVALID_VIEW", `conditionalOpportunities[${index}].assumptions must be an array (possibly empty)`); }
-    return {
-      conditionalId: requireNonEmptyViewString(entry["conditionalId"], `conditionalOpportunities[${index}].conditionalId`),
-      title: requireNonEmptyViewString(entry["title"], `conditionalOpportunities[${index}].title`),
-      description: requireNonEmptyViewString(entry["description"], `conditionalOpportunities[${index}].description`),
-      requiredPartyChanges: Object.freeze(validatedChanges),
-      assumptions: requireStringArray(assumptions, `conditionalOpportunities[${index}].assumptions`),
-      platformPrerequisites: Object.freeze(validatedPrerequisites),
-      expiresAt,
-      verification: requireVerification(entry["verification"], `conditionalOpportunities[${index}].verification`),
-      verificationReason: requireNonEmptyViewString(entry["verificationReason"], `conditionalOpportunities[${index}].verificationReason`),
-    };
-  });
-}
-
-/** Fail-closed validation of the optional platform-work section (the pinned card shape). */
-function validatePlatformWorkSection(value: unknown): readonly RoutePlanningPlatformWorkPin[] {
-  if (!Array.isArray(value)) { fail("INVALID_VIEW", "the platformWork section, when composed, must be an array of the pinned card shape"); }
-  return (value as readonly unknown[]).map((entry, index) => {
-    if (!isRecord(entry)) { fail("INVALID_VIEW", `platformWork[${index}] must be the pinned card record`); }
-    return {
-      workItemId: requireNonEmptyViewString(entry["workItemId"], `platformWork[${index}].workItemId`),
-      gapId: requireNonEmptyViewString(entry["gapId"], `platformWork[${index}].gapId`),
-      title: requireNonEmptyViewString(entry["title"], `platformWork[${index}].title`),
-      requiredByOperatorIds: requireStringArray(entry["requiredByOperatorIds"], `platformWork[${index}].requiredByOperatorIds`),
-      evidenceBasis: requireGroundedFactRefs(entry["evidenceBasis"], `platformWork[${index}].evidenceBasis`),
-    };
-  });
-}
-
-/** Fail-closed validation of the optional hypotheses section (the pinned card shape — never a route). */
-function validateHypothesesSection(value: unknown): readonly RoutePlanningHypothesisPin[] {
-  if (!Array.isArray(value)) { fail("INVALID_VIEW", "the hypotheses section, when composed, must be an array of the pinned card shape"); }
-  return (value as readonly unknown[]).map((entry, index) => {
-    if (!isRecord(entry)) { fail("INVALID_VIEW", `hypotheses[${index}] must be the pinned card record`); }
-    if (entry["neverExecutable"] !== true) { fail("INVALID_VIEW", `hypotheses[${index}].neverExecutable must be the literal true — a hypothesis is NEVER a route`); }
-    if (entry["advisoryOnly"] !== true) { fail("INVALID_VIEW", `hypotheses[${index}].advisoryOnly must be the literal true — the hypothesis tier is advisory only`); }
-    if (typeof entry["wouldCompose"] !== "boolean") { fail("INVALID_VIEW", `hypotheses[${index}].wouldCompose must be a boolean (the honest structural assessment)`); }
-    return {
-      hypothesisId: requireNonEmptyViewString(entry["hypothesisId"], `hypotheses[${index}].hypothesisId`),
-      operatorId: requireNonEmptyViewString(entry["operatorId"], `hypotheses[${index}].operatorId`),
-      assumptionSummary: requireNonEmptyViewString(entry["assumptionSummary"], `hypotheses[${index}].assumptionSummary`),
-      verifiedSegmentIds: requireStringArray(entry["verifiedSegmentIds"], `hypotheses[${index}].verifiedSegmentIds`),
-      assumedSegmentIds: requireStringArray(entry["assumedSegmentIds"], `hypotheses[${index}].assumedSegmentIds`),
-      citedShapeId: requireNonEmptyViewString(entry["citedShapeId"], `hypotheses[${index}].citedShapeId`),
-      blockers: requireGroundedFactRefs(entry["blockers"], `hypotheses[${index}].blockers`),
-      wouldCompose: entry["wouldCompose"] as boolean,
-      verification: requireVerification(entry["verification"], `hypotheses[${index}].verification`),
-      verificationReason: requireNonEmptyViewString(entry["verificationReason"], `hypotheses[${index}].verificationReason`),
-      neverExecutable: true,
-      advisoryOnly: true,
-    };
-  });
-}
-
-/** Fail-closed validation of the optional model-proposal state (provenance only — never a proposal payload). */
-function validateModelProposalState(value: unknown): RoutePlanningModelProposalStatePin {
-  if (!isRecord(value)) { fail("INVALID_VIEW", "the modelProposals state, when present, must be the typed provenance record"); }
-  const kind = value["kind"];
-  if (kind === "UNBOUND_NO_MODEL" || kind === "UNBOUND_NO_TRANSPORT") { return { kind } as RoutePlanningModelProposalStatePin; }
-  if (kind === "BOUND") {
-    return {
-      kind,
-      modelId: requireNonEmptyViewString(value["modelId"], "modelProposals.modelId"),
-      foldedOperatorIds: requireStringArray(value["foldedOperatorIds"], "modelProposals.foldedOperatorIds"),
-      novelProposalIds: requireStringArray(value["novelProposalIds"], "modelProposals.novelProposalIds"),
-    };
-  }
-  fail("INVALID_VIEW", "modelProposals.kind must be UNBOUND_NO_MODEL, UNBOUND_NO_TRANSPORT or BOUND (the closed provenance vocabulary)");
-}
+/* ------- (P23-B, ADR-0015 D8) the opportunity-section validators live
+ * in ./routePlanningSectionValidators.ts (the P24-3 file-law split — a
+ * pure mechanical move; the engine-view validation below calls them). */
 
 /** Fail-closed wait-criteria validation (prose UNCONSTRUCTIBLE — a string,
  * an array or a malformed record is rejected typed). Returns a NEW frozen

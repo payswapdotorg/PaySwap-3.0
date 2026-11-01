@@ -55,6 +55,13 @@ export const STRIPE_OPENAPI_PIN = Object.freeze({
   inventoryPath: './operations.json',
   /** Generator identity recorded with the inventory for reproducibility. */
   generatorId: 'stripe-openapi-inventory-gen@1',
+  /**
+   * P24-1 (D4): the committed request-schema artifact (parameters + request
+   * bodies, interned node vocabulary — see schema-generator.ts).
+   */
+  schemasPath: './operation-schemas.json',
+  /** Schema-generator identity recorded with the artifact for reproducibility. */
+  schemaGeneratorId: 'stripe-openapi-schema-gen@1',
 });
 
 /**

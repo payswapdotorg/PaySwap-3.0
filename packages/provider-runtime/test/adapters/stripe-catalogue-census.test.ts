@@ -29,11 +29,22 @@ import {
   stripeCensusSupportStateCounts,
 } from '../../src/adapters/stripe/catalogue/census.ts';
 import { generateStripeOperationInventory } from '../../src/adapters/stripe/catalogue/generator.ts';
+import { generateStripeOperationSchemas } from '../../src/adapters/stripe/catalogue/schema-generator.ts';
 import { STRIPE_OPENAPI_PIN, STRIPE_OPENAPI_PIN_COUNTS } from '../../src/adapters/stripe/catalogue/spec-pin.ts';
 import {
   STRIPE_P24_INITIAL_RELEASE_OPERATIONS,
   STRIPE_EFFECT_CLASSES,
 } from '../../src/adapters/stripe/catalogue/overlay.ts';
+import {
+  STRIPE_P24_IMPLEMENTED_OPERATIONS,
+  STRIPE_P24_READ_BACK_ROUTES,
+  stripeReadBackOperationOf,
+} from '../../src/adapters/stripe/catalogue/implemented-operations.ts';
+import {
+  STRIPE_SCHEMA_ARTIFACT_PIN,
+  STRIPE_SCHEMA_UNREPRESENTABLE_OPERATIONS,
+  stripeOperationSchema,
+} from '../../src/adapters/stripe/catalogue/schema-reader.ts';
 import { STRIPE_RESOURCE_PACK_IDS } from '../../src/adapters/stripe/catalogue/resource-packs.ts';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -107,7 +118,11 @@ describe('stripe catalogue — the DENY law (handoff §4.3)', () => {
     const planned = STRIPE_OPERATION_CENSUS.filter(
       (record) => record.supportState === 'PLANNED_P24_INITIAL_RELEASE',
     );
-    expect(planned.length).toBe(STRIPE_P24_INITIAL_RELEASE_OPERATIONS.size);
+    // P24-1 flip law: the planned remainder is the initial-release set minus
+    // the tested implemented registry — never a silent shortening.
+    expect(planned.length).toBe(
+      STRIPE_P24_INITIAL_RELEASE_OPERATIONS.size - STRIPE_P24_IMPLEMENTED_OPERATIONS.size,
+    );
     for (const record of planned) {
       expect(stripeCensusDispatchAllowed(record.operationId)).toBe(false);
     }
@@ -160,9 +175,91 @@ describe('stripe catalogue — the DENY law (handoff §4.3)', () => {
     const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
     expect(total).toBe(STRIPE_OPENAPI_PIN_COUNTS.operations);
     expect(counts['PLANNED_P24_INITIAL_RELEASE']).toBe(
-      STRIPE_P24_INITIAL_RELEASE_OPERATIONS.size,
+      STRIPE_P24_INITIAL_RELEASE_OPERATIONS.size - STRIPE_P24_IMPLEMENTED_OPERATIONS.size,
     );
+    expect(counts['IMPLEMENTED']).toBe(STRIPE_P24_IMPLEMENTED_OPERATIONS.size);
     expect(counts['NOT_SUPPORTED_WITH_REASON']).toBeGreaterThan(0);
     expect(counts['ACCOUNT_GATED']).toBeGreaterThan(0);
+  });
+});
+
+describe('stripe catalogue — the P24-1 flip law (states flip only with tests)', () => {
+  it('every IMPLEMENTED operation is inside the reviewed initial-release set', () => {
+    for (const operationId of STRIPE_P24_IMPLEMENTED_OPERATIONS) {
+      expect(
+        STRIPE_P24_INITIAL_RELEASE_OPERATIONS.has(operationId),
+        `implemented op ${operationId} is outside the reviewed initial-release set`,
+      ).toBe(true);
+    }
+  });
+
+  it('every IMPLEMENTED operation resolves a census record and IS dispatchable', () => {
+    for (const operationId of STRIPE_P24_IMPLEMENTED_OPERATIONS) {
+      const record = stripeCensusRecord(operationId);
+      expect(record, `no census record for implemented op ${operationId}`).toBeDefined();
+      expect(record?.supportState).toBe('IMPLEMENTED');
+      expect(stripeCensusDispatchAllowed(operationId)).toBe(true);
+    }
+  });
+
+  it('read-back routes reference only real, dispatchable operations', () => {
+    for (const [operationId, readBack] of Object.entries(STRIPE_P24_READ_BACK_ROUTES)) {
+      expect(STRIPE_P24_IMPLEMENTED_OPERATIONS.has(operationId), `${operationId} is not implemented`).toBe(true);
+      if (readBack !== null) {
+        const record = stripeCensusRecord(readBack);
+        expect(record, `read-back ${readBack} for ${operationId} does not exist`).toBeDefined();
+        expect(stripeCensusDispatchAllowed(readBack), `read-back ${readBack} is not dispatchable`).toBe(true);
+      }
+    }
+  });
+
+  it('every state-changing implemented operation has a read-back route entry', () => {
+    // The one documented exception: a billing-portal session is a one-shot
+    // hosted URL — Stripe exposes no retrieve route for it (honest null).
+    const nullReadBackAllowed = new Set(['PostBillingPortalSessions']);
+    for (const operationId of STRIPE_P24_IMPLEMENTED_OPERATIONS) {
+      const record = stripeCensusRecord(operationId);
+      if (record?.effectClass === 'READ_ONLY') continue;
+      expect(
+        operationId in STRIPE_P24_READ_BACK_ROUTES,
+        `state-changing ${operationId} has no read-back route entry`,
+      ).toBe(true);
+      const readBack = stripeReadBackOperationOf(operationId);
+      if (nullReadBackAllowed.has(operationId)) {
+        expect(readBack).toBeNull();
+      } else {
+        expect(readBack, `state-changing ${operationId} has no read-back operation`).not.toBeNull();
+      }
+    }
+  });
+});
+
+describe('stripe catalogue — the request-schema artifact (P24-1, D4)', () => {
+  it('the committed schema artifact regenerates deterministically from the spec', () => {
+    const spec = JSON.parse(
+      readFileSync(join(CATALOGUE_DIR, 'spec', 'openapi.spec3.json'), 'utf8'),
+    ) as unknown;
+    const regenerated = generateStripeOperationSchemas(spec as never, {
+      sha256Hex: (input) => createHash('sha256').update(input, 'utf8').digest('hex'),
+    });
+    const committed = JSON.parse(
+      readFileSync(join(CATALOGUE_DIR, 'operation-schemas.json'), 'utf8'),
+    ) as unknown;
+    expect(regenerated).toEqual(committed);
+  });
+
+  it('covers every pinned operation with a schema record (no invisible gap)', () => {
+    expect(STRIPE_SCHEMA_ARTIFACT_PIN.operationCount).toBe(STRIPE_OPENAPI_PIN_COUNTS.operations);
+    for (const record of STRIPE_OPERATION_CENSUS) {
+      expect(
+        stripeOperationSchema(record.operationId),
+        `no schema record for ${record.operationId}`,
+      ).toBeDefined();
+    }
+  });
+
+  it('the pinned spec resolves every request-surface ref (fail-closed ledger empty)', () => {
+    expect(STRIPE_SCHEMA_ARTIFACT_PIN.unresolvableRefCount).toBe(0);
+    expect(STRIPE_SCHEMA_UNREPRESENTABLE_OPERATIONS).toEqual([]);
   });
 });

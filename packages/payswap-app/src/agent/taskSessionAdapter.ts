@@ -53,9 +53,11 @@ import {
 } from "./taskSessionPort.js";
 import {
   advanceEventNumber,
+  appendConversationToSnapshot,
   defaultStorage,
   EMPTY_SNAPSHOT,
   loadTaskSnapshot,
+  mintConversationEvent,
   mintTaskEvent,
   requireEventKind,
   requireIsoInstantUtc,
@@ -66,6 +68,7 @@ import {
 } from "./taskSessionSnapshot.js";
 import { AGENT_TASK_SESSION_LOCALSTORAGE_KEY } from "./taskSessionSnapshot.js";
 import { scanAgentTranscriptText } from "./taskSessionGuard.js";
+import type { AgentConversationLogEvent, AgentConversationLogInput } from "./conversationLogEvents.js";
 
 export { AGENT_TASK_SESSION_LOCALSTORAGE_KEY } from "./taskSessionSnapshot.js";
 export type { AgentTaskSessionStorage } from "./taskSessionSnapshot.js";
@@ -301,6 +304,34 @@ export function createBrowserAgentTaskSessionPort(
       const revised: AgentTaskPin = { ...existing, modelSelection: validated, updatedAt: now };
       persist(replaceTask(state.snapshot, revised));
       return revised;
+    },
+
+    async appendConversationEvent(
+      id: string,
+      event: AgentConversationLogInput,
+      now: string,
+    ): Promise<readonly AgentConversationLogEvent[]> {
+      ensureLoaded();
+      requireIsoInstantUtc(now, "now");
+      const existing = findTask(id);
+      if (isTerminal(existing.status)) {
+        throw new AgentTaskSessionError(
+          "TERMINAL_TASK",
+          `task '${id}' is ${existing.status} — a terminal task records no further conversation (the monotonic-terminal law)`,
+        );
+      }
+      // The mint validates the event fail-closed (shape + secret scan +
+      // the frozen-contract pins) BEFORE anything persists.
+      const minted = mintConversationEvent(state.snapshot, id, event, now);
+      persist(appendConversationToSnapshot(state.snapshot, minted));
+      return [...(state.snapshot.conversations?.[id] ?? [])];
+    },
+
+    async conversationLog(id: string): Promise<readonly AgentConversationLogEvent[]> {
+      ensureLoaded();
+      // Unknown ids read as empty (a replay of nothing) — the append
+      // path is the one that fails closed on unknown tasks.
+      return [...(state.snapshot.conversations?.[id] ?? [])];
     },
 
     taskSessionHealth(): AgentTaskSessionHealth {

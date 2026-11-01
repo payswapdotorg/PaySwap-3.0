@@ -711,3 +711,57 @@
   margin-top: 4px;
   color: var(--ps-danger);
 }
+
+/* ---- P24-3: the conversation section (selected-model loop UI) ---- */
+
+.ps-agent-account-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 10px;
+}
+
+.ps-agent-account-chip {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ps-ink-2, #4b5563);
+}
+
+.ps-agent-prepared-action {
+  border-color: var(--ps-attention, #b45309);
+}
+
+.ps-agent-prepared-preview {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 8px;
+  background: var(--ps-surface-2, #f8fafc);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.ps-agent-prepared-preview div {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.ps-agent-prepared-preview dt {
+  min-width: 130px;
+  font-weight: 600;
+}
+
+.ps-agent-prepared-preview dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ps-agent-prepared-param {
+  display: block;
+}
+
+.ps-agent-reconcile-card {
+  border-style: dashed;
+}

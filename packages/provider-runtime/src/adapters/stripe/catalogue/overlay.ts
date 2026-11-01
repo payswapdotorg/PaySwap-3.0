@@ -15,6 +15,7 @@
 
 import type { StripeCatalogueOperation } from './generator.ts';
 import { stripeResourceFamilyOf, stripeResourcePackOf } from './resource-packs.ts';
+import { STRIPE_P24_IMPLEMENTED_OPERATIONS } from './implemented-operations.ts';
 
 /** Effect classes (handoff §7.1 — the exact vocabulary). */
 export const STRIPE_EFFECT_CLASSES = [
@@ -179,6 +180,8 @@ function permissionRuleOf(
  * implement and Sandbox-test first. Each entry was individually reviewed in
  * P24-0; everything outside this table resolves through the rule engine to
  * an honest not-yet/account-gated state and is DENIED for dispatch.
+ * P24-1 added DeleteProductsId (product archive — the work order's §14
+ * reading names it); the set is otherwise the frozen P24-0 review.
  */
 export const STRIPE_P24_INITIAL_RELEASE_OPERATIONS: ReadonlySet<string> = new Set([
   // Pack A — account, capability and configuration (reads + event listing)
@@ -203,6 +206,10 @@ export const STRIPE_P24_INITIAL_RELEASE_OPERATIONS: ReadonlySet<string> = new Se
   'PostProducts', 'GetProductsId', 'PostProductsId', 'GetProducts',
   'GetProductsSearch', 'PostPrices', 'GetPricesPrice', 'GetPrices',
   'GetPricesSearch',
+  // P24-1 addition (the work order's §14 reading names product archive):
+  // DELETE /v1/products/{id} archives the product; its effect class flows
+  // through the reviewed rule engine (DELETE → irreversible tier).
+  'DeleteProductsId',
   // Pack E — billing, invoicing, subscriptions (the invoice lifecycle is
   // NEVER collapsed: create → finalize → send/void/pay are distinct ops)
   'PostInvoices', 'GetInvoicesInvoice', 'GetInvoices', 'PostInvoicesInvoice',
@@ -221,15 +228,21 @@ export const STRIPE_P24_INITIAL_RELEASE_OPERATIONS: ReadonlySet<string> = new Se
 /** Compute the overlay record for one catalogue operation. */
 export function stripeOverlayFor(operation: StripeCatalogueOperation): StripeOperationOverlay {
   const planned = STRIPE_P24_INITIAL_RELEASE_OPERATIONS.has(operation.operationId);
+  const implemented = STRIPE_P24_IMPLEMENTED_OPERATIONS.has(operation.operationId);
   const family = stripeResourceFamilyOf(operation.path);
   const ruleEffect = ruleEffectClass(operation);
   // The reviewed overrides confirm the rule engine's class for every entry
   // (P24-0 review: no divergence found — the overrides pin the SUPPORT STATE,
   // the effect class still flows through the reviewed rule tables).
   const effectClass = ruleEffect;
-  const supportState: StripeSupportState = planned
-    ? 'PLANNED_P24_INITIAL_RELEASE'
-    : ruleSupportState(operation);
+  // THE FLIP LAW (P24-1): an operation flips to IMPLEMENTED only through the
+  // tested implemented-operations registry — never by trusting generated
+  // metadata, never without its family test.
+  const supportState: StripeSupportState = implemented
+    ? 'IMPLEMENTED'
+    : planned
+      ? 'PLANNED_P24_INITIAL_RELEASE'
+      : ruleSupportState(operation);
   return {
     operationId: operation.operationId,
     effectClass,

@@ -30,6 +30,10 @@ import type {
   AgentTaskPin,
   AgentTaskStatusPin,
 } from "../lib/agent-task-pins.js";
+import type {
+  AgentConversationLogEvent,
+  AgentConversationLogInput,
+} from "./conversationLogEvents.js";
 
 /** The honest durability label (the desktop host binding lands at P13-D). */
 export type AgentTaskSessionDurability = "BROWSER_PROFILE";
@@ -139,6 +143,26 @@ export interface AgentTaskSessionPort {
     selection: AgentTaskPin["modelSelection"],
     now: string,
   ): Promise<AgentTaskPin>;
+  /**
+   * (P24-3, ADR-0017 D8) Append ONE event to the task's CONVERSATION
+   * log — the app-owned append-only record of user-visible text, tool
+   * calls/results, prepared-action lifecycle and honest notes (the
+   * vocabulary + fail-closed validation live in
+   * ./conversationLogEvents.ts). The task record itself is NOT
+   * rewritten (the closed surface vocabulary stays untouched); the log
+   * rides the same store. Fail-closed: unknown ids, terminal tasks and
+   * malformed events throw typed errors. HUMAN-EVENT LAW:
+   * PREPARED_ACTION_CONFIRMED / PREPARED_ACTION_REFUSED are written
+   * only by the controller's user-gesture paths — never by model-side
+   * flow.
+   */
+  appendConversationEvent(
+    id: string,
+    event: AgentConversationLogInput,
+    now: string,
+  ): Promise<readonly AgentConversationLogEvent[]>;
+  /** (P24-3) Replay the task's conversation log (append order; empty when none). */
+  conversationLog(id: string): Promise<readonly AgentConversationLogEvent[]>;
   /** The honest health report. */
   taskSessionHealth(): AgentTaskSessionHealth;
 }

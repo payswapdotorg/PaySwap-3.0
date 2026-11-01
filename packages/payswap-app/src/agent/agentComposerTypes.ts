@@ -16,6 +16,7 @@ import type { AgentComposerTranscriptEntry } from "./agentComposerUiState.js";
 import type { MissionIntakePlanePort, MissionIntakeState } from "./missionIntakePins.js";
 import type { ModelCatalogPort, ModelControlsState } from "./taskModelPins.js";
 import type { AgentTaskModelSelectionPin } from "../lib/agent-task-pins.js";
+import type { AgentConversationPlane, AgentConversationState } from "./agentConversationWiring.js";
 
 /* ------------------------------ the state --------------------------- */
 
@@ -40,6 +41,8 @@ export interface AgentComposerState {
   readonly missionIntake: MissionIntakeState;
   /** (P21-B, D4) The model/difficulty controls state (UNBOUND without a catalog). */
   readonly modelControls: ModelControlsState;
+  /** (P24-3, ADR-0017 D8) The selected-model conversation state (UNBOUND without a plane). */
+  readonly conversation: AgentConversationState;
 }
 
 /** A surface-action seed request (card clicks and area entries). */
@@ -84,6 +87,14 @@ export interface AgentComposerControllerOptions {
    * honest unbound note, never a model list.
    */
   readonly modelCatalog?: ModelCatalogPort;
+  /**
+   * (P24-3, ADR-0017 D8) The selected-model conversation plane: when
+   * bound, the composer's seeded tasks with a recorded model run the
+   * BOUNDED conversation loop (model turns, tool calls, prepared
+   * actions) through the host-bridged ports; absent (the web tier) —
+   * the honest unbound note, never a simulated conversation.
+   */
+  readonly conversationPlane?: AgentConversationPlane;
 }
 
 export interface AgentComposerController {
@@ -108,6 +119,18 @@ export interface AgentComposerController {
   loadModelCatalog(): Promise<void>;
   /** (P21-B, D4) Record the model + difficulty selection on the newest resumable task (fail-closed). */
   selectModel(selection: AgentTaskModelSelectionPin): Promise<void>;
+  /**
+   * (P24-3) The USER-GESTURE confirm of a pending prepared action (the
+   * D10 human gate: host-minted authorization, execution, recorded
+   * outcome, model continuation). Zero app-side financial authority.
+   */
+  confirmPreparedAction(preparedActionId: string): Promise<void>;
+  /** (P24-3) The USER-GESTURE refusal — the action dies, recorded. */
+  refusePreparedAction(preparedActionId: string): Promise<void>;
+  /** (P24-3) The explicit user-authorized account-context bind/switch. */
+  bindAccountContext(connectionId: string): Promise<void>;
+  /** (P24-3) The user abort of a running conversation loop. */
+  cancelConversation(): void;
   /**
    * The controller's ONE task-session port (P17-C, ADR-0010 D5): the
    * composition seam a platform host uses to bind a route-planning
