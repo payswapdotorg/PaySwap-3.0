@@ -596,3 +596,91 @@ the P21 CDP journey (9/9) + the P23-D CDP emergence journey (12/12) +
 the P22-D CDP corridor journey (14/14) + the corridor bridge battery +
 the no-bypass battery (the ADR-0016 D7 gate) + the receipt
 machine-verification (the p23 + p22d batteries).
+
+## 11. The P24-D reconciliation (2026-11-01) — the Stripe conversational connector journeys
+
+REGISTERED by the resident TL at the P24-D closure (ADR-0017 D8/D9/D10
+— the handoff §12 verticals on the tier available; the closure policy's
+named gate — one genuine end-to-end conversational Stripe flow — met at
+the composition tier, honestly labeled; the real Sandbox and real-model
+tiers stay OPERATOR_GATED, never renamed). The five handoff journeys,
+each with its honest tier split:
+
+- **JOURNEY A (create customer/product/price + payment link)** — the
+  two-phase action law E2E at the composition tier: the model proposes
+  through `stripe.prepare_action` → the host mints the digest-bound
+  prepared action over the REAL census/validator (the P24-2 wiring
+  recipe lifted to production) → the EXACT preview pauses the loop →
+  the human confirms (the pinned phrase table; STRONG tiers never
+  confirm conversationally) → the host-minted single-use authorization
+  → the REAL transport dispatch (v1 form encoding, per-connection
+  Stripe-Version, Idempotency-Key on the operation's class) → CONFIRMED
+  with the authoritative read-back route + the append-only audit. The
+  multi-step dependency order (product → price → link) and the partial
+  failure compensation law are the P24-3 loop battery's domain. REAL
+  Stripe Sandbox: OPERATOR_GATED on STRIPE_SANDBOX_SECRET_KEY +
+  STRIPE_SANDBOX_WRITES_ENABLED=1 through the P24-1 harness TIER 2.
+- **JOURNEY B (inspect and reconcile payments)** — the read path: the
+  D9 permission-filtered domain registry (READ_ONLY + dispatchable +
+  the connection's verified RAK scopes), the bounded pagination (the
+  P24-1 contracts), INV-04 TIMEOUT_UNKNOWN on undelivered reads (never
+  FAILED). The E2E round trip at the composition tier proves the full
+  chain (the registry → the channel read member → the seal → the
+  transport → the model's answer over the bounded result). Real
+  yesterday's-payments totals: OPERATOR_GATED (a real account's
+  PaymentIntents).
+- **JOURNEY C (refund with exact confirmation and UNKNOWN handling)** —
+  the FINANCIAL_IRREVERSIBLE class + the tiered confirmation table +
+  the INV-04 UNKNOWN-after-dispatch law with the read-back-only
+  reconciliation (the P24-2 execute battery: consume-before-dispatch,
+  replay refused, expiry dead). Real refunds: OPERATOR_GATED.
+- **JOURNEY D (Connect seller onboarding and payout health)** — U3
+  (marketplace-connected-accounts) is declared UNCONFIGURED with the
+  exact missing operator configuration; the account-context resolver
+  refuses it typed (never ACTIVE from a redirect alone); a connected
+  seller is never simulated. The journey's honest current form is the
+  refusal itself (the account-context battery).
+- **JOURNEY E (conversational model tool integrity)** — the closure
+  policy's named gate, MET: the E2E conversational round trip at the
+  composition tier (agent-conversation-plane.test.ts) — the REAL shared
+  controller over the production binding (both shared seams bound as
+  main.tsx binds them), the persisted selection invoked VERBATIM through
+  the substrate surface (workspace/generateText: the CLI worker holds
+  every credential; no reasoning content crosses), the registered tool
+  called, the host answer returned, the final answer recorded in the
+  append-only log. The bounds (max steps, byte budgets, timeouts,
+  cancellation, resume) are the P24-3 loop battery's; the no-bypass
+  laws (the model can reference but never mint an authorization; the
+  digest change refuses; the account switch invalidates) are pinned by
+  the P24-3 + P24-2 batteries.
+- **THE DESKTOP COMPOSITION BINDING (the wave's named integration)** —
+  the renderer-tier AgentConversationPlane now binds the REAL host
+  plane: agentModelTurn over the substrate agent service's
+  generateWorkspaceText + the thirteen stripe members over
+  composeStripeActionPlane (the REAL provider-runtime census/validator/
+  transport by workspace-source path — the P17-C rootDir precedent
+  applied to the host tsconfig) + the executor over the product
+  connection plane (the seal, the verified-evidence account context,
+  the RAK binding, the api-version state, the durable store). The web
+  tier binds nothing — the honest unbound notes render VERBATIM (the
+  web honesty law; the P24-3 unbound-tier tests).
+- **THE HONEST TIER SPLIT (recorded, never blurred)**: the composition
+  tier's scripted model + scripted fetch are the IN-REPO proof; the
+  REAL tiers stay the standing operator actions — (1) the real
+  conversational journey over a live substrate agent runtime (the
+  model plane answers through the real CLI worker; turn-level
+  granularity disclosed), (2) the real Stripe Sandbox journeys through
+  the P24-1 harness TIER 2 (operator-gated on credentials), (3) the
+  Electron CDP receipts (the p22/p23 pattern, held for the operator's
+  desktop verification pass). Never a silent pass.
+
+The living suites after P24-D: the composition battery (11 laws — the
+census/pagination facts, the two-phase CONFIRMED over the real
+transport, the selection-verbatim + tool-choice laws, the absent
+postures, the renderer binding + the honest unbound, the E2E round
+trip) + the P24-3 composer suites (the loop, the wiring, the log, the
+prepared-action flow, the tool registry/runtime/output) + the P24-2
+host suites + the P24-1 provider-runtime suites — merged tree 1,956
+passed + 7 skipped across the three package batteries (provider-runtime
+34f/516t+5sk · desktop 79f/676t+2sk · payswap-app 66f/764t), +46 over
+the lane-acceptance base.

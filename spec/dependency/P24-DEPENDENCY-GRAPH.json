@@ -48,7 +48,7 @@
     {
       "id": "P24-D",
       "owner": "TL",
-      "status": "OPEN",
+      "status": "COMPLETE",
       "depends_on": [
         "P24-1",
         "P24-2",
@@ -57,11 +57,7 @@
       "lane_scope": "The TL integration and acceptance: Journeys A-E on the tier available (real Sandbox where credentials exist, OPERATOR_GATED markers otherwise — scripted receipts never renamed live) + the merged-tree batteries + the census flip review (every IMPLEMENTED state has its test) + the JOURNEY-MAP/FEATURE-MAP P24 rows + the graph/state closure + PUSH + the bundle archive + the evidence bundle."
     }
   ],
-  "frontier_after_registration": [
-    "P24-1",
-    "P24-2",
-    "P24-3"
-  ],
+  "frontier_after_registration": [],
   "closure_policy": "P24 closes only when P24-1/2/3/D are all accepted on main with their batteries green at the tip AND at least one genuine end-to-end conversational Stripe flow is proven on the tier available (the handoff §13.5/§16 law: no test-count-only closure; a scripted transport receipt is a separate tier from real Sandbox evidence; every unsupported family stays visibly classified with an exact reason). INV-25 live refusal must remain effective at the tip; secrets must be absent from model context, renderer, transcript, tool output, task records, logs and receipts (the secret-scan battery).",
-  "wave_status": "OPEN — P24-0, P24-1, P24-2 and P24-3 COMPLETE on the merged tree (the three file-disjoint worker lanes accepted 2026-11-01: the schema layer + v1/v2 transports + 46 IMPLEMENTED operations with the mechanically-verified flip law; the prepared-action executor + RAK binding + event plane over the byte-untouched frozen contracts; the bounded conversation loop + tool registry + prepared-action UX with all D8/D9/D10/D11 laws tested). The frontier is P24-D (the TL closure): the desktop composition binding — the renderer-tier conversation plane (the model-plane binding is the named integration: the substrate has no product-side model invocation client today; the honest unbound note stands until it lands) + Journeys A-E at the real tier (OPERATOR_GATED on Stripe Sandbox credentials; the scripted-tier integration suites are the separate honest tier, never renamed) + the JOURNEY-MAP journey rows + the final graph/state closure + PUSH + bundle archive."
+  "wave_status": "CLOSED — P24-0, P24-1, P24-2, P24-3 and P24-D all COMPLETE on main (the composition binding landed at cb86684: the model plane over the substrate generateWorkspaceText + the thirteen stripe channel members over the REAL provider-runtime adapters + the executor over the product connection plane; the E2E conversational round trip proven at the composition tier at 2515b92 — the closure policy's named gate, honestly labeled; the real Sandbox + live-runtime + CDP tiers stay the standing operator actions, never renamed). The carry-forwards: the FEATURE-MAP parser test (re-carried), the live-tier harness extensions (operator-gated), the official-MCP wrapped input evaluation (ADR-0017 D1 bounded)."
 }
