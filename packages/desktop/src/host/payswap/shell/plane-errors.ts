@@ -46,3 +46,38 @@ export class SessionModelCatalogNotConfiguredError extends Error {
     this.name = "SessionModelCatalogNotConfiguredError";
   }
 }
+
+/**
+ * The typed fail-closed error for an unconfigured model-conversation
+ * plane (P24-D, ADR-0017 D8 — the same posture): the substrate
+ * generateWorkspaceText binding was not composed at the host
+ * composition edge, so the model-turn member fails closed — never a
+ * simulated conversation turn.
+ */
+export class ModelConversationNotConfiguredError extends Error {
+  readonly kind = "MODEL_CONVERSATION_NOT_CONFIGURED" as const;
+  constructor() {
+    super(
+      "The model-conversation plane is not configured in this host (no substrate model invocation on the seam) — model-turn calls fail closed, and none is simulated",
+    );
+    this.name = "ModelConversationNotConfiguredError";
+  }
+}
+
+/**
+ * The typed fail-closed error for an unconfigured stripe action plane
+ * (P24-D, ADR-0017 D1/D10 — the same posture): the stripe plane
+ * composition (census/validator/transport + executor over the
+ * connection plane) was not composed at the host composition edge, so
+ * the stripe plane members fail closed — never a fabricated catalogue
+ * or a caller-asserted action.
+ */
+export class StripePlaneNotConfiguredError extends Error {
+  readonly kind = "STRIPE_PLANE_NOT_CONFIGURED" as const;
+  constructor() {
+    super(
+      "The Stripe action plane is not configured in this host (no stripe plane runtime on the seam) — stripe conversation calls fail closed",
+    );
+    this.name = "StripePlaneNotConfiguredError";
+  }
+}

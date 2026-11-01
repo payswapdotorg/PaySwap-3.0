@@ -214,6 +214,23 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   // recorded facts; an ambiguous attempt refuses typed (the reviewer's
   // law) and the typed refusals propagate, never masked.
   "paymentMissionVerifyAttempt",
+  // (P24-D, ADR-0017 D8/D9/D10) The agent conversation plane members —
+  // the selected-model turn over the substrate workspace model runtime
+  // + the Stripe catalogue/accounts/reads/prepared-actions members
+  // (fail-closed typed when their seams are absent; the principal and
+  // every authorization stay HOST-minted).
+  "agentModelTurn",
+  "stripeCatalogueRelease",
+  "stripeListOperationFacts",
+  "stripeOperationFact",
+  "stripeListAccountFacts",
+  "stripeAccountFacts",
+  "stripeExecuteRead",
+  "stripePrepareAction",
+  "stripeAuthorizeAction",
+  "stripeExecuteAction",
+  "stripeInspectAction",
+  "stripePlanePrincipalId",
 ] as const;
 
 /**

@@ -60,6 +60,14 @@ import {
 } from "../connections/chain-members.js";
 import { sessionModelCatalogMembersOf } from "./session-model-members.js";
 import {
+  modelConversationMembersOf,
+  type ModelConversationChannelDeps,
+} from "./model-conversation-members.js";
+import {
+  stripePlaneMembersOf,
+  type StripePlaneChannelDeps,
+} from "./stripe-plane-members.js";
+import {
   DECLARED_STRIPE_TEST_CORRIDOR,
   createGateEnvironmentFromConnections,
 } from "../connections/gate-environment.js";
@@ -141,6 +149,20 @@ export interface PaySwapDesktopServiceOptions {
   readonly sessionModelCatalog?: {
     readonly readSettings: () => Promise<ZCodeSessionSettingsState | undefined>;
   };
+  /**
+   * (P24-D, ADR-0017 D8) The substrate model-conversation binding: the
+   * agent service's workspace generateText surface + the workspace
+   * target. ABSENT → the agentModelTurn member fails closed typed
+   * (never a simulated turn).
+   */
+  readonly modelConversation?: ModelConversationChannelDeps;
+  /**
+   * (P24-D, ADR-0017 D9/D10) The composed stripe action plane + the
+   * connection authority surface the stripe members ride. ABSENT →
+   * every stripe plane member fails closed typed (never a fabricated
+   * catalogue, never a caller-asserted action).
+   */
+  readonly stripePlane?: StripePlaneChannelDeps;
 }
 
 function defaultSessionId(): string {
@@ -317,6 +339,20 @@ export function createPaySwapDesktopService(
     seamLog,
   );
 
+  // (P24-D, ADR-0017 D8) The model-conversation member: the substrate
+  // workspace model runtime (generateWorkspaceText) behind the
+  // selected-model turn (the members module owns the postures).
+  const modelConversationMembers = modelConversationMembersOf(
+    options.modelConversation,
+    seamLog,
+  );
+
+  // (P24-D, ADR-0017 D9/D10) The stripe plane members: the census
+  // facts + the verified account facts + the sealed reads + the
+  // two-phase prepared-action flow over the composed stripe action
+  // plane (the members module owns the postures).
+  const stripePlaneMembers = stripePlaneMembersOf(options.stripePlane, seamLog);
+
   // (P21-D reviewer-gate, Gap C) The VERIFICATION member: the single-act
   // authoritative read-back over the LANE-AWARE Stripe read-back port,
   // composed over the SAME connection + probe planes the dispatch
@@ -483,6 +519,12 @@ export function createPaySwapDesktopService(
     // (P21-D Gap C, ADR-0014 D4) The session-model-catalog member — the
     // substrate session settings' model availability as catalog DTOs.
     ...sessionModelCatalogMembers,
+
+    // (P24-D, ADR-0017 D8/D9/D10) The agent conversation plane — the
+    // selected-model turn + the Stripe catalogue/accounts/reads/actions
+    // members (all fail-closed typed when their seams are absent).
+    ...modelConversationMembers,
+    ...stripePlaneMembers,
 
     // (P17-A, ADR-0010 D2) The payment-mission plane — read/input
     // members over the composed runtime (instants are stamped at the

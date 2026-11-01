@@ -375,6 +375,126 @@ export interface IPaySwapDesktopService extends IPaySwapDesktopPaymentMissionMem
   >;
 
   // -------------------------------------------------------------------------
+  // The agent conversation plane (P24-D, ADR-0017 D8/D9/D10) — the
+  // selected-model turn + the Stripe plane members. All fail closed
+  // with the typed not-configured errors when their seams are absent
+  // (never a simulated turn, never a fabricated catalogue, never a
+  // caller-asserted action).
+  // -------------------------------------------------------------------------
+
+  /**
+   * (P24-D, ADR-0017 D8) ONE selected-model turn through the substrate
+   * workspace model runtime (workspace/generateText): the persisted
+   * selection invoked VERBATIM, the PUBLIC message history, the
+   * registered tool contracts. Turn-level honesty: the result is a
+   * COMPLETED turn (the substrate RPC answers whole turns); runtime
+   * failures cross as the typed {ok: false, error} shape. No
+   * credential material ever crosses (the CLI worker holds the
+   * provider keys); no reasoning content exists on the wire.
+   */
+  agentModelTurn(
+    request: import("./model-conversation-members.js").AgentModelTurnRequestDto,
+  ): Promise<import("./model-conversation-members.js").AgentModelTurnResultDto>;
+
+  /** (P24-D, ADR-0017 D9) The pinned catalogue release identity (the census's own string). */
+  stripeCatalogueRelease(): Promise<string>;
+
+  /** (P24-D, ADR-0017 D9) The census facts under a filter (bounded by the host). */
+  stripeListOperationFacts(filter?: {
+    readonly resourceFamily?: string;
+    readonly packId?: string;
+    readonly supportState?: string;
+    readonly apiNamespace?: "v1" | "v2";
+  }): Promise<
+    readonly import("../stripe/action-seams.js").StripeCensusOperationView[]
+  >;
+
+  /** (P24-D, ADR-0017 D9) One operation's census facts (null = unknown → DENY). */
+  stripeOperationFact(
+    operationId: string,
+  ): Promise<import("../stripe/action-seams.js").StripeCensusOperationView | null>;
+
+  /** (P24-D, ADR-0017 D9) The verified account facts (ACTIVE Stripe connections only). */
+  stripeListAccountFacts(): Promise<
+    readonly {
+      readonly connectionId: string;
+      readonly stripeAccountId: string;
+      readonly accountModel: string;
+      readonly environment: string;
+      readonly grantedPermissionRules: readonly string[];
+    }[]
+  >;
+
+  /** (P24-D, ADR-0017 D9) One connection's verified account facts (null = unresolvable). */
+  stripeAccountFacts(connectionId: string): Promise<{
+    readonly connectionId: string;
+    readonly stripeAccountId: string;
+    readonly accountModel: string;
+    readonly environment: string;
+    readonly grantedPermissionRules: readonly string[];
+  } | null>;
+
+  /** (P24-D, ADR-0017 D9) One informational read through the seal (READ_ONLY only). */
+  stripeExecuteRead(request: {
+    readonly operationId: string;
+    readonly arguments: Readonly<Record<string, unknown>>;
+    readonly connectionId: string;
+    readonly taskId: string;
+    readonly callId: string;
+  }): Promise<
+    | { readonly ok: true; readonly output: unknown }
+    | {
+        readonly ok: false;
+        readonly error: {
+          readonly code:
+            | "UNKNOWN_OPERATION"
+            | "PERMISSION_MISSING"
+            | "VALIDATION"
+            | "PROVIDER_FAILURE"
+            | "TIMEOUT_UNKNOWN";
+          readonly message: string;
+          readonly retryable: boolean;
+        };
+      }
+  >;
+
+  /** (P24-D, ADR-0017 D10) Prepare an action (the host mints the digest; the model proposes only). */
+  stripePrepareAction(proposal: {
+    readonly operationId: string;
+    readonly parameters: readonly import("../stripe/prepared-action-contracts.js").StripeActionParameter[];
+    readonly connectionId: string;
+    readonly taskId: string;
+  }): Promise<
+    | { readonly ok: true; readonly action: import("../stripe/prepared-action-contracts.js").StripePreparedAction }
+    | { readonly ok: false; readonly reason: string }
+  >;
+
+  /** (P24-D, ADR-0017 D10) Authorize a prepared action (the principal is HOST-RESOLVED). */
+  stripeAuthorizeAction(input: {
+    readonly preparedActionId: string;
+    readonly confirmedDigest: string;
+  }): Promise<
+    | {
+        readonly ok: true;
+        readonly authorization: import("../stripe/prepared-action-contracts.js").StripeActionAuthorization;
+      }
+    | { readonly ok: false; readonly reason: string }
+  >;
+
+  /** (P24-D, ADR-0017 D10) Execute an authorization (single-use; INV-04 UNKNOWN first-class). */
+  stripeExecuteAction(
+    authorizationId: string,
+  ): Promise<import("../stripe/prepared-action-contracts.js").StripeActionExecutionOutcome>;
+
+  /** (P24-D, ADR-0017 D10) Inspect a prepared action (null = unknown id). */
+  stripeInspectAction(
+    preparedActionId: string,
+  ): Promise<import("../stripe/prepared-action-contracts.js").StripePreparedAction | null>;
+
+  /** (P24-D) The host-resolved principal reference (the local desktop operator). */
+  stripePlanePrincipalId(): string;
+
+  // -------------------------------------------------------------------------
   // The payment-mission plane (P17-A, ADR-0010 D2) — read/input members
   // declared in ./payment-mission-contracts.ts (the no-authority-verb
   // law holds; authorization stays minted host-side behind the origin

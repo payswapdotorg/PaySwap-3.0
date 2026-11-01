@@ -72,6 +72,8 @@ import {
   derivePaymentsStoreDirectory,
   registerPaySwapDesktopService,
   composeNodeConnectionPlane,
+  composeStripeActionPlane,
+  CONNECTIONS_NODE_FILE_SYSTEM,
 } from "./payswap/index.js";
 import { createHostResourceUsageResponder } from "./hostResourceUsage.js";
 import {
@@ -3007,6 +3009,48 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
                       payswapSessionSettingsWorkspace,
                     ),
                   },
+                }
+              : {}),
+            // (P24-D, ADR-0017 D8) The model-conversation binding: the
+            // agent service's REAL workspace generateText surface over
+            // this init's workspace — the selected-model turn's
+            // substrate edge. ABSENT (no agent service / no workspace)
+            // → the member fails closed typed; nothing is simulated.
+            ...(payswapAgentService !== undefined && payswapSessionSettingsWorkspace !== undefined
+              ? {
+                  modelConversation: {
+                    agentService: payswapAgentService,
+                    workspace: payswapSessionSettingsWorkspace,
+                    log: (level, message, ...args) => {
+                      writeHostLog(level, message, ...args);
+                    },
+                  },
+                }
+              : {}),
+            // (P24-D, ADR-0017 D9/D10) The stripe action plane: the REAL
+            // census/validator/transport + the executor over the
+            // connection plane (the seal, the verified-evidence account
+            // context, the RAK binding, the api-version state, the
+            // durable store). Requires the connection plane + a store
+            // directory; ABSENT → the stripe members fail closed typed.
+            ...(payswapConnectionPlane !== undefined && payswapWorkspaceStoreDir !== undefined
+              ? {
+                  stripePlane: await composeStripeActionPlane({
+                    authority: payswapConnectionPlane.connectionAuthority,
+                    evidenceStore: payswapConnectionPlane.connectionProbe.evidenceStore,
+                    fetchImpl: globalThis.fetch,
+                    storeDirectory: payswapWorkspaceStoreDir,
+                    fileSystem: CONNECTIONS_NODE_FILE_SYSTEM,
+                    log: (level, message) => {
+                      writeHostLog(level, message);
+                    },
+                  }).then((plane) => ({
+                    plane,
+                    authority: payswapConnectionPlane.connectionAuthority,
+                    log: (level: "info" | "warn" | "error", message: string, ...args: readonly unknown[]) => {
+                      writeHostLog(level, message, ...args);
+                    },
+                  })),
                 }
               : {}),
           },

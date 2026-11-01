@@ -10,6 +10,7 @@ import {
   composeModelCatalogBinding,
 } from "./modelCatalogComposition.js";
 import { composeConnectionsActivationBinding } from "./connectionsActivationComposition.js";
+import { composeAgentConversationBinding } from "./agentConversationComposition.js";
 import { chainDerivedWaitRecheckObservations, composeWaitRecheckBinding } from "./waitRecheckComposition.js";
 import { createRoot } from "react-dom/client";
 import { useEffect } from "react";
@@ -212,7 +213,7 @@ function renderDatabaseStartup(): void {
 function enterAppIfPrepared(): void {
   if (appInitialized) return;
   const port = databaseStartupAdmission.takeReadyPort();
-  if (port) initializeBusinessRoot(port);
+  if (port) void initializeBusinessRoot(port);
 }
 const firstStartupStateTimer =
   windowKind === "update-status"
@@ -323,7 +324,7 @@ function handleServicePortMessage(event: MessageEvent): void {
   enterAppIfPrepared();
 }
 
-function initializeBusinessRoot(port: MessagePort): void {
+async function initializeBusinessRoot(port: MessagePort): Promise<void> {
   appInitialized = true;
   // P10-B：console 工作区需要 payswap-desktop channel（host 侧的 DESKTOP_PROFILE
   // workspace store），所以这里用 connectDesktopConsoleServices —— 它与
@@ -393,6 +394,17 @@ function initializeBusinessRoot(port: MessagePort): void {
     });
   } catch {
     // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未接线 re-check 说明。
+  }
+  // P24-D（ADR-0017 D8/D9/D10）：绑定对话面 —— 选定模型的 substrate 调用面
+  // （agentModelTurn over workspace/generateText）+ Stripe 目录/账户/读取/
+  // 预备动作成员，适配到应用侧钉住的 AgentConversationPlane 并绑上共享缝隙
+  // （首个共享 controller 构造之前）。失败时保持诚实默认（未绑定对话 ——
+  // 作曲家如实呈现未绑定说明，绝不模拟对话）。异步：目录 release 是宿主
+  // 权威数据，绑定期经通道取回；取回失败 = 面未组合，诚实说明成立。
+  try {
+    await composeAgentConversationBinding({ services });
+  } catch {
+    // 组合失败的诚实姿态：共享缝隙保持默认值 —— 未绑定对话说明。
   }
   // P17-C（ADR-0010 D1/D5）：绑定 REAL 路由规划引擎与会话 —— 组合根消费
   // payswap-desktop 的 mission-plane 成员（P17-A）；失败时保持诚实默认

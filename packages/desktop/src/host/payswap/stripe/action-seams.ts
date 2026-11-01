@@ -62,6 +62,12 @@ export interface StripeCensusOperationView {
    */
   readonly idempotencyKeyAllowed: boolean;
   readonly summary: string;
+  /** (P24-D) The operation's resource family (the overlay's join key — e.g. "customers"). */
+  readonly resourceFamily: string;
+  /** (P24-D) The reviewed resource-pack id (Packs A–K — the discovery surface). */
+  readonly packId: string;
+  /** (P24-D) Is the operation a paginated list (the bounded-walk law's input)? */
+  readonly listPaginated: boolean;
 }
 
 /** The census port (the pinned-release metadata + per-operation lookup). */

@@ -170,6 +170,30 @@ export class ConnectionSessionAuthority {
     return this.#verification.withSealedCredential(connectionId, consumer, context);
   }
 
+  /**
+   * (P24-D) The persisted connection record (the account-context read —
+   * evidence-backed durable truth, never a view reconstruction). Null
+   * for an unknown connection id.
+   */
+  async connectionRecordOf(connectionId: string): Promise<PersistedConnectionRecord | null> {
+    await this.#ensureLoaded();
+    return this.#records.get(connectionId) ?? null;
+  }
+
+  /**
+   * (P24-D) The credential seal's sealedAt (ISO) for a connection — the
+   * ROTATION FRESHNESS law's input (probe evidence older than a fresh
+   * seal is stale). Null when the handle is unknown (revoked or absent).
+   */
+  async credentialSealedAtOf(connectionId: string): Promise<string | null> {
+    await this.#ensureLoaded();
+    const record = this.#records.get(connectionId);
+    if (record?.credentialHandleRef == null) {
+      return null;
+    }
+    return this.#broker.metadataOf(record.credentialHandleRef)?.sealedAt ?? null;
+  }
+
   #nowMs(): number {
     return this.#options.nowMs?.() ?? Date.now();
   }

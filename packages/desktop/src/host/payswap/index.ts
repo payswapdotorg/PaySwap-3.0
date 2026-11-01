@@ -25,3 +25,8 @@ export * from "./shell/index.js";
 // connection session authority, the durable credential broker, the
 // pinned provider vocabularies and the node composition edge.
 export * from "./connections/index.js";
+
+// The stripe action plane (P24-D — ADR-0017 D9/D10): the REAL
+// provider-runtime adapter lifts + the executor composition over the
+// connection plane.
+export * from "./stripe/index.js";

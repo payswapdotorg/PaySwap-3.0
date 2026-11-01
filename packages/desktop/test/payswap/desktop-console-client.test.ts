@@ -117,6 +117,9 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
     expect(hostMembers).toEqual([...PAYSWAP_DESKTOP_CLIENT_MEMBERS].sort());
     // The known host members, spelled out (a drift in EITHER list fails).
     expect(hostMembers).toEqual([
+      // (P24-D, ADR-0017 D8) The selected-model turn (the substrate
+      // workspace model runtime behind the conversation plane).
+      "agentModelTurn",
       // (P21-D Gap A, ADR-0014 D6/D12) The bridge-derived corridor chains.
       "connectionCapabilityChains",
       "connectionConsumeProviderCallback",
@@ -169,6 +172,19 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       // catalog (read-only model metadata DTOs; the honest empty list
       // when the substrate reports no models).
       "sessionModelCatalog",
+      // (P24-D, ADR-0017 D9/D10) The Stripe plane members (catalogue/
+      // accounts/reads/prepared-actions + the host-resolved principal).
+      "stripeAccountFacts",
+      "stripeAuthorizeAction",
+      "stripeCatalogueRelease",
+      "stripeExecuteAction",
+      "stripeExecuteRead",
+      "stripeInspectAction",
+      "stripeListAccountFacts",
+      "stripeListOperationFacts",
+      "stripeOperationFact",
+      "stripePlanePrincipalId",
+      "stripePrepareAction",
       "workspaceArchiveMissionDraft",
       "workspaceListMissions",
       "workspaceMissionDetail",

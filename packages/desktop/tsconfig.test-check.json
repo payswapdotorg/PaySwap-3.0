@@ -7,10 +7,16 @@
     ],
     "types": [
       "node"
-    ]
+    ],
+    "allowImportingTsExtensions": true
   },
+  "files": [
+    "../provider-runtime/src/adapters/stripe/catalogue/operations.json",
+    "../provider-runtime/src/adapters/stripe/catalogue/operation-schemas.json"
+  ],
   "include": [
     "src/host/payswap",
+    "../provider-runtime/src",
     "test/payswap/payment-approval-plane.test.ts",
     "test/payswap/payment-approval-plane-harness.ts",
     "test/payswap/payment-dispatch-plane.test.ts",

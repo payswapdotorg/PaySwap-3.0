@@ -19,6 +19,7 @@
 
 import { createAgentComposerController } from "./agentComposerController.js";
 import type { AgentComposerController } from "./agentComposerTypes.js";
+import type { AgentConversationPlane } from "./agentConversationWiring.js";
 import type { MissionIntakePlanePort } from "./missionIntakePins.js";
 import type { ModelCatalogPort } from "./taskModelPins.js";
 
@@ -87,6 +88,7 @@ export function sharedAgentComposerController(): AgentComposerController {
     sharedController = createAgentComposerController({
       ...(sharedPlane === undefined ? {} : { missionIntakePlane: sharedPlane }),
       ...(boundModelCatalog === undefined ? {} : { modelCatalog: boundModelCatalog }),
+      ...(boundConversationPlane === undefined ? {} : { conversationPlane: boundConversationPlane }),
     });
   }
   return sharedController;
@@ -95,4 +97,31 @@ export function sharedAgentComposerController(): AgentComposerController {
 /** Test/inspection helper: drop the shared singleton (never used in src). */
 export function resetSharedAgentComposerController(): void {
   sharedController = undefined;
+}
+
+/* ------------------ the shared conversation plane ------------------ */
+
+let boundConversationPlane: AgentConversationPlane | undefined;
+
+/**
+ * Bind the shared conversation plane (P24-D, ADR-0017 D8): the
+ * platform host's composition root binds the REAL host plane — the
+ * selected-model invocation port, the Stripe catalogue/accounts/reads/
+ * prepared-actions ports and the principal resolver — BEFORE the first
+ * sharedAgentComposerController() construction. The web tier binds
+ * nothing: the honest UNBOUND conversation tier (the web honesty law —
+ * never a simulated conversation).
+ */
+export function bindSharedConversationPlane(plane: AgentConversationPlane): void {
+  boundConversationPlane = plane;
+}
+
+/** Test/inspection helper: drop the shared binding (never used in src). */
+export function resetSharedConversationPlane(): void {
+  boundConversationPlane = undefined;
+}
+
+/** The shared binding (undefined = the honest unbound conversation tier). */
+export function sharedConversationPlane(): AgentConversationPlane | undefined {
+  return boundConversationPlane;
 }

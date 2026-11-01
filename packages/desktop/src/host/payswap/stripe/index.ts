@@ -20,3 +20,5 @@ export * from "./webhook-destinations.js";
 export * from "./event-inbox-records.js";
 export * from "./event-inbox.js";
 export * from "./event-plane.js";
+export * from "./stripe-plane-adapters.js";
+export * from "./stripe-plane-composition.js";

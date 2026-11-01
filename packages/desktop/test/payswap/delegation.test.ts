@@ -103,6 +103,14 @@ describe("delegated money movement laws (P7-W2)", () => {
     });
     const methodNames = Object.keys(service).filter((key) => key !== "session");
     expect(methodNames.sort()).toEqual([
+      // (P24-D, ADR-0017 D8/D9/D10) The agent conversation plane — the
+      // selected-model turn + the Stripe catalogue/accounts/reads/
+      // prepared-actions members. The Stripe action verbs ride the
+      // frozen two-phase law (prepare/authorize/execute over the
+      // host-minted single-use artifacts — the P24-2 executor, not a
+      // parallel money-movement engine: the members dispatch through
+      // the SAME sealed transport the payment-mission kernel rides).
+      "agentModelTurn",
       // P13-B connection-plane members: registry/records/setup-seed/key
       // seal/probe-evidence/callback-consume/revocation — connection
       // orchestration ONLY (never money movement; connectionRevoke
@@ -188,6 +196,19 @@ describe("delegated money movement laws (P7-W2)", () => {
       "sessionModelCatalog",
       // P10-B console workspace members: demand-side mission intent +
       // host-computed deployment facts ONLY (never money movement).
+      // (P24-D) The Stripe plane members (catalogue/accounts/reads/
+      // prepared-actions + the host-resolved principal).
+      "stripeAccountFacts",
+      "stripeAuthorizeAction",
+      "stripeCatalogueRelease",
+      "stripeExecuteAction",
+      "stripeExecuteRead",
+      "stripeInspectAction",
+      "stripeListAccountFacts",
+      "stripeListOperationFacts",
+      "stripeOperationFact",
+      "stripePlanePrincipalId",
+      "stripePrepareAction",
       "workspaceArchiveMissionDraft",
       "workspaceListMissions",
       "workspaceMissionDetail",

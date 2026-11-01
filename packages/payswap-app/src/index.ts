@@ -106,6 +106,9 @@ export {
   bindSharedModelCatalog,
   resetSharedModelCatalog,
   sharedModelCatalog,
+  bindSharedConversationPlane,
+  resetSharedConversationPlane,
+  sharedConversationPlane,
 } from "./agent/agentComposerShared.js";
 // (P21-B run 3, ADR-0014 D10) The shared wait re-check plane seam: the
 // desktop renderer binds the REAL P21-C evaluator behind the pinned port;
@@ -211,6 +214,10 @@ export {
   type AgentTaskSessionStorage,
 } from "./agent/taskSessionAdapter.js";
 export type { AgentTaskSessionPort } from "./agent/taskSessionPort.js";
+// (P24-D, ADR-0017 D8/D9/D10) The conversation-plane surface (the
+// desktop renderer's composition root binds the REAL host plane; the
+// web tier binds nothing — the honest unbound conversation).
+export * from "./agent/conversationPlaneSurface.js";
 export {
   createRoutePlanningSession,
   type RoutePlanningSession,
