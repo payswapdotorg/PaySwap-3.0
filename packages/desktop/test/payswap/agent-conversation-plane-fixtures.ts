@@ -59,6 +59,7 @@ export function fakeConversationChannelClient(
   ];
   const reads = script.reads ?? [];
   let readSeq = 0;
+  let turnSeq = 0;
   const notConfigured = (): never => {
     const error = new Error("not configured");
     (error as { readonly name?: string }).name = "StripePlaneNotConfiguredError";
@@ -66,7 +67,8 @@ export function fakeConversationChannelClient(
   };
   return {
     async agentModelTurn() {
-      const turn = modelTurns[0];
+      const turn = modelTurns[Math.min(turnSeq, modelTurns.length - 1)];
+      turnSeq += 1;
       if (turn === undefined) {
         return { ok: false, error: { code: "PROVIDER_FAILURE", message: "no scripted turn", retryable: false } };
       }

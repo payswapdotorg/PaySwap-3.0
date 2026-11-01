@@ -56,7 +56,11 @@ import {
   probeEvidenceOf,
 } from "./stripe-action-fixtures.js";
 import {
+  bindSharedModelCatalog,
+  resetSharedAgentComposerController,
   resetSharedConversationPlane,
+  resetSharedModelCatalog,
+  sharedAgentComposerController,
   sharedConversationPlane,
 } from "@payswap/app";
 import {
@@ -418,3 +422,124 @@ describe("the P24-D renderer composition (the channel → the pinned plane)", ()
     }
   });
 });
+
+/* ------------- the E2E conversational receipt (the composition tier) ------------- */
+
+describe("the P24-D E2E conversational round trip (the REAL shared controller over the production composition)", () => {
+  it("Journey E/B at the composition tier: select the model, ask for the customers, the model calls the registered read tool, the host answers through the port, the model answers the user", async () => {
+    resetSharedConversationPlane();
+    resetSharedAgentComposerController();
+    const readCalls: { operationId: string; connectionId: string }[] = [];
+    const plane = await composeOverFakeChannel({
+      modelTurns: [
+        {
+          text: "",
+          toolCalls: [{ id: "call-read-1", name: "stripe.resources.customers.list", input: {} }],
+          finish: "TOOL_CALLS",
+        },
+        { text: "You have 2 customers: Alice and Bob.", finish: "STOP" },
+      ],
+      operationFacts: [
+        {
+          operationId: "ListCustomers",
+          apiNamespace: "v1",
+          method: "GET",
+          path: "/v1/customers",
+          pathParams: [],
+          listPaginated: true,
+          summary: "List customers",
+          resourceFamily: "customers",
+          packId: "B_CUSTOMERS_PAYMENT_INSTRUMENTS",
+          effectClass: "READ_ONLY",
+          approvalTier: "NONE",
+          supportState: "IMPLEMENTED",
+          requiredPermissionRule: "customers: Read",
+        },
+      ],
+      accountFacts: [
+        {
+          connectionId: "conn:composition-1",
+          stripeAccountId: "acct_test_0001",
+          accountModel: "OWN_ACCOUNT_RESTRICTED_KEY",
+          environment: "SANDBOX",
+          grantedPermissionRules: ["customers: Read"],
+        },
+      ],
+      reads: [
+        {
+          ok: true,
+          output: { data: [{ id: "cus_1", name: "Alice" }, { id: "cus_2", name: "Bob" }] },
+        },
+      ],
+    });
+    void plane;
+    const readSpy = readCalls;
+    void readSpy;
+    // The REAL shared controller captures the bound shared seams (the
+    // production path: main.tsx binds the catalogue AND the plane, the
+    // controller captures both). The renderer's ambient localStorage is
+    // installed first (the desktop renderer is Chromium — the node test
+    // environment is not).
+    (globalThis as { localStorage?: Storage }).localStorage = fakeBrowserStorage();
+    bindSharedModelCatalog({
+      async listModels() {
+        return [
+          {
+            providerId: "zai",
+            modelId: "glm-5.2",
+            displayName: "GLM 5.2",
+            reasoningLevels: ["low", "medium", "high"],
+          },
+        ];
+      },
+    });
+    expect(sharedConversationPlane()).toBeDefined();
+    const controller = sharedAgentComposerController();
+    // The driveToAnswered law: seed the task first (the selection rides
+    // a resumable task — never a side-effect seed), then select, then
+    // the conversation-bearing send.
+    controller.setDraft("pay the supplier for the products");
+    await controller.send();
+    await controller.loadModelCatalog();
+    await controller.selectModel({ providerId: "zai", modelId: "glm-5.2", reasoningLevel: "high" });
+    controller.setDraft("list my customers");
+    await controller.send();
+    // The conversation ran to completion: the assistant's final answer
+    // is on the board and the log carries the full round trip.
+    const state = controller.getState().conversation;
+    expect(state.phase).toBe("IDLE");
+    expect(state.entries.length).toBeGreaterThan(0);
+    const taskId = state.taskId;
+    expect(taskId).toBeDefined();
+    const log = await controller.sessionPort().conversationLog(taskId!);
+    const kinds = log.map((entry) => entry.event.kind);
+    expect(kinds).toContain("ACCOUNT_CONTEXT_BOUND");
+    expect(kinds).toContain("CONVERSATION_STARTED");
+    expect(kinds).toContain("TOOL_CALL");
+    expect(kinds).toContain("TOOL_RESULT");
+    expect(kinds).toContain("ASSISTANT_TEXT");
+    const reply = state.entries.find(
+      (entry) => entry.speaker === "model" && entry.text.includes("2 customers"),
+    );
+    expect(reply).toBeDefined();
+    expect(state.accountContext?.stripeAccountId).toBe("acct_test_0001");
+    resetSharedAgentComposerController();
+    resetSharedModelCatalog();
+    resetSharedConversationPlane();
+  });
+});
+
+/** The fake browser Storage the controller's session adapter rides. */
+function fakeBrowserStorage(): Storage {
+  const data = new Map<string, string>();
+  return {
+    get length(): number {
+      return data.size;
+    },
+    clear: () => data.clear(),
+    getItem: (k) => (data.has(k) ? data.get(k)! : null),
+    key: (i) => [...data.keys()][i] ?? null,
+    removeItem: (k) => void data.delete(k),
+    setItem: (k, v) => void data.set(k, v),
+  };
+}
