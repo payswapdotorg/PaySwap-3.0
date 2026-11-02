@@ -1235,7 +1235,7 @@
       "id": "P25-A",
       "owner": "resident-TL",
       "accepted_at": "2026-11-02T12:00:00Z",
-      "acceptance_commit": null,
+      "acceptance_commit": "9be8da6577cd5a1ecf0303fc9c3d397afeaee68f",
       "record": "The full-coverage wave on the operator's direct order: P25-0 (the audit + report) + P25-A (the flip implementation) delivered in one session. See spec/productization/P25-0-COVERAGE-AUDIT-2026-11-02.md and JOURNEY-MAP section 12."
     }
   ],
