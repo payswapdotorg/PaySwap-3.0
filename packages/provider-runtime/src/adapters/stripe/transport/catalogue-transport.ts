@@ -51,6 +51,7 @@ import {
 } from './call-context.ts';
 import { stripeV1FormBody, stripeV1QueryString } from './v1-form.ts';
 import { stripeV2JsonBody, stripeV2QueryString } from './v2-json.ts';
+import { stripeMultipartBody } from './multipart.ts';
 import { classifyStripeHttpError, type StripeClassifiedError } from './errors.ts';
 import {
   stripePaginateV1List,
@@ -74,7 +75,8 @@ export type StripeCatalogueFetch = (
   init: {
     readonly method: 'GET' | 'POST' | 'DELETE';
     readonly headers: Readonly<Record<string, string>>;
-    readonly body?: string;
+    /** String bodies (form/JSON) or the multipart binary body (P25 file upload). */
+    readonly body?: string | Uint8Array<ArrayBuffer>;
     readonly signal?: AbortSignal;
   },
 ) => Promise<StripeCatalogueFetchResponse>;
@@ -224,12 +226,6 @@ export class StripeCatalogueTransport {
         `operation '${input.operationId}' does not take an Idempotency-Key under its idempotency class`,
       );
     }
-    if (schema.body !== null && schema.body.contentType === 'multipart/form-data') {
-      return refused(
-        'UNSUPPORTED_CONTENT_TYPE',
-        `operation '${input.operationId}' requires multipart/form-data, which this transport does not serialize`,
-      );
-    }
     // URL assembly — ONLY the catalogue path + validated params.
     let path = schema.path;
     for (const [name, value] of Object.entries(validated.value.path)) {
@@ -245,14 +241,28 @@ export class StripeCatalogueTransport {
         : stripeV1QueryString(validated.value.query, styles);
     const url = `${this.#baseUrl}${path}${query}`;
     // Body assembly — ONLY validated body params.
-    let body: string | undefined;
+    let body: string | Uint8Array<ArrayBuffer> | undefined;
     let contentType: string | undefined;
     const bodyKeys = Object.keys(validated.value.body);
     if (schema.method !== 'GET' && bodyKeys.length > 0) {
       if (schema.body === null) {
         return refused('INVALID_PARAMETERS', 'body parameters supplied for a bodyless operation');
       }
-      if (census.apiNamespace === 'v2' || schema.body.contentType === 'application/json') {
+      if (schema.body.contentType === 'multipart/form-data') {
+        // THE P25 FILE UPLOAD (the audit's G5 fill): parameters stay
+        // JSON/base64 through validation and the digest; only the wire edge
+        // goes binary.
+        try {
+          const multipart = stripeMultipartBody(validated.value.body);
+          body = multipart.body;
+          contentType = multipart.contentType;
+        } catch (error) {
+          return refused(
+            'INVALID_PARAMETERS',
+            error instanceof Error ? error.message : 'multipart serialization failed',
+          );
+        }
+      } else if (census.apiNamespace === 'v2' || schema.body.contentType === 'application/json') {
         contentType = 'application/json';
         body = stripeV2JsonBody(validated.value.body);
       } else {

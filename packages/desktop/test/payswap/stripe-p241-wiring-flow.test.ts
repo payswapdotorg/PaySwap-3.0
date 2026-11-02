@@ -17,8 +17,8 @@
  *   reconciliation route (INV-04 — never FAILED, never a replay);
  * - the REAL strict validator gates prepare through the host port
  *   (no fake pass-through; nothing reaches the wire on refusal);
- * - a PLANNED operation in the REAL census refuses at prepare (the
- *   DENY law over real support state).
+ * - a HELD credential-admin operation in the REAL census refuses at
+ *   prepare (the DENY law over real support state — the P25 held set).
  */
 
 import { describe, expect, it } from "vitest";
@@ -209,25 +209,26 @@ describe("the REAL transport behind the host port (the full two-phase flow)", ()
     expect(calls.length).toBe(0);
   });
 
-  it("a PLANNED operation in the REAL census refuses at prepare (the DENY law over real state)", async () => {
+  it("a HELD credential-admin operation in the REAL census refuses at prepare (the DENY law over real state)", async () => {
     const { executor } = await realWiredExecutor({
       status: 200,
       body: JSON.stringify({ id: "cus_fake51neverReached" }),
     });
-    // Find a real PLANNED operation in the live census (never hardcode).
-    const planned = STRIPE_OPERATION_CENSUS.find(
+    // Find a real held operation in the live census (never hardcode): the
+    // P25 surface holds the credential-admin writes at NOT_SUPPORTED_WITH_REASON.
+    const held = STRIPE_OPERATION_CENSUS.find(
       (record) =>
-        record.supportState === "PLANNED_P24_INITIAL_RELEASE" &&
-        record.requiredPermissionRule === "customers: Write",
+        record.supportState === "NOT_SUPPORTED_WITH_REASON" &&
+        record.requiredPermissionRule === "webhookEndpoints: Write",
     );
-    expect(planned).toBeDefined();
+    expect(held).toBeDefined();
     const refused = await executor.prepare({
-      operationId: planned!.operationId,
+      operationId: held!.operationId,
       parameters: [],
       connectionId: CONN,
       taskId: "task:fake-1",
     });
     expect(refused.ok).toBe(false);
-    expect(refused.ok === false && refused.reason).toContain("PLANNED_P24_INITIAL_RELEASE");
+    expect(refused.ok === false && refused.reason).toContain("NOT_SUPPORTED_WITH_REASON");
   });
 });

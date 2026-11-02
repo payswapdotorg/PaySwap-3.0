@@ -143,7 +143,7 @@ async function runDiscoveryTool(
       supportStateCounts,
       packCounts,
       registeredTools: registry.list().map((tool) => tool.name),
-      note: "Capability facts derive from the pinned catalogue joined with this connection's verified permissions. Support states are honest: only IMPLEMENTED operations are dispatchable, and state-changing operations always follow the prepare → human-confirm → execute contract.",
+      note: "Capability facts derive from the pinned catalogue joined with this connection's verified permissions. Support states are honest: IMPLEMENTED and IMPLEMENTED_WITH_LIMITS operations are dispatchable (the limits — account entitlement, test-mode-only, file-size — are surfaced per operation), and state-changing operations always follow the prepare → human-confirm → execute contract.",
     };
   }
   if (name === "stripe.search_operations") {

@@ -1230,6 +1230,13 @@
       "accepted_at": "2026-11-01T23:30:00Z",
       "acceptance_commit": "2515b92",
       "record": "The desktop composition binding (the model plane over generateWorkspaceText + the stripe channel members over the real provider-runtime adapters + the executor over the connection plane) + the E2E conversational round trip at the composition tier (the closure policy's named gate) + the JOURNEY-MAP §11 / FEATURE-MAP reconciliation + this closure. Gates: tsc 0/0/0 · desktop 79f/676t+2sk · payswap-app 66f/764t · provider-runtime 34f/516t+5sk · oxlint 0 errors · architecture 0/0/0."
+    },
+    {
+      "id": "P25-A",
+      "owner": "resident-TL",
+      "accepted_at": "2026-11-02T12:00:00Z",
+      "acceptance_commit": null,
+      "record": "The full-coverage wave on the operator's direct order: P25-0 (the audit + report) + P25-A (the flip implementation) delivered in one session. See spec/productization/P25-0-COVERAGE-AUDIT-2026-11-02.md and JOURNEY-MAP section 12."
     }
   ],
   "policies": {
@@ -1780,7 +1787,19 @@
       "actor": "resident-TL",
       "action": "P24_D_CLOSED",
       "detail": "The TL closure accepted: the desktop composition binding (cb86684 — agentModelTurn over the substrate generateWorkspaceText + the thirteen stripe channel members over the REAL provider-runtime adapters + the executor over the product connection plane) + the E2E conversational round trip (2515b92 — the closure policy's named gate, composition tier, honestly labeled) + the JOURNEY-MAP §11 / FEATURE-MAP / graph / state reconciliation. The wave P24 is CLOSED; the real Sandbox, live-runtime and CDP tiers stay the standing operator actions."
+    },
+    {
+      "ts": "2026-11-02T11:30:00Z",
+      "actor": "resident-TL",
+      "action": "P25_0_REGISTERED",
+      "detail": "The operator's order taken as the P25 wave: the full-coverage audit (everything Stripe can do, through PaySwap once connected) — the report at spec/productization/P25-0-COVERAGE-AUDIT-2026-11-02.md (the 46/644 headline, the gap register G1-G12, the researched fills, the deep-dive catches: the create-secret escape, five secrets-in-response holds, the terminal-refund reclassification)."
+    },
+    {
+      "ts": "2026-11-02T12:00:00Z",
+      "actor": "resident-TL",
+      "action": "P25_A_CLOSED",
+      "detail": "The full-coverage flip accepted: the P25 surface law (631/644 = 98.0% dispatchable; the held thirteen recorded with reasons; IMPLEMENTED_WITH_LIMITS producers landed) + the rule-derived read-back routes (292 verified + 55 honest nulls, zero divergence from the reviewed 18) + the multipart file upload + the generated totality battery (every dispatchable op synthesized, validated, wire-proven, error-refused). Gates: provider-runtime tsc 0 + 35f/528t+5sk, desktop 3x scoped tsc 0/0/0 + architecture 0 + oxlint 0 + 676t+2sk, app 764t. The frontier returns to EMPTY."
     }
   ],
-  "last_tl_action_at": "2026-10-31T21:30:00Z"
+  "last_tl_action_at": "2026-11-02T12:00:00Z"
 }

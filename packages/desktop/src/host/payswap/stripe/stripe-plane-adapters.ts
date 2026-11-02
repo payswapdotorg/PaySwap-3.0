@@ -153,7 +153,8 @@ export function realDispatchTransport(fetchImpl: {
     init: {
       readonly method: "GET" | "POST" | "DELETE";
       readonly headers: Readonly<Record<string, string>>;
-      readonly body?: string;
+      /** P25: string bodies (form/JSON) or the multipart binary body (file upload). */
+      readonly body?: string | Uint8Array<ArrayBuffer>;
       readonly signal?: AbortSignal;
     },
   ): Promise<{
@@ -221,7 +222,19 @@ export function nodeFetchForStripePlane(
   fetchImpl: typeof globalThis.fetch,
 ): Parameters<typeof realDispatchTransport>[0] {
   return async (url, init) => {
-    const response = await fetchImpl(url, init);
+    // The P25 multipart body arrives as bytes; BodyInit takes a Blob.
+    const body =
+      init.body === undefined
+        ? undefined
+        : init.body instanceof Uint8Array
+          ? new Blob([init.body])
+          : init.body;
+    const response = await fetchImpl(url, {
+      method: init.method,
+      headers: init.headers,
+      ...(body !== undefined ? { body } : {}),
+      ...(init.signal !== undefined ? { signal: init.signal } : {}),
+    });
     const headers: Record<string, string> = {};
     response.headers.forEach((value, key) => {
       headers[key] = value;

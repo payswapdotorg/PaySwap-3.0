@@ -110,28 +110,54 @@ describe('the catalogue transport — dispatch law chain (fakes only)', () => {
     expect(fake.callCount).toBe(0);
   });
 
-  it('REFUSES a PLANNED initial-release operation (PLANNED is not dispatchable)', async () => {
+  it('REFUSES a held credential-admin operation (NOT_SUPPORTED_WITH_REASON — the P25 DENY)', async () => {
     const fake = new FakeStripeFetch();
     const transport = new StripeCatalogueTransport({ fetchImpl: fake.fetch });
     const result = await transport.dispatch({
-      operationId: 'GetCustomersSearch', // in the 74-set, not yet implemented
-      params: { query: 'name:\'Annual\'' },
+      operationId: 'PostWebhookEndpoints', // the secrets-in-response hold
+      params: { url: 'https://example.com/hook' },
       context: fakeCallContext(),
     });
     expect(result.kind).toBe('REFUSED');
     if (result.kind === 'REFUSED') {
       expect(result.reason).toBe('NOT_DISPATCHABLE');
-      expect(result.detail).toContain('PLANNED_P24_INITIAL_RELEASE');
+      expect(result.detail).toContain('NOT_SUPPORTED_WITH_REASON');
     }
     expect(fake.callCount).toBe(0);
   });
 
-  it('REFUSES a v2 operation (none are in the implemented surface yet — the honest DENY)', async () => {
-    const fake = new FakeStripeFetch();
+  it('DISPATCHES a historically-PLANNED read under P25 (the flip proof)', async () => {
+    const fake = new FakeStripeFetch().script({ kind: 'OK', status: 200, body: { object: 'search_result', data: [] } });
+    const transport = new StripeCatalogueTransport({ fetchImpl: fake.fetch });
+    const result = await transport.dispatch({
+      operationId: 'GetCustomersSearch', // in the P24 74-set, was PLANNED — flips with P25
+      params: { query: 'name:\'Annual\'' },
+      context: fakeCallContext(),
+    });
+    expect(result.kind).toBe('OK');
+    expect(fake.callCount).toBe(1);
+    expect(fake.calls()[0]?.url).toContain('/v1/customers/search');
+  });
+
+  it('DISPATCHES a v2 operation under P25 (the v2 flip proof)', async () => {
+    const fake = new FakeStripeFetch().script({ kind: 'OK', status: 200, body: { object: 'list', data: [] } });
     const transport = new StripeCatalogueTransport({ fetchImpl: fake.fetch });
     const result = await transport.dispatch({
       operationId: 'GetV2CoreEvents',
       params: {},
+      context: fakeCallContext(),
+    });
+    expect(result.kind).toBe('OK');
+    expect(fake.callCount).toBe(1);
+    expect(fake.calls()[0]?.url).toContain('/v2/core/events');
+  });
+
+  it('REFUSES the secrets-law create (the audit’s live catch, held at REAUTH class)', async () => {
+    const fake = new FakeStripeFetch();
+    const transport = new StripeCatalogueTransport({ fetchImpl: fake.fetch });
+    const result = await transport.dispatch({
+      operationId: 'PostAppsSecrets', // 3-segment path — the family rule missed it; the path-prefix law holds it
+      params: { name: 'a', payload: 'b' },
       context: fakeCallContext(),
     });
     expect(result.kind).toBe('REFUSED');

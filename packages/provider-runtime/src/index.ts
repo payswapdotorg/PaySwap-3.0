@@ -128,4 +128,5 @@ export * from './adapters/stripe/catalogue/spec-pin.ts';
 export * from './adapters/stripe/catalogue/generator.ts';
 export * from './adapters/stripe/catalogue/resource-packs.ts';
 export * from './adapters/stripe/catalogue/overlay.ts';
+export * from './adapters/stripe/catalogue/read-back-routes.ts';
 export * from './adapters/stripe/catalogue/census.ts';

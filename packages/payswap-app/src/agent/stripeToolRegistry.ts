@@ -100,12 +100,14 @@ export function stripeReadToolName(fact: StripeOperationFactPin): string {
 
 /* -------------------------- the intent filter ------------------------ */
 
-/** Tokenize intent text like the deterministic router (lowercase stems). */
+/** Tokenize intent text like the deterministic router (lowercase stems).
+ *  P25: the threshold is 3 characters — 4 silently blinded the short
+ *  families (`tax`, `core`, `apps`) from ever intent-matching. */
 function tokenize(text: string): readonly string[] {
   return text
     .toLowerCase()
     .split(/[^a-z0-9]+/)
-    .filter((token) => token.length >= 4);
+    .filter((token) => token.length >= 3);
 }
 
 /** Does the intent text name this fact's resource family? (deterministic) */
@@ -114,7 +116,7 @@ function intentNamesFamily(intentText: string, fact: StripeOperationFactPin): bo
   const segments = fact.resourceFamily
     .split("/")
     .map((segment) => segment.split("_")[0] as string)
-    .filter((segment) => segment.length >= 4);
+    .filter((segment) => segment.length >= 3);
   return segments.some((segment) =>
     tokens.some((token) => token === segment || token === `${segment}s` || segment.startsWith(token)),
   );

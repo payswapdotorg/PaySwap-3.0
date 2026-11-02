@@ -322,7 +322,7 @@ describe("the discovery path (bounded, data-minimized)", () => {
     expect(payload).toContain("OWN_ACCOUNT_RESTRICTED_KEY");
     expect(payload).toContain("IMPLEMENTED");
     expect(payload).toContain("stripe.resources.products.list");
-    expect(payload).toContain("only IMPLEMENTED operations are dispatchable");
+    expect(payload).toContain("IMPLEMENTED and IMPLEMENTED_WITH_LIMITS operations are dispatchable");
   });
 
   it("discover_capabilities with an unknown pack filter yields empty counts (never invented)", async () => {

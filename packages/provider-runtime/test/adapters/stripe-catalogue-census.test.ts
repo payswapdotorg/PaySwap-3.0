@@ -113,19 +113,47 @@ describe('stripe catalogue — the census law (every operation, exactly once)', 
   });
 });
 
-describe('stripe catalogue — the DENY law (handoff §4.3)', () => {
-  it('PLANNED_P24_INITIAL_RELEASE operations are NOT dispatchable yet', () => {
-    const planned = STRIPE_OPERATION_CENSUS.filter(
-      (record) => record.supportState === 'PLANNED_P24_INITIAL_RELEASE',
+describe('stripe catalogue — the DENY law (handoff §4.3, the P25 surface law)', () => {
+  it('THE HELD THIRTEEN are the ONLY non-dispatchable operations — each a recorded decision', () => {
+    const held = STRIPE_OPERATION_CENSUS.filter(
+      (record) => !stripeCensusDispatchAllowed(record.operationId),
     );
-    // P24-1 flip law: the planned remainder is the initial-release set minus
-    // the tested implemented registry — never a silent shortening.
-    expect(planned.length).toBe(
-      STRIPE_P24_INITIAL_RELEASE_OPERATIONS.size - STRIPE_P24_IMPLEMENTED_OPERATIONS.size,
-    );
-    for (const record of planned) {
-      expect(stripeCensusDispatchAllowed(record.operationId)).toBe(false);
+    expect(held.map((record) => record.operationId).sort()).toEqual([
+      // (ASCII order; the categories are annotated inline)
+      'DeleteEphemeralKeysKey', // reviewed: the ek_ secret rides delete responses
+      'DeleteWebhookEndpointsWebhookEndpoint', // family: webhook_endpoints (whsec_ law)
+      'GetAppsSecretsFind', // reviewed: a GET that REVEALS the stored payload
+      'PostAccountLinks', // family: REAUTH tier, no re-auth flow
+      'PostAccountSessions', // family: REAUTH tier, no re-auth flow
+      'PostAppsSecrets', // path-prefix law: the audit's live catch (3-segment family escape)
+      'PostAppsSecretsDelete', // family: apps/secrets (4-segment paths match the table)
+      'PostCustomerSessions', // reviewed: single-use client secret
+      'PostEphemeralKeys', // reviewed: the ek_ secret rides create responses
+      'PostTerminalConnectionTokens', // reviewed: short-lived SDK connection token
+      'PostV2CoreAccountLinks', // reviewed: the v2 twin of held PostAccountLinks
+      'PostWebhookEndpoints', // family: webhook_endpoints (whsec_ in create response)
+      'PostWebhookEndpointsWebhookEndpoint', // family: webhook_endpoints
+    ]);
+    for (const record of held) {
+      expect(record.supportState).toBe('NOT_SUPPORTED_WITH_REASON');
     }
+  });
+
+  it('the create-secret escape is closed (the audit\u2019s live catch)', () => {
+    // /v1/apps/secrets is a 3-segment path whose family derives as 'apps' —
+    // the family table alone never matched it. The path-prefix law holds it.
+    const create = stripeCensusRecord('PostAppsSecrets');
+    expect(create?.effectClass).toBe('PERMISSION_OR_CREDENTIAL_ADMIN');
+    expect(create?.approvalTier).toBe('REAUTH');
+    expect(stripeCensusDispatchAllowed('PostAppsSecrets')).toBe(false);
+    // …while the metadata LIST (names only, no payload) stays a dispatchable read.
+    expect(stripeCensusDispatchAllowed('GetAppsSecrets')).toBe(true);
+  });
+
+  it('terminal refunds are STRONG_CONFIRM money-movers (the reclassification)', () => {
+    const refund = stripeCensusRecord('PostTerminalRefunds');
+    expect(refund?.effectClass).toBe('FINANCIAL_IRREVERSIBLE_OR_REVERSAL');
+    expect(refund?.approvalTier).toBe('STRONG_CONFIRM');
   });
 
   it('unknown operationIds are refused (fail-closed)', () => {
@@ -160,30 +188,39 @@ describe('stripe catalogue — the DENY law (handoff §4.3)', () => {
     expect(sendInvoice?.effectClass).toBe('CUSTOMER_COMMUNICATION');
   });
 
-  it('test helpers are clearly SANDBOX_TEST_HELPER_ONLY', () => {
-    const clock = stripeCensusRecord('PostTestHelpersTestClocks');
-    expect(clock?.supportState).toBe('PLANNED_P24_INITIAL_RELEASE'); // reviewed in the initial surface
-    const helper = STRIPE_OPERATION_CENSUS.find(
-      (record) => record.resourceFamily.startsWith('test_helpers/') &&
-        !STRIPE_P24_INITIAL_RELEASE_OPERATIONS.has(record.operationId),
-    );
-    expect(helper?.supportState).toBe('SANDBOX_TEST_HELPER_ONLY');
+  it('test helpers dispatch IMPLEMENTED_WITH_LIMITS (test-mode only)', () => {
+    // The whole plane is Sandbox-only today (live keys refused, INV-25/D14);
+    // the honest limit is the state itself.
+    for (const record of STRIPE_OPERATION_CENSUS) {
+      if (record.resourceFamily.startsWith('test_helpers/')) {
+        expect(record.supportState).toBe('IMPLEMENTED_WITH_LIMITS');
+        expect(stripeCensusDispatchAllowed(record.operationId)).toBe(true);
+      }
+    }
   });
 
-  it('the support-state census is complete and non-empty in every bucket it claims', () => {
+  it('the support-state census is the reviewed P25 ledger (exact)', () => {
     const counts = stripeCensusSupportStateCounts();
     const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
     expect(total).toBe(STRIPE_OPENAPI_PIN_COUNTS.operations);
-    expect(counts['PLANNED_P24_INITIAL_RELEASE']).toBe(
-      STRIPE_P24_INITIAL_RELEASE_OPERATIONS.size - STRIPE_P24_IMPLEMENTED_OPERATIONS.size,
+    expect(counts['IMPLEMENTED']).toBe(468);
+    expect(counts['IMPLEMENTED_WITH_LIMITS']).toBe(163);
+    expect(counts['NOT_SUPPORTED_WITH_REASON']).toBe(13);
+    // The P24 states have no producer under P25 (historical vocabulary):
+    expect(counts['PLANNED_P24_INITIAL_RELEASE']).toBeUndefined();
+    expect(counts['ACCOUNT_GATED']).toBeUndefined();
+    expect(counts['SANDBOX_TEST_HELPER_ONLY']).toBeUndefined();
+    // 631 of 644 dispatchable (98.0%) — the full-coverage flip.
+    const dispatchable = STRIPE_OPERATION_CENSUS.filter((record) =>
+      stripeCensusDispatchAllowed(record.operationId),
     );
-    expect(counts['IMPLEMENTED']).toBe(STRIPE_P24_IMPLEMENTED_OPERATIONS.size);
-    expect(counts['NOT_SUPPORTED_WITH_REASON']).toBeGreaterThan(0);
-    expect(counts['ACCOUNT_GATED']).toBeGreaterThan(0);
+    expect(dispatchable).toHaveLength(631);
+    expect(dispatchable.filter((record) => record.effectClass === 'READ_ONLY')).toHaveLength(284);
+    expect(dispatchable.filter((record) => record.apiNamespace === 'v2')).toHaveLength(31);
   });
 });
 
-describe('stripe catalogue — the P24-1 flip law (states flip only with tests)', () => {
+describe('stripe catalogue — the P24→P25 flip coherence (the lineage still dispatches)', () => {
   it('every IMPLEMENTED operation is inside the reviewed initial-release set', () => {
     for (const operationId of STRIPE_P24_IMPLEMENTED_OPERATIONS) {
       expect(
@@ -193,7 +230,7 @@ describe('stripe catalogue — the P24-1 flip law (states flip only with tests)'
     }
   });
 
-  it('every IMPLEMENTED operation resolves a census record and IS dispatchable', () => {
+  it('every reviewed P24 implementation resolves a census record and IS dispatchable under P25', () => {
     for (const operationId of STRIPE_P24_IMPLEMENTED_OPERATIONS) {
       const record = stripeCensusRecord(operationId);
       expect(record, `no census record for implemented op ${operationId}`).toBeDefined();
@@ -202,9 +239,21 @@ describe('stripe catalogue — the P24-1 flip law (states flip only with tests)'
     }
   });
 
+  it('the historical planned remainder now dispatches (the P25 flip coherence)', () => {
+    const planned = [...STRIPE_P24_INITIAL_RELEASE_OPERATIONS].filter(
+      (operationId) => !STRIPE_P24_IMPLEMENTED_OPERATIONS.has(operationId),
+    );
+    expect(planned.length).toBe(28);
+    for (const operationId of planned) {
+      expect(
+        stripeCensusDispatchAllowed(operationId),
+        `historical planned op ${operationId} does not dispatch under P25`,
+      ).toBe(true);
+    }
+  });
+
   it('read-back routes reference only real, dispatchable operations', () => {
     for (const [operationId, readBack] of Object.entries(STRIPE_P24_READ_BACK_ROUTES)) {
-      expect(STRIPE_P24_IMPLEMENTED_OPERATIONS.has(operationId), `${operationId} is not implemented`).toBe(true);
       if (readBack !== null) {
         const record = stripeCensusRecord(readBack);
         expect(record, `read-back ${readBack} for ${operationId} does not exist`).toBeDefined();
@@ -213,24 +262,31 @@ describe('stripe catalogue — the P24-1 flip law (states flip only with tests)'
     }
   });
 
-  it('every state-changing implemented operation has a read-back route entry', () => {
-    // The one documented exception: a billing-portal session is a one-shot
-    // hosted URL — Stripe exposes no retrieve route for it (honest null).
-    const nullReadBackAllowed = new Set(['PostBillingPortalSessions']);
-    for (const operationId of STRIPE_P24_IMPLEMENTED_OPERATIONS) {
-      const record = stripeCensusRecord(operationId);
-      if (record?.effectClass === 'READ_ONLY') continue;
-      expect(
-        operationId in STRIPE_P24_READ_BACK_ROUTES,
-        `state-changing ${operationId} has no read-back route entry`,
-      ).toBe(true);
-      const readBack = stripeReadBackOperationOf(operationId);
-      if (nullReadBackAllowed.has(operationId)) {
-        expect(readBack).toBeNull();
-      } else {
-        expect(readBack, `state-changing ${operationId} has no read-back operation`).not.toBeNull();
+  it('EVERY dispatchable write resolves a dispatchable GET read-back or an honest null (the P25 totality)', () => {
+    const nulls: string[] = [];
+    let verified = 0;
+    for (const record of STRIPE_OPERATION_CENSUS) {
+      if (!stripeCensusDispatchAllowed(record.operationId)) continue;
+      if (record.effectClass === 'READ_ONLY') continue;
+      const readBack = stripeReadBackOperationOf(record.operationId);
+      if (readBack === null) {
+        nulls.push(record.operationId);
+        continue;
       }
+      const target = stripeCensusRecord(readBack);
+      expect(target, `read-back ${readBack} for ${record.operationId} does not exist`).toBeDefined();
+      expect(target?.method).toBe('GET');
+      expect(
+        stripeCensusDispatchAllowed(readBack),
+        `read-back ${readBack} for ${record.operationId} is not dispatchable`,
+      ).toBe(true);
+      verified += 1;
     }
+    // One-shot surfaces with no verification route — the honest nulls.
+    // 55 reviewed-derivation nulls among 347 dispatchable writes.
+    expect(verified).toBe(292);
+    expect(nulls).toHaveLength(55);
+    expect(nulls).toContain('PostBillingPortalSessions'); // the reviewed one-shot
   });
 });
 

@@ -1,21 +1,29 @@
 /**
- * @payswap/provider-runtime — the Stripe operation SAFETY OVERLAY (P24-0).
+ * @payswap/provider-runtime — the Stripe operation SAFETY OVERLAY (P24-0, P25).
  *
  * ADR-0017 D7 (BINDING): the OpenAPI catalogue describes the HTTP contract;
  * it never decides permission. Every operation must resolve, through THIS
  * reviewed overlay, to an effect class + support state before it can be
  * exposed to a model or dispatched. UNKNOWN OVERLAY = DENY (handoff §4.3).
  *
- * Composition: overlay(op) = reviewed overrides[opId] ?? ruleEngine(op).
- * The RULE ENGINE derives a provisional class from method + family + path
- * shape (reviewed tables below); the OVERRIDES are the explicitly reviewed
- * entries (the P24 initial-release surface). Both are PaySwap-authored —
- * generated spec data never contributes.
+ * Composition: overlay(op) = reviewed state overrides[opId] ?? p25 rule(op).
+ * The RULE ENGINE derives the effect class from method + family + path shape
+ * (reviewed tables below); the P25 SURFACE LAW derives the support state
+ * (the full-coverage flip — see spec/productization/P25-0-COVERAGE-AUDIT-
+ * 2026-11-02.md). Both halves are PaySwap-authored — generated spec data
+ * never contributes.
+ *
+ * THE P25 LAW: the connector's plumbing (strict validator, sealed transport,
+ * two-phase action contract, RAK eligibility, idempotency classification) is
+ * operationId-parametric, so the dispatchable surface is a RULE, not a
+ * hand-list: every operation dispatches EXCEPT the credential-admin writes
+ * (the HELD SIX — secrets-in-response + the missing re-authentication flow),
+ * with IMPLEMENTED_WITH_LIMITS marking the three honest limit classes
+ * (account-entitlement families, test-mode helpers, the file-size bound).
  */
 
 import type { StripeCatalogueOperation } from './generator.ts';
 import { stripeResourceFamilyOf, stripeResourcePackOf } from './resource-packs.ts';
-import { STRIPE_P24_IMPLEMENTED_OPERATIONS } from './implemented-operations.ts';
 
 /** Effect classes (handoff §7.1 — the exact vocabulary). */
 export const STRIPE_EFFECT_CLASSES = [
@@ -88,6 +96,16 @@ const COMMUNICATION_PATH_TOKENS = ['/send', '/send_invoice', '/send_quote'];
 /** Path tokens that make a POST a SEARCH (read-like) — handoff §7.1. */
 const SEARCH_PATH_TOKENS = ['/search', '/list'];
 
+/** THE P25 AUDIT'S CATCH: the secrets-law path prefix. The family derivation
+ *  yields 'apps' for the 3-segment path `/v1/apps/secrets` (the
+ *  'apps/secrets' family table entry only matches 4-segment paths like
+ *  `/v1/apps/secrets/delete`), so the CREATE-secret operation silently
+ *  escaped the credential-admin family rule — its response carries the
+ *  secret payload. Path-prefix check, before the family table. (The GETs on
+ *  the family stay READ_ONLY by the structural invariant; the reveal GET is
+ *  held by the reviewed state override below.) */
+const SECRETS_LAW_PATH_PREFIXES = ['/v1/apps/secrets'];
+
 /** Families gated behind account enrolment for ANY operation (support state). */
 const ACCOUNT_GATED_FAMILIES = new Set([
   'treasury', 'treasury/financial_accounts', 'treasury/credit_reversals',
@@ -127,14 +145,20 @@ function ruleEffectClass(operation: StripeCatalogueOperation): StripeEffectClass
   // the secret and grants nothing).
   if (operation.method === 'GET') return 'READ_ONLY';
   if (SEARCH_PATH_TOKENS.some((token) => lowerPath.includes(token))) return 'READ_ONLY';
+  if (SECRETS_LAW_PATH_PREFIXES.some((prefix) => lowerPath.startsWith(prefix))) {
+    return 'PERMISSION_OR_CREDENTIAL_ADMIN';
+  }
   if (CREDENTIAL_ADMIN_FAMILIES.has(family)) return 'PERMISSION_OR_CREDENTIAL_ADMIN';
   if (COMMUNICATION_PATH_TOKENS.some((token) => lowerPath.endsWith(token))) {
     return 'CUSTOMER_COMMUNICATION';
   }
-  // Capture/reverse/refund/close/void/finalize tokens are irreversible money effects.
+  // Capture/reverse/refund/close/void/finalize tokens are irreversible money
+  // effects. P25: `refunds` (plural) added — POST /v1/terminal/refunds creates
+  // a REAL refund but escaped both the family table (family 'terminal') and
+  // the singular token; the audit reclassified it STRONG_CONFIRM.
   if (
     operation.method === 'DELETE' ||
-    /\/(capture|refund|reverse|close|void|finalize|pay|confirm|cancel)$/.test(lowerPath)
+    /\/(capture|refund|refunds|reverse|close|void|finalize|pay|confirm|cancel)$/.test(lowerPath)
   ) {
     return 'FINANCIAL_IRREVERSIBLE_OR_REVERSAL';
   }
@@ -145,12 +169,69 @@ function ruleEffectClass(operation: StripeCatalogueOperation): StripeEffectClass
   return 'STRIPE_CONFIGURATION_WRITE';
 }
 
-/** Rule-engine support state (the honest default before implementation). */
-function ruleSupportState(operation: StripeCatalogueOperation): StripeSupportState {
+/** Rule-engine support state was replaced by the P25 surface law below; the
+ *  P24 states (PLANNED_P24_INITIAL_RELEASE, ACCOUNT_GATED,
+ *  SANDBOX_TEST_HELPER_ONLY) remain in the vocabulary as the historical and
+ *  reserved-for-live-tier states — no producer assigns them today. */
+
+/** The reviewed per-operation SUPPORT-STATE overrides (the P25 exceptions).
+ *
+ * THE SECRETS-IN-RESPONSE HOLDS (the audit's deep-dive — fail-closed when a
+ * response carries credential-class material, even read-shaped):
+ * - PostEphemeralKeys / DeleteEphemeralKeysKey: the ephemeral-key object
+ *   carries the `ek_` secret in create AND delete responses.
+ * - PostCustomerSessions: the response carries a single-use client secret.
+ * - PostTerminalConnectionTokens: the response carries a short-lived SDK
+ *   connection token.
+ * - PostV2CoreAccountLinks: the v2 twin of the held v1 PostAccountLinks —
+ *   identical REAUTH-tier semantics (the family table misses it because the
+ *   v2 path geometry derives family 'core').
+ * - GetAppsSecretsFind: a GET that REVEALS the stored secret payload — held
+ *   by override so the structural GET→READ_ONLY invariant stays intact.
+ *
+ * PostFiles: the catalogue's only multipart operation dispatches, but its
+ * parameters ride the same JSON plane as every other operation — the base64
+ * `file` string is subject to the validator's parameter-size bound
+ * (≤100k chars ≈ 75 KB binary). Larger artifacts belong to a future
+ * attachment plane, never to chat parameters. The honest state says so. */
+const REVIEWED_STATE_OVERRIDES: Readonly<Record<string, StripeSupportState>> = Object.freeze({
+  PostEphemeralKeys: 'NOT_SUPPORTED_WITH_REASON',
+  DeleteEphemeralKeysKey: 'NOT_SUPPORTED_WITH_REASON',
+  PostCustomerSessions: 'NOT_SUPPORTED_WITH_REASON',
+  PostTerminalConnectionTokens: 'NOT_SUPPORTED_WITH_REASON',
+  PostV2CoreAccountLinks: 'NOT_SUPPORTED_WITH_REASON',
+  GetAppsSecretsFind: 'NOT_SUPPORTED_WITH_REASON',
+  PostFiles: 'IMPLEMENTED_WITH_LIMITS',
+});
+
+/** THE P25 SURFACE LAW (the full-coverage flip — the audit's decision).
+ *
+ * Returns the support state for every catalogue operation:
+ * 1. credential-admin operations (the family table + the secrets-law path
+ *    prefix + the reviewed holds above) stay NOT_SUPPORTED_WITH_REASON —
+ *    `apps/secrets` and `webhook_endpoints` responses carry secret material
+ *    (the secrets-never-enter-chat law; webhook destinations are managed by
+ *    the D12 host plane with sealed storage), and `account_links` /
+ *    `account_sessions` are REAUTH-tier with no re-authentication flow in
+ *    this product — dispatching them on a card click would be a lie in the
+ *    tier's name.
+ * 2. test_helpers/* dispatch IMPLEMENTED_WITH_LIMITS (test-mode only — the
+ *    credential gate already refuses live keys globally, INV-25/D14).
+ * 3. account-entitlement families dispatch IMPLEMENTED_WITH_LIMITS (Stripe
+ *    rejects the call if the product is not enabled on the account).
+ * 4. everything else dispatches IMPLEMENTED.
+ */
+function p25SupportState(
+  operation: StripeCatalogueOperation,
+  effectClass: StripeEffectClass,
+): StripeSupportState {
+  const reviewed = REVIEWED_STATE_OVERRIDES[operation.operationId];
+  if (reviewed !== undefined) return reviewed;
+  if (effectClass === 'PERMISSION_OR_CREDENTIAL_ADMIN') return 'NOT_SUPPORTED_WITH_REASON';
   const family = stripeResourceFamilyOf(operation.path);
-  if (family.startsWith('test_helpers/')) return 'SANDBOX_TEST_HELPER_ONLY';
-  if (ACCOUNT_GATED_FAMILIES.has(family)) return 'ACCOUNT_GATED';
-  return 'NOT_SUPPORTED_WITH_REASON';
+  if (family.startsWith('test_helpers/')) return 'IMPLEMENTED_WITH_LIMITS';
+  if (ACCOUNT_GATED_FAMILIES.has(family)) return 'IMPLEMENTED_WITH_LIMITS';
+  return 'IMPLEMENTED';
 }
 
 /** The RAK permission rule string for an operation (Stripe permission naming). */
@@ -176,12 +257,12 @@ function permissionRuleOf(
 /* ------------- the reviewed overrides (P24-0 frozen surface) ------------- */
 
 /**
- * The P24 INITIAL-RELEASE SURFACE (handoff §14): the operations Workers 1–3
- * implement and Sandbox-test first. Each entry was individually reviewed in
- * P24-0; everything outside this table resolves through the rule engine to
- * an honest not-yet/account-gated state and is DENIED for dispatch.
- * P24-1 added DeleteProductsId (product archive — the work order's §14
- * reading names it); the set is otherwise the frozen P24-0 review.
+ * The P24 INITIAL-RELEASE SURFACE (handoff §14) — THE HISTORICAL RECORD.
+ * Each entry was individually reviewed in P24-0; Workers 1–3 implemented 46
+ * of them before the P25 full-coverage flip replaced the hand-list with the
+ * rule-derived surface above. The set stays exported as the reviewed lineage
+ * (the census battery asserts the 46 implemented operations all dispatch
+ * under the P25 law — the flip-law coherence).
  */
 export const STRIPE_P24_INITIAL_RELEASE_OPERATIONS: ReadonlySet<string> = new Set([
   // Pack A — account, capability and configuration (reads + event listing)
@@ -228,21 +309,17 @@ export const STRIPE_P24_INITIAL_RELEASE_OPERATIONS: ReadonlySet<string> = new Se
 /** Compute the overlay record for one catalogue operation. */
 export function stripeOverlayFor(operation: StripeCatalogueOperation): StripeOperationOverlay {
   const planned = STRIPE_P24_INITIAL_RELEASE_OPERATIONS.has(operation.operationId);
-  const implemented = STRIPE_P24_IMPLEMENTED_OPERATIONS.has(operation.operationId);
   const family = stripeResourceFamilyOf(operation.path);
   const ruleEffect = ruleEffectClass(operation);
   // The reviewed overrides confirm the rule engine's class for every entry
   // (P24-0 review: no divergence found — the overrides pin the SUPPORT STATE,
   // the effect class still flows through the reviewed rule tables).
   const effectClass = ruleEffect;
-  // THE FLIP LAW (P24-1): an operation flips to IMPLEMENTED only through the
-  // tested implemented-operations registry — never by trusting generated
-  // metadata, never without its family test.
-  const supportState: StripeSupportState = implemented
-    ? 'IMPLEMENTED'
-    : planned
-      ? 'PLANNED_P24_INITIAL_RELEASE'
-      : ruleSupportState(operation);
+  // THE P25 SURFACE LAW: the support state is rule-derived (the audit's
+  // full-coverage flip) — the P24 hand-lists remain as the historical record
+  // and the flip-law coherence is test-enforced (the census battery asserts
+  // the 46 reviewed implementations are all dispatchable under P25).
+  const supportState: StripeSupportState = p25SupportState(operation, effectClass);
   return {
     operationId: operation.operationId,
     effectClass,
@@ -257,8 +334,8 @@ export function stripeOverlayFor(operation: StripeCatalogueOperation): StripeOpe
 
 /** Is the operation dispatchable under the overlay today? (The DENY law.) */
 export function stripeOverlayDispatchAllowed(overlay: StripeOperationOverlay): boolean {
-  // Only reviewed-and-implemented states may ever dispatch; PLANNED is not
-  // IMPLEMENTED — the workers flip these states as they land + test them.
+  // Only IMPLEMENTED states may ever dispatch; every other state — the held
+  // credential-admin writes, and any future reserved state — is DENIED.
   return (
     overlay.supportState === 'IMPLEMENTED' || overlay.supportState === 'IMPLEMENTED_WITH_LIMITS'
   );

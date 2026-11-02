@@ -52,8 +52,9 @@ export interface FakeStripeCall {
   readonly method: 'GET' | 'POST' | 'DELETE';
   /** Header NAMES only — header VALUES are never recorded (INV-19). */
   readonly headerNames: readonly string[];
-  /** The serialized wire body (validated params only — never credentials). */
-  readonly body: string | undefined;
+  /** The serialized wire body (validated params only — never credentials);
+   *  P25: multipart operations dispatch binary bodies (the file upload). */
+  readonly body: string | Uint8Array | undefined;
   /** The Stripe-Version header value (public metadata, not a secret). */
   readonly stripeVersion: string | null;
   /** The Idempotency-Key header value (registrar-minted dedup ref, not a secret). */

@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "wave": "P25",
+  "title": "The Stripe full-coverage wave — everything Stripe can do, through PaySwap once connected",
+  "source": {
+    "operator_order": "2026-11-02 chat order (session web-a95c8999): in-depth audit → research the gap fills → report → implement all suggestions",
+    "audit_report": "spec/productization/P25-0-COVERAGE-AUDIT-2026-11-02.md",
+    "prior_wave": "spec/dependency/P24-DEPENDENCY-GRAPH.json (CLOSED at 635130c)"
+  },
+  "registration_commit_base": "635130cf36f38ad5b75b3a533e9ca7e01bbf6ba6",
+  "policy": "The audit's suggestions implemented in full: the flip, the holds, the catches, the multipart upload, the read-back derivation, the totality battery. Every boundary recorded, never silently dropped.",
+  "work_orders": [
+    {
+      "id": "P25-0",
+      "owner": "resident-TL",
+      "status": "COMPLETE",
+      "depends_on": [],
+      "lane_scope": [
+        "spec/productization/P25-0-COVERAGE-AUDIT-2026-11-02.md (the audit, the ledger, the gap register G1-G12, the research, the deep-dive catches)"
+      ]
+    },
+    {
+      "id": "P25-A",
+      "owner": "resident-TL",
+      "status": "COMPLETE",
+      "depends_on": ["P25-0"],
+      "lane_scope": [
+        "packages/provider-runtime/src/adapters/stripe/catalogue/overlay.ts (the P25 surface law + the secrets-law path prefix + the reviewed holds + the refunds reclassification)",
+        "packages/provider-runtime/src/adapters/stripe/catalogue/read-back-routes.ts (the rule-derived verification routes + the moved reviewed table)",
+        "packages/provider-runtime/src/adapters/stripe/transport/multipart.ts (the file upload)",
+        "packages/provider-runtime/src/adapters/stripe/transport/catalogue-transport.ts (the multipart wire + the widened body seam)",
+        "packages/desktop/src/host/payswap/stripe/stripe-plane-adapters.ts (the Blob adaptation at the fetch edge)",
+        "packages/payswap-app/src/agent/stripeToolRegistry.ts (the intent filter >=3) + stripeToolRuntime.ts (the honest discovery note)",
+        "tests: stripe-totality.test.ts (generated), the census ledger rewrite, the transports flip proofs, the desktop fixture rebase, the app note assertion"
+      ]
+    }
+  ],
+  "frontier_after_registration": [],
+  "closure_policy": "The composition-tier proof is the generated totality battery over the REAL transport + the existing composition battery; the real tiers (live substrate runtime, real Stripe Sandbox, Electron CDP) remain the standing operator actions, never renamed.",
+  "wave_status": "CLOSED — 631/644 (98.0%) dispatchable; the held thirteen recorded with reasons; the audit's deep-dive catches fixed at source; carry-forwards: the live-tier ADR, the re-authentication flow, the attachment plane, the basil-to-endive migration runbook, auto-pagination UX, the response-surface secrets sweep"
+}

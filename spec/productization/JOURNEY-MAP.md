@@ -684,3 +684,61 @@ host suites + the P24-1 provider-runtime suites — merged tree 1,956
 passed + 7 skipped across the three package batteries (provider-runtime
 34f/516t+5sk · desktop 79f/676t+2sk · payswap-app 66f/764t), +46 over
 the lane-acceptance base.
+
+## 12. The P25 full-coverage reconciliation (2026-11-02) — everything Stripe can do, through PaySwap
+
+REGISTERED by the resident TL on the operator's direct order ("do an in
+depth audit to make sure everything that can be done in stripe can be done
+through payswap once the user connects his stripe account; research ways to
+fill in the gaps emerged by the audit; write a report on the whole thing;
+implement all the suggestions from the audit"). The wave's record is
+`P25-0-COVERAGE-AUDIT-2026-11-02.md` (this productization directory) — the
+audit, the gap register G1–G12, the researched fills, the deep-dive catches
+and the honest boundaries, all in one document.
+
+- **THE AUDIT'S HEADLINE**: at P24-D the connector dispatched 46 of 644
+  catalogue operations (7.1%) — the plumbing (validator, transport,
+  two-phase executor, RAK, idempotency) was already operationId-parametric,
+  but the P24 overlay deliberately gated a reviewed 74-operation surface.
+  The honest answer to "can everything be done" was NO.
+- **THE P25 SURFACE LAW (the flip)**: the dispatchable surface is now a
+  RULE, not a hand-list — every catalogue operation dispatches EXCEPT the
+  thirteen held (the credential-admin set + the secrets-law path prefix +
+  the reviewed secrets-in-response holds), with IMPLEMENTED_WITH_LIMITS
+  marking the three honest limit classes (account entitlement 122 ·
+  test-mode helpers 41 · the file-size bound 1). **631 of 644 (98.0%)
+  dispatchable**: 284 of 285 reads, 347 of 359 writes, 31 of 32 v2.
+- **THE DEEP-DIVE CATCHES (live bugs the audit found while filling G4)**:
+  the create-secret escape (`PostAppsSecrets` — a 3-segment path whose
+  family derives `apps`, silently past the `apps/secrets` family table;
+  fixed with a path-prefix law), five more secrets-in-response surfaces
+  (ephemeral keys ×2, customer sessions, terminal connection tokens, the
+  v2 account-links twin, the `GetAppsSecretsFind` reveal — all held
+  fail-closed), and the under-classified money-mover (`PostTerminalRefunds`
+  — a REAL refund at CONFIRM; reclassified FINANCIAL_IRREVERSIBLE at
+  STRONG_CONFIRM via the plural-`refunds` path token).
+- **THE NEW CAPABILITIES**: multipart file upload (the `file` parameter
+  rides base64 through the digest, decoded to a binary part at the wire —
+  IMPLEMENTED_WITH_LIMITS at the 100k-char parameter bound ≈ 75 KB), the
+  rule-derived read-back routes (the derivation reproduces all 18 reviewed
+  P24 routes with zero divergence; 292 verified + 55 honest one-shot
+  nulls across 347 dispatchable writes), and the intent filter's ≥3-char
+  threshold (`tax`, `core`, `apps` intent-match again).
+- **THE GENERATED TOTALITY BATTERY (the flip's proof)**: for EVERY one of
+  the 631 dispatchable operations — synthesized minimal valid parameters
+  from the committed schema records, strict validation, the fake-transport
+  wire (method, substituted path, body shape, Idempotency-Key exactly for
+  v1 state-changing POSTs), and the unknown-parameter refusal BEFORE the
+  wire. Deterministic, no network, no hand cases.
+- **THE HONEST BOUNDARIES (restated, unchanged)**: Sandbox-only by law
+  (live keys refused, INV-25/D14); the real tiers stay OPERATOR_GATED
+  (real Sandbox credentials, the live substrate runtime, Electron CDP);
+  RAK scope filtering and account entitlement decide per connection; the
+  v2596 pin boundary; the thirteen holds are recorded decisions, never
+  omissions.
+
+The living suites after P25: provider-runtime 35f/528t+5sk (+1f/+12t over
+P24-D — the totality battery's four laws + the rewritten census/transport
+laws) · desktop 676t+2sk (the fixtures rebased onto the held set) ·
+payswap-app 764t (the honest discovery note). The frontier returns to
+EMPTY; the next wave is the operator's to name.

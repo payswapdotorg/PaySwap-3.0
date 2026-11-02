@@ -183,10 +183,15 @@ describe("the census adapter recipe (the P24-D wiring over the REAL census)", ()
     for (const view of dispatchable) {
       expect(["IMPLEMENTED", "IMPLEMENTED_WITH_LIMITS"]).toContain(view.supportState);
     }
-    // The P24-1 flip registry decides breadth: at least the committed
-    // initial-release surface resolves, and PLANNED operations deny.
+    // The P25 surface law decides breadth: the committed initial-release
+    // surface resolves (now all dispatchable), and the held credential-admin
+    // set denies (the thirteen reviewed holds).
     expect(census.resolve("PostCustomers")).toBeDefined();
-    expect(census.dispatchAllowed("PostPrices")).toBe(stripeCensusRecord("PostPrices")?.supportState === "IMPLEMENTED");
-    expect(census.enumerate().some((view) => view.supportState === "PLANNED_P24_INITIAL_RELEASE")).toBe(true);
+    expect(census.dispatchAllowed("PostPrices")).toBe(true);
+    expect(census.dispatchAllowed("PostWebhookEndpoints")).toBe(false);
+    expect(census.dispatchAllowed("PostAppsSecrets")).toBe(false);
+    expect(census.dispatchAllowed("GetAppsSecretsFind")).toBe(false);
+    expect(census.dispatchAllowed("PostTerminalConnectionTokens")).toBe(false);
+    expect(census.enumerate().some((view) => view.supportState === "NOT_SUPPORTED_WITH_REASON")).toBe(true);
   });
 });
