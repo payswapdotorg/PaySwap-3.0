@@ -43,6 +43,7 @@
     "test/payswap/connect-account-lifecycle.test.ts",
     "test/payswap/connect-webhook-events.test.ts",
     "test/payswap/connect-topology.test.ts",
-    "test/payswap/connect-connection-views.test.ts"
+    "test/payswap/connect-connection-views.test.ts",
+    "test/payswap/p27c-paystack-endpoint-mirror.test.ts"
   ]
 }
