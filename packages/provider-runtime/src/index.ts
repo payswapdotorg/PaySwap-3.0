@@ -119,6 +119,20 @@ export * from './adapters/paystack/verification-probe.ts';
 // SANDBOX payout grant derivation + the initiate/finalize/verify paths
 // (the corridor's KES off-ramp lane).
 export * from './adapters/paystack/transfer-execution.ts';
+// P27-C (ADR-0020 D4/D10/D11): the Paystack recipient plane (typed
+// recipient structures + the EMPTY dated-evidence registry that alone
+// admits a recipient type — K3/K4 fail-closed), the collection surface
+// (transaction initialize/verify + the hosted payment page), and the
+// webhook verification machinery (the claimed HMAC-SHA512 scheme over
+// the raw body, typed events, the event-key consumption law).
+export * from './adapters/paystack/recipient-facts.ts';
+export * from './adapters/paystack/recipient-request.ts';
+export * from './adapters/paystack/recipient-plane.ts';
+export * from './adapters/paystack/collection-execution.ts';
+export * from './adapters/paystack/hosted-payment-page.ts';
+export * from './adapters/paystack/transfer-product-lane.ts';
+export * from './adapters/paystack/webhook-signature.ts';
+export * from './adapters/paystack/webhook-verification.ts';
 export * from './adapters/mtn-momo/declaration.ts';
 
 // P24-0 (ADR-0017): the Stripe OpenAPI catalogue lane — pin, generator,

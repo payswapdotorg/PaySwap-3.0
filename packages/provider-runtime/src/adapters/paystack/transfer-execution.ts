@@ -1,12 +1,14 @@
 /**
  * @payswap/provider-runtime — the Paystack transfer execution path
- * (P22-H, ADR-0016 D8 — the KES off-ramp lane). The consumer that runs
- * INSIDE the credential seal: it receives the sealed material, derives
- * the SANDBOX payout grant (fail-closed — `sk_test_` only; `sk_live_`
- * refused here AND at the seal verb, INV-25), and drives the transfer
- * surface (initiate → finalize; verify — the INV-04 reconcile read)
- * through the REAL transport, returning ONLY the clean envelope-shaped
- * evidence (escape-scanned; a leak THROWS).
+ * (P22-H, ADR-0016 D8 — the KES off-ramp lane; GROWN by P27-C,
+ * ADR-0020 D2/D4 — the typed product lane + the INV-30 purpose gate).
+ * The consumer that runs INSIDE the credential seal: it receives the
+ * sealed material, derives the SANDBOX payout grant (fail-closed —
+ * `sk_test_` only; `sk_live_` refused here AND at the seal verb,
+ * INV-25), and drives the transfer surface (initiate → finalize; verify
+ * — the INV-04 reconcile read) through the REAL transport, returning
+ * ONLY the clean envelope-shaped evidence (escape-scanned; a leak
+ * THROWS).
  *
  * LAWS (the stripe/payment-execution.ts precedent, applied verbatim):
  * - THE GRANT (D8): derivePaystackSandboxPayoutGrant runs on EVERY path
@@ -23,6 +25,23 @@
  * - SECRETS: the Authorization header exists only inside this call
  *   frame; the result is escape-scanned against the material's secret
  *   strings (assertNoSecretMaterial).
+ *
+ * THE P27-C GROWTH (below the P22-H surface, additive — D13):
+ * - THE INV-30 PURPOSE GATE: the typed transaction-purpose vocabulary
+ *   and `refuseIneligiblePaystackPurpose` — a Paystack transfer is the
+ *   business-payout product (marketplace seller settlement, the
+ *   business's own contractor/supplier payments, reimbursements); a
+ *   REGULATED_REMITTANCE_P2P purpose is REFUSED with a typed refusal
+ *   and so is an UNCLASSIFIED one. The gate reads ONLY the typed class:
+ *   no reason string, label, metadata value or relabeling changes the
+ *   classification (route decomposition/distribution/relabeling/hop-
+ *   chaining never changes eligibility — ADR-0020 D2).
+ * - THE TYPED PRODUCT LANE: `paystackTransferLifecycleStateOf` maps an
+ *   execution result into the typed states (only the provider's own
+ *   `success` status is final; every other provider status stays
+ *   PENDING with the raw status carried — never a guessed finality),
+ *   and `createPaystackTransferProductLane` drives initiate → OTP/
+ *   finalize → verify through the typed states.
  */
 
 import { ValidationError } from '../../errors.ts';
