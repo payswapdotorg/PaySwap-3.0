@@ -382,3 +382,45 @@ Dependency: P26-0 accepted (concurrent — file-disjoint from P26-A/P26-B). Scop
 ## P26-D — TL integration and closure — PENDING
 
 Dependency: P26-A, P26-B, P26-C accepted. The merged-tree batteries at the tip (all three packages + the three desktop scoped tsc gates + architecture 0/0/0 + oxlint 0 + CI GREEN on every gate including the two the takeover fixed) + the JOURNEY-MAP §13 / FEATURE-MAP P26 row reconciliation + `docs/productization-evidence/P26-ACCEPTANCE-RECORD-2026-11-03.md` (the classic closure record — the work orders, the evidence tiers, the defects caught, the honest boundaries, the verdict) + the graph/state closure + PUSH to GitHub + the bundle archive + the honest carry-forward record (the attachment plane · the response-surface secrets sweep · ADR-0019's activation bundle as the named live prerequisites · the official-MCP lane · the re-pin path · the live substrate runtime + Electron CDP receipts as the standing operator actions).
+
+
+---
+
+# P27 — Stripe U2/U3, Connect, Global Payouts, African provider access and PaySwap node network (proposal registered 2026-11-03)
+
+**Operator order:** 2026-11-03 conversation on economic money-transfer semantics, multi-provider/multi-node route discovery, African payment access, and the request to configure Stripe U3/Connect/Global Payouts and remaining provider capabilities.
+
+**Proposal artifacts (branch `p27/stripe-connect-global-payouts-africa-network`):**
+- `spec/productization/P27-0-GAP-MATRIX-2026-11-03.md` — source-audit requirements, transaction/purpose semantics, U2/U3, Global Payouts, Paystack/Africa, node-network architecture, acceptance journeys and operator dependencies.
+- `spec/dependency/P27-DEPENDENCY-GRAPH.json` — proposed work orders and dependency graph.
+- **Status:** PROPOSED only. Resident-TL must verify sources/current provider eligibility, accept the architecture ADR and graph, and replace proposal statuses with machine-verified state before worker implementation. No external Stripe account has been configured by this repository change.
+
+**Important predecessor correction:** P26's dependency graph and acceptance record mark P26-A/B/C/D COMPLETE and P26 CLOSED at 634/644 dispatchable; the P26 rows earlier in this catalog remained marked PENDING. P27-0 owns reconciling those stale P26 labels against the accepted graph and acceptance record without reopening completed work.
+
+## P27-0 — source audit and architecture registration (resident-TL) — PROPOSED
+
+Re-verify U1/U2/U3, Stripe Connect, Global Payouts and Treasury access, the current pinned Stripe API census, Paystack and other Africa PSP slices, P16/P21/P22 route architecture, node and composite execution seams, current operator secrets/credentials, and all current official product/country restrictions. Produce the next available accepted ADR (expected ADR-0020 only after checking the ADR index), a current country × method × currency × account-entitlement matrix, an actual-transaction-purpose and regulatory eligibility table, operator configuration run card, machine dependency graph and file-disjoint lane boundaries. Preserve P26 security gates and reconcile the stale P26 catalog rows.
+
+## P27-A — Stripe OAuth U2 and Connect U3 (worker-1) — BLOCKED ON P27-0 ACCEPTANCE
+
+Configure a real Stripe platform application and existing-account OAuth flow; implement U3 platform and connected-seller lifecycle using the currently recommended Stripe account model and API. Include host-side secret delivery, browser authorization and state/replay protection, hosted onboarding, account link/session return, connected-account identity binding, capability and requirement observations, webhooks, charge/transfer/payout topology, merchant-of-record and dispute/refund liability, prepared actions, reauthentication and reconciliation. Sandbox first; no LIVE activation. Connect is not unrestricted P2P.
+
+## P27-B — Stripe Global Payouts (worker-2) — BLOCKED ON P27-0 ACCEPTANCE
+
+Implement Global Payouts as a distinct product/capability with independent origin-country/product entitlement and funding gates, Treasury/financial-account prerequisites, recipient and hosted recipient form lifecycle, third-party disbursement execution, exact country/method/currency/limit/fee/FX/delivery gates, webhook/status/read-back/reconciliation and return/exception handling. Do not alias normal Stripe payouts or Connect transfers. Fintech P2P is eligible only if the actual product, Stripe approval, origin programme and required licences permit it.
+
+## P27-C — Paystack and African local rails (worker-3) — BLOCKED ON P27-0 ACCEPTANCE
+
+Extend the existing Paystack adapter with provider-evidenced local collection, hosted payment pages, recipient resolution, country-specific bank/mobile-money transfer methods, initiation/finalize/OTP, transfer events, read-back and reconciliation. Include Ghana, Kenya, Nigeria and South Africa only where the current provider/account supports the precise product and payout method. Add working Africa Extended Network → Paystack onboarding links and local business connection journeys. Re-audit Flutterwave and MTN MoMo; a declared integration or provider card is not a dispatchable capability. Test mode only pending separate live certification.
+
+## P27-D — multi-node capability network and multi-leg execution (worker-4) — BLOCKED ON P27-0 ACCEPTANCE
+
+Extend existing capability, route-planning, route-compiler, opportunity, protocol and execution-authority modules; do not create a parallel payment kernel. Implement accountable node enrollment/attestation, signed expiring capability offers tied to real connected instances, bounded graph search, hard eligibility gates before ranking, direct/native baseline comparison, multi-leg saga execution, per-leg authority/approval/idempotency/evidence/reconciliation, privacy minimization, node revocation and documented compensation. Multi-hop paths cannot be used to bypass country, product, purpose, sanctions, AML/KYC, licensing or provider restrictions.
+
+## P27-E — TL integration and acceptance (resident-TL) — BLOCKED ON P27-A/B/C/D
+
+Run exact merged-tree provider/runtime/route-planning/route-compiler/capability/protocol/desktop/app test suites, architecture/lint/typecheck/CI and end-to-end journeys. Verify U2 OAuth, U3 seller onboarding, Global Payouts (only where the real account is entitled), Ghana Paystack collection/payout, country-specific African recipient flows, and at least a two-node interoperability journey with an independently grounded direct-route baseline. Obtain real Sandbox receipts where operator credentials and product access are supplied; retain all live/preview/operator-gated exclusions. Reconcile FEATURE-MAP, JOURNEY-MAP, current-state, graph, work orders and acceptance record; push and archive evidence.
+
+**Non-negotiable gates:** PaymentIntent/Payment Link is a payment mechanism, not proof that personal remittance is permitted. Ordinary Stripe Payments, Connect and Global Payouts are distinct products/purpose contexts. A route cannot relabel P2P as commerce or route funds through unrelated merchants. No new route is executable based only on graph compilation. Every effect requires real provider/account eligibility, explicit authorization and authoritative reconciliation. INV-04/13/19/24/25 and the existing no-secret-in-chat and Sandbox/Live separation laws remain binding.
+
+**External operator prerequisites:** register/verify the Stripe platform and Connect product; supply test-mode client credentials via the approved secret channel; configure public callback/webhook endpoints and sealed signing secrets; secure Global Payouts/Treasury entitlement and confirm origin-country eligibility; supply required legal licences and written Stripe approval for the actual use case; connect eligible Paystack business accounts and supply test keys/webhook secrets through the secret channel. These cannot be completed by a GitHub repository commit.
