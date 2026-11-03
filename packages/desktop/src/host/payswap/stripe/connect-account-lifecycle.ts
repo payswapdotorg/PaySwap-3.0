@@ -108,10 +108,9 @@ function requireCensusOperation(
 
 /**
  * Body parameters for the census dispatch stack: TOP-LEVEL schema names with
- * NESTED-OBJECT values (the strict validator's known set is the top-level
- * body-property names; the v1 form encoder flattens the nested values into
- * the wire's bracket notation — controller[stripe_dashboard][type]=… — so the
- * plan names the schema, never the wire encoding).
+ * NESTED-OBJECT values (the strict validator's known set; the v1 form encoder
+ * emits the wire's bracket notation — the plan names the schema, never the
+ * wire encoding).
  */
 function bodyParametersOf(fields: Readonly<Record<string, unknown>>): StripeActionParameter[] {
   return Object.entries(fields).map(([name, value]) => ({ name, value, location: "body" as const }));
@@ -148,7 +147,7 @@ export function createStripeConnectAccountLifecycle(deps: StripeConnectLifecycle
     readonly authorizationHeader: string;
     readonly apiVersion: string;
   }): Promise<StripeConnectLifecycleResult<StripeConnectedAccountObservation>>;
-  /** Bind the connected account identity to a PaySwap seller principal (monotonic). */
+  /** Bind the account identity to a PaySwap seller principal (monotonic). */
   bindSellerIdentity(input: {
     readonly accountRef: string;
     readonly sellerPrincipalRef: string;
@@ -184,10 +183,9 @@ export function createStripeConnectAccountLifecycle(deps: StripeConnectLifecycle
     if (!consistency.ok) {
       return { kind: "INCONSISTENT_DECISION", reason: consistency.reason };
     }
-    // The dispatch-stack shape: top-level schema names with nested-object
-    // values (the strict validator + the v1 form encoder compose them into
-    // the documented wire form; bracket-named FLAT parameters would be an
-    // UNKNOWN_PARAMETER refusal at dispatch — caught by the wiring dry-run).
+    // The dispatch-stack shape: top-level schema names with nested values
+    // (bracket-named FLAT parameters would be an UNKNOWN_PARAMETER refusal
+    // at dispatch — caught by the p27 wiring dry-run).
     const capabilities: Record<string, { readonly requested: boolean }> = {};
     for (const capability of accountModel.requestedCapabilities) {
       capabilities[capability] = { requested: true };
@@ -212,12 +210,8 @@ export function createStripeConnectAccountLifecycle(deps: StripeConnectLifecycle
     };
   };
 
-  const dispatch = async (
-    operationId: string,
-    parameters: readonly StripeActionParameter[],
-    pathParams: Readonly<Record<string, string>>,
-    authorizationHeader: string,
-    apiVersion: string,
+  const dispatch = async (operationId: string, parameters: readonly StripeActionParameter[],
+    pathParams: Readonly<Record<string, string>>, authorizationHeader: string, apiVersion: string,
   ): Promise<StripeDispatchResponse> => {
     const merged: StripeActionParameter[] = [...parameters];
     for (const [name, value] of Object.entries(pathParams)) {
@@ -398,8 +392,7 @@ export function createStripeConnectAccountLifecycle(deps: StripeConnectLifecycle
     async reconcile(input) {
       // INV-04: the named read-back after an UNKNOWN dispatch — the same
       // observation path, recorded as reconciliation evidence.
-      const result = await this.observeConnectedAccount(input);
-      return result;
+      return await this.observeConnectedAccount(input);
     },
   };
 }
