@@ -32,7 +32,7 @@ import {
   type PaymentMissionRuntime,
 } from "../../src/host/payswap/payments/payment-mission-runtime.js";
 import { openPaymentMissionStore } from "../../src/host/payswap/payments/payment-mission-store.js";
-import { createHonestEmptyGateEnvironment, type PaymentGateEnvironment } from "../../src/host/payswap/payments/validation-gates.js";
+import { type PaymentGateEnvironment } from "../../src/host/payswap/payments/validation-gates.js";
 import { PaymentMissionError } from "../../src/host/payswap/payments/contracts.js";
 import { compiledIntentDigest, sagaCompensationRecordsOf } from "../../src/host/payswap/payments/mission-execution.js";
 import {
@@ -76,7 +76,7 @@ function scriptedAuthority(
     },
     async dispatch(command) {
       calls.push({
-        ...(command.leg !== undefined ? { legIndex: command.leg.legIndex } : {}),
+        legIndex: command.leg !== undefined ? command.leg.legIndex : undefined,
       });
       const answer = script[Math.min(index, script.length - 1)] ?? "REFUSED";
       index += 1;
