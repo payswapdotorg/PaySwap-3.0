@@ -102,6 +102,7 @@
     "../capability/src",
     "../provider-runtime/src",
     "../node-network/src",
+    "../merchant/src",
     "../trust/src"
   ]
 }

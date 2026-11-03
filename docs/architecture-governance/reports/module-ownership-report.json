@@ -20,7 +20,7 @@
       "R4-cycle": 1,
       "R6-cross-package-relative": 27
     },
-    "unresolved_external_specifiers": 377
+    "unresolved_external_specifiers": 378
   },
   "packages": [
     {
@@ -653,7 +653,7 @@
         },
         {
           "target": "packages/merchant",
-          "occurrences": 1
+          "occurrences": 4
         },
         {
           "target": "packages/node-network",
@@ -677,7 +677,7 @@
         },
         {
           "target": "packages/provider-runtime",
-          "occurrences": 47
+          "occurrences": 51
         },
         {
           "target": "packages/route-compiler",
@@ -837,7 +837,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 1
+          "occurrences": 4
         }
       ],
       "dependency_layers": []
@@ -1134,7 +1134,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 47
+          "occurrences": 51
         },
         {
           "source": "packages/payswap-app",
@@ -1918,9 +1918,51 @@
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/merchant",
+          "specifier": "../../../../../merchant/src/kes-receiving.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 47,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../../../merchant/src/errors.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 48,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/errors.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
           "specifier": "../../../merchant/src/kes-receiving.js",
           "file": "packages/desktop/test/payswap/corridor-pin-mirrors.test.ts",
           "line": 51,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../merchant/src/kes-receiving.js",
+          "file": "packages/desktop/test/payswap/paystack-africa-composition.test.ts",
+          "line": 29,
           "kind": "import",
           "typeOnly": false,
           "classification": "relative",
@@ -2318,6 +2360,20 @@
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/paystack/recipient-facts.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/paystack/recipient-facts.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
           "specifier": "../../../../../provider-runtime/src/adapters/stripe/oauth-state.js",
           "file": "packages/desktop/src/host/payswap/stripe/connect-u2-flow.ts",
           "line": 34,
@@ -2580,23 +2636,9 @@
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/census.ts",
-          "file": "packages/desktop/test/payswap/connect-topology.test.ts",
-          "line": 22,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/census.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
         }
       ],
-      "occurrences_total": 47,
+      "occurrences_total": 51,
       "occurrences_capped": true
     },
     {
@@ -4759,14 +4801,56 @@
       "severity": "error",
       "sourcePkg": "packages/desktop",
       "targetPkg": "packages/merchant",
-      "detail": "1 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "4 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../../../merchant/src/kes-receiving.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 47,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../../../merchant/src/errors.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 48,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/errors.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/merchant",
           "specifier": "../../../merchant/src/kes-receiving.js",
           "file": "packages/desktop/test/payswap/corridor-pin-mirrors.test.ts",
           "line": 51,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../merchant/src/kes-receiving.js",
+          "file": "packages/desktop/test/payswap/paystack-africa-composition.test.ts",
+          "line": 29,
           "kind": "import",
           "typeOnly": false,
           "classification": "relative",
@@ -5113,8 +5197,22 @@
       "severity": "error",
       "sourcePkg": "packages/desktop",
       "targetPkg": "packages/provider-runtime",
-      "detail": "47 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "51 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/paystack/recipient-facts.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/paystack/recipient-facts.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/provider-runtime",
@@ -5380,23 +5478,9 @@
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/census.ts",
-          "file": "packages/desktop/test/payswap/connect-topology.test.ts",
-          "line": 22,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/census.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
         }
       ],
-      "occurrences_total": 47,
+      "occurrences_total": 51,
       "occurrences_capped": true
     },
     {

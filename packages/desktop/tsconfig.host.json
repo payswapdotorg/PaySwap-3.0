@@ -16,7 +16,8 @@
   "include": [
     "src/host",
     "../provider-runtime/src",
-    "../node-network/src"
+    "../node-network/src",
+    "../merchant/src"
   ],
   "references": [
     {
