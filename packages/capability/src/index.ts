@@ -94,3 +94,8 @@ export * from './extension.ts';
 // The deterministic four-layer registry (+ completeness/corridor bridge).
 export * from './registry.ts';
 export * from './registry-support.ts';
+
+// P27-D (ADR-0020 D5): the node-network offer chain into the capability
+// plane — a verified node offer admits a route CANDIDATE FACT over the
+// local four-layer evidence (INV-13: provider evidence stays decisive).
+export * from './node-offer.ts';

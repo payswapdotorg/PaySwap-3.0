@@ -1,6 +1,7 @@
 /**
  * @payswap/route-planning — the bounded route-candidate search law
- * (P16-A, ADR-0009 D6).
+ * (P16-A, ADR-0009 D6; the graph-search budget dimensions added by P27-D,
+ * ADR-0020 D6).
  *
  * Every bounded enumeration is COUNT-BASED ONLY (no wall clock): positive
  * integer dimensions, fail-closed validation of every candidate BEFORE
@@ -12,6 +13,13 @@
  * is never claimed when capped. The selection digest covers
  * budget + selection + receipts + coverage and is input-order
  * independent (candidates are canonically ordered before admission).
+ *
+ * The ROUTE-GRAPH search budget (P27-D): the same law over the typed
+ * vertex/edge graph — the enumerated simple paths are the candidates; the
+ * dimensions bound the admitted paths, the distinct vertices and the
+ * distinct edges they represent; the receipts carry the TRUE pre-cut
+ * totals of the COMPLETE enumeration (the enumeration is finite by
+ * construction: a bounded, validated graph and the intent's hop bound).
  */
 
 import { RouteSearchBudgetError } from "./errors.ts";
@@ -227,4 +235,65 @@ export function admitRouteCandidatesWithinBudget(input: {
     coverage,
     selectionDigest,
   });
+}
+
+/** The route-graph search budget dimensions (count-based only; P27-D, ADR-0020 D6). */
+export const ROUTE_GRAPH_SEARCH_BUDGET_DIMENSIONS = Object.freeze([
+  "maxPathCandidates",
+  "maxDistinctVertices",
+  "maxDistinctEdges",
+] as const);
+
+export type RouteGraphSearchBudgetDimension =
+  (typeof ROUTE_GRAPH_SEARCH_BUDGET_DIMENSIONS)[number];
+
+/** The bounded route-graph search budget (all positive integers). */
+export interface RouteGraphSearchBudget {
+  /** Maximum number of enumerated paths admitted into the selection. */
+  readonly maxPathCandidates: number;
+  /** Maximum number of DISTINCT vertices represented in the selection. */
+  readonly maxDistinctVertices: number;
+  /** Maximum number of DISTINCT edges represented in the selection. */
+  readonly maxDistinctEdges: number;
+}
+
+/**
+ * Fail-closed validation of a route-graph search budget: every dimension
+ * must be a positive safe integer (count-based budgets only — a zero or
+ * fractional budget is refused; a wall-clock dimension is unrepresentable).
+ */
+export function validateRouteGraphSearchBudget(candidate: unknown): RouteGraphSearchBudget {
+  const record = requireObject(candidate, "a RouteGraphSearchBudget");
+  const errors: string[] = [];
+  const validated: Partial<Record<RouteGraphSearchBudgetDimension, number>> = {};
+  for (const dimension of ROUTE_GRAPH_SEARCH_BUDGET_DIMENSIONS) {
+    const value = record[dimension];
+    if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1) {
+      errors.push(
+        `${dimension} must be a positive integer (count-based budgets only — no wall clock)`,
+      );
+    } else {
+      validated[dimension] = value;
+    }
+  }
+  if (errors.length > 0) {
+    throw new RouteSearchBudgetError(
+      `the route graph search budget failed validation: ${errors.join("; ")}`,
+      { errors: Object.freeze(errors) },
+    );
+  }
+  return deepFreeze({
+    maxPathCandidates: validated.maxPathCandidates as number,
+    maxDistinctVertices: validated.maxDistinctVertices as number,
+    maxDistinctEdges: validated.maxDistinctEdges as number,
+  });
+}
+
+/** One route-graph truncation receipt: the TRUE pre-cut total, never the post-cut count. */
+export interface RouteGraphTruncationReceipt {
+  readonly dimension: RouteGraphSearchBudgetDimension;
+  readonly limit: number;
+  /** The TRUE total BEFORE the cut (the complete enumeration's total). */
+  readonly actualCount: number;
+  readonly disclosedAs: "TRUNCATED";
 }

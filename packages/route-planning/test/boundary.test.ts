@@ -110,7 +110,11 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
     // (bridge-proof — the typed deterministic bridge proof for the hypothesis
     // stage; the PLANNER_VERIFIED badge now requires the assumed element's
     // provable participation, never merely a real eligible route).
-    expect(sourceFiles.length).toBe(30);
+    // DISCLOSED RE-PIN (P27-D, ADR-0020 D5/D6/D12 — the node-network
+    // intelligence seam): +6 src modules (graph-schema, graph-search,
+    // eligibility-gates, eligibility-validation, baseline-comparison,
+    // pins/node-network) on the P23 30.
+    expect(sourceFiles.length).toBe(36);
   });
 
   it("no @payswap/* or @zcode/* import appears ANYWHERE in src (the pin-only law)", () => {
@@ -189,9 +193,18 @@ describe("architectural boundary: @payswap/route-planning (the zero-sibling guar
     // deterministic bridge proof that closes the hypothesis-verification
     // compatibility defect (a valid real route + an unrelated assumed
     // element coexisting into a false PLANNER_VERIFIED).
-    expect(sourceFiles.length).toBe(30);
-    expect(testFiles.length).toBe(26);
-    expect(allTestFiles.length).toBe(31);
+    // DISCLOSED RE-PIN (P27-D, ADR-0020 D5/D6/D12 — the node-network
+    // intelligence seam): +6 src modules (graph-schema, graph-search,
+    // eligibility-gates, eligibility-validation, baseline-comparison,
+    // pins/node-network) and +6 test-tier files (the five suites
+    // graph-search, node-network-pins, eligibility-gates, no-bypass,
+    // baseline-comparison + the node-network-fixtures helper), so the
+    // census moved 30 -> 36 src, 26 -> 31 test suites and 31 -> 37
+    // all-test .ts files. The pins stay EXACT toBe (never loosened to
+    // ranges) — the census law's strength is unchanged.
+    expect(sourceFiles.length).toBe(36);
+    expect(testFiles.length).toBe(31);
+    expect(allTestFiles.length).toBe(37);
   });
 
   it("the manifest law + tsconfig carries EXACTLY the one documented type-only paths mapping + a single node.d.ts process declaration", () => {

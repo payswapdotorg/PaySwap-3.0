@@ -1,24 +1,34 @@
 /**
  * @payswap/route-planning — the fail-closed injected engine ports
- * (P16-A, ADR-0009 D2).
+ * (P16-A, ADR-0009 D2; the node-offer admission port added by P27-D,
+ * ADR-0020 D5).
  *
  * THE COMPOSITION LAW: this package's src NEVER imports a sibling
  * package. Every REAL engine (the capability lane's corridor projection,
- * the route compiler) is reached ONLY through these INJECTED PORTS, and
- * every DEFAULT implementation here FAILS CLOSED with a typed
- * PortUnboundError carrying the EXACT unbound stage name. No default may
- * fabricate data, fall back, or return partial results — an unbound
- * engine is an honest typed error, never an LLM-only routing fallback
- * (the ROUTINE-CONTRACT acceptance law). The REAL engines are bound at
- * the TEST tier (relative cross-package imports — the established
- * pattern) and later at the platform host's composition root.
+ * the route compiler, the capability lane's node-offer admission chain)
+ * is reached ONLY through these INJECTED PORTS, and every DEFAULT
+ * implementation here FAILS CLOSED with a typed PortUnboundError carrying
+ * the EXACT unbound stage name. No default may fabricate data, fall back,
+ * or return partial results — an unbound engine is an honest typed error,
+ * never an LLM-only routing fallback (the ROUTINE-CONTRACT acceptance
+ * law). The REAL engines are bound at the TEST tier (relative
+ * cross-package imports — the established pattern) and later at the
+ * platform host's composition root.
  */
 
 import { PortUnboundError } from "./errors.ts";
 import type { PinnedCorridorQuery, PinnedCorridorRouteChain, PinnedCorridorSideEvaluation } from "./pins/capability.ts";
-import type { PinnedObservationFreshnessPolicy } from "./pins/capability.ts";
+import type {
+  PinnedInstanceScope,
+  PinnedObservationFreshnessPolicy,
+  PinnedObservationScope,
+} from "./pins/capability.ts";
 import type { PinnedRouteCompilationResult } from "./pins/route-compiler.ts";
 import type { RouteCompilerInputPin } from "./pins/route-compiler-input.ts";
+import type {
+  PinnedNodeOfferAdmission,
+  PinnedVerifiedNodeOfferWire,
+} from "./pins/node-network.ts";
 
 /**
  * The routine stage names an engine binding serves (ROUTINE-CONTRACT
@@ -127,4 +137,60 @@ export function requireRouteCompilationPort(candidate: unknown): RouteCompilatio
     );
   }
   return candidate as RouteCompilationPort;
+}
+
+/**
+ * THE NODE-OFFER ADMISSION PORT (P27-D, ADR-0020 D5 — serves stages 2 and
+ * 3): runs the REAL capability-lane node-offer admission chain (the
+ * INV-13 seam: a verified node offer is revalidated against the ACCEPTING
+ * authority's own provider evidence before it admits a route CANDIDATE
+ * FACT). The request carries the side whose rail discovery the admission
+ * serves; the unbound default names that side's exact stage.
+ */
+export interface NodeOfferAdmissionRequest {
+  readonly side: CorridorSide;
+  /** The verified offer wire (node-network's verification output, pinned). */
+  readonly offer: PinnedVerifiedNodeOfferWire;
+  /** The local connected-instance scope (layer 3 — the INV-13 surface). */
+  readonly instance: PinnedInstanceScope;
+  /** The local current observation (layer 4 — the freshness/eligibility evidence). */
+  readonly observation: PinnedObservationScope;
+}
+
+export interface NodeOfferAdmissionPort {
+  admitNodeOffer(request: NodeOfferAdmissionRequest): PinnedNodeOfferAdmission;
+}
+
+/**
+ * The UNBOUND node-offer admission port (fail closed): every call throws a
+ * PortUnboundError naming the EXACT unbound stage for the requested side.
+ * Never fabricates a fact, never admits on a signature alone (provider
+ * evidence stays decisive — §6), never returns partial results.
+ */
+export function unboundNodeOfferAdmissionPort(): NodeOfferAdmissionPort {
+  return {
+    admitNodeOffer(request: NodeOfferAdmissionRequest): PinnedNodeOfferAdmission {
+      throw new PortUnboundError(
+        `the node-offer admission engine is not bound for '${request.side}' rails — bind a real NodeOfferAdmissionPort at the composition root (ADR-0009 D2/ADR-0020 D5: an unbound engine is an honest typed failure; a node offer is never admitted without the real capability chain revalidating it against local provider evidence)`,
+        { stage: corridorSideStage(request.side), side: request.side },
+      );
+    },
+  };
+}
+
+/** Require an injected node-offer admission port (fail closed on a missing binding). */
+export function requireNodeOfferAdmissionPort(
+  candidate: unknown,
+): NodeOfferAdmissionPort {
+  if (
+    candidate === null ||
+    typeof candidate !== "object" ||
+    typeof (candidate as NodeOfferAdmissionPort).admitNodeOffer !== "function"
+  ) {
+    throw new PortUnboundError(
+      "a NodeOfferAdmissionPort must be injected (an object implementing admitNodeOffer) — the rail snapshot never fabricates a node-offer admission",
+      { stage: "stage-2:discover-sender-rails" as RoutePlanningEngineStage },
+    );
+  }
+  return candidate as NodeOfferAdmissionPort;
 }
