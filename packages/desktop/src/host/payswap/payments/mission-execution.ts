@@ -206,3 +206,62 @@ export function corridorLegDispatchPermitted(
   }
   return { permitted: true };
 }
+
+// ---------------------------------------------------------------------------
+// (P27-E, ADR-0020 D7 — the P27-D lane report §6.5) The saga
+// compensation extend-per-leg: the documented compensation records of
+// the CONFIRMED legs of a stopped saga chain (the honest inputs the
+// operator/compensation plane consumes). A leg whose documented
+// mechanism is null stays null — never a fabricated reversal (D7).
+// ---------------------------------------------------------------------------
+
+/** One confirmed saga leg's compensation record (the documented provider mechanism, or the honest null). */
+export interface SagaCompensationProjection {
+  readonly legIndex: number;
+  readonly operation: string;
+  readonly legOutcome: "CONFIRMED";
+  /** The documented provider reversal mechanism (null = NO documented reversal exists). */
+  readonly documentedMechanism: string | null;
+  readonly mechanismEvidenceRefs: readonly string[];
+}
+
+/**
+ * Project the compensation records of the legs a saga chain CONFIRMED
+ * before it stopped (per corridorLegOutcomes — the append-only
+ * evidence): the failed chain's honest compensation surface. A leg that
+ * never dispatched (after the stop) contributes NOTHING; a leg with no
+ * documented mechanism contributes its honest null — compensation is
+ * the operator's act over documented mechanisms, never an automatic
+ * reversal.
+ */
+export function sagaCompensationRecordsOf(
+  mission: PaymentMissionRecord,
+  binding: {
+    readonly plan: {
+      readonly legs: readonly {
+        readonly legIndex: number;
+        readonly operation: string;
+        readonly compensation: {
+          readonly documentedMechanism: string | null;
+          readonly mechanismEvidenceRefs: readonly string[];
+        };
+      }[];
+    };
+  },
+): readonly SagaCompensationProjection[] {
+  const outcomes = corridorLegOutcomes(mission, binding.plan.legs.length);
+  const projections: SagaCompensationProjection[] = [];
+  for (const leg of binding.plan.legs) {
+    if (outcomes[leg.legIndex] !== "CONFIRMED") {
+      continue; // only a CONFIRMED leg may ever need compensating
+    }
+    projections.push({
+      legIndex: leg.legIndex,
+      operation: leg.operation,
+      legOutcome: "CONFIRMED" as const,
+      documentedMechanism: leg.compensation.documentedMechanism,
+      mechanismEvidenceRefs: [...leg.compensation.mechanismEvidenceRefs],
+    });
+  }
+  return Object.freeze(projections);
+}

@@ -8,19 +8,19 @@
     "packages_checked": 58,
     "packages_mapped": 58,
     "packages_unmapped": 0,
-    "import_edges": 111,
+    "import_edges": 112,
     "layer_rules": 10,
-    "violations_total": 51,
+    "violations_total": 53,
     "violations_by_severity": {
-      "error": 51,
+      "error": 53,
       "warn": 0
     },
     "violations_by_rule": {
-      "R3-not-in-may-depend-on": 24,
+      "R3-not-in-may-depend-on": 25,
       "R4-cycle": 1,
-      "R6-cross-package-relative": 26
+      "R6-cross-package-relative": 27
     },
-    "unresolved_external_specifiers": 374
+    "unresolved_external_specifiers": 375
   },
   "packages": [
     {
@@ -656,6 +656,10 @@
           "occurrences": 1
         },
         {
+          "target": "packages/node-network",
+          "occurrences": 2
+        },
+        {
           "target": "packages/onchain-adapters",
           "occurrences": 1
         },
@@ -863,6 +867,10 @@
       "status": "FAIL",
       "dependencies": [],
       "dependents": [
+        {
+          "source": "packages/desktop",
+          "occurrences": 2
+        },
         {
           "source": "packages/route-planning",
           "occurrences": 2
@@ -1917,6 +1925,44 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/node-network",
+      "detail": "layer \"platform\" -> layer \"intelligence\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../../../../node-network/src/saga.ts",
+          "file": "packages/desktop/src/host/payswap/payments/saga-composite-binding.ts",
+          "line": 53,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/saga.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../../node-network/src/saga.ts",
+          "file": "packages/desktop/test/payswap/saga-composite-binding.test.ts",
+          "line": 45,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/saga.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -4725,6 +4771,44 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/node-network",
+      "detail": "2 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../../../../node-network/src/saga.ts",
+          "file": "packages/desktop/src/host/payswap/payments/saga-composite-binding.ts",
+          "line": 53,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/saga.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../../node-network/src/saga.ts",
+          "file": "packages/desktop/test/payswap/saga-composite-binding.test.ts",
+          "line": 45,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/saga.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true

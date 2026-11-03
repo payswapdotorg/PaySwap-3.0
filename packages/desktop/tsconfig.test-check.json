@@ -17,6 +17,7 @@
   "include": [
     "src/host/payswap",
     "../provider-runtime/src",
+    "../node-network/src",
     "test/payswap/payment-approval-plane.test.ts",
     "test/payswap/payment-approval-plane-harness.ts",
     "test/payswap/payment-dispatch-plane.test.ts",
@@ -37,6 +38,7 @@
     "test/payswap/connections-stellar-plane.test.ts",
     "test/payswap/payment-corridor-kernels.test.ts",
     "test/payswap/payment-corridor-dispatch.test.ts",
+    "test/payswap/saga-composite-binding.test.ts",
     "test/payswap/onchain-corridor-chain.test.ts",
     "test/payswap/connect-platform-gates.test.ts",
     "test/payswap/connect-u2-flow.test.ts",

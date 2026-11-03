@@ -101,6 +101,7 @@
     "../route-compiler/test/venue-fixtures.ts",
     "../capability/src",
     "../provider-runtime/src",
+    "../node-network/src",
     "../trust/src"
   ]
 }
