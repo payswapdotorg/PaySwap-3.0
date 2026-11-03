@@ -69,7 +69,7 @@ function memoryFs() {
 /** A re-auth service over the world's census/context + a scripted transport. */
 function reauthOf(
   world: Awaited<ReturnType<typeof executorWorld>>,
-  script: readonly Parameters<typeof scriptedTransport>[0],
+  script: Parameters<typeof scriptedTransport>[0],
   clockMs: () => number,
 ): { readonly service: StripeReauthenticationService; readonly transport: ReturnType<typeof scriptedTransport>["transport"] } {
   const { transport } = scriptedTransport([...script]);
