@@ -52,12 +52,10 @@ function diamondGraph(): RouteGraph {
       vertex("v:a3", "GH"),
       vertex("v:dest", "KE", "BENEFICIARY"),
     ],
-    edges: [
-      ...["a1", "a2", "a3"].flatMap((mid) => [
-        edge(`e:o-${mid}`, "v:origin", `v:${mid}`),
-        edge(`e:${mid}-d`, `v:${mid}`, "v:dest"),
-      ]),
-    ],
+    edges: ["a1", "a2", "a3"].flatMap((mid) => [
+      edge(`e:o-${mid}`, "v:origin", `v:${mid}`),
+      edge(`e:${mid}-d`, `v:${mid}`, "v:dest"),
+    ]),
   });
 }
 

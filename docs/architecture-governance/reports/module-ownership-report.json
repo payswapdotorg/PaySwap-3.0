@@ -5,20 +5,21 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 57,
+    "packages_checked": 58,
     "packages_mapped": 57,
-    "packages_unmapped": 0,
-    "import_edges": 110,
+    "packages_unmapped": 1,
+    "import_edges": 111,
     "layer_rules": 10,
-    "violations_total": 49,
+    "violations_total": 51,
     "violations_by_severity": {
-      "error": 49,
+      "error": 51,
       "warn": 0
     },
     "violations_by_rule": {
+      "R1-unmapped-package": 1,
       "R3-not-in-may-depend-on": 23,
       "R4-cycle": 1,
-      "R6-cross-package-relative": 25
+      "R6-cross-package-relative": 26
     },
     "unresolved_external_specifiers": 364
   },
@@ -566,7 +567,7 @@
         },
         {
           "source": "packages/route-planning",
-          "occurrences": 14
+          "occurrences": 15
         }
       ],
       "dependency_layers": [
@@ -852,6 +853,20 @@
         {
           "source": "packages/shared",
           "occurrences": 1
+        }
+      ],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/node-network",
+      "name": "@payswap/node-network",
+      "declared_layer": null,
+      "status": "UNMAPPED",
+      "dependencies": [],
+      "dependents": [
+        {
+          "source": "packages/route-planning",
+          "occurrences": 2
         }
       ],
       "dependency_layers": []
@@ -1147,7 +1162,7 @@
       "dependencies": [
         {
           "target": "packages/capability",
-          "occurrences": 14
+          "occurrences": 15
         },
         {
           "target": "packages/economic",
@@ -1156,6 +1171,10 @@
         {
           "target": "packages/lab",
           "occurrences": 13
+        },
+        {
+          "target": "packages/node-network",
+          "occurrences": 2
         },
         {
           "target": "packages/opportunities",
@@ -1562,6 +1581,15 @@
     }
   ],
   "violations": [
+    {
+      "rule": "R1-unmapped-package",
+      "severity": "error",
+      "sourcePkg": "packages/node-network",
+      "targetPkg": null,
+      "detail": "no package_layers annotation; layer cannot be determined",
+      "occurrences": null,
+      "occurrences_capped": false
+    },
     {
       "rule": "R3-not-in-may-depend-on",
       "severity": "error",
@@ -6575,7 +6603,7 @@
       "severity": "error",
       "sourcePkg": "packages/route-planning",
       "targetPkg": "packages/capability",
-      "detail": "14 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "15 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
         {
           "sourcePkg": "packages/route-planning",
@@ -6699,6 +6727,20 @@
           "typeOnly": true,
           "classification": "relative",
           "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/node-offer.ts",
+          "file": "packages/route-planning/test/node-network-pins.test.ts",
+          "line": 14,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/node-offer.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -7013,6 +7055,44 @@
           "typeOnly": true,
           "classification": "relative",
           "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/node-network",
+      "detail": "2 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../node-network/src/classification.ts",
+          "file": "packages/route-planning/test/node-network-pins.test.ts",
+          "line": 8,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/classification.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../node-network/src/enrollment.ts",
+          "file": "packages/route-planning/test/node-network-pins.test.ts",
+          "line": 9,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/enrollment.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
