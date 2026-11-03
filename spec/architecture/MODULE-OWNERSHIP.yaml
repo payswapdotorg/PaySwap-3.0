@@ -158,6 +158,7 @@ package_layers:
   packages/onchain-security: security # spec/onchain-security/ONCHAIN-SECURITY.md (layer security, cannot_downgrade_block)
   packages/route-compiler: intelligence # spec/route-compiler/ROUTE-COMPILER.md §2 (v1 hermetic, zero sibling imports)
   packages/route-planning: intelligence # ADR-0009 D2 (pin-only src + fail-closed injected ports; discovery never permits execution)
+  packages/node-network: intelligence # ADR-0020 D5/D12 (P27-D, 2026-11-03): the node capability-offer intelligence layer — signed expiring offers as discovery inputs bound to legal principals and ACTIVE instances; intelligence never authorizes financial effects (per-leg authorization stays in the desktop host authority). Honest test-tier R3/R6 (annotation-documented, the packages/agents ADR-0004 precedent): route-planning pins this package's wire shapes in its own src/pins/ (pin-only, ADR-0009 D2 — no src-level cross-package import) and its pin-fidelity tests import node-network relatively to fail when the pinned shapes drift; src-level intelligence->intelligence imports remain forbidden
   packages/opportunities: economic # spec/opportunities/OPPORTUNITIES.md economic observation/discovery layer (proposal-seam law: opportunities propose, never commit)
   packages/adversarial: security # spec/adversarial/ADVERSARIAL.md INV-21 block authority + cannot_downgrade_block (escalate-only lattice)
   packages/command: platform # spec/command/COMMAND.md "Layer law" (P7-W3 platform layer)
