@@ -1,6 +1,7 @@
 /**
  * @payswap/provider-runtime — the REAL Paystack HTTPS transport (P14-C,
- * ADR-0008 D5; the endpoint map GROWN by P22-H, ADR-0016 D8).
+ * ADR-0008 D5; the endpoint map GROWN by P22-H, ADR-0016 D8, and by
+ * P27-C, ADR-0020 D4 — the recipient + collection surface entries).
  *
  * The transport.ts law: NO SDK, no ambient fetch in unit-testable paths —
  * the fetch binding is INJECTED at the composition edge. transportClass
@@ -12,9 +13,14 @@
  * - 'paystack.transfer.initiate' → POST /transfer (the D8 payout lane)
  * - 'paystack.transfer.finalize' → POST /transfer/finalize_transfer
  * - 'paystack.transfer.verify' → GET /transfer/{id} (path-parameter)
+ * - 'paystack.transfer_recipient.create' → POST /transferrecipient (P27-C)
+ * - 'paystack.transfer_recipient.list' → GET /transferrecipient (P27-C)
+ * - 'paystack.transaction.initialize' → POST /transaction/initialize (P27-C)
+ * - 'paystack.transaction.verify' → GET /transaction/verify/{reference} (P27-C)
+ * - 'paystack.page.create' → POST /page (P27-C — the hosted payment page)
  * The GET-only law of the P14-C slice is RELAXED by ADR-0016 D8 to the
  * operation-endpoint map: each operation carries its own method; the
- * read surface stays GET, the transfer surface POSTs a JSON body.
+ * read surface stays GET, the write surfaces POST a JSON body.
  * Unknown operation ids are REFUSED BEFORE DISPATCH (fail-closed).
  *
  * SECRETS: the Authorization header (the sealed key) exists only inside
@@ -68,12 +74,18 @@ export interface PaystackEndpointSpec {
   readonly pathParam?: string;
 }
 
-/** The operation → endpoint mapping (frozen evidence surface). */
+/** The operation → endpoint mapping (frozen evidence surface; the P27-C
+ * rows are the recipient-plane + collection-surface growth, ADR-0020 D4). */
 export const PAYSTACK_OPERATION_ENDPOINTS: ReadonlyMap<string, PaystackEndpointSpec> = new Map([
   ['paystack.transactions.read', { method: 'GET', path: '/transaction' }],
   ['paystack.transfer.initiate', { method: 'POST', path: '/transfer' }],
   ['paystack.transfer.finalize', { method: 'POST', path: '/transfer/finalize_transfer' }],
   ['paystack.transfer.verify', { method: 'GET', path: '/transfer', pathParam: 'id' }],
+  ['paystack.transfer_recipient.create', { method: 'POST', path: '/transferrecipient' }],
+  ['paystack.transfer_recipient.list', { method: 'GET', path: '/transferrecipient' }],
+  ['paystack.transaction.initialize', { method: 'POST', path: '/transaction/initialize' }],
+  ['paystack.transaction.verify', { method: 'GET', path: '/transaction/verify', pathParam: 'reference' }],
+  ['paystack.page.create', { method: 'POST', path: '/page' }],
 ]);
 
 function isAbortLikeError(error: unknown): boolean {

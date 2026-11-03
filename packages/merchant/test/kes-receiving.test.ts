@@ -4,7 +4,9 @@ import {
   PINNED_CORRIDOR_KES_OFFRAMP_PAYOUT_METHOD,
   PINNED_CORRIDOR_KES_RECEIVING_CURRENCY,
   PINNED_CORRIDOR_KES_RECEIVING_KIND,
+  PINNED_PAYSTACK_KES_RECIPIENT_TYPE_CANDIDATES,
   defineCorridorKesReceivingContext,
+  defineCorridorKesPaystackRecipientReceiving,
 } from "../src/kes-receiving.ts";
 import { isExternalConversionRoute } from "../src/settlement-routes.ts";
 
@@ -108,5 +110,159 @@ describe("the corridor KES receiving context (ADR-0016 D5 — the off-ramp arriv
         conversionChain: ["cap.a", "cap.a"],
       }),
     ).toThrow(/must not repeat/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// (P27-C, ADR-0020 D10) the Paystack recipient association — the KES
+// receiving slice riding the new recipient plane. The dated evidence
+// observation below is a FIXTURE (test material only — never promoted to
+// shipped constants, D11); at the 2026-11-03 station NO verified KES
+// recipient fact exists (the Paystack docs were unreachable — the K3/K4
+// record), so the association is unconstructible from shipped constants
+// and every test constructs it from an explicit fixture observation.
+// ---------------------------------------------------------------------------
+
+describe("the Paystack recipient association (P27-C — the typed KES arrival)", () => {
+  const FIXTURE_EVIDENCE = {
+    recipientType: "kepss" as const,
+    country: "KE" as const,
+    currency: "KES" as const,
+    status: "VERIFIED_AVAILABLE" as const,
+    sourceUrl: "https://docs.paystack.com/transfers",
+    retrievedAt: "2026-11-03",
+  };
+
+  function recipientInput() {
+    return {
+      destinationId: "destination:kes:beneficiary-001",
+      bankInstrumentRef: "bank:kes:acct-****3391",
+      paystackRecipient: {
+        recipientCode: "RCP_fixture_p27c",
+        recipientType: "kepss" as const,
+        evidence: FIXTURE_EVIDENCE,
+      },
+      provenance: {
+        source: "merchant-onboarding",
+        reference: "ref:kes-bank-details-001",
+        recordedAt: RECORDED_AT,
+      },
+      conversionChain: ["cap.corridor.stellar-usdc-holding", "cap.corridor.kes-payout"],
+    };
+  }
+
+  it("carries the claimed KES candidate vocabulary (names only — never availability facts)", () => {
+    expect(PINNED_PAYSTACK_KES_RECIPIENT_TYPE_CANDIDATES).toEqual([
+      "kepss",
+      "mobile_money",
+    ]);
+  });
+
+  it("constructs the associated receiving context over the same EXTERNAL conversion route", () => {
+    const context = defineCorridorKesPaystackRecipientReceiving(recipientInput());
+    expect(isExternalConversionRoute(context.route)).toBe(true);
+    expect(context.receivingKind).toBe("BANK_INSTRUMENT");
+    expect(context.receivingCurrency).toBe("KES");
+    expect(context.payoutMethod).toBe("paystack_kes_bank_transfer");
+    expect(context.paystackRecipient).toEqual({
+      recipientCode: "RCP_fixture_p27c",
+      recipientType: "kepss",
+      evidence: FIXTURE_EVIDENCE,
+    });
+    expect(Object.isFrozen(context)).toBe(true);
+    expect(Object.isFrozen(context.paystackRecipient)).toBe(true);
+  });
+
+  it("refuses a recipient type outside the claimed KES candidate vocabulary", () => {
+    expect(() =>
+      defineCorridorKesPaystackRecipientReceiving({
+        ...recipientInput(),
+        paystackRecipient: {
+          recipientCode: "RCP_fixture_p27c",
+          recipientType: "nuban" as never,
+          evidence: FIXTURE_EVIDENCE,
+        },
+      }),
+    ).toThrow(/kepss\/mobile_money/);
+  });
+
+  it("refuses evidence that widens the pinned Kenya/KES triple or is not VERIFIED_AVAILABLE", () => {
+    expect(() =>
+      defineCorridorKesPaystackRecipientReceiving({
+        ...recipientInput(),
+        paystackRecipient: {
+          recipientCode: "RCP_fixture_p27c",
+          recipientType: "kepss",
+          evidence: { ...FIXTURE_EVIDENCE, country: "GH" as never },
+        },
+      }),
+    ).toThrow(/Kenya\/KES/);
+    expect(() =>
+      defineCorridorKesPaystackRecipientReceiving({
+        ...recipientInput(),
+        paystackRecipient: {
+          recipientCode: "RCP_fixture_p27c",
+          recipientType: "kepss",
+          evidence: { ...FIXTURE_EVIDENCE, status: "VERIFIED_EXCLUDED" as never },
+        },
+      }),
+    ).toThrow(/VERIFIED_AVAILABLE/);
+  });
+
+  it("refuses undated or unsourced observations (the D10 law — a fixture-grade claim is not evidence)", () => {
+    expect(() =>
+      defineCorridorKesPaystackRecipientReceiving({
+        ...recipientInput(),
+        paystackRecipient: {
+          recipientCode: "RCP_fixture_p27c",
+          recipientType: "kepss",
+          evidence: { ...FIXTURE_EVIDENCE, retrievedAt: "2026-11-03T12:00:00Z" },
+        },
+      }),
+    ).toThrow(/ISO retrieval date/);
+    expect(() =>
+      defineCorridorKesPaystackRecipientReceiving({
+        ...recipientInput(),
+        paystackRecipient: {
+          recipientCode: "RCP_fixture_p27c",
+          recipientType: "kepss",
+          evidence: { ...FIXTURE_EVIDENCE, sourceUrl: "ftp://not-https.example" },
+        },
+      }),
+    ).toThrow(/source URL/);
+  });
+
+  it("refuses an empty recipient code or a missing association (fail-closed)", () => {
+    expect(() =>
+      defineCorridorKesPaystackRecipientReceiving({
+        ...recipientInput(),
+        paystackRecipient: {
+          recipientCode: "",
+          recipientType: "kepss",
+          evidence: FIXTURE_EVIDENCE,
+        },
+      }),
+    ).toThrow(/recipient code/);
+    expect(() =>
+      defineCorridorKesPaystackRecipientReceiving({
+        ...recipientInput(),
+        paystackRecipient: null as never,
+      }),
+    ).toThrow(/typed recipient association/);
+  });
+
+  it("the base route laws still apply (the existing constructor's refusals are unchanged)", () => {
+    expect(() =>
+      defineCorridorKesPaystackRecipientReceiving({
+        ...recipientInput(),
+        conversionChain: [],
+      }),
+    ).toThrow(/non-empty conversion capability chain/);
+    expect(() =>
+      defineCorridorKesPaystackRecipientReceiving({
+        ...recipientInput(),
+        provenance: { source: "", reference: "r", recordedAt: RECORDED_AT },
+      }),
+    ).toThrow(/provenance/);
   });
 });

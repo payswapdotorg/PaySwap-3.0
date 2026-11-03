@@ -1,9 +1,10 @@
 /**
  * @payswap/provider-runtime — the Paystack registry declaration (P14-C,
- * ADR-0008 D5; the operation surface GROWN by P22-H, ADR-0016 D8). The
- * vertical slice in the P13-B shape: ONE configured form — the own-store
- * test-mode secret key through the host-side credential broker, verified
- * by a read-only transactions probe.
+ * ADR-0008 D5; the operation surface GROWN by P22-H, ADR-0016 D8, and
+ * by P27-C, ADR-0020 D4). The vertical slice in the P13-B shape: ONE
+ * configured form — the own-store test-mode secret key through the
+ * host-side credential broker, verified by a read-only transactions
+ * probe.
  *
  * Paystack's credential vocabulary (public documentation):
  * - Secret keys: `sk_test_…` (test) / `sk_live_…` (live) — the
@@ -21,6 +22,17 @@
  * surface's operation ids are pinned below and the read-only form
  * declaration is UNCHANGED (the connection's use-case scope stays
  * read-only; the probe stays the only path to ACTIVE).
+ *
+ * THE RECIPIENT + COLLECTION LANES (ADR-0020 D4 — the P27-C growth):
+ * the SAME law extends to the two new product surfaces — the recipient
+ * plane (transfer-recipient create/list) and the collection surface
+ * (transaction initialize/verify + the hosted payment page). Their
+ * operation ids are pinned below beside the transfer surface; their
+ * grants derive ONLY at dispatch through their own fail-closed
+ * derivations (`derivePaystackSandboxRecipientGrant`,
+ * `derivePaystackSandboxCollectionGrant`), and the connection form
+ * below is STILL the read-only own-store form — unchanged in every
+ * field (a new operation never widens the read-only scope).
  *
  * LAWS (identical to the Stripe U1 slice):
  * - The ONLY path to ACTIVE is the read-only verification probe through
@@ -42,13 +54,23 @@ export const PAYSTACK_API_BASE_URL = 'https://api.paystack.co' as const;
  * The transport operation ids the Paystack adapter maps (evidence
  * surface). GROWN by ADR-0016 D8: the transfer surface (the corridor's
  * KES off-ramp lane) — initiate/finalize/verify, the transfer API's
- * real shapes.
+ * real shapes. GROWN by ADR-0020 D4 (P27-C): the recipient plane
+ * (create/list over the transfer-recipient API surface) and the
+ * collection surface (transaction initialize/verify + the hosted
+ * payment page) — each new operation carries its own dispatch-time
+ * SANDBOX grant derivation and never widens the read-only connection
+ * scope (the fail-closed endpoint map is the only wire path).
  */
 export const PAYSTACK_OPERATION_IDS = [
   'paystack.transactions.read',
   'paystack.transfer.initiate',
   'paystack.transfer.finalize',
   'paystack.transfer.verify',
+  'paystack.transfer_recipient.create',
+  'paystack.transfer_recipient.list',
+  'paystack.transaction.initialize',
+  'paystack.transaction.verify',
+  'paystack.page.create',
 ] as const;
 export type PaystackOperationId = (typeof PAYSTACK_OPERATION_IDS)[number];
 

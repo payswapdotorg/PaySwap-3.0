@@ -170,8 +170,19 @@ export {
   PINNED_CORRIDOR_KES_RECEIVING_CURRENCY,
   PINNED_CORRIDOR_KES_OFFRAMP_PAYOUT_METHOD,
   defineCorridorKesReceivingContext,
+  // (P27-C, ADR-0020 D10) the Paystack recipient association — the KES
+  // receiving slice riding the new recipient plane, fail-closed on the
+  // caller-supplied dated evidence observation (nothing unverified ships).
+  PINNED_PAYSTACK_KES_RECIPIENT_TYPE_CANDIDATES,
+  defineCorridorKesPaystackRecipientReceiving,
 } from "./kes-receiving.ts";
-export type { CorridorKesReceivingContext } from "./kes-receiving.ts";
+export type {
+  CorridorKesReceivingContext,
+  PinnedPaystackKesRecipientType,
+  PinnedPaystackKesRecipientEvidence,
+  PinnedPaystackKesRecipientAssociation,
+  CorridorKesPaystackRecipientReceivingContext,
+} from "./kes-receiving.ts";
 export {
   validateMerchantCapabilityDescriptor,
   stripeNativeCryptoSettlementCapabilityDefinition,

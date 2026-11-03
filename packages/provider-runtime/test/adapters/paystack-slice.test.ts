@@ -75,11 +75,21 @@ describe('the Paystack registry entry (P14-C, the P13-B slice shape)', () => {
     ).toThrow(ValidationError);
     // P22-H re-pin (ADR-0016 D8): the operation surface grew the transfer
     // ops — the read op stays first, the transfer surface follows.
+    // P27-C re-pin (ADR-0020 D4, disclosed): the operation surface grew
+    // AGAIN — the recipient plane (transfer_recipient create/list), the
+    // collection surface (transaction initialize/verify) and the hosted
+    // payment page (page.create) follow the transfer ops. The read-only
+    // connection form itself is UNCHANGED (asserted above).
     expect(PAYSTACK_OPERATION_IDS).toEqual([
       'paystack.transactions.read',
       'paystack.transfer.initiate',
       'paystack.transfer.finalize',
       'paystack.transfer.verify',
+      'paystack.transfer_recipient.create',
+      'paystack.transfer_recipient.list',
+      'paystack.transaction.initialize',
+      'paystack.transaction.verify',
+      'paystack.page.create',
     ]);
   });
 });
