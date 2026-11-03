@@ -35,17 +35,17 @@ import { SandboxLiveBoundaryError, ValidationError } from '../../src/errors.ts';
 describe('the platform configuration resolver (key-ready, fail-closed)', () => {
   it('resolves a well-formed configuration', () => {
     const config = requireStripePlatformOAuthConfiguration({
-      clientId: 'ca_TESTPLATFORM0000000000000000',
-      clientSecret: 'sk_test_PLATFORMSECRET00000000000000',
+      clientId: 'ca_FAKEPLATFORM0000000000000000',
+      clientSecret: 'sk_test_FAKEPLATFORMSECRET0000000000',
     });
-    expect(config.clientId).toBe('ca_TESTPLATFORM0000000000000000');
-    expect(config.clientSecret).toBe('sk_test_PLATFORMSECRET00000000000000');
+    expect(config.clientId).toBe('ca_FAKEPLATFORM0000000000000000');
+    expect(config.clientSecret).toBe('sk_test_FAKEPLATFORMSECRET0000000000');
   });
 
   it('refuses typed without the client_id, carrying the exact missing item', () => {
     try {
       requireStripePlatformOAuthConfiguration({
-        clientSecret: 'sk_test_PLATFORMSECRET00000000000000',
+        clientSecret: 'sk_test_FAKEPLATFORMSECRET0000000000',
       });
       throw new Error('unreachable');
     } catch (error) {
@@ -59,7 +59,7 @@ describe('the platform configuration resolver (key-ready, fail-closed)', () => {
 
   it('refuses typed without the client_secret, carrying the exact missing item', () => {
     try {
-      requireStripePlatformOAuthConfiguration({ clientId: 'ca_TESTPLATFORM0000000000000000' });
+      requireStripePlatformOAuthConfiguration({ clientId: 'ca_FAKEPLATFORM0000000000000000' });
       throw new Error('unreachable');
     } catch (error) {
       expect(error).toBeInstanceOf(MissingStripePlatformConfigurationError);
@@ -79,13 +79,13 @@ describe('the platform configuration resolver (key-ready, fail-closed)', () => {
   it('INV-25: refuses a live-shaped platform secret at this edge', () => {
     expect(() =>
       requireStripePlatformOAuthConfiguration({
-        clientId: 'ca_TESTPLATFORM0000000000000000',
+        clientId: 'ca_FAKEPLATFORM0000000000000000',
         clientSecret: 'sk_live_' + 'PLATFORMSECRET000000000000',
       }),
     ).toThrow(SandboxLiveBoundaryError);
     expect(() =>
       requireStripePlatformOAuthConfiguration({
-        clientId: 'ca_TESTPLATFORM0000000000000000',
+        clientId: 'ca_FAKEPLATFORM0000000000000000',
         clientSecret: 'rk_live_' + 'PLATFORMSECRET000000000000',
       }),
     ).toThrow(SandboxLiveBoundaryError);
@@ -94,20 +94,20 @@ describe('the platform configuration resolver (key-ready, fail-closed)', () => {
 
 describe('the token-exchange request builder (the documented current shape)', () => {
   const configuration = {
-    clientId: 'ca_TESTPLATFORM0000000000000000',
-    clientSecret: 'sk_test_PLATFORMSECRET00000000000000',
+    clientId: 'ca_FAKEPLATFORM0000000000000000',
+    clientSecret: 'sk_test_FAKEPLATFORMSECRET0000000000',
   };
 
   it('builds grant_type=authorization_code with the secret ONLY in the basic header', () => {
     const request = buildStripeTokenExchangeRequest({
-      code: 'ac_TESTAUTHCODE0000000000000000',
+      code: 'ac_FAKEAUTHCODE0000000000000000',
       ...configuration,
     });
     expect(request.url).toBe(STRIPE_OAUTH_TOKEN_URL);
     expect(request.url).toBe('https://connect.stripe.com/oauth/token');
     expect(request.bodyFields).toEqual({
       grant_type: 'authorization_code',
-      code: 'ac_TESTAUTHCODE0000000000000000',
+      code: 'ac_FAKEAUTHCODE0000000000000000',
     });
     // The secret exists only inside the basic authorization header.
     expect(request.basicAuthorization.startsWith('Basic ')).toBe(true);
@@ -118,7 +118,7 @@ describe('the token-exchange request builder (the documented current shape)', ()
 
   it('refuses without the platform configuration (never a simulated exchange)', () => {
     expect(() =>
-      buildStripeTokenExchangeRequest({ code: 'ac_TESTAUTHCODE0000000000000000' }),
+      buildStripeTokenExchangeRequest({ code: 'ac_FAKEAUTHCODE0000000000000000' }),
     ).toThrow(MissingStripePlatformConfigurationError);
   });
 
@@ -135,7 +135,7 @@ describe('the token-exchange request builder (the documented current shape)', ()
     });
     expect(request.url).toBe(STRIPE_OAUTH_DEAUTHORIZE_URL);
     expect(request.bodyFields).toEqual({
-      client_id: 'ca_TESTPLATFORM0000000000000000',
+      client_id: 'ca_FAKEPLATFORM0000000000000000',
       stripe_user_id: 'acct_00000000000000',
     });
     expect(request.basicAuthorization.startsWith('Basic ')).toBe(true);
@@ -168,8 +168,8 @@ describe('the token-response parser (fail-closed; the never-ACTIVE parse twin)',
       scope: 'read_only',
       livemode: false,
       stripe_user_id: 'acct_00000000000000',
-      access_token: 'sk_test_ACCESSTOKEN000000000000000',
-      refresh_token: 'rt_TESTREFRESHTOKEN0000000000000',
+      access_token: 'sk_test_FAKEACCESSTOKEN00000000000',
+      refresh_token: 'rt_FAKEREFRESHTOKEN00000000000',
     });
     expect(outcome.kind).toBe('TOKEN_ISSUED');
     if (outcome.kind !== 'TOKEN_ISSUED') return;
@@ -178,10 +178,10 @@ describe('the token-response parser (fail-closed; the never-ACTIVE parse twin)',
     expect(outcome.stripeUserId).toBe('acct_00000000000000');
     expect(outcome.refreshTokenPresent).toBe(true);
     expect(outcome.accessTokenMaterial.stripeAccessToken).toBe(
-      'sk_test_ACCESSTOKEN000000000000000',
+      'sk_test_FAKEACCESSTOKEN00000000000',
     );
     expect(outcome.refreshTokenMaterial?.stripeRefreshToken).toBe(
-      'rt_TESTREFRESHTOKEN0000000000000',
+      'rt_FAKEREFRESHTOKEN00000000000',
     );
   });
 
@@ -189,7 +189,7 @@ describe('the token-response parser (fail-closed; the never-ACTIVE parse twin)',
     const outcome = parseStripeOAuthTokenResponse({
       token_type: 'bearer',
       livemode: false,
-      access_token: 'sk_test_ACCESSTOKEN000000000000000',
+      access_token: 'sk_test_FAKEACCESSTOKEN00000000000',
     });
     expect(outcome.kind).toBe('TOKEN_ISSUED');
     if (outcome.kind !== 'TOKEN_ISSUED') return;

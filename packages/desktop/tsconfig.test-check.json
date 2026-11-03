@@ -37,6 +37,12 @@
     "test/payswap/connections-stellar-plane.test.ts",
     "test/payswap/payment-corridor-kernels.test.ts",
     "test/payswap/payment-corridor-dispatch.test.ts",
-    "test/payswap/onchain-corridor-chain.test.ts"
+    "test/payswap/onchain-corridor-chain.test.ts",
+    "test/payswap/connect-platform-gates.test.ts",
+    "test/payswap/connect-u2-flow.test.ts",
+    "test/payswap/connect-account-lifecycle.test.ts",
+    "test/payswap/connect-webhook-events.test.ts",
+    "test/payswap/connect-topology.test.ts",
+    "test/payswap/connect-connection-views.test.ts"
   ]
 }
