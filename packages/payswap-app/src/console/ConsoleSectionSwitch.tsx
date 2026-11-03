@@ -36,6 +36,7 @@ import { ConnectionsSection } from "./sections/ConnectionsSection.js";
 import { ActivitySection } from "./sections/ActivitySection.js";
 import { LabSection } from "./sections/LabSection.js";
 import { SettingsSection } from "./sections/SettingsSection.js";
+import { ConnectFormsPanel } from "./sections/ConnectFormsPanel.js";
 
 export interface ConsoleSectionSwitchProps {
   /** The resolved console route (the switch renders its section). */
@@ -121,12 +122,19 @@ export function ConsoleSectionSwitch({
         <ApprovalsSection section={sectionById("approvals")} />
       ) : null}
       {route.kind === "section" && route.sectionId === "connections" ? (
-        <ConnectionsSection
-          section={sectionById("connections")}
-          navigation={navigation}
-          backToProduct={backToProduct}
-          modelProviders={modelProviders}
-        />
+        <>
+          <ConnectionsSection
+            section={sectionById("connections")}
+            navigation={navigation}
+            backToProduct={backToProduct}
+            modelProviders={modelProviders}
+          />
+          {/* (P27-A) The Stripe U2/U3 connect forms — ADDITIVE registration
+              point: the typed operator-gate surface rendered after the
+              connections section (zero financial authority; the host seed
+              verb wires at the P27-E integration). */}
+          <ConnectFormsPanel />
+        </>
       ) : null}
       {route.kind === "section" && route.sectionId === "activity" ? (
         <ActivitySection

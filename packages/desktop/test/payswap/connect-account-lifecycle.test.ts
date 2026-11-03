@@ -203,13 +203,18 @@ describe("the account-creation plan (the CURRENT model — never a default guess
     const fields = Object.fromEntries(
       result.value.parameters.map((p) => [p.name, p.value]),
     );
+    // The dispatch-stack shape: TOP-LEVEL schema names with NESTED values
+    // (the strict validator's known set; the form encoder emits the wire's
+    // bracket notation — a bracket-named flat parameter would be refused).
     expect(fields["country"]).toBe("GH");
-    expect(fields["controller[stripe_dashboard][type]"]).toBe("none");
-    expect(fields["controller[fees][payer]"]).toBe("application");
-    expect(fields["controller[losses][payments]"]).toBe("application");
-    expect(fields["controller[requirement_collection]"]).toBe("stripe");
-    expect(fields["tos_acceptance[service_agreement]"]).toBe("recipient");
-    expect(fields["capabilities[transfers][requested]"]).toBe("true");
+    expect(fields["controller"]).toEqual({
+      stripe_dashboard: { type: "none" },
+      fees: { payer: "application" },
+      losses: { payments: "application" },
+      requirement_collection: "stripe",
+    });
+    expect(fields["tos_acceptance"]).toEqual({ service_agreement: "recipient" });
+    expect(fields["capabilities"]).toEqual({ transfers: { requested: true } });
     // The legacy type= parameter is NOT part of the current-model plan.
     expect(fields["type"]).toBeUndefined();
   });

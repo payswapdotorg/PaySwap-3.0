@@ -97,7 +97,7 @@ export const AGENT_PROVIDER_SETUP_ENTRIES: readonly AgentProviderSetupEntry[] = 
         useCaseRef: "marketplace-onboarding",
         cardTitle: "Stripe — marketplace onboarding",
         cardLine:
-          "Onboard sellers as Stripe connected accounts (Express/Custom) through Account Links hosted onboarding. This integration type is declared with its exact missing operator configuration: Stripe platform credentials plus a webhook endpoint. No onboarding flow exists until that configuration is supplied.",
+          "Onboard sellers as Stripe Connect connected accounts (Account Links hosted onboarding under the current controller-properties account model). The lifecycle machinery is implemented and key-ready; the form stays UNCONFIGURED with its exact missing operator configuration — the platform credentials, the decided account model, charge model, liability assignment and the connected-account webhook endpoint (P27 run card §B). No onboarding flow runs until that configuration is supplied.",
         cardActionLabel: "Connect Stripe — marketplace onboarding",
       },
       {
@@ -113,7 +113,7 @@ export const AGENT_PROVIDER_SETUP_ENTRIES: readonly AgentProviderSetupEntry[] = 
         useCaseRef: "existing-account-grant",
         cardTitle: "Stripe — existing account grant",
         cardLine:
-          "Delegate PaySwap scoped access to your existing Stripe account through Stripe OAuth. This integration type is declared with its exact missing operator configuration: a registered Stripe platform (client_id + secret). No OAuth flow exists until that configuration is supplied.",
+          "Delegate PaySwap scoped read-only access to your existing Stripe account through Stripe OAuth. The flow machinery (single-use state, authorize URL, code-to-token exchange, typed error paths, seal + read-back probe) is implemented and key-ready; the form stays UNCONFIGURED with its exact missing operator configuration — the operator-registered Stripe platform application, its client_id and client_secret, the registered redirect URL and the business-model approval (P27 run card §B). No OAuth flow runs until that configuration is supplied.",
         cardActionLabel: "Connect Stripe — existing account grant",
       },
     ],

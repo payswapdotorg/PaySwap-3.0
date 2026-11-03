@@ -106,8 +106,14 @@ function requireCensusOperation(
   return { ok: true, view };
 }
 
-/** Form-encode nested controller/capability params onto the census body-parameter names. */
-function bodyParametersOf(fields: Readonly<Record<string, string>>): StripeActionParameter[] {
+/**
+ * Body parameters for the census dispatch stack: TOP-LEVEL schema names with
+ * NESTED-OBJECT values (the strict validator's known set is the top-level
+ * body-property names; the v1 form encoder flattens the nested values into
+ * the wire's bracket notation — controller[stripe_dashboard][type]=… — so the
+ * plan names the schema, never the wire encoding).
+ */
+function bodyParametersOf(fields: Readonly<Record<string, unknown>>): StripeActionParameter[] {
   return Object.entries(fields).map(([name, value]) => ({ name, value, location: "body" as const }));
 }
 
@@ -178,17 +184,25 @@ export function createStripeConnectAccountLifecycle(deps: StripeConnectLifecycle
     if (!consistency.ok) {
       return { kind: "INCONSISTENT_DECISION", reason: consistency.reason };
     }
-    const fields: Record<string, string> = {
-      country,
-      "controller[stripe_dashboard][type]": accountModel.stripeDashboardType,
-      "controller[fees][payer]": accountModel.feesPayer,
-      "controller[losses][payments]": accountModel.lossesPayer,
-      "controller[requirement_collection]": accountModel.requirementCollection,
-      "tos_acceptance[service_agreement]": accountModel.serviceAgreement,
-    };
+    // The dispatch-stack shape: top-level schema names with nested-object
+    // values (the strict validator + the v1 form encoder compose them into
+    // the documented wire form; bracket-named FLAT parameters would be an
+    // UNKNOWN_PARAMETER refusal at dispatch — caught by the wiring dry-run).
+    const capabilities: Record<string, { readonly requested: boolean }> = {};
     for (const capability of accountModel.requestedCapabilities) {
-      fields[`capabilities[${capability}][requested]`] = "true";
+      capabilities[capability] = { requested: true };
     }
+    const fields: Record<string, unknown> = {
+      country,
+      controller: {
+        stripe_dashboard: { type: accountModel.stripeDashboardType },
+        fees: { payer: accountModel.feesPayer },
+        losses: { payments: accountModel.lossesPayer },
+        requirement_collection: accountModel.requirementCollection,
+      },
+      capabilities,
+      tos_acceptance: { service_agreement: accountModel.serviceAgreement },
+    };
     return {
       kind: "OK",
       value: {
