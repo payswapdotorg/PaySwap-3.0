@@ -24,6 +24,17 @@
  * - N=1 IS THE DEGENERATE CASE: the single-leg laws are byte-pinned by
  *   the existing dispatch/authorization/idempotency tests staying green
  *   unmodified — this module never touches them.
+ *
+ * (P27-E, ADR-0020 D7 — the P27-D lane report §6.5) THE SAGA EXTENSION:
+ * dispatchSagaCompositePlan consumes a bound node-network saga plan's
+ * per-leg outputs (the share REQUESTS, the saga idempotency keys, the
+ * reconciliation checkpoints, the documented compensation records —
+ * saga-composite-binding.ts) through the SAME per-leg dispatch path,
+ * ADDITIVELY: the pinned four-leg corridor law above is untouched, the
+ * outcome rows grow optional per-leg saga records, and the runtime's
+ * own custody-continuity + per-leg artifact + idempotency laws stay
+ * THE enforcement (intelligence never authorizes — the share requests
+ * are requests; the host authority mints the shares).
  */
 
 import { PaymentMissionError } from "./contracts.js";
@@ -34,6 +45,12 @@ import {
   PINNED_CROSS_PROVIDER_CORRIDOR_SHAPE_ID,
   type PinnedCorridorLegKind,
 } from "../connections/onchain-rail-pins.js";
+import {
+  sagaLegOf,
+  validateSagaLegPresentations,
+  type SagaCompositeBinding,
+  type SagaLegPresentation,
+} from "./saga-composite-binding.js";
 
 /** One leg of the presented corridor plan (the orchestration's input shape). */
 export interface CorridorPlanLegInput {
@@ -131,6 +148,20 @@ export interface CorridorLegDispatchResult {
   readonly outcome: "CONFIRMED" | "UNKNOWN" | "FAILED" | "REFUSED" | "BLOCKED";
   readonly attemptId?: string;
   readonly summary: string;
+  /**
+   * (P27-E, the saga extension — OPTIONAL, additive) The saga-side
+   * per-leg records the composite act consumes: the authorization-share
+   * REQUEST (the host authority mints the share), the saga idempotency
+   * key (the audit record — the runtime's own derivation stays the
+   * enforcement), the reconciliation checkpoint and the documented
+   * compensation record. Present only on the saga dispatch path.
+   */
+  readonly saga?: {
+    readonly shareRequest: { readonly legIndex: number; readonly operation: string; readonly approvalTier: string; readonly effectClass: string };
+    readonly idempotencyKey: string;
+    readonly readBackRoute: string;
+    readonly compensation: { readonly documentedMechanism: string | null; readonly mechanismEvidenceRefs: readonly string[] };
+  };
 }
 
 /** The whole corridor dispatch's outcome (index-aligned rows). */
@@ -253,6 +284,132 @@ export async function dispatchCorridorPlan(
     planDigest,
     results: Object.freeze(results),
     allLegsConfirmed: results.length === options.plan.legs.length && results.every((row) => row.outcome === "CONFIRMED"),
+    stoppedAfterLeg,
+  };
+}
+
+/**
+ * (P27-E, ADR-0020 D7 — the P27-D §6.5 seam) THE SAGA COMPOSITE
+ * DISPATCH: orchestrate a bound node-network saga plan's legs through
+ * the dispatch runtime's own per-leg slice — each saga leg its OWN
+ * command (its OWN lane, its OWN connectionRef, its OWN legIndex, the
+ * SAGA plan digest bound into the composite authorization artifact),
+ * with the binding's per-leg share REQUESTS, saga idempotency keys,
+ * reconciliation checkpoints and documented compensation records
+ * carried onto the outcome rows. The chain stops honestly at the first
+ * non-CONFIRMED leg (the runtime's custody-continuity gate is the
+ * enforcement point; this loop also stops — never dispatches past a
+ * stopped chain). The pinned corridor dispatch above is untouched.
+ */
+export async function dispatchSagaCompositePlan(options: {
+  readonly slice: PaymentDispatchSlice;
+  readonly missionId: string;
+  /** The bound saga plan's outputs (bindSagaPlanToCompositeAct — already identity-bound to this mission + intent). */
+  readonly binding: SagaCompositeBinding;
+  /** The presenter's per-leg execution mapping (index-aligned; validated fail-closed). */
+  readonly legPresentations: readonly SagaLegPresentation[];
+  readonly authorizationArtifactId: string;
+  readonly executionMode: "SANDBOX" | "LIVE";
+  readonly now: string;
+}): Promise<CorridorDispatchOutcome> {
+  const presentations = validateSagaLegPresentations(options.binding, options.legPresentations);
+  const plan = options.binding.plan;
+  const planDigest = plan.planDigest;
+  const results: CorridorLegDispatchResult[] = [];
+  let stoppedAfterLeg: number | null = null;
+
+  for (const leg of plan.legs) {
+    const presentation = presentations[leg.legIndex]!;
+    const saga = Object.freeze({
+      shareRequest: Object.freeze({
+        legIndex: leg.legIndex,
+        operation: leg.operation,
+        approvalTier: leg.approvalTier,
+        effectClass: leg.effectClass,
+      }),
+      idempotencyKey: options.binding.idempotencyKeys[leg.legIndex]!,
+      readBackRoute: leg.readBackRoute,
+      compensation: Object.freeze({
+        documentedMechanism: leg.compensation.documentedMechanism,
+        mechanismEvidenceRefs: Object.freeze([...leg.compensation.mechanismEvidenceRefs]),
+      }),
+    });
+    const payload = sagaLegOf(leg);
+    const legPayload: PaymentDispatchLegPayload = {
+      legIndex: leg.legIndex,
+      legKind: presentation.legKind,
+      lane: payload.lane,
+      plannedAmount: payload.plannedAmount,
+      destinationRef: payload.destinationRef,
+    };
+    let outcome: CorridorLegDispatchResult;
+    try {
+      const dispatched = await options.slice.dispatch(options.missionId, "CREATE_EXTERNAL_EFFECT", {
+        authorizationArtifactId: options.authorizationArtifactId,
+        connectionRef: presentation.connectionRef,
+        executionMode: options.executionMode,
+        legIndex: leg.legIndex,
+        leg: legPayload,
+        planDigest,
+      }, options.now);
+      if (dispatched.kind === "REFUSED") {
+        outcome = {
+          legIndex: leg.legIndex,
+          legKind: presentation.legKind,
+          outcome: "REFUSED",
+          attemptId: dispatched.attemptId,
+          summary: `saga leg ${String(leg.legIndex)} (${leg.operation}) REFUSED (${dispatched.refusal.kind}): ${dispatched.refusal.reason}`,
+          saga,
+        };
+      } else if (dispatched.envelope.outcome === "UNKNOWN") {
+        outcome = {
+          legIndex: leg.legIndex,
+          legKind: presentation.legKind,
+          outcome: "UNKNOWN",
+          attemptId: dispatched.attemptId,
+          summary: `saga leg ${String(leg.legIndex)} (${leg.operation}) UNKNOWN (${dispatched.envelope.ambiguityReason ?? "unrecorded"}) — pending reconciliation through '${leg.readBackRoute}'; the chain waits, honestly`,
+          saga,
+        };
+      } else if (dispatched.envelope.outcome === "FAILED") {
+        outcome = {
+          legIndex: leg.legIndex,
+          legKind: presentation.legKind,
+          outcome: "FAILED",
+          attemptId: dispatched.attemptId,
+          summary: `saga leg ${String(leg.legIndex)} (${leg.operation}) FAILED (${dispatched.envelope.providerFailure?.providerErrorCode ?? "no provider code"}) — the chain stops honestly; the legs before it are recorded facts with their documented compensation records`,
+          saga,
+        };
+      } else {
+        outcome = {
+          legIndex: leg.legIndex,
+          legKind: presentation.legKind,
+          outcome: "CONFIRMED",
+          attemptId: dispatched.attemptId,
+          summary: `saga leg ${String(leg.legIndex)} (${leg.operation}) CONFIRMED (references: ${dispatched.envelope.providerReferences.join(", ") || "none acknowledged"})`,
+          saga,
+        };
+      }
+    } catch (error) {
+      const reason = error instanceof PaymentMissionError ? error.message : String(error);
+      outcome = {
+        legIndex: leg.legIndex,
+        legKind: presentation.legKind,
+        outcome: "BLOCKED",
+        summary: `saga leg ${String(leg.legIndex)} (${leg.operation}) BLOCKED: ${reason}`,
+        saga,
+      };
+    }
+    results.push(outcome);
+    if (outcome.outcome !== "CONFIRMED") {
+      stoppedAfterLeg = leg.legIndex;
+      break; // THE CHAIN STOPS HONESTLY — no later leg dispatches.
+    }
+  }
+
+  return {
+    planDigest,
+    results: Object.freeze(results),
+    allLegsConfirmed: results.length === plan.legs.length && results.every((row) => row.outcome === "CONFIRMED"),
     stoppedAfterLeg,
   };
 }

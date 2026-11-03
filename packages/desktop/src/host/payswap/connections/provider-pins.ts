@@ -147,18 +147,23 @@ export function isPinnedLawfulConnectionTransition(
 /** Mirrors STRIPE_PROVIDER_ID. */
 export const PINNED_STRIPE_PROVIDER_ID = "stripe" as const;
 
-/** Mirrors STRIPE_U2_MISSING_OPERATOR_CONFIGURATION (verbatim honesty). */
+/** Mirrors STRIPE_U2_MISSING_OPERATOR_CONFIGURATION (verbatim honesty; the P27-A §B-mapped items). */
 export const PINNED_STRIPE_U2_MISSING_OPERATOR_CONFIGURATION: readonly string[] =
   Object.freeze([
-    "Stripe platform client_id (a registered Stripe platform application owned by the operator)",
-    "Stripe platform client_secret (delivered to the host through the operator secret channel, never chat)",
+    "STRIPE_PLATFORM_CLIENT_ID — the OAuth client_id of a Stripe platform application registered by the operator (run card §B.1)",
+    "STRIPE_PLATFORM_CLIENT_SECRET — the platform secret key (the OAuth client_secret), delivered to the host through the operator secret channel, never chat (run card §B.1 and §B.4)",
+    "The exact redirect/callback URL registered with the Stripe platform application (run card §B.3)",
+    "Stripe's written approval of PaySwap's disclosed actual business model (run card §B.5)",
   ]);
 
-/** Mirrors STRIPE_U3_MISSING_OPERATOR_CONFIGURATION (verbatim honesty). */
+/** Mirrors STRIPE_U3_MISSING_OPERATOR_CONFIGURATION (verbatim honesty; the P27-A §B-mapped items). */
 export const PINNED_STRIPE_U3_MISSING_OPERATOR_CONFIGURATION: readonly string[] =
   Object.freeze([
-    "Stripe platform credentials (client_id + client_secret for the Connect platform)",
-    "A webhook endpoint registered with Stripe for connected-account events, delivered to the operator-run PaySwap backend",
+    "STRIPE_PLATFORM_CLIENT_ID + STRIPE_PLATFORM_CLIENT_SECRET — the Stripe Connect platform credentials (run card §B.1 and §B.4)",
+    "STRIPE_CONNECT_WEBHOOK_SECRET — the signing secret of a publicly reachable webhook endpoint registered with Stripe for connected-account events (run card §B.3 and §B.4)",
+    "The operator-decided Connect account model — the onboarding configuration, service agreement (full or recipient) and controller settings, approved with Stripe for the actual business model (run card §B.2)",
+    "The operator-decided charge model (direct / destination / separate charges and transfers), platform country, and merchant-of-record + dispute/refund liability assignment (run card §B.2)",
+    "Stripe's written approval of PaySwap's disclosed actual business model (run card §B.5)",
   ]);
 
 /** One provider form as the renderer renders it (mirrors the registry entry fields). */
@@ -205,7 +210,7 @@ export const PINNED_STRIPE_REGISTRY_ENTRY: {
       credentialKind: "OAUTH" as const,
       executionModes: Object.freeze(["SANDBOX" as const]),
       summary:
-        "Delegate scoped PaySwap access to an existing Stripe account through Stripe OAuth. Requires operator platform registration that does not exist in this deployment — the exact missing configuration is stated, never simulated.",
+        "Delegate scoped PaySwap access to an existing Stripe account through Stripe OAuth. The flow machinery (single-use state, authorize URL, code-to-token exchange, typed error paths, seal + read-back probe) is implemented and key-ready; the form stays UNCONFIGURED until the operator platform configuration arrives through the secret channel — the exact missing configuration is stated, never simulated.",
     }),
     Object.freeze({
       useCaseRef: "marketplace-connected-accounts",
@@ -216,7 +221,7 @@ export const PINNED_STRIPE_REGISTRY_ENTRY: {
       credentialKind: "PROVIDER_DEFINED" as const,
       executionModes: Object.freeze(["SANDBOX" as const]),
       summary:
-        "Onboard sellers as Stripe Connect accounts (Account Links hosted onboarding). Requires platform credentials and a webhook endpoint that do not exist in this deployment — the exact missing configuration is stated, never simulated.",
+        "Onboard sellers as Stripe Connect connected accounts (Account Links hosted onboarding). The lifecycle machinery (controller-properties account creation, hosted onboarding links, capability and requirements observations, connected-account webhooks, charge/transfer/payout topology with merchant-of-record and liability gates) is key-ready; the form stays UNCONFIGURED until the operator credentials, model and liability decisions, and webhook endpoint arrive — the exact missing configuration is stated, never simulated.",
     }),
   ]),
 });

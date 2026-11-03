@@ -35,6 +35,7 @@ import {
 } from "../connectionsActivationPins.js";
 import { sharedConnectionsActivationPlane } from "../connectionsActivationShared.js";
 import { STELLAR_RAIL, StellarRailActivationCard } from "./StellarRailActivationCard.js";
+import { PaystackAfricaCollectionCard } from "./PaystackAfricaCollectionCard.js";
 
 /** One provider's activation card view-state (no key material — ever). */
 interface ProviderActivationState {
@@ -424,6 +425,19 @@ export function ConnectionsActivationPanel(): React.ReactElement | null {
           </Card>
         );
       })}
+      {/* (P27-C) The Paystack Africa journeys card — the collection
+          declaration, the recipient K3/K4 gate note and the Africa Extended
+          Network onboarding links. Its one action seeds the SAME Paystack
+          own-store test-mode connection journey (zero financial authority;
+          the onboarding links are external anchors). */}
+      <PaystackAfricaCollectionCard
+        onSeedConnection={() => {
+          const paystackDescriptor = PROVIDERS.find((provider) => provider.id === "paystack");
+          if (paystackDescriptor !== undefined) {
+            void seed(paystackDescriptor);
+          }
+        }}
+      />
       {/* (P22-B) The Stellar testnet onchain-rail card — the keypair wallet
           (the extracted component; a port without the rail members renders
           the honest unavailable note, never a simulated activation). */}

@@ -5,22 +5,22 @@
   "mode": "strict",
   "root": ".",
   "summary": {
-    "packages_checked": 57,
-    "packages_mapped": 57,
+    "packages_checked": 58,
+    "packages_mapped": 58,
     "packages_unmapped": 0,
-    "import_edges": 110,
+    "import_edges": 112,
     "layer_rules": 10,
-    "violations_total": 49,
+    "violations_total": 53,
     "violations_by_severity": {
-      "error": 49,
+      "error": 53,
       "warn": 0
     },
     "violations_by_rule": {
-      "R3-not-in-may-depend-on": 23,
+      "R3-not-in-may-depend-on": 25,
       "R4-cycle": 1,
-      "R6-cross-package-relative": 25
+      "R6-cross-package-relative": 27
     },
-    "unresolved_external_specifiers": 364
+    "unresolved_external_specifiers": 378
   },
   "packages": [
     {
@@ -558,7 +558,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 5
+          "occurrences": 7
         },
         {
           "source": "packages/execution-graph",
@@ -566,7 +566,7 @@
         },
         {
           "source": "packages/route-planning",
-          "occurrences": 14
+          "occurrences": 15
         }
       ],
       "dependency_layers": [
@@ -637,7 +637,7 @@
       "dependencies": [
         {
           "target": "packages/capability",
-          "occurrences": 5
+          "occurrences": 7
         },
         {
           "target": "packages/client",
@@ -653,7 +653,11 @@
         },
         {
           "target": "packages/merchant",
-          "occurrences": 1
+          "occurrences": 4
+        },
+        {
+          "target": "packages/node-network",
+          "occurrences": 2
         },
         {
           "target": "packages/onchain-adapters",
@@ -673,7 +677,7 @@
         },
         {
           "target": "packages/provider-runtime",
-          "occurrences": 27
+          "occurrences": 51
         },
         {
           "target": "packages/route-compiler",
@@ -681,7 +685,7 @@
         },
         {
           "target": "packages/route-planning",
-          "occurrences": 23
+          "occurrences": 26
         },
         {
           "target": "packages/rpc",
@@ -715,7 +719,7 @@
       "dependents": [
         {
           "source": "packages/payswap-app",
-          "occurrences": 1
+          "occurrences": 2
         }
       ],
       "dependency_layers": [
@@ -833,7 +837,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 1
+          "occurrences": 4
         }
       ],
       "dependency_layers": []
@@ -852,6 +856,24 @@
         {
           "source": "packages/shared",
           "occurrences": 1
+        }
+      ],
+      "dependency_layers": []
+    },
+    {
+      "dir": "packages/node-network",
+      "name": "@payswap/node-network",
+      "declared_layer": "intelligence",
+      "status": "FAIL",
+      "dependencies": [],
+      "dependents": [
+        {
+          "source": "packages/desktop",
+          "occurrences": 2
+        },
+        {
+          "source": "packages/route-planning",
+          "occurrences": 2
         }
       ],
       "dependency_layers": []
@@ -954,7 +976,7 @@
       "dependencies": [
         {
           "target": "packages/desktop",
-          "occurrences": 1
+          "occurrences": 2
         },
         {
           "target": "packages/lab",
@@ -990,7 +1012,7 @@
         },
         {
           "target": "packages/ui",
-          "occurrences": 36
+          "occurrences": 38
         }
       ],
       "dependents": [
@@ -1112,7 +1134,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 27
+          "occurrences": 51
         },
         {
           "source": "packages/payswap-app",
@@ -1147,7 +1169,7 @@
       "dependencies": [
         {
           "target": "packages/capability",
-          "occurrences": 14
+          "occurrences": 15
         },
         {
           "target": "packages/economic",
@@ -1156,6 +1178,10 @@
         {
           "target": "packages/lab",
           "occurrences": 13
+        },
+        {
+          "target": "packages/node-network",
+          "occurrences": 2
         },
         {
           "target": "packages/opportunities",
@@ -1169,7 +1195,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 23
+          "occurrences": 26
         },
         {
           "source": "packages/payswap-app",
@@ -1455,7 +1481,7 @@
         },
         {
           "source": "packages/payswap-app",
-          "occurrences": 36
+          "occurrences": 38
         },
         {
           "source": "packages/web",
@@ -1737,6 +1763,34 @@
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/capability",
           "specifier": "@payswap/capability",
+          "file": "packages/desktop/src/renderer/src/routePlanningNodeNetwork.ts",
+          "line": 59,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/desktop/src/renderer/src/routePlanningNodeNetwork.ts",
+          "line": 60,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
           "file": "packages/desktop/test/payswap/chain-from-bridge.test.ts",
           "line": 55,
           "kind": "import",
@@ -1864,6 +1918,34 @@
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/merchant",
+          "specifier": "../../../../../merchant/src/kes-receiving.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 47,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../../../merchant/src/errors.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 48,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/errors.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
           "specifier": "../../../merchant/src/kes-receiving.js",
           "file": "packages/desktop/test/payswap/corridor-pin-mirrors.test.ts",
           "line": 51,
@@ -1871,6 +1953,58 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../merchant/src/kes-receiving.js",
+          "file": "packages/desktop/test/payswap/paystack-africa-composition.test.ts",
+          "line": 29,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/node-network",
+      "detail": "layer \"platform\" -> layer \"intelligence\" is not in may_depend_on [contracts, platform]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../../../../node-network/src/saga.ts",
+          "file": "packages/desktop/src/host/payswap/payments/saga-composite-binding.ts",
+          "line": 53,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/saga.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../../node-network/src/saga.ts",
+          "file": "packages/desktop/test/payswap/saga-composite-binding.test.ts",
+          "line": 45,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/saga.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -2226,6 +2360,174 @@
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/paystack/recipient-facts.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/paystack/recipient-facts.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/oauth-state.js",
+          "file": "packages/desktop/src/host/payswap/stripe/connect-u2-flow.ts",
+          "line": 34,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/oauth-state.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/oauth-token-exchange.js",
+          "file": "packages/desktop/src/host/payswap/stripe/connect-u2-flow.ts",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/oauth-token-exchange.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/oauth-state.js",
+          "file": "packages/desktop/src/host/payswap/stripe/connect-u2-flow.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/oauth-state.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/errors.js",
+          "file": "packages/desktop/src/host/payswap/stripe/connect-u2-flow.ts",
+          "line": 43,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/errors.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-entitlements.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/transport/catalogue-transport.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/transport/catalogue-transport.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/transport/call-context.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 43,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/transport/call-context.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-journey.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 44,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-journey.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 45,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 50,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-journey.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 58,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-journey.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
           "specifier": "../../../../../provider-runtime/src/index.js",
           "file": "packages/desktop/src/host/payswap/stripe/stripe-plane-adapters.ts",
           "line": 41,
@@ -2310,13 +2612,13 @@
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/corridor-pin-mirrors.test.ts",
-          "line": 53,
+          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/census.ts",
+          "file": "packages/desktop/test/payswap/connect-account-lifecycle.test.ts",
+          "line": 27,
           "kind": "import",
           "typeOnly": false,
           "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/census.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -2324,187 +2626,19 @@
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/p21-transport-probe-mirrors.test.ts",
-          "line": 34,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/p21-transport-probe-mirrors.test.ts",
-          "line": 195,
-          "kind": "dynamic-import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/p21-transport-probe-mirrors.test.ts",
-          "line": 196,
-          "kind": "dynamic-import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/p21-transport-probe-mirrors.test.ts",
-          "line": 201,
-          "kind": "dynamic-import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/payment-execution-kernel.test.ts",
-          "line": 54,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/payment-webhook-feed.test.ts",
-          "line": 13,
-          "kind": "import",
-          "typeOnly": true,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/webhook-verification.ts",
-          "file": "packages/desktop/test/payswap/payment-webhook-feed.test.ts",
+          "specifier": "../../../provider-runtime/src/adapters/stripe/declaration.ts",
+          "file": "packages/desktop/test/payswap/connect-connection-views.test.ts",
           "line": 17,
           "kind": "import",
           "typeOnly": false,
           "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/webhook-verification.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/payment-provider-registry.ts",
-          "file": "packages/desktop/test/payswap/provider-registry-mirror.test.ts",
-          "line": 3,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/payment-provider-registry.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/stripe-event-plane.test.ts",
-          "line": 31,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/stripe-p241-wiring-adapters.ts",
-          "line": 36,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/schema-reader.js",
-          "file": "packages/desktop/test/payswap/stripe-p241-wiring-adapters.ts",
-          "line": 37,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/schema-reader.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/schema-validator.js",
-          "file": "packages/desktop/test/payswap/stripe-p241-wiring-adapters.ts",
-          "line": 38,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/schema-validator.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/implemented-operations.js",
-          "file": "packages/desktop/test/payswap/stripe-p241-wiring-adapters.ts",
-          "line": 39,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/implemented-operations.ts",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/declaration.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
         }
       ],
-      "occurrences_total": 27,
+      "occurrences_total": 51,
       "occurrences_capped": true
     },
     {
@@ -2724,6 +2858,20 @@
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/route-planning",
           "specifier": "@payswap/route-planning",
+          "file": "packages/desktop/src/renderer/src/routePlanningNodeNetwork.ts",
+          "line": 58,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/route-planning/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-planning",
+          "specifier": "@payswap/route-planning",
           "file": "packages/desktop/test/payswap/chain-from-bridge.test.ts",
           "line": 56,
           "kind": "import",
@@ -2744,6 +2892,34 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/route-planning/src/pins/corridor.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-planning",
+          "specifier": "@payswap/route-planning",
+          "file": "packages/desktop/test/payswap/node-network-composition.test.ts",
+          "line": 36,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/route-planning/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/node-network-fixtures.ts",
+          "file": "packages/desktop/test/payswap/node-network-composition.test.ts",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/node-network-fixtures.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -2873,51 +3049,9 @@
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/route-planning",
-          "specifier": "../../../route-planning/test/fixtures.ts",
-          "file": "packages/desktop/test/payswap/p23-no-bypass.test.ts",
-          "line": 62,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/route-planning/test/fixtures.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/route-planning",
-          "specifier": "@payswap/route-planning",
-          "file": "packages/desktop/test/payswap/p23-opportunity-emergence.test.ts",
-          "line": 11,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "workspace",
-          "targetFile": "packages/route-planning/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": false
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/route-planning",
-          "specifier": "../../../route-planning/test/no-route-fixtures.ts",
-          "file": "packages/desktop/test/payswap/p23-opportunity-emergence.test.ts",
-          "line": 19,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/route-planning/test/no-route-fixtures.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
         }
       ],
-      "occurrences_total": 23,
+      "occurrences_total": 26,
       "occurrences_capped": true
     },
     {
@@ -4463,6 +4597,44 @@
       "rule": "R3-not-in-may-depend-on",
       "severity": "error",
       "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/node-network",
+      "detail": "layer \"intelligence\" -> layer \"intelligence\" is not in may_depend_on [economic, capability, contracts]",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../node-network/src/classification.ts",
+          "file": "packages/route-planning/test/node-network-pins.test.ts",
+          "line": 8,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/classification.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../node-network/src/enrollment.ts",
+          "file": "packages/route-planning/test/node-network-pins.test.ts",
+          "line": 9,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/enrollment.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R3-not-in-may-depend-on",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
       "targetPkg": "packages/route-compiler",
       "detail": "layer \"intelligence\" -> layer \"intelligence\" is not in may_depend_on [economic, capability, contracts]",
       "occurrences": [
@@ -4629,8 +4801,36 @@
       "severity": "error",
       "sourcePkg": "packages/desktop",
       "targetPkg": "packages/merchant",
-      "detail": "1 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "4 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../../../merchant/src/kes-receiving.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 47,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../../../merchant/src/errors.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 48,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/errors.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/merchant",
@@ -4641,6 +4841,58 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/merchant",
+          "specifier": "../../../merchant/src/kes-receiving.js",
+          "file": "packages/desktop/test/payswap/paystack-africa-composition.test.ts",
+          "line": 29,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/merchant/src/kes-receiving.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/desktop",
+      "targetPkg": "packages/node-network",
+      "detail": "2 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../../../../node-network/src/saga.ts",
+          "file": "packages/desktop/src/host/payswap/payments/saga-composite-binding.ts",
+          "line": 53,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/saga.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../../node-network/src/saga.ts",
+          "file": "packages/desktop/test/payswap/saga-composite-binding.test.ts",
+          "line": 45,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/saga.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -4945,8 +5197,176 @@
       "severity": "error",
       "sourcePkg": "packages/desktop",
       "targetPkg": "packages/provider-runtime",
-      "detail": "27 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "51 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/paystack/recipient-facts.js",
+          "file": "packages/desktop/src/host/payswap/connections/paystack-africa-composition.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/paystack/recipient-facts.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/oauth-state.js",
+          "file": "packages/desktop/src/host/payswap/stripe/connect-u2-flow.ts",
+          "line": 34,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/oauth-state.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/oauth-token-exchange.js",
+          "file": "packages/desktop/src/host/payswap/stripe/connect-u2-flow.ts",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/oauth-token-exchange.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/oauth-state.js",
+          "file": "packages/desktop/src/host/payswap/stripe/connect-u2-flow.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/oauth-state.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/errors.js",
+          "file": "packages/desktop/src/host/payswap/stripe/connect-u2-flow.ts",
+          "line": 43,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/errors.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-entitlements.ts",
+          "line": 23,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/transport/catalogue-transport.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 42,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/transport/catalogue-transport.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/transport/call-context.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 43,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/transport/call-context.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-journey.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 44,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-journey.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 45,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 50,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-eligibility.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/provider-runtime",
+          "specifier": "../../../../../provider-runtime/src/adapters/stripe/catalogue/payouts-journey.js",
+          "file": "packages/desktop/src/host/payswap/stripe/payouts-plane-composition.ts",
+          "line": 58,
+          "kind": "import",
+          "typeOnly": true,
+          "classification": "relative",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/payouts-journey.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/provider-runtime",
@@ -5034,13 +5454,13 @@
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/corridor-pin-mirrors.test.ts",
-          "line": 53,
+          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/census.ts",
+          "file": "packages/desktop/test/payswap/connect-account-lifecycle.test.ts",
+          "line": 27,
           "kind": "import",
           "typeOnly": false,
           "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/census.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -5048,187 +5468,19 @@
         {
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/p21-transport-probe-mirrors.test.ts",
-          "line": 34,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/p21-transport-probe-mirrors.test.ts",
-          "line": 195,
-          "kind": "dynamic-import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/p21-transport-probe-mirrors.test.ts",
-          "line": 196,
-          "kind": "dynamic-import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/p21-transport-probe-mirrors.test.ts",
-          "line": 201,
-          "kind": "dynamic-import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/payment-execution-kernel.test.ts",
-          "line": 54,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/payment-webhook-feed.test.ts",
-          "line": 13,
-          "kind": "import",
-          "typeOnly": true,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/webhook-verification.ts",
-          "file": "packages/desktop/test/payswap/payment-webhook-feed.test.ts",
+          "specifier": "../../../provider-runtime/src/adapters/stripe/declaration.ts",
+          "file": "packages/desktop/test/payswap/connect-connection-views.test.ts",
           "line": 17,
           "kind": "import",
           "typeOnly": false,
           "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/webhook-verification.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/payment-provider-registry.ts",
-          "file": "packages/desktop/test/payswap/provider-registry-mirror.test.ts",
-          "line": 3,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/payment-provider-registry.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/stripe-event-plane.test.ts",
-          "line": 31,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/index.js",
-          "file": "packages/desktop/test/payswap/stripe-p241-wiring-adapters.ts",
-          "line": 36,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/schema-reader.js",
-          "file": "packages/desktop/test/payswap/stripe-p241-wiring-adapters.ts",
-          "line": 37,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/schema-reader.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/schema-validator.js",
-          "file": "packages/desktop/test/payswap/stripe-p241-wiring-adapters.ts",
-          "line": 38,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/schema-validator.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/provider-runtime",
-          "specifier": "../../../provider-runtime/src/adapters/stripe/catalogue/implemented-operations.js",
-          "file": "packages/desktop/test/payswap/stripe-p241-wiring-adapters.ts",
-          "line": 39,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/provider-runtime/src/adapters/stripe/catalogue/implemented-operations.ts",
+          "targetFile": "packages/provider-runtime/src/adapters/stripe/declaration.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
         }
       ],
-      "occurrences_total": 27,
+      "occurrences_total": 51,
       "occurrences_capped": true
     },
     {
@@ -5316,7 +5568,7 @@
       "severity": "error",
       "sourcePkg": "packages/desktop",
       "targetPkg": "packages/route-planning",
-      "detail": "10 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "11 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
         {
           "sourcePkg": "packages/desktop",
@@ -5328,6 +5580,20 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/route-planning/src/pins/corridor.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/node-network-fixtures.ts",
+          "file": "packages/desktop/test/payswap/node-network-composition.test.ts",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/node-network-fixtures.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -5490,7 +5756,7 @@
       "severity": "error",
       "sourcePkg": "packages/payswap-app",
       "targetPkg": "packages/desktop",
-      "detail": "1 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "2 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
         {
           "sourcePkg": "packages/payswap-app",
@@ -5502,6 +5768,20 @@
           "typeOnly": true,
           "classification": "relative",
           "targetFile": "packages/desktop/src/host/payswap/stripe/prepared-action-contracts.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/payswap-app",
+          "targetPkg": "packages/desktop",
+          "specifier": "../../../desktop/src/host/payswap/connections/connect-connection-views.js",
+          "file": "packages/payswap-app/test/payswap/connect-form-pins-mirror.test.ts",
+          "line": 20,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/desktop/src/host/payswap/connections/connect-connection-views.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -6575,7 +6855,7 @@
       "severity": "error",
       "sourcePkg": "packages/route-planning",
       "targetPkg": "packages/capability",
-      "detail": "14 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "15 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
         {
           "sourcePkg": "packages/route-planning",
@@ -6699,6 +6979,20 @@
           "typeOnly": true,
           "classification": "relative",
           "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/capability",
+          "specifier": "../../capability/src/node-offer.ts",
+          "file": "packages/route-planning/test/node-network-pins.test.ts",
+          "line": 14,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/capability/src/node-offer.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -7013,6 +7307,44 @@
           "typeOnly": true,
           "classification": "relative",
           "targetFile": "packages/lab/src/interventions.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        }
+      ],
+      "occurrences_capped": false
+    },
+    {
+      "rule": "R6-cross-package-relative",
+      "severity": "error",
+      "sourcePkg": "packages/route-planning",
+      "targetPkg": "packages/node-network",
+      "detail": "2 relative/alias import(s) cross the package boundary instead of using the package name",
+      "occurrences": [
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../node-network/src/classification.ts",
+          "file": "packages/route-planning/test/node-network-pins.test.ts",
+          "line": 8,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/classification.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/route-planning",
+          "targetPkg": "packages/node-network",
+          "specifier": "../../node-network/src/enrollment.ts",
+          "file": "packages/route-planning/test/node-network-pins.test.ts",
+          "line": 9,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/node-network/src/enrollment.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -7393,6 +7725,41 @@
       "line": 38
     },
     {
+      "file": "packages/desktop/test/payswap/connect-account-lifecycle.test.ts",
+      "specifier": "vitest",
+      "line": 26
+    },
+    {
+      "file": "packages/desktop/test/payswap/connect-connection-views.test.ts",
+      "specifier": "vitest",
+      "line": 16
+    },
+    {
+      "file": "packages/desktop/test/payswap/connect-plane-composition.test.ts",
+      "specifier": "vitest",
+      "line": 15
+    },
+    {
+      "file": "packages/desktop/test/payswap/connect-platform-gates.test.ts",
+      "specifier": "vitest",
+      "line": 18
+    },
+    {
+      "file": "packages/desktop/test/payswap/connect-topology.test.ts",
+      "specifier": "vitest",
+      "line": 21
+    },
+    {
+      "file": "packages/desktop/test/payswap/connect-u2-flow.test.ts",
+      "specifier": "vitest",
+      "line": 21
+    },
+    {
+      "file": "packages/desktop/test/payswap/connect-webhook-events.test.ts",
+      "specifier": "vitest",
+      "line": 25
+    },
+    {
       "file": "packages/desktop/test/payswap/connections-activation-composition.test.ts",
       "specifier": "vitest",
       "line": 22
@@ -7478,6 +7845,11 @@
       "line": 7
     },
     {
+      "file": "packages/desktop/test/payswap/node-network-composition.test.ts",
+      "specifier": "vitest",
+      "line": 22
+    },
+    {
       "file": "packages/desktop/test/payswap/onchain-corridor-chain.test.ts",
       "specifier": "vitest",
       "line": 28
@@ -7531,46 +7903,6 @@
       "file": "packages/desktop/test/payswap/p23-cdp-seeder.test.ts",
       "specifier": "vitest",
       "line": 29
-    },
-    {
-      "file": "packages/desktop/test/payswap/p23-journey-emergence.test.ts",
-      "specifier": "vitest",
-      "line": 39
-    },
-    {
-      "file": "packages/desktop/test/payswap/p23-no-bypass.test.ts",
-      "specifier": "vitest",
-      "line": 35
-    },
-    {
-      "file": "packages/desktop/test/payswap/p23-opportunity-emergence.test.ts",
-      "specifier": "vitest",
-      "line": 1
-    },
-    {
-      "file": "packages/desktop/test/payswap/p23-rpc-bigint-wire.test.ts",
-      "specifier": "vitest",
-      "line": 18
-    },
-    {
-      "file": "packages/desktop/test/payswap/packaging-identity.test.ts",
-      "specifier": "vitest",
-      "line": 18
-    },
-    {
-      "file": "packages/desktop/test/payswap/payment-approval-plane-harness.ts",
-      "specifier": "vitest",
-      "line": 16
-    },
-    {
-      "file": "packages/desktop/test/payswap/payment-approval-plane.test.ts",
-      "specifier": "vitest",
-      "line": 38
-    },
-    {
-      "file": "packages/desktop/test/payswap/payment-corridor-dispatch.test.ts",
-      "specifier": "vitest",
-      "line": 31
     }
   ],
   "example_hints_without_packages": [

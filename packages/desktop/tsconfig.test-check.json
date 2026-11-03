@@ -17,6 +17,8 @@
   "include": [
     "src/host/payswap",
     "../provider-runtime/src",
+    "../node-network/src",
+    "../merchant/src",
     "test/payswap/payment-approval-plane.test.ts",
     "test/payswap/payment-approval-plane-harness.ts",
     "test/payswap/payment-dispatch-plane.test.ts",
@@ -37,6 +39,17 @@
     "test/payswap/connections-stellar-plane.test.ts",
     "test/payswap/payment-corridor-kernels.test.ts",
     "test/payswap/payment-corridor-dispatch.test.ts",
-    "test/payswap/onchain-corridor-chain.test.ts"
+    "test/payswap/saga-composite-binding.test.ts",
+    "test/payswap/onchain-corridor-chain.test.ts",
+    "test/payswap/connect-platform-gates.test.ts",
+    "test/payswap/connect-u2-flow.test.ts",
+    "test/payswap/connect-account-lifecycle.test.ts",
+    "test/payswap/connect-webhook-events.test.ts",
+    "test/payswap/connect-topology.test.ts",
+    "test/payswap/connect-connection-views.test.ts",
+    "test/payswap/p27c-paystack-endpoint-mirror.test.ts",
+    "test/payswap/connect-plane-composition.test.ts",
+    "test/payswap/payouts-plane-composition.test.ts",
+    "test/payswap/paystack-africa-composition.test.ts"
   ]
 }

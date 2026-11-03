@@ -61,16 +61,34 @@ export class MissingStripePlatformConfigurationError extends ProviderRuntimeErro
   }
 }
 
-/** The exact missing operator configuration for U2 (ADR-0007 D1). */
+/**
+ * The exact missing operator configuration for U2 (ADR-0007 D1 + the
+ * P27-A machinery, key-ready). Mapped 1:1 to the operator run card §B
+ * (docs/productization-evidence/P27-OPERATOR-RUN-CARD-2026-11-03.md):
+ * §B.1 the platform application, §B.3 the registered redirect URL, §B.4
+ * the secret-channel delivery, §B.5 the business-model approval.
+ */
 export const STRIPE_U2_MISSING_OPERATOR_CONFIGURATION: readonly string[] = Object.freeze([
-  'Stripe platform client_id (a registered Stripe platform application owned by the operator)',
-  'Stripe platform client_secret (delivered to the host through the operator secret channel, never chat)',
+  'STRIPE_PLATFORM_CLIENT_ID — the OAuth client_id of a Stripe platform application registered by the operator (run card §B.1)',
+  'STRIPE_PLATFORM_CLIENT_SECRET — the platform secret key (the OAuth client_secret), delivered to the host through the operator secret channel, never chat (run card §B.1 and §B.4)',
+  'The exact redirect/callback URL registered with the Stripe platform application (run card §B.3)',
+  "Stripe's written approval of PaySwap's disclosed actual business model (run card §B.5)",
 ]);
 
-/** The exact missing operator configuration for U3 (ADR-0007 D1). */
+/**
+ * The exact missing operator configuration for U3 (ADR-0007 D1 + the
+ * P27-A machinery, key-ready). Mapped 1:1 to the operator run card §B:
+ * §B.1/§B.4 the platform credentials, §B.2 the decided account model +
+ * charge model + platform country + liability model, §B.3 the registered
+ * connected-account webhook endpoint + signing secret, §B.5 the
+ * business-model approval.
+ */
 export const STRIPE_U3_MISSING_OPERATOR_CONFIGURATION: readonly string[] = Object.freeze([
-  'Stripe platform credentials (client_id + client_secret for the Connect platform)',
-  'A webhook endpoint registered with Stripe for connected-account events, delivered to the operator-run PaySwap backend',
+  'STRIPE_PLATFORM_CLIENT_ID + STRIPE_PLATFORM_CLIENT_SECRET — the Stripe Connect platform credentials (run card §B.1 and §B.4)',
+  'STRIPE_CONNECT_WEBHOOK_SECRET — the signing secret of a publicly reachable webhook endpoint registered with Stripe for connected-account events (run card §B.3 and §B.4)',
+  'The operator-decided Connect account model — the onboarding configuration, service agreement (full or recipient) and controller settings, approved with Stripe for the actual business model (run card §B.2)',
+  'The operator-decided charge model (direct / destination / separate charges and transfers), platform country, and merchant-of-record + dispute/refund liability assignment (run card §B.2)',
+  "Stripe's written approval of PaySwap's disclosed actual business model (run card §B.5)",
 ]);
 
 /**

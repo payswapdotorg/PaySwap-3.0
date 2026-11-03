@@ -42,70 +42,91 @@
     {
       "id": "P27-A",
       "owner": "worker-1",
-      "status": "ACTIVE",
-      "dispatched_at": "2026-11-03",
-      "depends_on": ["P27-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P27-0"
+      ],
       "file_ownership": "provider-runtime/src/adapters/stripe/{declaration.ts (U2/U3 rows), oauth-state.ts} + NEW provider-runtime/src/adapters/stripe/connect-*.ts + desktop/src/host/payswap/connections/ stripe U2/U3 members + desktop/src/host/payswap/stripe/ connect growth + the payswap-app U2/U3 surfaces + their tests. The shared files (execution-lane-composition.ts, capability-bridge.ts, probe-contracts.ts) belong to P27-E.",
       "lane_scope": [
         "Stripe U2 delegated OAuth and U3 Connect platform/connected-account setup using current Stripe APIs, system-browser auth, host-side secrets, verified account identity, hosted onboarding, capability requirements, webhooks, account context, actions and reconciliation.",
         "Stripe Connect charge/transfer/payout models with platform, seller, merchant-of-record, refund/dispute and liability semantics explicitly reviewed against ADR-0020 D4 (no Connect-is-P2P; INV-30).",
         "The account-link/session operations dispatch at the existing REAUTH tier (ADR-0018) for onboarding flows.",
         "Sandbox end-to-end tests (key-ready, exit 2 without operator credentials); LIVE remains refused under INV-25."
-      ]
+      ],
+      "accepted_at": "2026-11-03T20:44:00Z",
+      "acceptance_commit": "672cb9e",
+      "recovery_note": "The 12:15Z dispatch was killed mid-flight; its local commit b0c27bb + seven uncommitted U3 host files were adopted and completed by the re-dispatch. Worker-claimed batteries verified by the TL merged-tree run."
     },
     {
       "id": "P27-B",
       "owner": "worker-2",
-      "status": "ACTIVE",
-      "dispatched_at": "2026-11-03",
-      "depends_on": ["P27-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P27-0"
+      ],
       "file_ownership": "NEW provider-runtime/src/adapters/stripe/catalogue/payouts-*.ts + the Global-Payouts recipient/product files + the capability definitions for the product slice + scripts/p27/ payouts harness. Disjoint from P27-A's oauth/connect files inside adapters/stripe/ (ADR-0020 D12).",
       "lane_scope": [
         "Dedicated Stripe Global Payouts product and entitlement slice; do not alias ordinary Stripe payouts or Connect transfers (ADR-0020 D4).",
         "Treasury/financial-account prerequisites, recipient creation and hosted forms, third-party payout execution, country/method/amount/FX/fee eligibility, events, status retrieval and reconciliation.",
         "Fail closed unless eligible origin country (GA UK/US per the 2026-11-03 research; private preview otherwise), product entitlement, funding and required licences/Stripe approvals are proven; the Ghana corridor stays a conditional opportunity (K1: H2 27 on the dated page).",
         "Key-ready harness with exit-2 law; every country/method fact encoded only after live-doc re-verification (ADR-0020 D10)."
-      ]
+      ],
+      "accepted_at": "2026-11-03T20:50:00Z",
+      "acceptance_commit": "f842a9e"
     },
     {
       "id": "P27-C",
       "owner": "worker-3",
-      "status": "ACTIVE",
-      "dispatched_at": "2026-11-03",
-      "depends_on": ["P27-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P27-0"
+      ],
       "file_ownership": "provider-runtime/src/adapters/paystack/** (recipient/collect/webhook/transfer growth) + packages/merchant/src/kes-receiving.ts + the Paystack app surfaces. The route-planning corridor pins belong to P27-E.",
       "lane_scope": [
         "Paystack Africa connection and local collection/recipient/payout vertical slices: Ghana bank and mobile-money, Kenya, Nigeria and South Africa ONLY where live-doc re-verification (K3/K4 — the docs were unreachable at the P27-0 station) and the actual account entitlements confirm support.",
         "Recipient types encoded as dated evidence observations (ghipss/mobile_money/nuban/basa/kepss per the re-verified docs; the Bank-of-Ghana exclusion), recipient validation, transfer OTP/finalize wiring in the product lane, webhook verification, transfer read-back, idempotency and reconciliation.",
         "The Africa Extended Network → Paystack onboarding links (the verified paystack.com/stripe/* URLs) and local business connection journeys.",
         "Re-audit Flutterwave and MTN MoMo; implement only capability slices with real valid credentials and provider evidence (Flutterwave stays read-only until its own ADR amendment)."
-      ]
+      ],
+      "accepted_at": "2026-11-03T20:50:00Z",
+      "acceptance_commit": "3a586c0 (5012e12 + 3a586c0)"
     },
     {
       "id": "P27-D",
       "owner": "worker-4",
-      "status": "ACTIVE",
-      "dispatched_at": "2026-11-03 (behind the station's 3-concurrent-worker bound; starts when the first slot frees)",
-      "depends_on": ["P27-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P27-0"
+      ],
       "file_ownership": "NEW packages/node-network/ (intelligence layer; pins/ports per ADR-0009 D2) + capability/src/node-*.ts (the offer chain) + route-planning/src/{ports.ts, pins/capability.ts, search-budget.ts, hard-gates.ts} extensions + route-compiler/src/shapes.ts growth (one new shape, ADR-gated). The desktop composite-act files extend only if P27-E decides the P22 artifact cannot express per-leg scoped approvals (ADR-0020 D7).",
       "lane_scope": [
         "Multi-node identity/enrollment, signed and expiring capability offers bound to accountable legal principals and real ACTIVE provider connected instances (ADR-0020 D5; a self-asserted node list is a discovery input, never provider evidence).",
         "Bounded graph search over typed provider-operation edges; compare direct/native, composed and multi-node paths after hard policy/country/method/funding/purpose gates (ADR-0020 D6; INV-30 at the eligibility gates).",
         "Multi-leg saga orchestration with one immutable route digest and separate per-leg authorization, idempotency, evidence and reconciliation (ADR-0020 D7; UNKNOWN stops dependents, INV-04); privacy minimization, revocation, retries and documented compensation.",
         "The no-bypass battery: typed refusals for relabeled P2P, pass-through merchant routing, purpose/party concealment, split/chain evasion (INV-30's enforcement path)."
-      ]
+      ],
+      "accepted_at": "2026-11-03T20:50:00Z",
+      "acceptance_commit": "1cfe94b",
+      "recovery_note": "This dispatch resumed its killed sibling's four already-pushed commits (adopted and verified before completing)."
     },
     {
       "id": "P27-E",
       "owner": "resident-TL",
-      "status": "BLOCKED",
-      "depends_on": ["P27-A", "P27-B", "P27-C", "P27-D"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P27-A",
+        "P27-B",
+        "P27-C",
+        "P27-D"
+      ],
       "lane_scope": [
         "Merged-tree integration, exact-package tests, the scoped tsc trio, architecture, lint, CI, route and desktop/web integration journeys.",
         "Real Sandbox evidence where credentials and product entitlements are supplied; no fixture promotion and no live activation.",
         "The shared-file integrations: execution-lane-composition.ts, connections/capability-bridge.ts, connections/probe-contracts.ts, route-planning/src/pins/corridor.ts, MODULE-OWNERSHIP.yaml.",
         "Update FEATURE-MAP, JOURNEY-MAP, current-state, acceptance record, work-orders catalog and evidence bundle; record all operator-gated and product-preview limitations."
-      ]
+      ],
+      "accepted_at": "2026-11-03T22:30:00Z",
+      "acceptance_commit": "the closure commit (the merges 90ae93f/217712e/28bb392/b7257c2 + stage 1 2c64b47 + the seams 83e0470/c8c5382/fb0c533/5baeaf0/e1a9401/0ff8de7)"
     }
   ],
   "frontier_after_registration": [
@@ -115,5 +136,20 @@
     "P27-D"
   ],
   "closure_policy": "P27 cannot close on operation counts or synthetic route compilation alone. Each enabled journey must have current product/country eligibility, account entitlement and provider-evidenced capabilities; real Sandbox end-to-end state change/read-back where available; no secret leakage; per-leg approvals and reconciliation; and honest exclusions for every unsupported or operator-gated corridor. Any LIVE launch requires a separate operator order, completion of ADR-0019 activation prerequisites and independent live certification.",
-  "wave_status": "ACCEPTED AND IN FLIGHT — P27-0 complete (ADR-0020 + INV-30 + the capability matrix + the operator run card + the P26 catalog reconciliation + the batteries re-run EXACT + three station catches fixed); P27-A/B/C/D dispatched file-disjoint; P27-E waits on all four. No Stripe platform, Connect or Global Payouts account has been configured by repository changes; the real runs are the operator's standing actions (the run card is the interface)."
+  "wave_status": "CLOSED (2026-11-03) — all five lanes landed and accepted: P27-A @ 672cb9e (recovered), P27-B @ f842a9e, P27-C @ 3a586c0, P27-D @ 1cfe94b (resumed), P27-E the TL closure (the four-branch merge B→C→A→D + the shared-file integrations + the five composition seams + the merged-tree batteries + this closure). The TL's own merged-tree run: provider-runtime 46f/680t+6sk · desktop 92f+2sk/839t+2sk + tsc trio 0/0/0 · payswap-app 69f/800t · capability 255t · route-planning 362t · node-network 94t · merchant 365t · the untouched trio EXACT 375/325/279 · hermetic tsc 0 · architecture 0/0 · oxlint 0 errors · invariants pass · governance 28/28 · ownership 53 (0 new) · all four harnesses exit 2 without credentials. No external account was configured by any repository change; the run card §A–§E is the operator's interface.",
+  "closure": {
+    "closed_at": "2026-11-03T22:30:00Z",
+    "commits": [
+      "81d986c (P27-0, merged 6c0aef7 via PR #8)",
+      "f842a9e (P27-B)",
+      "5012e12 + 3a586c0 (P27-C)",
+      "672cb9e (P27-A — recovered b0c27bb + the uncommitted files)",
+      "1cfe94b (P27-D — resumed its sibling's four commits)",
+      "90ae93f + 217712e + 28bb392 + b7257c2 (the P27-E merges B→C→A→D)",
+      "2c64b47 + 83e0470 + c8c5382 + fb0c533 + 5baeaf0 + e1a9401 + 0ff8de7 (stage 1 + the six seams)",
+      "the closure commit (P27-E)"
+    ],
+    "gates": "provider-runtime 46f/680t+6sk · desktop tsc 0/0/0 + 92f+2sk/839t+2sk · payswap-app 69f/800t · capability 20f/255t · route-planning 31f/362t · node-network 9 suites/94t · merchant 26f/365t · route-compiler 375t · opportunities 325t · protocol 279t · provider-runtime hermetic tsc 0 · architecture 0/0 · oxlint 0 errors/384 warnings · invariants pass · governance 28/28 · ownership 53 (0 new) · harnesses exit-2 ×4 · a1 wiring dry-run 0 (5 GREEN + 2 SKIPPED)",
+    "acceptance_record": "docs/productization-evidence/P27-ACCEPTANCE-RECORD-2026-11-03.md"
+  }
 }

@@ -58,7 +58,10 @@ const realFetchBinding: StripeCatalogueFetch = async (url, init) => {
   return { status: response.status, headers, text: () => response.text() };
 };
 
-const transport = new StripeCatalogueTransport(realFetchBinding);
+// P27-E fix (2026-11-03): the constructor takes an options object ({ fetchImpl }), not a
+// positional binding — the positional form threw ValidationError the moment the operator
+// supplied a key (caught by the P27-A lane's file-disjoint audit, recorded in its lane report §9).
+const transport = new StripeCatalogueTransport({ fetchImpl: realFetchBinding });
 
 function context(apiVersion: string): { apiVersion: string; authorizationHeader: string; timeoutMs: number } {
   return { apiVersion, authorizationHeader: `Bearer ${secretKey}`, timeoutMs: 25_000 };

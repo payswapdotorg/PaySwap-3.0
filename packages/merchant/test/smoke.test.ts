@@ -9,13 +9,17 @@ import * as errors from "../src/errors.ts";
  */
 
 describe("package surface smoke", () => {
-  it("the barrel imports cleanly with the curated public surface (206..235 exports)", () => {
+  it("the barrel imports cleanly with the curated public surface (206..237 exports)", () => {
     const count = Object.keys(pkg).length;
     expect(count).toBeGreaterThanOrEqual(206);
-    expect(count).toBeLessThanOrEqual(235);
+    expect(count).toBeLessThanOrEqual(237);
     // DISCLOSED RE-PIN (P22-C, ADR-0016 D5): +4 value exports (the corridor
     // KES receiving context — three pinned literals + the constructor).
-    expect(count).toBe(235);
+    // DISCLOSED RE-PIN (P27-C, ADR-0020 D10): +2 value exports (the Paystack
+    // recipient association riding the new recipient plane — the claimed
+    // KES candidate vocabulary + the recipient-association constructor;
+    // the four type-only exports do not enter the runtime key count).
+    expect(count).toBe(237);
   });
 
   it("the package identity constants are stable", () => {

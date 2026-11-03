@@ -362,14 +362,27 @@ const PAYSTACK_API_BASE_URL = "https://api.paystack.co";
 
 /**
  * The Paystack endpoint map (mirrors PAYSTACK_OPERATION_IDS — the D8
- * growth: the transfer surface). The POST bodies are JSON (the Paystack
- * transfer API's canonical encoding — the canonical transport's law).
+ * growth: the transfer surface; the P27-C growth mirrored by P27-E: the
+ * recipient plane (create/list), the collection surface (transaction
+ * initialize/verify) and the hosted page product — the five-row mirror
+ * of the canonical PAYSTACK_OPERATION_ENDPOINTS additions). The POST
+ * bodies are JSON (the Paystack transfer API's canonical encoding — the
+ * canonical transport's law).
  */
 const PAYSTACK_ENDPOINTS: ReadonlyMap<string, EndpointSpec> = new Map([
   ["paystack.transactions.read", { method: "GET", path: "/transaction" }],
   ["paystack.transfer.initiate", { method: "POST", path: "/transfer" }],
   ["paystack.transfer.finalize", { method: "POST", path: "/transfer/finalize_transfer" }],
   ["paystack.transfer.verify", { method: "GET", path: "/transfer/{id}" }],
+  // (P27-C · the P27-E seam) The recipient plane: POST/GET /transferrecipient.
+  ["paystack.transfer_recipient.create", { method: "POST", path: "/transferrecipient" }],
+  ["paystack.transfer_recipient.list", { method: "GET", path: "/transferrecipient" }],
+  // The collection surface: a payment REQUEST the customer still
+  // authorizes on the provider's hosted page (P27-C, ADR-0020 D1).
+  ["paystack.transaction.initialize", { method: "POST", path: "/transaction/initialize" }],
+  ["paystack.transaction.verify", { method: "GET", path: "/transaction/verify/{reference}" }],
+  // The reusable hosted payment-page product (POST /page).
+  ["paystack.page.create", { method: "POST", path: "/page" }],
 ]);
 
 /** The REAL Paystack transport (mirror of PaystackHttpsTransport — the D8-grown endpoint map). */

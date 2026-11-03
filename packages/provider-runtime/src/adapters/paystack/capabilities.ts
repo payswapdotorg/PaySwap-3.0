@@ -1,23 +1,32 @@
 /**
  * @payswap/provider-runtime — Paystack key capabilities → connection
- * scope mapping (P14-C, ADR-0008 D5; AMENDED by P22-H, ADR-0016 D8).
+ * scope mapping (P14-C, ADR-0008 D5; AMENDED by P22-H, ADR-0016 D8;
+ * GROWN by P27-C, ADR-0020 D4 — the recipient + collection grants).
  *
  * LAWS:
  * - FAIL-CLOSED SCOPE DERIVATION: the own-store use case grants read-only
  *   operation classes and observation-only effect classes. NO consequential
  *   grant can be derived from the read-only slice — any attempt THROWS.
  *   The read-only slice's refusal law is UNCHANGED by the D8 amendment:
- *   the slice never grows a write class.
- * - THE PAYOUT LANE (ADR-0016 D8 — the amendment this wave IS): a
- *   `sk_test_` secret key bound to a SANDBOX runtime may derive the
- *   SANDBOX PAYOUT GRANT (the transfer surface's CREATE_EXTERNAL_EFFECT —
- *   the corridor's KES off-ramp lane) through
- *   `derivePaystackSandboxPayoutGrant`, NEVER from the read-only slice.
- *   The payout derivation is separate from the use-case scope fold,
- *   exactly as Stripe's `deriveStripeSandboxExecutionGrant` (ADR-0008 D2)
- *   is separate from `refuseConsequentialStripeGrant`. `sk_live_` never
- *   derives a payout grant (refused at the seal verb AND at the
- *   derivation, INV-25 — this deployment is SANDBOX-only).
+ *   the slice never grows a write class (the P27-C growth does not touch
+ *   it either — D4: new operations never widen the read-only scope).
+ * - THE PAYOUT LANE (ADR-0016 D8): a `sk_test_` secret key bound to a
+ *   SANDBOX runtime may derive the SANDBOX PAYOUT GRANT (the transfer
+ *   surface's CREATE_EXTERNAL_EFFECT — the corridor's KES off-ramp lane)
+ *   through `derivePaystackSandboxPayoutGrant`, NEVER from the read-only
+ *   slice. The payout derivation is separate from the use-case scope
+ *   fold, exactly as Stripe's `deriveStripeSandboxExecutionGrant`
+ *   (ADR-0008 D2) is separate from `refuseConsequentialStripeGrant`.
+ *   `sk_live_` never derives a payout grant (refused at the seal verb
+ *   AND at the derivation, INV-25 — this deployment is SANDBOX-only).
+ * - THE RECIPIENT + COLLECTION LANES (ADR-0020 D4 — the P27-C growth):
+ *   the SAME law, one derivation per product surface. Creating a
+ *   transfer recipient (`derivePaystackSandboxRecipientGrant`) and
+ *   initializing a collection request / hosted payment page
+ *   (`derivePaystackSandboxCollectionGrant`) are each SEPARATE
+ *   dispatch-time SANDBOX grants derived from the full test secret key
+ *   inside the seal — never a connection-scope growth, never cached, and
+ *   the read-only connection form's probe stays the only path to ACTIVE.
  * - KEY MODE LAW (INV-25): the Paystack secret-key PREFIX selects the
  *   mode (`sk_test_…` = test; `sk_live_…` = live — IDENTICAL in shape to
  *   Stripe's law, per ADR-0008 D5). A test key can never bind a LIVE
@@ -212,9 +221,9 @@ export function derivePaystackSandboxPayoutGrant(
  * The full scope-mapping fold for the own-store use case: validates the
  * material shape, enforces the key-mode binding, refuses any requested
  * consequential class, and returns the frozen read-only scope. UNCHANGED
- * by the D8 amendment — the use-case connection scope stays read-only;
- * the payout grant is a dispatch-time derivation (the kernel), never a
- * connection-scope growth.
+ * by the D8 amendment and by the P27-C growth — the use-case connection
+ * scope stays read-only; the payout/recipient/collection grants are
+ * dispatch-time derivations (the kernel), never a connection-scope growth.
  */
 export function paystackUseCaseScope(
   material: unknown,
@@ -227,4 +236,118 @@ export function paystackUseCaseScope(
     refuseConsequentialPaystackGrant(requested);
   }
   return paystackReadOnlyScope();
+}
+
+// ---------------------------------------------------------------------------
+// THE P27-C GRANTS (ADR-0020 D4): the recipient plane + the collection
+// surface — each its OWN dispatch-time SANDBOX derivation, fail-closed,
+// never cached, `sk_live_` refused at the derivation exactly like the
+// payout grant. The read-only slice's refusal law is UNCHANGED above.
+// ---------------------------------------------------------------------------
+
+/** The operation classes the SANDBOX recipient grant carries (closed set). */
+export const PAYSTACK_SANDBOX_RECIPIENT_OPERATION_CLASSES: readonly OperationClass[] = Object.freeze([
+  'READ_PROVIDER_STATE',
+  'OBSERVE_EXTERNAL_FUNDS',
+  'MANAGE_CONNECTION',
+  'CREATE_EXTERNAL_EFFECT',
+]);
+
+/** The effect classes the SANDBOX recipient grant permits. */
+export const PAYSTACK_SANDBOX_RECIPIENT_EFFECT_CLASSES: readonly EffectClass[] = Object.freeze([
+  'NONE',
+  'OBSERVATION_ONLY',
+  'STATE_CHANGING',
+]);
+
+/** The data classes the SANDBOX recipient grant carries (the recipient write). */
+export const PAYSTACK_SANDBOX_RECIPIENT_DATA_CLASSES = ['TRANSACTION_READ', 'RECIPIENT_WRITE'] as const;
+
+/** The connection scope the SANDBOX recipient grant carries (frozen). */
+export function paystackSandboxRecipientScope(): ConnectionScope {
+  return Object.freeze({
+    allowedOperations: Object.freeze([...PAYSTACK_SANDBOX_RECIPIENT_OPERATION_CLASSES]),
+    allowedEffectClasses: Object.freeze([...PAYSTACK_SANDBOX_RECIPIENT_EFFECT_CLASSES]),
+    scopedCapabilities: Object.freeze([]),
+    allowedDataClasses: Object.freeze([...PAYSTACK_SANDBOX_RECIPIENT_DATA_CLASSES]),
+  });
+}
+
+/**
+ * THE RECIPIENT GRANT DERIVATION (ADR-0020 D4 — the P27-C plane):
+ * SANDBOX-only by name and by law; the key-mode binding runs first (an
+ * `sk_live_` key can never bind SANDBOX — INV-25); an `sk_test_` key
+ * bound to a SANDBOX runtime derives the recipient-plane grant (the
+ * transfer-recipient create/list surface's CREATE_EXTERNAL_EFFECT).
+ * Re-derived at dispatch inside the seal on EVERY path — never cached.
+ * CANCEL_OR_REVERSE_EFFECT is NOT granted (there is no documented
+ * recipient-deletion lane in this slice; the honest read-back is the
+ * list read).
+ */
+export function derivePaystackSandboxRecipientGrant(
+  apiKey: string,
+  executionMode: ExecutionMode,
+): ConnectionScope {
+  if (executionMode !== 'SANDBOX') {
+    throw new SandboxLiveBoundaryError(
+      `INV-25: the Paystack recipient grant derivation is SANDBOX-only (a live recipient lane is never derived in this deployment; got ${executionMode})`,
+      { keyMode: paystackKeyMode(apiKey), executionMode },
+    );
+  }
+  validatePaystackKeyModeBinding(apiKey, executionMode);
+  return paystackSandboxRecipientScope();
+}
+
+/** The operation classes the SANDBOX collection grant carries (closed set). */
+export const PAYSTACK_SANDBOX_COLLECTION_OPERATION_CLASSES: readonly OperationClass[] = Object.freeze([
+  'READ_PROVIDER_STATE',
+  'OBSERVE_EXTERNAL_FUNDS',
+  'MANAGE_CONNECTION',
+  'CREATE_EXTERNAL_EFFECT',
+]);
+
+/** The effect classes the SANDBOX collection grant permits. */
+export const PAYSTACK_SANDBOX_COLLECTION_EFFECT_CLASSES: readonly EffectClass[] = Object.freeze([
+  'NONE',
+  'OBSERVATION_ONLY',
+  'STATE_CHANGING',
+]);
+
+/** The data classes the SANDBOX collection grant carries (the collection write). */
+export const PAYSTACK_SANDBOX_COLLECTION_DATA_CLASSES = ['TRANSACTION_READ', 'COLLECTION_WRITE'] as const;
+
+/** The connection scope the SANDBOX collection grant carries (frozen). */
+export function paystackSandboxCollectionScope(): ConnectionScope {
+  return Object.freeze({
+    allowedOperations: Object.freeze([...PAYSTACK_SANDBOX_COLLECTION_OPERATION_CLASSES]),
+    allowedEffectClasses: Object.freeze([...PAYSTACK_SANDBOX_COLLECTION_EFFECT_CLASSES]),
+    scopedCapabilities: Object.freeze([]),
+    allowedDataClasses: Object.freeze([...PAYSTACK_SANDBOX_COLLECTION_DATA_CLASSES]),
+  });
+}
+
+/**
+ * THE COLLECTION GRANT DERIVATION (ADR-0020 D4 — the P27-C surface):
+ * SANDBOX-only; key-mode binding first (INV-25); an `sk_test_` key bound
+ * to a SANDBOX runtime derives the collection grant (the transaction-
+ * initialize / hosted-payment-page surface's CREATE_EXTERNAL_EFFECT — a
+ * payment REQUEST the customer must still authorize on the provider's
+ * hosted page; it is never money movement by itself). Re-derived at
+ * dispatch inside the seal on EVERY path — never cached.
+ * CANCEL_OR_REVERSE_EFFECT is NOT granted (there is no documented
+ * collection-void lane in this slice; the honest read-back is the
+ * transaction verify read).
+ */
+export function derivePaystackSandboxCollectionGrant(
+  apiKey: string,
+  executionMode: ExecutionMode,
+): ConnectionScope {
+  if (executionMode !== 'SANDBOX') {
+    throw new SandboxLiveBoundaryError(
+      `INV-25: the Paystack collection grant derivation is SANDBOX-only (a live collection lane is never derived in this deployment; got ${executionMode})`,
+      { keyMode: paystackKeyMode(apiKey), executionMode },
+    );
+  }
+  validatePaystackKeyModeBinding(apiKey, executionMode);
+  return paystackSandboxCollectionScope();
 }
