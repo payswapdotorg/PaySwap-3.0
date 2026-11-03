@@ -10,7 +10,9 @@
  *   wire request is EXACTLY the census path + the REAL v1 form
  *   serializer output + the sealed Authorization header + the
  *   per-connection request version (the legacy pin — ADR-0017 D2) +
- *   the digest-bound Idempotency-Key on v1 state-changing POSTs only;
+ *   the digest-bound Idempotency-Key on v1 state-changing POSTs only
+ *   — and (P26-C) a connection migrated through the PUBLIC verb
+ *   carries the catalogue pin version instead, with the same laws;
  * - a real classified error response maps onto PROVIDER_REJECTED with
  *   the typed provider error code;
  * - a timeout after possible dispatch is UNKNOWN with the real
@@ -124,6 +126,52 @@ describe("the REAL transport behind the host port (the full two-phase flow)", ()
     expect(call.headers["Idempotency-Key"]).toBeUndefined();
     expect(call.headers["Content-Type"]).toBeUndefined();
     expect(call.headers["Stripe-Version"]).toBe("2025-08-27.basil");
+  });
+
+  it("the MIGRATED-connection twin carries the catalogue pin version on the wire (P26-C)", async () => {
+    // The same two-phase flow as the legacy tests, over a connection
+    // migrated through the PUBLIC verb first: the per-connection state
+    // answers 2026-09-30.endive and ONLY the Stripe-Version header
+    // differs — the default (option absent) stays proven basil above.
+    const { executor, calls } = await realWiredExecutor(
+      {
+        status: 200,
+        body: JSON.stringify({ object: "list", data: [], has_more: false }),
+        headers: { "request-id": "req_fake51realWired04" },
+      },
+      { migrateRequestApiVersion: true },
+    );
+    const prepared = await executor.prepare({
+      operationId: "GetCustomers",
+      parameters: [{ name: "limit", value: 3, location: "query" }],
+      connectionId: CONN,
+      taskId: "task:fake-1",
+    });
+    expect(prepared.ok).toBe(true);
+    if (!prepared.ok) {
+      throw new Error(prepared.reason);
+    }
+    const authorized = await executor.authorize({
+      preparedActionId: prepared.action.preparedActionId,
+      principalId: "principal:user-1",
+      confirmedDigest: prepared.action.digest,
+    });
+    expect(authorized.ok).toBe(true);
+    if (!authorized.ok) {
+      throw new Error(authorized.reason);
+    }
+    const outcome = await executor.execute(authorized.authorization.authorizationId);
+    expect(outcome.kind).toBe("CONFIRMED");
+    expect(calls.length).toBe(1);
+    const call = calls[0]!;
+    // THE WIRE PROOF: the migrated connection's dispatch carries the
+    // catalogue pin version — and nothing else changed (same path, same
+    // GET class laws, no idempotency key).
+    expect(call.url).toBe("https://api.stripe.com/v1/customers?limit=3");
+    expect(call.method).toBe("GET");
+    expect(call.headers["Stripe-Version"]).toBe("2026-09-30.endive");
+    expect(call.headers["Idempotency-Key"]).toBeUndefined();
+    expect(call.headers["Content-Type"]).toBeUndefined();
   });
 
   it("a real classified error response maps onto PROVIDER_REJECTED with the typed code", async () => {

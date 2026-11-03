@@ -1,6 +1,7 @@
 /**
  * @payswap/app — the STRIPE TOOL RUNTIME battery (P24-3, ADR-0017
- * D9/D10 — the loop's ONE execution seam).
+ * D9/D10 — the loop's ONE execution seam; P26-C — the bounded
+ * auto-walk).
  *
  * The registry-mediated runtime, machine-checked against the REAL
  * runtime over deterministic registry/port fakes:
@@ -13,6 +14,11 @@
  * - THE READ PATH: the registered operationId + the task's bound
  *   connection cross the host port; a TIMEOUT_UNKNOWN read stays
  *   UNKNOWN; a refused read surfaces its typed code;
+ * - THE AUTO-WALK (P26-C): absent = exactly ONE read (the G11 default,
+ *   byte-identical); present = the bounded page walk (cursor-continued,
+ *   10-page hard budget, honest truncation, the flag never crossing
+ *   the host port); non-paginated reads reject the flag; a mid-walk
+ *   ambiguity stays UNKNOWN (INV-04);
  * - THE PREPARE PATH: a validated proposal crosses the host port and
  *   returns the EXACT preview — with NO authorization (the host mints
  *   that only after the human confirms); a host refusal is honest;
@@ -33,7 +39,13 @@ import type {
   StripeOperationFactPin,
   StripeToolCataloguePort,
 } from "../../src/agent/stripeToolCataloguePort.js";
-import { STRIPE_TOOL_OUTPUT_UNTRUSTED_OPEN } from "../../src/agent/stripeToolOutput.js";
+import {
+  STRIPE_TOOL_AUTO_WALK_MAX_PAGES,
+} from "../../src/agent/stripeToolAutoWalk.js";
+import {
+  STRIPE_TOOL_OUTPUT_TRUNCATION_NOTE,
+  STRIPE_TOOL_OUTPUT_UNTRUSTED_OPEN,
+} from "../../src/agent/stripeToolOutput.js";
 
 /* ------------------------------ the fakes ----------------------------- */
 
@@ -60,6 +72,17 @@ const FACTS: readonly StripeOperationFactPin[] = [
   fact({ operationId: "ListProducts" }),
   fact({ operationId: "GetProducts", pathParams: ["id"], path: "/v1/products/{id}", listPaginated: false }),
   fact({ operationId: "PostProducts", method: "POST", effectClass: "STRIPE_CONFIGURATION_WRITE", approvalTier: "CONFIRM" }),
+  // A v2 page-token list (the auto-walk's v2 contract — D6).
+  fact({
+    operationId: "ListRefundsV2",
+    apiNamespace: "v2",
+    method: "GET",
+    path: "/v2/refunds",
+    pathParams: [],
+    resourceFamily: "refunds",
+    requiredPermissionRule: "Refunds: Read",
+    summary: "List refunds (v2 page-token pagination).",
+  }),
 ];
 
 const ACCOUNT: StripeAccountFactsPin = {
@@ -67,7 +90,7 @@ const ACCOUNT: StripeAccountFactsPin = {
   stripeAccountId: "acct_test_1",
   accountModel: "OWN_ACCOUNT_RESTRICTED_KEY",
   environment: "SANDBOX",
-  grantedPermissionRules: ["Products: Read"],
+  grantedPermissionRules: ["Products: Read", "Refunds: Read"],
 };
 
 const catalogue: StripeToolCataloguePort = {
@@ -268,6 +291,221 @@ describe("the read path (informational tools)", () => {
     expect(result.status).toBe("ERROR");
     expect(result.error).toMatchObject({ code: "SECRET_SHAPED_OUTPUT" });
     expect(JSON.stringify(result)).not.toContain("rk_test_");
+  });
+});
+
+describe("the bounded auto-walk (P26-C — the opt-in pagination affordance)", () => {
+  it("the flag ABSENT is exactly ONE read even when more pages exist (the G11 default)", async () => {
+    const reads = makeReads(() => ({
+      ok: true,
+      output: { object: "list", data: [{ id: "prod_1" }, { id: "prod_2" }], has_more: true },
+    }));
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(call("c1", "stripe.resources.products.list", { limit: 2 }));
+    expect(result.status).toBe("OK");
+    expect(reads.calls).toHaveLength(1);
+    expect(reads.calls[0]!.args).toEqual({ limit: 2 });
+    // The single page is returned verbatim (no synthesized envelope).
+    expect(String(result.output)).toContain("has_more");
+    expect(String(result.output)).not.toContain("autoWalk");
+    expect(result.truncated).toBe(false);
+  });
+
+  it("the flag PRESENT walks pages with the continuation cursor until has_more is false", async () => {
+    const reads = makeReads((_operationId, args) => {
+      if (args.starting_after === "prod_2") {
+        return { ok: true, output: { object: "list", data: [{ id: "prod_3" }], has_more: false } };
+      }
+      return { ok: true, output: { object: "list", data: [{ id: "prod_1" }, { id: "prod_2" }], has_more: true } };
+    });
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(
+      call("c1", "stripe.resources.products.list", { limit: 2, autoWalk: true }),
+    );
+    expect(result.status).toBe("OK");
+    // Three pages walked? Two: page 1 (prod_1, prod_2) → page 2 (prod_3).
+    expect(reads.calls).toHaveLength(2);
+    // The autoWalk flag NEVER crosses the host port; the cursor merges in.
+    expect(reads.calls[0]!.args).toEqual({ limit: 2 });
+    expect(reads.calls[1]!.args).toEqual({ limit: 2, starting_after: "prod_2" });
+    const payload = JSON.parse(String(result.boundedJson));
+    expect(payload.data.map((item: { id: string }) => item.id)).toEqual(["prod_1", "prod_2", "prod_3"]);
+    expect(payload.has_more).toBe(false);
+    expect(payload.autoWalk).toMatchObject({
+      pagesWalked: 2,
+      truncated: false,
+      truncatedByBudget: false,
+      nextCursor: null,
+    });
+    expect(payload.autoWalk.note).toContain("auto-walk complete: 2 page(s) walked, 3 items collected");
+  });
+
+  it("the hard page budget is 10 (the pinned bound) and truncation NAMES it honestly", async () => {
+    expect(STRIPE_TOOL_AUTO_WALK_MAX_PAGES).toBe(10);
+    const reads = makeReads((_operationId, args) => {
+      const last = typeof args.starting_after === "string" ? Number(args.starting_after.slice(5)) : 0;
+      return {
+        ok: true,
+        output: { object: "list", data: [{ id: `prod_${last + 1}` }], has_more: true },
+      };
+    });
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(call("c1", "stripe.resources.products.list", { autoWalk: true }));
+    expect(result.status).toBe("OK");
+    // EXACTLY the budget's reads — never an eleventh page.
+    expect(reads.calls).toHaveLength(10);
+    expect(reads.calls[9]!.args).toEqual({ starting_after: "prod_9" });
+    const payload = JSON.parse(String(result.boundedJson));
+    expect(payload.data).toHaveLength(10);
+    expect(payload.has_more).toBe(true);
+    expect(payload.autoWalk).toMatchObject({
+      pagesWalked: 10,
+      truncated: true,
+      truncatedByBudget: true,
+      nextCursor: "prod_10",
+    });
+    expect(payload.autoWalk.note).toContain("10-page budget");
+    expect(payload.autoWalk.note).toContain("resume with starting_after 'prod_10'");
+  });
+
+  it("a page claiming more pages without a usable cursor is an honest dead-cursor truncation", async () => {
+    const reads = makeReads(() => ({
+      ok: true,
+      output: { object: "list", data: [{ name: "no id here" }], has_more: true },
+    }));
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(call("c1", "stripe.resources.products.list", { autoWalk: true }));
+    expect(result.status).toBe("OK");
+    expect(reads.calls).toHaveLength(1);
+    const payload = JSON.parse(String(result.boundedJson));
+    expect(payload.autoWalk).toMatchObject({
+      pagesWalked: 1,
+      truncated: true,
+      truncatedByBudget: false,
+      nextCursor: null,
+    });
+    expect(payload.autoWalk.note).toContain("no usable starting_after cursor");
+    expect(payload.autoWalk.note).toContain("never an invented total");
+  });
+
+  it("the flag is REJECTED for non-paginated reads (unknown field — zero reads)", async () => {
+    const reads = makeReads(() => ({ ok: true, output: {} }));
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(
+      call("c1", "stripe.resources.products.get", { id: "prod_1", autoWalk: true }),
+    );
+    expect(result.status).toBe("ERROR");
+    expect(result.error).toMatchObject({ code: "VALIDATION" });
+    expect(result.error!.message).toContain("unknown argument field 'autoWalk'");
+    expect(reads.calls).toHaveLength(0);
+  });
+
+  it("a non-boolean autoWalk value is a typed INVALID_VALUE (never coerced)", async () => {
+    const reads = makeReads(() => ({ ok: true, output: {} }));
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(
+      call("c1", "stripe.resources.products.list", { autoWalk: "yes" }),
+    );
+    expect(result.status).toBe("ERROR");
+    expect(result.error).toMatchObject({ code: "VALIDATION" });
+    expect(result.error!.message).toContain("autoWalk must be a boolean");
+    expect(reads.calls).toHaveLength(0);
+  });
+
+  it("a mid-walk TIMEOUT_UNKNOWN makes the whole call UNKNOWN (INV-04 — never a quiet partial)", async () => {
+    const reads = makeReads((_operationId, args) => {
+      if (args.starting_after !== undefined) {
+        return { ok: false, error: { code: "TIMEOUT_UNKNOWN", message: "timeout after possible dispatch", retryable: false } };
+      }
+      return { ok: true, output: { object: "list", data: [{ id: "prod_1" }], has_more: true } };
+    });
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(call("c1", "stripe.resources.products.list", { autoWalk: true }));
+    expect(result.status).toBe("UNKNOWN");
+    expect(result.error).toMatchObject({ code: "TIMEOUT_UNKNOWN" });
+    expect(result.error!.message).toContain("page 2");
+    expect(result.error!.message).toContain("INV-04");
+    expect(result.error!.message).toContain("resume with starting_after 'prod_1'");
+  });
+
+  it("a mid-walk definitive failure returns the collected items with the failure NAMED", async () => {
+    const reads = makeReads((_operationId, args) => {
+      if (args.starting_after !== undefined) {
+        return { ok: false, error: { code: "PROVIDER_FAILURE", message: "HTTP 429: rate limited", retryable: true } };
+      }
+      return { ok: true, output: { object: "list", data: [{ id: "prod_1" }, { id: "prod_2" }], has_more: true } };
+    });
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(call("c1", "stripe.resources.products.list", { autoWalk: true }));
+    expect(result.status).toBe("OK");
+    const payload = JSON.parse(String(result.boundedJson));
+    expect(payload.data.map((item: { id: string }) => item.id)).toEqual(["prod_1", "prod_2"]);
+    expect(payload.autoWalk).toMatchObject({
+      pagesWalked: 1,
+      truncated: true,
+      truncatedByBudget: false,
+      nextCursor: "prod_2",
+    });
+    expect(payload.autoWalk.note).toContain("stopped at page 2");
+    expect(payload.autoWalk.note).toContain("PROVIDER_FAILURE");
+  });
+
+  it("an oversized concatenation truncates under the byte budget with the honest marker", async () => {
+    const reads = makeReads((_operationId, args) => {
+      if (args.starting_after !== undefined) {
+        return { ok: true, output: { object: "list", data: [], has_more: false } };
+      }
+      return {
+        ok: true,
+        output: { object: "list", data: [{ id: "prod_big", blob: "x".repeat(9000) }], has_more: true },
+      };
+    });
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(call("c1", "stripe.resources.products.list", { autoWalk: true }));
+    expect(result.status).toBe("OK");
+    // The byte budget still applies to the concatenated walk result.
+    expect(result.truncated).toBe(true);
+    expect(String(result.output)).toContain(STRIPE_TOOL_OUTPUT_TRUNCATION_NOTE);
+  });
+
+  it("a v2 list walks with the page token extracted from next_page_url (the URL is never followed)", async () => {
+    const reads = makeReads((_operationId, args) => {
+      if (args.page === "page-2") {
+        return { ok: true, output: { data: [{ id: "r2" }] } };
+      }
+      return {
+        ok: true,
+        output: {
+          data: [{ id: "r1" }],
+          next_page_url: "https://api.stripe.com/v2/refunds?page=page-2",
+        },
+      };
+    });
+    const { runtime } = await makeRuntime({ reads });
+    // The refunds tool is registered mid-task (the verified request path).
+    const granted = await runtime.executeCall(call("c0", "stripe.request_tools", { operationIds: ["ListRefundsV2"] }));
+    expect(String(granted.output)).toContain("stripe.resources.refunds.list");
+    const result = await runtime.executeCall(call("c1", "stripe.resources.refunds.list", { autoWalk: true }));
+    expect(result.status).toBe("OK");
+    expect(reads.calls).toHaveLength(2);
+    // The continuation is the extracted page TOKEN, never the URL.
+    expect(reads.calls[0]!.args).toEqual({});
+    expect(reads.calls[1]!.args).toEqual({ page: "page-2" });
+    const payload = JSON.parse(String(result.boundedJson));
+    expect(payload.data.map((item: { id: string }) => item.id)).toEqual(["r1", "r2"]);
+    expect(payload.autoWalk).toMatchObject({ pagesWalked: 2, truncated: false, truncatedByBudget: false });
+  });
+
+  it("a first page that is not a list shape is returned verbatim with an honest walk note", async () => {
+    const reads = makeReads(() => ({ ok: true, output: { id: "prod_singleton", object: "product" } }));
+    const { runtime } = await makeRuntime({ reads });
+    const result = await runtime.executeCall(call("c1", "stripe.resources.products.list", { autoWalk: true }));
+    expect(result.status).toBe("OK");
+    expect(reads.calls).toHaveLength(1);
+    const payload = JSON.parse(String(result.boundedJson));
+    expect(payload.autoWalk).toMatchObject({ pagesWalked: 1, truncated: false, truncatedByBudget: false });
+    expect(payload.autoWalk.note).toContain("did not carry a paginated list shape");
+    expect(payload.firstPage).toEqual({ id: "prod_singleton", object: "product" });
   });
 });
 

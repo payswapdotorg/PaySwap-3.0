@@ -1,5 +1,6 @@
 /**
- * @payswap/app — the STRIPE TOOL RUNTIME (P24-3, ADR-0017 D9/D10).
+ * @payswap/app — the STRIPE TOOL RUNTIME (P24-3, ADR-0017 D9/D10 — P26-C:
+ * the bounded auto-walk on paginated list reads).
  *
  * The app-side AgentToolRuntimePort implementation the conversation
  * loop consumes: resolve the tool against the CURRENT registry
@@ -25,11 +26,16 @@ import type {
 import type { StripeToolRegistry } from "./stripeToolRegistry.js";
 import {
   requireActionParameters,
+  requireBoolean,
   requireNonEmptyString,
   requireStringArray,
   StripeToolArgumentError,
   validateToolArguments,
 } from "./stripeToolSchemas.js";
+import {
+  autoWalkPaginatedRead,
+  STRIPE_TOOL_AUTO_WALK_ARGUMENT_NAME,
+} from "./stripeToolAutoWalk.js";
 import {
   boundStripeToolOutput,
   minimizeOperationFact,
@@ -223,9 +229,27 @@ async function runRequestTools(
 
 /* ---------------------------- the read tools -------------------------- */
 
+/** Bound one read payload through the output treatment into an OK result. */
+function boundedReadOk(payload: unknown): AgentToolExecutionResult {
+  const treated = boundStripeToolOutput(payload, STRIPE_TOOL_OUTPUT_DEFAULT_MAX_BYTES);
+  return {
+    status: "OK",
+    output: treated.framed,
+    boundedJson: treated.boundedJson,
+    truncated: treated.truncated,
+  };
+}
+
 async function runReadTool(
   reads: StripeResourceReadPort,
-  tool: { readonly operationId?: string; readonly fact?: { readonly pathParams: readonly string[] } },
+  tool: {
+    readonly operationId?: string;
+    readonly fact?: {
+      readonly pathParams: readonly string[];
+      readonly listPaginated: boolean;
+      readonly apiNamespace: "v1" | "v2";
+    };
+  },
   input: unknown,
   context: AgentToolCallContext,
   callId: string,
@@ -233,9 +257,11 @@ async function runReadTool(
   const operationId = tool.operationId ?? "";
   const toolName = "stripe.resources.read";
   const pathParams = tool.fact?.pathParams ?? [];
+  // The autoWalk opt-in exists ONLY on paginated list reads (the census fact decides).
+  const paginated = tool.fact?.listPaginated === true;
   const args = validateToolArguments(toolName, input, {
     required: pathParams,
-    optional: ["limit", "starting_after"],
+    optional: ["limit", "starting_after", ...(paginated ? [STRIPE_TOOL_AUTO_WALK_ARGUMENT_NAME] : [])],
     validate: (field, value) => {
       if (pathParams.includes(field) || field === "starting_after") {
         requireNonEmptyString(toolName, field, value);
@@ -246,35 +272,63 @@ async function runReadTool(
           `${toolName}.limit must be an integer between 1 and 100`,
         );
       }
+      if (field === STRIPE_TOOL_AUTO_WALK_ARGUMENT_NAME) {
+        requireBoolean(toolName, field, value);
+      }
     },
   });
-  const outcome = await reads.executeRead({
-    operationId,
-    arguments: args,
-    connectionId: context.connectionId,
-    taskId: context.taskId,
-    callId,
-  });
-  if (!outcome.ok) {
-    if (outcome.error.code === "TIMEOUT_UNKNOWN") {
-      return unknownToolOutcome(outcome.error.message);
+  // The autoWalk flag is an APP-side affordance: it never crosses the host
+  // port (the host's strict validator would refuse it as an unknown parameter).
+  const wantsAutoWalk = paginated && args[STRIPE_TOOL_AUTO_WALK_ARGUMENT_NAME] === true;
+  const hostArguments: Record<string, unknown> = { ...args };
+  delete hostArguments[STRIPE_TOOL_AUTO_WALK_ARGUMENT_NAME];
+  if (!wantsAutoWalk) {
+    // THE DEFAULT (G11): exactly one read per call, byte-identical to
+    // the pre-P26-C behavior.
+    const outcome = await reads.executeRead({
+      operationId,
+      arguments: hostArguments,
+      connectionId: context.connectionId,
+      taskId: context.taskId,
+      callId,
+    });
+    if (!outcome.ok) {
+      if (outcome.error.code === "TIMEOUT_UNKNOWN") {
+        return unknownToolOutcome(outcome.error.message);
+      }
+      return {
+        status: "ERROR",
+        error: {
+          code: outcome.error.code,
+          message: outcome.error.message,
+          retryable: outcome.error.retryable,
+        },
+      };
     }
-    return {
-      status: "ERROR",
-      error: {
-        code: outcome.error.code,
-        message: outcome.error.message,
-        retryable: outcome.error.retryable,
-      },
-    };
+    return boundedReadOk(outcome.output);
   }
-  const treated = boundStripeToolOutput(outcome.output, STRIPE_TOOL_OUTPUT_DEFAULT_MAX_BYTES);
-  return {
-    status: "OK",
-    output: treated.framed,
-    boundedJson: treated.boundedJson,
-    truncated: treated.truncated,
-  };
+  // THE OPT-IN (P26-C): the bounded auto-walk over the SAME host read
+  // port (repeated calls with the continuation cursor) — the hard page
+  // budget and honest truncation live in ./stripeToolAutoWalk.ts.
+  const walked = await autoWalkPaginatedRead({
+    apiNamespace: tool.fact?.apiNamespace ?? "v1",
+    baseArguments: hostArguments,
+    executeRead: (pageArguments) =>
+      reads.executeRead({
+        operationId,
+        arguments: pageArguments,
+        connectionId: context.connectionId,
+        taskId: context.taskId,
+        callId,
+      }),
+  });
+  if (walked.status === "ERROR") {
+    return { status: "ERROR", error: walked.error };
+  }
+  if (walked.status === "UNKNOWN") {
+    return unknownToolOutcome(walked.message);
+  }
+  return boundedReadOk(walked.payload);
 }
 
 /* -------------------------- the prepare tool -------------------------- */

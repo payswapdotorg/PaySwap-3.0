@@ -175,6 +175,17 @@ export function requireNonEmptyString(toolName: string, field: string, value: un
   return value;
 }
 
+/** Require a boolean field value. */
+export function requireBoolean(toolName: string, field: string, value: unknown): boolean {
+  if (typeof value !== "boolean") {
+    throw new StripeToolArgumentError(
+      "INVALID_VALUE",
+      `${toolName}.${field} must be a boolean`,
+    );
+  }
+  return value;
+}
+
 /** Require an array of non-empty strings. */
 export function requireStringArray(
   toolName: string,
