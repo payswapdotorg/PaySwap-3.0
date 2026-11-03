@@ -263,3 +263,40 @@ export function requireIsoUtcTimestamp(value: unknown, subject: string): string 
   }
   return value;
 }
+
+const ISO_UTC_GROUPS = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/;
+
+const DAYS_IN_MONTH = Object.freeze([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]);
+
+function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+/**
+ * Parse a STRICT ISO-8601 UTC timestamp to epoch milliseconds — a pure,
+ * deterministic calendar computation (Date.UTC math over explicit
+ * components: never an ambient clock read; the determinism law holds).
+ * Returns null on any out-of-range calendar component (fail closed,
+ * never coerced — 2026-02-30 is a validation failure, not a rollover).
+ */
+export function parseStrictIsoUtcToEpochMs(value: string): number | null {
+  const match = ISO_UTC_GROUPS.exec(value);
+  if (match === null) {
+    return null;
+  }
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const second = Number(match[6]);
+  const millisecond = match[7] !== undefined ? Number(match[7].padEnd(3, "0")) : 0;
+  if (month < 1 || month > 12 || day < 1 || hour > 23 || minute > 59 || second > 59) {
+    return null;
+  }
+  const daysInMonth = month === 2 && isLeapYear(year) ? 29 : DAYS_IN_MONTH[month - 1] ?? 30;
+  if (day > daysInMonth) {
+    return null;
+  }
+  return Date.UTC(year, month - 1, day, hour, minute, second, millisecond);
+}

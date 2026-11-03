@@ -105,8 +105,12 @@ describe("architectural boundary: @payswap/node-network (the intelligence leaf l
     expect(offenders.join("\n")).toBe("");
   });
 
-  it("node:crypto appears ONLY in the signing modules (offer/attestation), never elsewhere", () => {
-    const allowedFiles = new Set(["src/offer.ts", "src/attestation.ts"]);
+  it("node:crypto appears ONLY in the signing modules, never elsewhere", () => {
+    const allowedFiles = new Set([
+      "src/offer.ts",
+      "src/offer-verification.ts",
+      "src/attestation.ts",
+    ]);
     const offenders: string[] = [];
     for (const file of sourceFiles) {
       const rel = relative(packageRoot, file);
@@ -140,12 +144,21 @@ describe("architectural boundary: @payswap/node-network (the intelligence leaf l
   });
 
   it("the DETERMINISM LAW: src never performs I/O, uses Node globals, timers, randomness, the wall clock or float parsing", () => {
+    // Buffer.from (deterministic utf8/base64 conversion for the crypto
+    // interop) is allowed ONLY in the signing modules — the same set that
+    // may import node:crypto; everywhere else the full determinism law
+    // applies with no exemption.
+    const signingModules = new Set([
+      "src/offer.ts",
+      "src/offer-verification.ts",
+      "src/attestation.ts",
+    ]);
     const offenders: string[] = [];
     for (const file of sourceFiles) {
+      const rel = relative(packageRoot, file);
       const source = readFileSync(file, "utf8");
       for (const probe of [
         /\bfetch\s*\(/,
-        /\bBuffer\b/,
         /\bprocess\b/,
         /setTimeout/,
         /setInterval/,
@@ -155,9 +168,10 @@ describe("architectural boundary: @payswap/node-network (the intelligence leaf l
         /Date\.now/,
         /new Date\s*\(/,
         /\bparseFloat\b/,
+        ...(signingModules.has(rel) ? [] : [/\bBuffer\b/]),
       ]) {
         if (probe.test(source)) {
-          offenders.push(`${relative(packageRoot, file)}: ${probe.source}`);
+          offenders.push(`${rel}: ${probe.source}`);
         }
       }
     }
@@ -198,11 +212,14 @@ describe("architectural boundary: @payswap/node-network (the intelligence leaf l
   });
 
   it("the exact census (P27-D lane landing; re-pin = disclosed deviation, ADR-0009 D9)", () => {
-    // CENSUS (P27-D first landing, 2026-11-03): 3 src modules (canonical,
-    // errors, classification) + the barrel; 2 test suites (boundary,
-    // classification) + node.d.ts shim. Re-pinned per module batch below.
-    expect(sourceFiles.length).toBe(4);
-    expect(testFiles.length).toBe(2);
-    expect(allTestFiles.length).toBe(3);
+    // CENSUS (P27-D second batch, 2026-11-03 — the core offer machinery):
+    // 9 src modules (canonical, errors, classification, enrollment,
+    // attestation, offer, offer-verification [the 400-line file-law split],
+    // registry, index) and 6 test suites (boundary, classification,
+    // enrollment, attestation, offer, registry) + the fixtures helper and
+    // the node.d.ts shim (8 all-test .ts files).
+    expect(sourceFiles.length).toBe(9);
+    expect(testFiles.length).toBe(6);
+    expect(allTestFiles.length).toBe(8);
   });
 });
