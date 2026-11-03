@@ -199,7 +199,15 @@ describe("architectural boundary: @payswap/node-network (the intelligence leaf l
     const manifest = JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8"));
     expect(manifest.name).toBe("@payswap/node-network");
     expect(manifest.dependencies).toBeUndefined();
-    expect(Object.keys(manifest.devDependencies ?? {}).sort()).toEqual(["typescript", "vitest"]);
+    // DISCLOSED RE-PIN (P27-E, 2026-11-03): the package joined the CI
+    // per-package matrix (the stage-1 growth) whose self-contained
+    // `npm install --no-workspaces` + hermetic tsc needs the node types
+    // this package's own src + test tiers import (node:crypto in the
+    // signing modules, node:fs/node:path in the boundary suite) —
+    // @types/node joins the devDeps (the provider-runtime P26-D-1
+    // precedent: the hermetic CI program, never the workspace program,
+    // is the truth).
+    expect(Object.keys(manifest.devDependencies ?? {}).sort()).toEqual(["@types/node", "typescript", "vitest"]);
     expect(manifest.private).toBe(true);
     expect(manifest.type).toBe("module");
     expect(manifest.exports["."]).toBe("./src/index.ts");
