@@ -22,6 +22,10 @@
 
 import type { PaymentProviderRegistryEntry } from '../registry-declaration.ts';
 import { validatePaymentProviderRegistryEntry } from '../registry-declaration.ts';
+import {
+  STRIPE_U2_MISSING_OPERATOR_CONFIGURATION,
+  STRIPE_U3_MISSING_OPERATOR_CONFIGURATION,
+} from './oauth-state.ts';
 
 /** The single declared payment provider id for Stripe. */
 export const STRIPE_PROVIDER_ID = 'stripe' as const;
@@ -149,12 +153,9 @@ export const STRIPE_REGISTRY_ENTRY: PaymentProviderRegistryEntry = Object.freeze
         guidance:
           'A denied authorization returns the connection to a resumable state with the reason recorded; it is never silently retried.',
       }),
-      missingOperatorConfiguration: Object.freeze([
-        'Stripe platform client_id (a registered Stripe platform application owned by the operator)',
-        'Stripe platform client_secret (delivered to the host through the operator secret channel, never chat)',
-      ]),
+      missingOperatorConfiguration: Object.freeze([...STRIPE_U2_MISSING_OPERATOR_CONFIGURATION]),
       summary:
-        'Delegate PaySwap scoped read-only access to an existing Stripe account through Stripe OAuth in the system browser.',
+        'Delegate PaySwap scoped read-only access to an existing Stripe account through Stripe OAuth in the system browser. The flow machinery (single-use state, authorize URL, code-to-token exchange, typed error paths, seal + read-back probe) is implemented and key-ready; the form stays UNCONFIGURED until the operator supplies the platform application configuration through the secret channel.',
     }),
     Object.freeze({
       useCaseRef: 'marketplace-connected-accounts',
@@ -198,12 +199,9 @@ export const STRIPE_REGISTRY_ENTRY: PaymentProviderRegistryEntry = Object.freeze
         guidance:
           'An incomplete hosted onboarding can be resumed with a fresh Account Link for the same connected account.',
       }),
-      missingOperatorConfiguration: Object.freeze([
-        'Stripe platform credentials (client_id + client_secret for the Connect platform)',
-        'A webhook endpoint registered with Stripe for connected-account events, delivered to the operator-run PaySwap backend',
-      ]),
+      missingOperatorConfiguration: Object.freeze([...STRIPE_U3_MISSING_OPERATOR_CONFIGURATION]),
       summary:
-        'Onboard marketplace sellers as Stripe Connect accounts through hosted Account Links.',
+        'Onboard marketplace sellers as Stripe Connect connected accounts through hosted Account Links. The lifecycle machinery (controller-properties account creation, hosted onboarding links, capability and requirements observations, connected-account webhooks, charge/transfer/payout topology with merchant-of-record and liability gates) is key-ready; the form stays UNCONFIGURED until the operator supplies the platform credentials, the model and liability decisions, and the webhook endpoint.',
     }),
   ]),
 });
