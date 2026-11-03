@@ -26,6 +26,7 @@ import type {
   StripeCensusOperationView,
   StripeActionPermissionPort,
   StripeActionApiVersionPort,
+  StripeReauthenticationPort,
   StripeActionSeal,
 } from "../../src/host/payswap/stripe/action-seams.js";
 import { createStripePreparedActionExecutor } from "../../src/host/payswap/stripe/prepared-action-executor.js";
@@ -293,6 +294,7 @@ export async function executorWorld(input?: {
       readonly census?: StripeOperationCensusPort;
       readonly permissions?: StripeActionPermissionPort;
       readonly apiVersion?: StripeActionApiVersionPort;
+      readonly reauthentication?: StripeReauthenticationPort;
     }): StripePreparedActionExecutor & { readonly store: StripePreparedActionStore } => {
       const store = overrides?.store ?? createInMemoryStripePreparedActionStore();
       const { transport } = scriptedTransport([
@@ -308,6 +310,7 @@ export async function executorWorld(input?: {
         accountContext: overrides?.accountContext ?? accountContext,
         permissions: overrides?.permissions ?? permissions,
         apiVersion: overrides?.apiVersion ?? apiVersion,
+        reauthentication: overrides?.reauthentication,
         nowMs: () => clock.ms,
         nowIso: () => clock.iso,
         createId: () => `fake-${(idSeq += 1)}`,

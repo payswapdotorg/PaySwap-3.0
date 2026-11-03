@@ -200,6 +200,7 @@ describe("delegated money movement laws (P7-W2)", () => {
       // prepared-actions + the host-resolved principal).
       "stripeAccountFacts",
       "stripeAuthorizeAction",
+      "stripeBeginReauthentication",
       "stripeCatalogueRelease",
       "stripeExecuteAction",
       "stripeExecuteRead",

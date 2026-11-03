@@ -765,3 +765,26 @@
 .ps-agent-reconcile-card {
   border-style: dashed;
 }
+
+/* (P26-A, ADR-0018 D5) The REAUTH step: the credential field crosses to the
+   host security seam only — it is never echoed, never logged. */
+.ps-agent-reauth-step {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  border: 1px solid var(--ps-border, #d8dbe2);
+  border-radius: 0.5rem;
+  background: var(--ps-surface-muted, #f7f8fa);
+}
+.ps-agent-reauth-step input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--ps-border, #d8dbe2);
+  border-radius: 0.4rem;
+  font-family: var(--ps-mono, ui-monospace, monospace);
+  font-size: 0.85rem;
+}

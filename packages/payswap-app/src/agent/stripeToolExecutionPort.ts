@@ -98,6 +98,13 @@ export interface StripePreparedActionPort {
   >;
   execute(authorizationId: string): Promise<StripeActionExecutionOutcomePin>;
   inspect(preparedActionId: string): Promise<StripePreparedActionPin | null>;
+  /** (P26-A, ADR-0018) The REAUTH tier's proof mint (the material-carrying
+   *  member — the credential crosses to the HOST only, never the model). */
+  beginReauthentication(input: {
+    readonly connectionId: string;
+    readonly actionDigests: readonly string[];
+    readonly freshCredential: string;
+  }): Promise<{ readonly ok: true; readonly proofId: string } | { readonly ok: false; readonly reason: string }>;
 }
 
 /* ------------------- the unified loop-side tool runtime --------------- */

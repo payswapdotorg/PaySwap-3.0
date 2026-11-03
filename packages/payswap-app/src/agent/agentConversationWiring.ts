@@ -210,6 +210,7 @@ export function createAgentConversationWiring(
 
   const idleActions: AgentConversationActions = {
     async confirmPreparedAction(): Promise<void> {},
+    async confirmReauthPreparedAction(): Promise<void> {},
     async refusePreparedAction(): Promise<void> {},
     async bindAccountContext(): Promise<void> {},
     cancelRunning(): void {},

@@ -15,6 +15,7 @@
  * UNKNOWN — never as failed or succeeded.
  */
 
+import { useState } from "react";
 import { StatusPill } from "@zcode/ui/payswap";
 import type { AgentComposerController, AgentComposerState } from "./agentComposerController.js";
 import type { AgentConversationState } from "./agentConversationWiring.js";
@@ -120,6 +121,8 @@ function PendingActionCard({
   readonly controller: AgentComposerController;
 }): React.ReactNode {
   const tier = card.action.approvalTier;
+  const [reauthCredential, setReauthCredential] = useState("");
+  const [reauthOpen, setReauthOpen] = useState(false);
   const confirmLabel =
     tier === "REAUTH"
       ? "Re-authenticate & confirm"
@@ -129,6 +132,10 @@ function PendingActionCard({
   const conversationalHint = tierAllowsConversationalConfirmation(tier)
     ? " You can also confirm by replying exactly 'yes' in the conversation (or refuse with 'no')."
     : " This tier requires the button — a chat reply cannot confirm it.";
+  const reauthHint =
+    tier === "REAUTH"
+      ? " Re-authentication proves you still hold this account's credential material: re-enter the connection's secret key (or a fresh restricted key for the same account) — it goes to the host security field only, never to the model or the conversation record."
+      : "";
   return (
     <div className="ps-agent-task ps-agent-prepared-action" data-testid="ps-agent-prepared-action">
       <div className="ps-agent-task-head">
@@ -139,16 +146,67 @@ function PendingActionCard({
       <p className="ps-agent-voice-note">
         {AGENT_CONVERSATION_CONFIRMATION_NOTE}
         {conversationalHint}
+        {reauthHint}
       </p>
+      {tier === "REAUTH" && reauthOpen ? (
+        <div className="ps-agent-reauth-step" data-testid="ps-agent-reauth-step">
+          <input
+            type="password"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="Re-enter the connection's secret key (rk_test_…)"
+            aria-label="Re-authentication credential (goes to the host security field only)"
+            data-testid="ps-agent-reauth-credential"
+            value={reauthCredential}
+            onChange={(event) => setReauthCredential(event.target.value)}
+          />
+          <button
+            type="button"
+            className="ps-agent-task-action"
+            data-testid="ps-agent-reauth-confirm"
+            disabled={reauthCredential.length === 0}
+            onClick={() => {
+              const credential = reauthCredential;
+              setReauthCredential("");
+              setReauthOpen(false);
+              void controller.confirmReauthPreparedAction(card.preparedActionId, credential);
+            }}
+          >
+            Verify &amp; confirm
+          </button>
+          <button
+            type="button"
+            className="ps-agent-task-action"
+            data-testid="ps-agent-reauth-cancel"
+            onClick={() => {
+              setReauthCredential("");
+              setReauthOpen(false);
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      ) : null}
       <div className="ps-agent-task-actions">
-        <button
-          type="button"
-          className="ps-agent-task-action"
-          data-testid="ps-agent-confirm-action"
-          onClick={() => void controller.confirmPreparedAction(card.preparedActionId)}
-        >
-          {confirmLabel}
-        </button>
+        {tier === "REAUTH" ? (
+          <button
+            type="button"
+            className="ps-agent-task-action"
+            data-testid="ps-agent-confirm-action"
+            onClick={() => setReauthOpen(true)}
+          >
+            {confirmLabel}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="ps-agent-task-action"
+            data-testid="ps-agent-confirm-action"
+            onClick={() => void controller.confirmPreparedAction(card.preparedActionId)}
+          >
+            {confirmLabel}
+          </button>
+        )}
         <button
           type="button"
           className="ps-agent-task-action"

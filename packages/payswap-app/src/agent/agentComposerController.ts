@@ -474,6 +474,10 @@ export function createAgentComposerController(
       await conversationWiring.confirmPreparedAction(preparedActionId);
     },
 
+    async confirmReauthPreparedAction(preparedActionId: string, freshCredential: string): Promise<void> {
+      await conversationWiring.confirmReauthPreparedAction(preparedActionId, freshCredential);
+    },
+
     async refusePreparedAction(preparedActionId: string): Promise<void> {
       await conversationWiring.refusePreparedAction(preparedActionId);
     },

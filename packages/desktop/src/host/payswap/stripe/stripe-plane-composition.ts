@@ -32,6 +32,11 @@ import type { ConnectionSessionAuthority } from "../connections/session-authorit
 import type { ProbeEvidenceStore } from "../connections/probe-evidence.js";
 import { createStripePreparedActionExecutor } from "./prepared-action-executor.js";
 import { openStripePreparedActionStore } from "./prepared-action-store.js";
+import {
+  createStripeReauthenticationService,
+  reauthenticationPortOf,
+  StripeReauthenticationStore,
+} from "./reauthentication.js";
 import type { StripePreparedActionExecutor } from "./prepared-action-contracts.js";
 import type {
   StripeActionAccountContextResolver,
@@ -41,6 +46,7 @@ import type {
   StripeOperationCensusPort,
   StripeOperationSchemaValidator,
   StripeDispatchTransport,
+  StripeReauthenticationPort,
 } from "./action-seams.js";
 import {
   realCensusPort,
@@ -88,6 +94,8 @@ export interface StripeActionPlane {
   };
   readonly apiVersion: StripeActionApiVersionPort;
   readonly executor: StripePreparedActionExecutor;
+  /** (P26-A, ADR-0018) The re-authentication plane — the REAUTH tier's proof machinery. */
+  readonly reauthentication: StripeReauthenticationPort;
 }
 
 /** Compose the REAL stripe action plane over the connection plane. */
@@ -136,8 +144,27 @@ export async function composeStripeActionPlane(
     directory: `${directory}/stripe-actions`,
   });
 
+  // THE P26-A RE-AUTHENTICATION PLANE (ADR-0018): the proof store under the
+  // same workspace root; the service probes with the FRESH credential over
+  // the REAL transport (the material never persists — the store's
+  // secret-shape scan gates every write).
+  const reauthenticationStore = new StripeReauthenticationStore(
+    input.fileSystem,
+    `${directory}/stripe-reauth/proofs.json`,
+  );
+
   // The REAL transport over the REAL fetch.
   const transport = realDispatchTransport(nodeFetchForStripePlane(input.fetchImpl));
+
+  const reauthenticationService = createStripeReauthenticationService({
+    census,
+    transport,
+    accountContext,
+    store: reauthenticationStore,
+    nowMs: () => Date.parse(nowIso()),
+    createId,
+  });
+  const reauthentication = reauthenticationPortOf(reauthenticationService);
 
   // The seal over the connection authority (ADR-0008 — material never escapes).
   const seal: StripeActionSeal = {
@@ -160,12 +187,23 @@ export async function composeStripeActionPlane(
     nowIso,
     createId,
     store,
+    reauthentication,
   });
 
   input.log?.(
     "info",
-    "payswap-desktop: stripe action plane composed (real census/validator/transport + executor over the connection plane)",
+    "payswap-desktop: stripe action plane composed (real census/validator/transport + executor over the connection plane + the re-authentication plane)",
   );
 
-  return { census, schemaValidator, transport, seal, accountContext, permissions, apiVersion, executor };
+  return {
+    census,
+    schemaValidator,
+    transport,
+    seal,
+    accountContext,
+    permissions,
+    apiVersion,
+    executor,
+    reauthentication,
+  };
 }

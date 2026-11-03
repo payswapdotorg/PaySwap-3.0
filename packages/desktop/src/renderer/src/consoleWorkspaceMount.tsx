@@ -231,6 +231,7 @@ export const PAYSWAP_DESKTOP_CLIENT_MEMBERS = [
   "stripeExecuteAction",
   "stripeInspectAction",
   "stripePlanePrincipalId",
+  "stripeBeginReauthentication",
 ] as const;
 
 /**

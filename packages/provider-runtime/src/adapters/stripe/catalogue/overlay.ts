@@ -1,5 +1,5 @@
 /**
- * @payswap/provider-runtime — the Stripe operation SAFETY OVERLAY (P24-0, P25).
+ * @payswap/provider-runtime — the Stripe operation SAFETY OVERLAY (P24-0, P25, P26-A).
  *
  * ADR-0017 D7 (BINDING): the OpenAPI catalogue describes the HTTP contract;
  * it never decides permission. Every operation must resolve, through THIS
@@ -17,9 +17,17 @@
  * two-phase action contract, RAK eligibility, idempotency classification) is
  * operationId-parametric, so the dispatchable surface is a RULE, not a
  * hand-list: every operation dispatches EXCEPT the credential-admin writes
- * (the HELD SIX — secrets-in-response + the missing re-authentication flow),
- * with IMPLEMENTED_WITH_LIMITS marking the three honest limit classes
- * (account-entitlement families, test-mode helpers, the file-size bound).
+ * (the secrets-law holds) and the account-link/session operations held for
+ * the missing re-authentication flow.
+ *
+ * THE P26-A LAW (ADR-0018): the re-authentication flow EXISTS — the three
+ * account-link/session operations (PostAccountLinks, PostAccountSessions,
+ * PostV2CoreAccountLinks) dispatch at their REAUTH tier behind the host-side
+ * fresh-credential proof (host-minted, digest-scoped, single-use, 10-minute;
+ * the model can never mint one). The held set shrinks thirteen → ten; the
+ * ten remaining are the secrets law (apps/secrets, webhook_endpoints,
+ * ephemeral keys, customer-session secrets, terminal connection tokens, the
+ * secret-reveal GET) — permanent holds, not missing flows.
  */
 
 import type { StripeCatalogueOperation } from './generator.ts';
@@ -90,6 +98,22 @@ const CREDENTIAL_ADMIN_FAMILIES = new Set([
   'account_links', 'account_sessions', 'webhook_endpoints', 'apps/secrets',
 ]);
 
+/** THE P26-A REAUTH-FLOW SET (ADR-0018 D4 — the un-hold). The three
+ *  account-link/session operations whose responses carry onboarding URLs
+ *  and Dashboard session objects (NOT credentials): they dispatch at their
+ *  existing effect class (PERMISSION_OR_CREDENTIAL_ADMIN → REAUTH tier)
+ *  behind the host re-authentication proof — a fresh credential proof for
+ *  the SAME account, live-probe-verified, host-minted, digest-scoped,
+ *  single-use, 10 minutes. The proof machinery lives in the desktop plane
+ *  (packages/desktop/src/host/payswap/stripe/reauthentication.ts); this
+ *  overlay only records that the flow exists and the operations are no
+ *  longer held for its absence. */
+export const STRIPE_REAUTH_FLOW_OPERATIONS: ReadonlySet<string> = new Set([
+  'PostAccountLinks',
+  'PostAccountSessions',
+  'PostV2CoreAccountLinks',
+]);
+
 /** Families that send/finalize communications to customers. */
 const COMMUNICATION_PATH_TOKENS = ['/send', '/send_invoice', '/send_quote'];
 
@@ -105,6 +129,17 @@ const SEARCH_PATH_TOKENS = ['/search', '/list'];
  *  the family stay READ_ONLY by the structural invariant; the reveal GET is
  *  held by the reviewed state override below.) */
 const SECRETS_LAW_PATH_PREFIXES = ['/v1/apps/secrets'];
+
+/** THE P26-A CATCH (measured before pinning — the totality discipline): the
+ *  v2 account-links twin (POST /v2/core/account_links) derives family 'core'
+ *  and so escaped the CREDENTIAL_ADMIN family table, which masked at P25
+ *  because the operation was held by reviewed override. Un-holding it
+ *  exposed the misclassification: the twin would have dispatched at mere
+ *  CONFIRM tier while carrying the audit's own recorded REAUTH semantics
+ *  (the P25 deep-dive: "identical REAUTH-tier semantics"). Path-prefix law,
+ *  checked before the family table — the same pattern as the secrets-law
+ *  prefix above. */
+const REAUTH_LAW_PATH_PREFIXES = ['/v2/core/account_links'];
 
 /** Families gated behind account enrolment for ANY operation (support state). */
 const ACCOUNT_GATED_FAMILIES = new Set([
@@ -148,6 +183,9 @@ function ruleEffectClass(operation: StripeCatalogueOperation): StripeEffectClass
   if (SECRETS_LAW_PATH_PREFIXES.some((prefix) => lowerPath.startsWith(prefix))) {
     return 'PERMISSION_OR_CREDENTIAL_ADMIN';
   }
+  if (REAUTH_LAW_PATH_PREFIXES.some((prefix) => lowerPath.startsWith(prefix))) {
+    return 'PERMISSION_OR_CREDENTIAL_ADMIN';
+  }
   if (CREDENTIAL_ADMIN_FAMILIES.has(family)) return 'PERMISSION_OR_CREDENTIAL_ADMIN';
   if (COMMUNICATION_PATH_TOKENS.some((token) => lowerPath.endsWith(token))) {
     return 'CUSTOMER_COMMUNICATION';
@@ -183,11 +221,13 @@ function ruleEffectClass(operation: StripeCatalogueOperation): StripeEffectClass
  * - PostCustomerSessions: the response carries a single-use client secret.
  * - PostTerminalConnectionTokens: the response carries a short-lived SDK
  *   connection token.
- * - PostV2CoreAccountLinks: the v2 twin of the held v1 PostAccountLinks —
- *   identical REAUTH-tier semantics (the family table misses it because the
- *   v2 path geometry derives family 'core').
  * - GetAppsSecretsFind: a GET that REVEALS the stored secret payload — held
  *   by override so the structural GET→READ_ONLY invariant stays intact.
+ *
+ * (P26-A removed PostV2CoreAccountLinks from this table — it now dispatches
+ * at REAUTH tier behind the re-authentication flow, STRIPE_REAUTH_FLOW_
+ * OPERATIONS above; the v2 twin needed the override ONLY because the family
+ * table misses its v2 path geometry, and a hold is no longer the reason.)
  *
  * PostFiles: the catalogue's only multipart operation dispatches, but its
  * parameters ride the same JSON plane as every other operation — the base64
@@ -199,32 +239,32 @@ const REVIEWED_STATE_OVERRIDES: Readonly<Record<string, StripeSupportState>> = O
   DeleteEphemeralKeysKey: 'NOT_SUPPORTED_WITH_REASON',
   PostCustomerSessions: 'NOT_SUPPORTED_WITH_REASON',
   PostTerminalConnectionTokens: 'NOT_SUPPORTED_WITH_REASON',
-  PostV2CoreAccountLinks: 'NOT_SUPPORTED_WITH_REASON',
   GetAppsSecretsFind: 'NOT_SUPPORTED_WITH_REASON',
   PostFiles: 'IMPLEMENTED_WITH_LIMITS',
 });
 
-/** THE P25 SURFACE LAW (the full-coverage flip — the audit's decision).
+/** THE P25 SURFACE LAW + THE P26-A AMENDMENT (the flip, then the un-hold).
  *
  * Returns the support state for every catalogue operation:
- * 1. credential-admin operations (the family table + the secrets-law path
- *    prefix + the reviewed holds above) stay NOT_SUPPORTED_WITH_REASON —
- *    `apps/secrets` and `webhook_endpoints` responses carry secret material
- *    (the secrets-never-enter-chat law; webhook destinations are managed by
- *    the D12 host plane with sealed storage), and `account_links` /
- *    `account_sessions` are REAUTH-tier with no re-authentication flow in
- *    this product — dispatching them on a card click would be a lie in the
- *    tier's name.
- * 2. test_helpers/* dispatch IMPLEMENTED_WITH_LIMITS (test-mode only — the
+ * 1. THE REAUTH-FLOW OPERATIONS dispatch (P26-A, ADR-0018): account links
+ *    and account sessions at their REAUTH tier behind the host proof.
+ * 2. the remaining credential-admin operations (the family table + the
+ *    secrets-law path prefix + the reviewed holds below) stay
+ *    NOT_SUPPORTED_WITH_REASON — `apps/secrets` and `webhook_endpoints`
+ *    responses carry secret material (the secrets-never-enter-chat law;
+ *    webhook destinations are managed by the D12 host plane with sealed
+ *    storage).
+ * 3. test_helpers/* dispatch IMPLEMENTED_WITH_LIMITS (test-mode only — the
  *    credential gate already refuses live keys globally, INV-25/D14).
- * 3. account-entitlement families dispatch IMPLEMENTED_WITH_LIMITS (Stripe
+ * 4. account-entitlement families dispatch IMPLEMENTED_WITH_LIMITS (Stripe
  *    rejects the call if the product is not enabled on the account).
- * 4. everything else dispatches IMPLEMENTED.
+ * 5. everything else dispatches IMPLEMENTED.
  */
 function p25SupportState(
   operation: StripeCatalogueOperation,
   effectClass: StripeEffectClass,
 ): StripeSupportState {
+  if (STRIPE_REAUTH_FLOW_OPERATIONS.has(operation.operationId)) return 'IMPLEMENTED';
   const reviewed = REVIEWED_STATE_OVERRIDES[operation.operationId];
   if (reviewed !== undefined) return reviewed;
   if (effectClass === 'PERMISSION_OR_CREDENTIAL_ADMIN') return 'NOT_SUPPORTED_WITH_REASON';

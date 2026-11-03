@@ -153,6 +153,11 @@ export interface AgentConversationChannelClient {
   stripeExecuteAction(authorizationId: string): Promise<unknown>;
   stripeInspectAction(preparedActionId: string): Promise<StripePreparedActionPin | null>;
   stripePlanePrincipalId(): string;
+  stripeBeginReauthentication(input: {
+    readonly connectionId: string;
+    readonly actionDigests: readonly string[];
+    readonly freshCredential: string;
+  }): Promise<{ readonly ok: true; readonly proofId: string } | { readonly ok: false; readonly reason: string }>;
 }
 
 /** True iff the thrown value is a host's typed fail-closed plane error. */
@@ -311,6 +316,7 @@ function channelPreparedActionsPort(
     execute: (authorizationId: string) =>
       client.stripeExecuteAction(authorizationId) as Promise<unknown>,
     inspect: (preparedActionId: string) => client.stripeInspectAction(preparedActionId),
+    beginReauthentication: (input) => client.stripeBeginReauthentication(input),
   };
 }
 

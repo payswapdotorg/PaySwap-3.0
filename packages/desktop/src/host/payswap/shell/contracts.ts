@@ -494,6 +494,20 @@ export interface IPaySwapDesktopService extends IPaySwapDesktopPaymentMissionMem
   /** (P24-D) The host-resolved principal reference (the local desktop operator). */
   stripePlanePrincipalId(): string;
 
+  /**
+   * (P26-A, ADR-0018 D1/D3) Begin re-authentication for a REAUTH-tier action:
+   * verify the fresh credential against the SAME account by live probe and
+   * mint the digest-scoped proof. THE MATERIAL-CARRYING MEMBER (the one
+   * place beside the U1 verb): the credential exists only inside this call —
+   * never stored, logged or echoed; the principal is HOST-RESOLVED; live
+   * keys are refused here AND at the transport edge (INV-25).
+   */
+  stripeBeginReauthentication(input: {
+    readonly connectionId: string;
+    readonly actionDigests: readonly string[];
+    readonly freshCredential: string;
+  }): Promise<{ readonly ok: true; readonly proofId: string } | { readonly ok: false; readonly reason: string }>;
+
   // -------------------------------------------------------------------------
   // The payment-mission plane (P17-A, ADR-0010 D2) — read/input members
   // declared in ./payment-mission-contracts.ts (the no-authority-verb

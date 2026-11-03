@@ -12,12 +12,18 @@
  *   idempotencyKeyRef + readBackOperationId.
  * - AUTHORIZE: the single-use, digest-bound artifact. Digest mismatch,
  *   expiry and unknown actions refuse; one live authorization per
- *   action; replay after consumption refuses.
+ *   action; replay after consumption refuses. (P26-A, ADR-0018 D3: a
+ *   REAUTH-tier action additionally requires an unconsumed, unexpired,
+ *   digest-matching re-authentication proof — the typed
+ *   REAUTH_PROOF_REQUIRED refusal otherwise; an uncomposed plane
+ *   refuses the same way, never degrading the tier.)
  * - EXECUTE: re-resolve context/permissions, re-check the approval
  *   tier, re-derive the grant INSIDE the seal (ADR-0008), dispatch
  *   through the transport seam, classify honestly (INV-04) and append
  *   the secret-free audit record. Parameter/context change after
  *   approval invalidates; expired actions are never auto-executed.
+ *   (P26-A: a REAUTH-tier action's proof is re-verified and consumed
+ *   DURABLY BEFORE dispatch — the crash law.)
  */
 
 import type {
@@ -153,6 +159,31 @@ export function createStripePreparedActionExecutor(
           ok: false,
           reason: `prepared action '${input.preparedActionId}' already carries a live authorization ('${live.authorizationId}') — it is single-use; consume it or let it expire`,
         };
+      }
+      // ---- THE P26-A REAUTH GATE (ADR-0018 D3): a REAUTH-tier action
+      // authorizes ONLY against an unconsumed, unexpired, digest-matching
+      // re-authentication proof. An uncomposed re-authentication plane
+      // refuses honestly — the tier NEVER degrades to a card click. ----
+      if (action.approvalTier === "REAUTH") {
+        const reauth = deps.reauthentication;
+        if (reauth === undefined) {
+          return {
+            ok: false,
+            reason:
+              "REAUTH_PROOF_REQUIRED — this action's approval tier requires re-authentication, and the re-authentication plane is not composed on this surface (the tier never degrades to an ordinary confirmation)",
+          };
+        }
+        const verified = await reauth.verify({
+          connectionId: action.accountContext.connectionId,
+          principalId: input.principalId,
+          digest: action.digest,
+        });
+        if (!verified.ok) {
+          return {
+            ok: false,
+            reason: `REAUTH_PROOF_REQUIRED — ${verified.reason} (re-authenticate through the security field, then confirm)`,
+          };
+        }
       }
       const authorization: StripeActionAuthorization = Object.freeze({
         authorizationId: `stripe-authz:${deps.createId()}`,
@@ -299,6 +330,52 @@ export function createStripePreparedActionExecutor(
           { kind: "FAILED", reason: "PERMISSION_MISSING", detail: eligibility.reason },
           [],
         );
+      }
+      // ---- THE P26-A REAUTH GATE AT EXECUTE (ADR-0018 D3/D6): the proof is
+      // re-verified against the AUTHORIZING principal and consumed DURABLY
+      // BEFORE dispatch — the same crash law as the single-use authorization
+      // (a crash after consumption leaves UNKNOWN, never a replayable proof).
+      // ----
+      if (action.approvalTier === "REAUTH") {
+        const reauth = deps.reauthentication;
+        if (reauth === undefined) {
+          return audit(
+            {
+              kind: "FAILED",
+              reason: "REFUSED_BEFORE_DISPATCH",
+              detail:
+                "REAUTH_PROOF_REQUIRED — the re-authentication plane is not composed on this surface (the tier never degrades to an ordinary confirmation)",
+            },
+            [],
+          );
+        }
+        const verified = await reauth.verify({
+          connectionId: action.accountContext.connectionId,
+          principalId: authorization.approvedByPrincipalId,
+          digest: action.digest,
+        });
+        if (!verified.ok) {
+          return audit(
+            {
+              kind: "FAILED",
+              reason: "REFUSED_BEFORE_DISPATCH",
+              detail: `REAUTH_PROOF_REQUIRED — ${verified.reason}`,
+            },
+            [],
+          );
+        }
+        const proofConsumed = await reauth.consume(verified.proofId);
+        if (!proofConsumed) {
+          return audit(
+            {
+              kind: "FAILED",
+              reason: "REFUSED_BEFORE_DISPATCH",
+              detail:
+                "REAUTH_PROOF_REQUIRED — the re-authentication proof was already consumed (single-use; a new proof is required)",
+            },
+            [],
+          );
+        }
       }
       const requestApiVersion = await deps.apiVersion.requestApiVersionOf(
         action.accountContext.connectionId,

@@ -215,6 +215,33 @@ export interface StripeActionApiVersionPort {
   recordCatalogueSurfaceUse(connectionId: string, catalogueRelease: string): Promise<void>;
 }
 
+/**
+ * The re-authentication port (P26-A, ADR-0018 — reauthentication.ts
+ * implements it). The REAUTH approval tier is honest ONLY through this
+ * seam: `begin` is the ONE material-carrying entry (the fresh credential
+ * exists only inside the call — live-probe-verified against the SAME
+ * account, INV-25 at two layers); `verify`/`consume` enforce the
+ * digest-scoped, single-use, 10-minute proof law. The seam is OPTIONAL
+ * at the executor: an uncomposed plane refuses REAUTH-tier authorization
+ * with the typed reason (the honest-unbound posture) — it never
+ * degrades the tier to an ordinary confirmation.
+ */
+export interface StripeReauthenticationPort {
+  begin(input: {
+    readonly connectionId: string;
+    readonly principalId: string;
+    readonly actionDigests: readonly string[];
+    readonly freshCredential: string;
+  }): Promise<{ readonly ok: true; readonly proofId: string } | { readonly ok: false; readonly reason: string }>;
+  verify(input: {
+    readonly connectionId: string;
+    readonly principalId: string;
+    readonly digest: string;
+  }): Promise<{ readonly ok: true; readonly proofId: string } | { readonly ok: false; readonly reason: string }>;
+  /** The durable single-use consumption (the executor calls it BEFORE dispatch). */
+  consume(proofId: string): Promise<boolean>;
+}
+
 /** The executor's injectable dependencies (all seams; no ambient anything). */
 export interface StripePreparedActionExecutorDeps {
   readonly census: StripeOperationCensusPort;
@@ -234,4 +261,7 @@ export interface StripePreparedActionExecutorDeps {
   readonly preparedActionTtlMs?: number;
   /** Authorization lifetime (ms; default 10 minutes — never outlives the action). */
   readonly authorizationTtlMs?: number;
+  /** (P26-A, ADR-0018) The re-authentication plane — REQUIRED for REAUTH-tier
+   *  authorization; absent = every REAUTH-tier action refuses honestly. */
+  readonly reauthentication?: StripeReauthenticationPort;
 }

@@ -125,6 +125,7 @@ export interface AgentComposerController {
    * outcome, model continuation). Zero app-side financial authority.
    */
   confirmPreparedAction(preparedActionId: string): Promise<void>;
+  confirmReauthPreparedAction(preparedActionId: string, freshCredential: string): Promise<void>;
   /** (P24-3) The USER-GESTURE refusal — the action dies, recorded. */
   refusePreparedAction(preparedActionId: string): Promise<void>;
   /** (P24-3) The explicit user-authorized account-context bind/switch. */

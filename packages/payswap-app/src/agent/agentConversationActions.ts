@@ -41,6 +41,10 @@ import type { AgentPendingToolResult } from "./conversationLoopTypes.js";
 export interface AgentConversationActions {
   /** The user-gesture confirm path (the human gate of the two-phase law). */
   confirmPreparedAction(preparedActionId: string): Promise<void>;
+  /** (P26-A, ADR-0018 D5) The REAUTH-tier confirm: mint the digest-scoped
+   *  proof with the fresh credential (the HOST-ONLY material path), then
+   *  ride the ordinary confirm chain — the host gate does the rest. */
+  confirmReauthPreparedAction(preparedActionId: string, freshCredential: string): Promise<void>;
   /** The user-gesture refusal (the action dies, recorded). */
   refusePreparedAction(preparedActionId: string): Promise<void>;
   /** The explicit user-authorized account scope change (bind or switch). */
@@ -83,6 +87,16 @@ export function createAgentConversationActions(
       await guarded(taskId, () => runConfirm(context, cycle, extras, taskId, preparedActionId));
     },
 
+    async confirmReauthPreparedAction(preparedActionId, freshCredential): Promise<void> {
+      const taskId = extras.getConversation().taskId;
+      if (taskId === undefined) {
+        return;
+      }
+      await guarded(taskId, () =>
+        runReauthConfirm(context, cycle, extras, taskId, preparedActionId, freshCredential),
+      );
+    },
+
     async refusePreparedAction(preparedActionId): Promise<void> {
       const taskId = extras.getConversation().taskId;
       if (taskId === undefined) {
@@ -106,6 +120,52 @@ export function createAgentConversationActions(
 }
 
 /* ---------------------- the verb bodies (split) ---------------------- */
+
+/** (P26-A, ADR-0018 D5) The REAUTH-tier confirm: the proof is minted through
+ *  the HOST-ONLY material path (the credential crosses to the host seam and
+ *  exists nowhere else — never the log, never the model), digest-scoped to
+ *  the pending action; the ordinary confirm chain then authorizes against
+ *  it (the executor's REAUTH gate consumes the proof at dispatch). */
+async function runReauthConfirm(
+  context: AgentConversationContext,
+  cycle: ConversationCycleRunner,
+  extras: AgentConversationActionExtras,
+  taskId: string,
+  preparedActionId: string,
+  freshCredential: string,
+): Promise<void> {
+  const fail = async (message: string): Promise<void> => {
+    await context.appendLog(taskId, { kind: "CONVERSATION_NOTE", note: message });
+    await context.projectState(taskId);
+  };
+  const log = await context.session().conversationLog(taskId);
+  const card = findActionCard(log, preparedActionId);
+  if (card === undefined || card.phase !== "PENDING") {
+    await fail(`No action '${preparedActionId}' is awaiting your confirmation — nothing was executed.`);
+    return;
+  }
+  const inspected = await context.plane.preparedActions.inspect(preparedActionId);
+  if (inspected === null) {
+    await fail(`The prepared action '${preparedActionId}' is no longer known to the host — nothing was executed; ask for a fresh preview if you still want it.`);
+    return;
+  }
+  if (inspected.approvalTier !== "REAUTH") {
+    await fail("This action does not require re-authentication — use the ordinary confirm.");
+    return;
+  }
+  const begun = await context.plane.preparedActions.beginReauthentication({
+    connectionId: inspected.accountContext.connectionId,
+    actionDigests: [inspected.digest],
+    freshCredential,
+  });
+  if (!begun.ok) {
+    await fail(`Re-authentication refused: ${begun.reason} — nothing was executed.`);
+    return;
+  }
+  // The proof is live and digest-scoped; the ordinary chain authorizes
+  // against it and the executor consumes it at dispatch (single-use).
+  await runConfirm(context, cycle, extras, taskId, preparedActionId);
+}
 
 async function runConfirm(
   context: AgentConversationContext,

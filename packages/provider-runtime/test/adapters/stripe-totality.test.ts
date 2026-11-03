@@ -150,8 +150,8 @@ const DISPATCHABLE = STRIPE_OPERATION_CENSUS.filter((record) =>
 );
 
 describe('stripe catalogue — the P25 generated totality battery (every dispatchable operation)', () => {
-  it('the dispatchable census is the expected 631 (the flip ledger)', () => {
-    expect(DISPATCHABLE).toHaveLength(631);
+  it('the dispatchable census is the expected 634 (the flip ledger + the P26-A un-hold)', () => {
+    expect(DISPATCHABLE).toHaveLength(634);
   });
 
   it('EVERY dispatchable operation synthesizes, validates and reaches the wire (happy path)', async () => {

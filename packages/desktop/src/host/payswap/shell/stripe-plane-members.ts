@@ -58,6 +58,7 @@ export function stripePlaneMembersOf(
   | "stripeExecuteAction"
   | "stripeInspectAction"
   | "stripePlanePrincipalId"
+  | "stripeBeginReauthentication"
 > {
   return options !== undefined
     ? createStripePlaneChannelMembers({ ...options, log })
@@ -78,6 +79,7 @@ export function createAbsentStripePlaneChannelMembers(): Pick<
   | "stripeExecuteAction"
   | "stripeInspectAction"
   | "stripePlanePrincipalId"
+  | "stripeBeginReauthentication"
 > {
   const refuse = async (): Promise<never> => {
     throw new StripePlaneNotConfiguredError();
@@ -93,6 +95,7 @@ export function createAbsentStripePlaneChannelMembers(): Pick<
     stripeAuthorizeAction: refuse,
     stripeExecuteAction: refuse,
     stripeInspectAction: refuse,
+    stripeBeginReauthentication: refuse,
     stripePlanePrincipalId: () => STRIPE_PLANE_LOCAL_PRINCIPAL_ID,
   };
 }
@@ -113,6 +116,7 @@ export function createStripePlaneChannelMembers(
   | "stripeExecuteAction"
   | "stripeInspectAction"
   | "stripePlanePrincipalId"
+  | "stripeBeginReauthentication"
 > {
   const { plane, authority } = deps;
 
@@ -352,6 +356,18 @@ export function createStripePlaneChannelMembers(
 
     stripePlanePrincipalId() {
       return STRIPE_PLANE_LOCAL_PRINCIPAL_ID;
+    },
+
+    async stripeBeginReauthentication(input) {
+      // THE MATERIAL-CARRYING MEMBER (ADR-0018 D1): the principal is
+      // HOST-RESOLVED (never renderer-supplied); the credential exists only
+      // inside this call; the proof is digest-scoped to the pending actions.
+      return plane.reauthentication.begin({
+        connectionId: input.connectionId,
+        principalId: STRIPE_PLANE_LOCAL_PRINCIPAL_ID,
+        actionDigests: input.actionDigests,
+        freshCredential: input.freshCredential,
+      });
     },
   };
 }

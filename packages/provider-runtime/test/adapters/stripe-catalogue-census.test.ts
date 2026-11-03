@@ -34,6 +34,7 @@ import { STRIPE_OPENAPI_PIN, STRIPE_OPENAPI_PIN_COUNTS } from '../../src/adapter
 import {
   STRIPE_P24_INITIAL_RELEASE_OPERATIONS,
   STRIPE_EFFECT_CLASSES,
+  STRIPE_REAUTH_FLOW_OPERATIONS,
 } from '../../src/adapters/stripe/catalogue/overlay.ts';
 import {
   STRIPE_P24_IMPLEMENTED_OPERATIONS,
@@ -113,8 +114,8 @@ describe('stripe catalogue — the census law (every operation, exactly once)', 
   });
 });
 
-describe('stripe catalogue — the DENY law (handoff §4.3, the P25 surface law)', () => {
-  it('THE HELD THIRTEEN are the ONLY non-dispatchable operations — each a recorded decision', () => {
+describe('stripe catalogue — the DENY law (handoff §4.3, the P25 surface law + the P26-A amendment)', () => {
+  it('THE HELD TEN are the ONLY non-dispatchable operations — each a recorded decision (the secrets law)', () => {
     const held = STRIPE_OPERATION_CENSUS.filter(
       (record) => !stripeCensusDispatchAllowed(record.operationId),
     );
@@ -123,20 +124,35 @@ describe('stripe catalogue — the DENY law (handoff §4.3, the P25 surface law)
       'DeleteEphemeralKeysKey', // reviewed: the ek_ secret rides delete responses
       'DeleteWebhookEndpointsWebhookEndpoint', // family: webhook_endpoints (whsec_ law)
       'GetAppsSecretsFind', // reviewed: a GET that REVEALS the stored payload
-      'PostAccountLinks', // family: REAUTH tier, no re-auth flow
-      'PostAccountSessions', // family: REAUTH tier, no re-auth flow
       'PostAppsSecrets', // path-prefix law: the audit's live catch (3-segment family escape)
       'PostAppsSecretsDelete', // family: apps/secrets (4-segment paths match the table)
       'PostCustomerSessions', // reviewed: single-use client secret
       'PostEphemeralKeys', // reviewed: the ek_ secret rides create responses
       'PostTerminalConnectionTokens', // reviewed: short-lived SDK connection token
-      'PostV2CoreAccountLinks', // reviewed: the v2 twin of held PostAccountLinks
       'PostWebhookEndpoints', // family: webhook_endpoints (whsec_ in create response)
       'PostWebhookEndpointsWebhookEndpoint', // family: webhook_endpoints
     ]);
     for (const record of held) {
       expect(record.supportState).toBe('NOT_SUPPORTED_WITH_REASON');
     }
+  });
+
+  it('THE P26-A REAUTH-FLOW UN-HOLD: the three account-link/session operations dispatch at REAUTH tier (ADR-0018)', () => {
+    // The responses carry onboarding URLs / Dashboard session objects, never
+    // credentials; the REAUTH tier + the host proof machinery (the desktop
+    // lane) are the flow. A chat reply still never confirms this tier.
+    for (const operationId of STRIPE_REAUTH_FLOW_OPERATIONS) {
+      const record = stripeCensusRecord(operationId);
+      expect(record, `no census record for ${operationId}`).toBeDefined();
+      expect(record?.effectClass).toBe('PERMISSION_OR_CREDENTIAL_ADMIN');
+      expect(record?.approvalTier).toBe('REAUTH');
+      expect(record?.supportState).toBe('IMPLEMENTED');
+      expect(stripeCensusDispatchAllowed(operationId)).toBe(true);
+    }
+    // THE P26-A CATCH (measured before pinning): the v2 twin derives family
+    // 'core' — without the reviewed path-prefix law it would have dispatched
+    // at mere CONFIRM tier (masked at P25 by the override hold).
+    expect(stripeCensusRecord('PostV2CoreAccountLinks')?.approvalTier).toBe('REAUTH');
   });
 
   it('the create-secret escape is closed (the audit\u2019s live catch)', () => {
@@ -199,24 +215,42 @@ describe('stripe catalogue — the DENY law (handoff §4.3, the P25 surface law)
     }
   });
 
-  it('the support-state census is the reviewed P25 ledger (exact)', () => {
+  it('the support-state census is the reviewed P26 ledger (exact — the anti-drift law)', () => {
     const counts = stripeCensusSupportStateCounts();
     const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
     expect(total).toBe(STRIPE_OPENAPI_PIN_COUNTS.operations);
-    expect(counts['IMPLEMENTED']).toBe(468);
+    expect(counts['IMPLEMENTED']).toBe(471);
     expect(counts['IMPLEMENTED_WITH_LIMITS']).toBe(163);
-    expect(counts['NOT_SUPPORTED_WITH_REASON']).toBe(13);
-    // The P24 states have no producer under P25 (historical vocabulary):
+    expect(counts['NOT_SUPPORTED_WITH_REASON']).toBe(10);
+    // The P24 states have no producer under P25/P26 (historical vocabulary):
     expect(counts['PLANNED_P24_INITIAL_RELEASE']).toBeUndefined();
     expect(counts['ACCOUNT_GATED']).toBeUndefined();
     expect(counts['SANDBOX_TEST_HELPER_ONLY']).toBeUndefined();
-    // 631 of 644 dispatchable (98.0%) — the full-coverage flip.
+    // 634 of 644 dispatchable (98.4%) — the P25 flip + the P26-A un-hold.
     const dispatchable = STRIPE_OPERATION_CENSUS.filter((record) =>
       stripeCensusDispatchAllowed(record.operationId),
     );
-    expect(dispatchable).toHaveLength(631);
+    expect(dispatchable).toHaveLength(634);
     expect(dispatchable.filter((record) => record.effectClass === 'READ_ONLY')).toHaveLength(284);
-    expect(dispatchable.filter((record) => record.apiNamespace === 'v2')).toHaveLength(31);
+    expect(dispatchable.filter((record) => record.apiNamespace === 'v2')).toHaveLength(32);
+    // THE PER-TIER ANTI-DRIFT LAW (P26-A, gap-matrix D-3): the P25 audit's
+    // prose ledger drifted from its own artifacts (231/75+40/1 vs the text's
+    // 235/76/40/1) with nothing failing. These assertions make every tier
+    // ledger drift a test failure from now on.
+    const writes = dispatchable.filter((record) => record.effectClass !== 'READ_ONLY');
+    expect(writes).toHaveLength(350);
+    const byTier: Record<string, number> = {};
+    for (const record of writes) byTier[record.approvalTier] = (byTier[record.approvalTier] ?? 0) + 1;
+    expect(byTier).toEqual({ CONFIRM: 232, STRONG_CONFIRM: 115, REAUTH: 3 });
+    const byClass: Record<string, number> = {};
+    for (const record of writes) byClass[record.effectClass] = (byClass[record.effectClass] ?? 0) + 1;
+    expect(byClass).toEqual({
+      STRIPE_CONFIGURATION_WRITE: 231,
+      FINANCIAL_IRREVERSIBLE_OR_REVERSAL: 75,
+      FINANCIAL_CREATE: 40,
+      CUSTOMER_COMMUNICATION: 1,
+      PERMISSION_OR_CREDENTIAL_ADMIN: 3,
+    });
   });
 });
 
@@ -283,10 +317,15 @@ describe('stripe catalogue — the P24→P25 flip coherence (the lineage still d
       verified += 1;
     }
     // One-shot surfaces with no verification route — the honest nulls.
-    // 55 reviewed-derivation nulls among 347 dispatchable writes.
+    // 58 reviewed-derivation nulls among 350 dispatchable writes (55 at P25
+    // + the three P26-A un-held one-shots: account links and sessions create
+    // session/URL artifacts with no GET twin).
     expect(verified).toBe(292);
-    expect(nulls).toHaveLength(55);
+    expect(nulls).toHaveLength(58);
     expect(nulls).toContain('PostBillingPortalSessions'); // the reviewed one-shot
+    expect(nulls).toContain('PostAccountLinks'); // the P26-A one-shot twins
+    expect(nulls).toContain('PostAccountSessions');
+    expect(nulls).toContain('PostV2CoreAccountLinks');
   });
 });
 

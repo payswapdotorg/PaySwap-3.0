@@ -176,6 +176,7 @@ describe("the payswap-desktop channel client descriptor (drift laws, P10-B)", ()
       // accounts/reads/prepared-actions + the host-resolved principal).
       "stripeAccountFacts",
       "stripeAuthorizeAction",
+      "stripeBeginReauthentication",
       "stripeCatalogueRelease",
       "stripeExecuteAction",
       "stripeExecuteRead",
