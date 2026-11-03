@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0",
+  "wave": "P27",
+  "title": "Stripe U2/U3, Connect, Global Payouts, African PSP access, and the PaySwap node network",
+  "source": {
+    "operator_order": "2026-11-03 conversation: evaluate PaymentIntent and Payment Link as economic transfers; discover valid multi-provider/multi-node routes; enable Africa-facing Stripe/Paystack pathways; configure U2/U3, Stripe Connect, Global Payouts, and remaining Stripe operations.",
+    "gap_matrix": "spec/productization/P27-0-GAP-MATRIX-2026-11-03.md",
+    "prior_wave": "P26 CLOSED at main base 5ca077e1b3e3c25897b605e683a4e7da27277cb1; see spec/dependency/P26-DEPENDENCY-GRAPH.json and docs/productization-evidence/P26-ACCEPTANCE-RECORD-2026-11-03.md."
+  },
+  "registration_commit_base": "5ca077e1b3e3c25897b605e683a4e7da27277cb1",
+  "proposal_branch": "p27/stripe-connect-global-payouts-africa-network",
+  "policy": "PROPOSAL ONLY. Resident-TL must re-verify every requirement against source, current provider documentation, actual operator-account entitlements, tests and CI; accept the architecture ADR and graph before implementation. No live-mode activation, unapproved P2P, disguised merchant payment links, bypass through multiple nodes, or credential handling outside the host-side secret broker.",
+  "work_orders": [
+    {
+      "id": "P27-0",
+      "owner": "resident-TL",
+      "status": "PROPOSED",
+      "depends_on": [],
+      "lane_scope": [
+        "Source-verify P26 base, current U1/U2/U3, Stripe catalogue 634/644 state, Connect, account-link/session REAUTH gates, Stripe Global Payouts entitlement/API, Paystack transfers, Flutterwave/MTN MoMo, route-compiler and multi-node execution seams.",
+        "Reconcile stale P26-A/B/C/D PENDING labels in spec/dependency/work-orders.md against P26-DEPENDENCY-GRAPH.json and P26-ACCEPTANCE-RECORD-2026-11-03.md.",
+        "Produce accepted ADR-0020 (or next verified available ADR number), current country/product capability matrix, purpose/regulatory eligibility table, exact operator prerequisites, dependency graph and lane ownership.",
+        "Separate PaymentIntent/Payment Link economic value transfer from provider product and regulated activity classification; Global Payouts P2P must be separately entitled and licensed.",
+        "Define node enrolment/attestation, provider-evidenced capability offers, bounded multi-hop graph search, per-leg custody/funding/authorization/reconciliation, privacy and no-bypass controls."
+      ]
+    },
+    {
+      "id": "P27-A",
+      "owner": "worker-1",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P27-0"
+      ],
+      "lane_scope": [
+        "Stripe U2 delegated OAuth and U3 Connect platform/connected-account setup using current Stripe APIs, system-browser auth, host-side secrets, verified account identity, hosted onboarding, capability requirements, webhooks, account context, actions and reconciliation.",
+        "Stripe Connect charge/transfer/payout models with platform, seller, merchant-of-record, refund/dispute and liability semantics explicitly reviewed.",
+        "Sandbox end-to-end tests; LIVE remains refused under INV-25."
+      ]
+    },
+    {
+      "id": "P27-B",
+      "owner": "worker-2",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P27-0"
+      ],
+      "lane_scope": [
+        "Dedicated Stripe Global Payouts product and entitlement slice; do not alias ordinary Stripe payouts or Connect transfers.",
+        "Treasury/financial-account prerequisites, recipient creation and hosted forms, third-party payout execution, country/method/amount/FX/fee eligibility, events, status retrieval and reconciliation.",
+        "Fail closed unless eligible origin country, product entitlement, funding and required licences/Stripe approvals are proven."
+      ]
+    },
+    {
+      "id": "P27-C",
+      "owner": "worker-3",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P27-0"
+      ],
+      "lane_scope": [
+        "Paystack Africa connection and local collection/recipient/payout vertical slices: Ghana bank and mobile-money, Kenya, Nigeria and South Africa where account entitlements and current country/method documentation confirm support.",
+        "Hosted onboarding/payment links, recipient validation, transfer OTP/finalize, webhook verification, transfer read-back, idempotency and reconciliation.",
+        "Re-audit Flutterwave and MTN MoMo; implement only capability slices with real valid credentials and provider evidence."
+      ]
+    },
+    {
+      "id": "P27-D",
+      "owner": "worker-4",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P27-0"
+      ],
+      "lane_scope": [
+        "Multi-node identity/enrolment, signed and expiring capability offers bound to accountable legal principals and real provider connected instances.",
+        "Bounded graph search over typed provider-operation edges; compare direct/native, composed and multi-node paths after hard policy/country/method/funding gates.",
+        "Multi-leg saga orchestration with one immutable route digest and separate per-leg authorization, idempotency, evidence and reconciliation; privacy minimization, revocation, retries and compensation."
+      ]
+    },
+    {
+      "id": "P27-E",
+      "owner": "resident-TL",
+      "status": "BLOCKED",
+      "depends_on": [
+        "P27-A",
+        "P27-B",
+        "P27-C",
+        "P27-D"
+      ],
+      "lane_scope": [
+        "Merged-tree integration, exact-package tests, typecheck, architecture, lint, CI, route and desktop/web integration journeys.",
+        "Real Sandbox evidence where credentials and product entitlements are supplied; no fixture promotion and no live activation.",
+        "Update FEATURE-MAP, JOURNEY-MAP, current-state, acceptance record, work-orders catalog and evidence bundle; record all operator-gated and product-preview limitations."
+      ]
+    }
+  ],
+  "frontier_after_registration": [
+    "P27-0"
+  ],
+  "closure_policy": "P27 cannot close on operation counts or synthetic route compilation alone. Each enabled journey must have current product/country eligibility, account entitlement and provider-evidenced capabilities; real Sandbox end-to-end state change/read-back where available; no secret leakage; per-leg approvals and reconciliation; and honest exclusions for every unsupported or operator-gated corridor. Any LIVE launch requires a separate operator order, completion of ADR-0019 activation prerequisites and independent live certification.",
+  "wave_status": "PROPOSED — proposal branch and handoff created; resident-TL/operator acceptance required. No Stripe platform, Connect or Global Payouts account has been configured by this registration."
+}
