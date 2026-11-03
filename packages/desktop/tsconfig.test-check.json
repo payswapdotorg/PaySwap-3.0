@@ -47,6 +47,7 @@
     "test/payswap/connect-topology.test.ts",
     "test/payswap/connect-connection-views.test.ts",
     "test/payswap/p27c-paystack-endpoint-mirror.test.ts",
-    "test/payswap/connect-plane-composition.test.ts"
+    "test/payswap/connect-plane-composition.test.ts",
+    "test/payswap/payouts-plane-composition.test.ts"
   ]
 }
