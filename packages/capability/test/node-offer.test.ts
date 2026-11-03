@@ -15,6 +15,7 @@ function verifiedWire(overrides: Record<string, unknown> = {}): VerifiedNodeOffe
     nodeId: 'node:gh-router-1',
     boundInstanceIds: ['inst:acct-1-payments'],
     custodyRole: 'TECHNICAL_ROUTER',
+    custodyProgrammeRefs: [],
     constraints: {
       sourceCountries: ['GH'],
       destinationCountries: ['KE'],
@@ -211,5 +212,50 @@ describe('the node-offer chain (ADR-0020 D5 — the INV-13 seam; §6: provider-e
       admitNodeOffer({ offer: null, instance: connectedInstance(), observation: healthyObservation() }),
     ).toThrow(ValidationError);
     expect([...NODE_OFFER_REFUSAL_CODES]).toHaveLength(8);
+  });
+});
+
+describe('the D8 custody evidence surface on the offer wire (ADR-0020 D8)', () => {
+  it('a custody-bearing offer carries its licence/programme refs VERBATIM onto the admitted fact', () => {
+    const admission = admitNodeOffer({
+      offer: verifiedWire({
+        custodyRole: 'CUSTODIAN',
+        custodyProgrammeRefs: ['licence:boj-psp-2026-014', 'programme:safeguarding-segregated'],
+      }),
+      instance: connectedInstance(),
+      observation: healthyObservation(),
+    });
+    expect(admission.admitted).toBe(true);
+    if (admission.admitted) {
+      expect(admission.fact.custodyRole).toBe('CUSTODIAN');
+      expect(admission.fact.custodyProgrammeRefs).toEqual([
+        'licence:boj-psp-2026-014',
+        'programme:safeguarding-segregated',
+      ]);
+    }
+  });
+
+  it('EMPTY programme refs are honest absence (admitted as a fact; the route-level D8 gate refuses the custody leg)', () => {
+    const admission = admitNodeOffer({
+      offer: verifiedWire({ custodyProgrammeRefs: [] }),
+      instance: connectedInstance(),
+      observation: healthyObservation(),
+    });
+    expect(admission.admitted).toBe(true);
+    if (admission.admitted) {
+      expect(admission.fact.custodyProgrammeRefs).toEqual([]);
+    }
+  });
+
+  it('a malformed programme-refs field is refused at the wire (never coerced)', () => {
+    for (const bad of ['not-an-array', ['ok', 42], [null]] as unknown[]) {
+      expect(() =>
+        admitNodeOffer({
+          offer: verifiedWire({ custodyProgrammeRefs: bad }),
+          instance: connectedInstance(),
+          observation: healthyObservation(),
+        }),
+      ).toThrow(ValidationError);
+    }
   });
 });

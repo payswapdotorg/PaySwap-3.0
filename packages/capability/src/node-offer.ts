@@ -62,6 +62,13 @@ export interface VerifiedNodeOfferWire {
   readonly boundInstanceIds: readonly string[];
   /** The explicit custody role (the ADR-0020 D5 role vocabulary). */
   readonly custodyRole: string;
+  /**
+   * The node's D8 licence/programme approval references (carried ON the
+   * signed offer — ADR-0020 D8: a custody-bearing leg is eligible only
+   * when the operating node presents this evidence as a route
+   * precondition; EMPTY is honest absence, never a fabricated approval).
+   */
+  readonly custodyProgrammeRefs: readonly string[];
   readonly constraints: {
     readonly sourceCountries: readonly string[];
     readonly destinationCountries: readonly string[];
@@ -100,6 +107,8 @@ export interface NodeOfferCapabilityFact {
   readonly providerName: string;
   readonly constraints: VerifiedNodeOfferWire['constraints'];
   readonly custodyRole: string;
+  /** The node's D8 licence/programme references, carried verbatim from the signed offer. */
+  readonly custodyProgrammeRefs: readonly string[];
   readonly lineage: {
     readonly instanceId: string;
     readonly implementationId: string;
@@ -140,6 +149,14 @@ function parseOfferWire(candidate: unknown): VerifiedNodeOfferWire {
   ) {
     throw new ValidationError(
       'the offer wire must carry its non-empty boundInstanceIds (an offer is bound to real instances, D5)',
+    );
+  }
+  if (
+    !Array.isArray(candidate['custodyProgrammeRefs']) ||
+    !(candidate['custodyProgrammeRefs'] as readonly unknown[]).every(isNonEmptyString)
+  ) {
+    throw new ValidationError(
+      'the offer wire must carry its custodyProgrammeRefs (an array of licence/programme reference strings; EMPTY is honest absence — D8)',
     );
   }
   const constraints = candidate['constraints'];
@@ -253,6 +270,7 @@ export function admitNodeOffer(input: {
     providerName: input.instance.providerName,
     constraints: offer.constraints,
     custodyRole: offer.custodyRole,
+    custodyProgrammeRefs: Object.freeze([...offer.custodyProgrammeRefs]),
     lineage: Object.freeze({
       instanceId: input.instance.instanceId,
       implementationId: input.instance.implementationId,
