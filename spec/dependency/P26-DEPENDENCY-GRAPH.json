@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "wave": "P26",
+  "title": "The Stripe Dashboard parity and real-account acceptance wave — prove real Sandbox parity, map the entire Dashboard, close the remaining user-facing gaps without weakening the security model",
+  "source": {
+    "operator_order": "2026-11-02 takeover review (session web-e7311ad6): 'I would keep the existing implementation and give the TL one next assignment: P26 — prove real Stripe Sandbox parity, map the entire Dashboard, and close the remaining user-facing gaps without weakening the security model.'",
+    "gap_matrix": "spec/productization/P26-0-GAP-MATRIX-2026-11-03.md",
+    "prior_wave": "spec/dependency/P25-DEPENDENCY-GRAPH.json (CLOSED — frontier empty at 635130c/2d18a42)"
+  },
+  "registration_commit_base": "2d18a423ebe3c1977d99abbee1ada057dfead27c",
+  "policy": "The takeover verification law: every claim re-checked against source/tests/CI at the base commit before registration (six takeover defects found and recorded, two fixed in this registration); the P25-0 arithmetic drifts corrected; real-tier harnesses ship key-ready and exit 2 without credentials (the P22 precedent); the security model is only ever strengthened (ADR-0018 adds gates, removes none; ADR-0019 activates nothing).",
+  "work_orders": [
+    {
+      "id": "P26-0",
+      "owner": "resident-TL",
+      "status": "COMPLETE",
+      "depends_on": [],
+      "lane_scope": [
+        "spec/productization/P26-0-GAP-MATRIX-2026-11-03.md (the six requirement families + the six takeover defects, every row verified at 2d18a42)",
+        "docs/architecture-governance/adr/ADR-0018-p26-reauthentication-flow.md (the re-authentication flow)",
+        "docs/architecture-governance/adr/ADR-0019-p26-live-mode-readiness.md (the live-mode readiness framework — specification only, activation never implied)",
+        "spec/productization/P26-0-DASHBOARD-PARITY-MATRIX-2026-11-03.md + scripts/p26/dashboard-parity-facts.ts + docs/productization-evidence/p26-0-dashboard-parity-FACTS-2026-11-03.json (the Dashboard inventory: evidence-cited research joined to a totality-checked mechanical census partition)",
+        "the CI hygiene fixes: packages/provider-runtime @types/node toolchain fix (the hermetic tsc gate green again) + the regenerated module-ownership report (the governance drift gate green again)",
+        "spec/productization/P25-0-COVERAGE-AUDIT-2026-11-02.md — the correction appendix (the 121 account-gated in-tree count; the 231/75+40/1 tier ledger)",
+        "the work-orders.md reconciliation (the P24-D closure recorded; the P25 orders recorded retroactively) + this graph + the current-state registration"
+      ]
+    },
+    {
+      "id": "P26-A",
+      "owner": "resident-TL",
+      "status": "PENDING",
+      "depends_on": ["P26-0"],
+      "lane_scope": [
+        "packages/provider-runtime/src/adapters/stripe/catalogue/overlay.ts (the D4 un-hold: PostAccountLinks/PostAccountSessions/PostV2CoreAccountLinks dispatchable at REAUTH; the held ten stay held)",
+        "packages/provider-runtime/test/adapters/stripe-catalogue-census.test.ts (the ledger rewrite: 634/10, per-tier assertions — the anti-drift law)",
+        "packages/desktop/src/host/payswap/stripe/reauthentication.ts (NEW — the proof machinery: mint/verify/consume, 10-minute TTL, digest-scoped, account-mismatch refusal)",
+        "packages/desktop/src/host/payswap/stripe/prepared-action-executor.ts + prepared-action-gates.ts (the REAUTH gate: REAUTH_PROOF_REQUIRED / digest match / consumption-before-dispatch)",
+        "packages/desktop/src/host/payswap/shell/stripe-plane-members.ts (the re-auth channel members)",
+        "packages/payswap-app/src/agent/ (the re-auth step on the pending-action card; the chat-refusal law unchanged)",
+        "the batteries: proof lifecycle, executor gate, census ledger, UI law, composition"
+      ]
+    },
+    {
+      "id": "P26-B",
+      "owner": "resident-TL",
+      "status": "PENDING",
+      "depends_on": ["P26-0"],
+      "lane_scope": [
+        "scripts/p26/ (NEW — the key-ready real-Sandbox harness family: the catalogue read journey, the two-phase write journey with read-back, the API-version A/B, the conversation-composition-over-real-Stripe tier, the re-auth proof journey)",
+        "packages/provider-runtime/test/adapters/stripe-sandbox-harness.test.ts (the TIER 2 expansion for the 634-dispatchable ledger)",
+        "docs/productization-evidence/P26-OPERATOR-RUN-CARD-2026-11-03.md (the exact env vars + commands + receipt laws for the operator's key re-supply)",
+        "the receipts land on key re-supply (STRIPE_SANDBOX_SECRET_KEY [+ STRIPE_SANDBOX_WRITES_ENABLED=1]; exit 2 without — never a silent pass)"
+      ]
+    },
+    {
+      "id": "P26-C",
+      "owner": "resident-TL",
+      "status": "PENDING",
+      "depends_on": ["P26-0"],
+      "lane_scope": [
+        "packages/desktop/src/host/payswap/connections/stripe-api-version-state.ts (the tested per-connection migration verb: 2025-08-27.basil → 2026-09-30.endive, explicit, reversible, default unchanged — ADR-0017 D2's law made real)",
+        "packages/payswap-app/src/agent/stripeToolRuntime.ts + the read tool schema (the bounded auto-walk pagination affordance — G11 closed as UX; the model-driven path stays)",
+        "the batteries: migration lifecycle + wire-version proof + auto-walk bounds"
+      ]
+    },
+    {
+      "id": "P26-D",
+      "owner": "resident-TL",
+      "status": "PENDING",
+      "depends_on": ["P26-A", "P26-B", "P26-C"],
+      "lane_scope": [
+        "the merged-tree batteries at the tip (provider-runtime + desktop 3x scoped tsc + payswap-app + architecture 0/0/0 + oxlint 0 + CI green on all gates including the two the takeover fixed)",
+        "spec/productization/JOURNEY-MAP.md §13 (the P26 journeys with the honest tier split) + spec/productization/FEATURE-MAP.md (the P26 row)",
+        "docs/productization-evidence/P26-ACCEPTANCE-RECORD-2026-11-03.md (the classic closure record)",
+        "the graph/state closure + PUSH to GitHub + the bundle archive + the honest carry-forward record (the attachment plane, the secrets sweep, the live activation bundle of ADR-0019, the official-MCP lane, the re-pin path)"
+      ]
+    }
+  ],
+  "frontier_after_registration": ["P26-A", "P26-B", "P26-C"],
+  "closure_policy": "P26 closes only when P26-A/B/C/D are accepted on main with their batteries green at the tip AND the Dashboard parity matrix is committed with its facts artifact reproducible AND every real-Sandbox tier that ran is evidenced by a machine-verified secret-free receipt AND every real tier that did NOT run is recorded as the standing operator action in the acceptance record's verdict — never a silent pass, never a scripted receipt renamed live. No test-count-only closure."
+}

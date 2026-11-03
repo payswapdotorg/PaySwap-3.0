@@ -113,3 +113,15 @@ Every dispatchable write keeps its rule-derived approval tier: 235 STRIPE_CONFIG
 - The `2025-08-27.basil → 2026-09-30.endive` request-version migration runbook (G12).
 - Auto-pagination over `paginateList` as a UX enhancement (G11).
 - A response-surface secrets review for the whole dispatchable set (the deep-dive held the credential-class responses it found; a systematic sweep of every operation's RESPONSE schema for secret-shaped fields would harden the class further).
+
+---
+
+## CORRECTION APPENDIX (appended at P26-0, 2026-11-03 — the takeover audit)
+
+The incoming TL's verification against the committed artifacts found two arithmetic drifts in this document's prose. Neither changes any decision, held operation, or code artifact — the census battery's asserted counts (631 dispatchable · 468 IMPLEMENTED · 163 IMPLEMENTED_WITH_LIMITS · 13 held · 284 reads · 31 v2) were always correct. The drifted numbers are corrected here so the record never misleads:
+
+1. **"122 ACCOUNT_GATED" (§ the ledger table's decomposition, and § honest boundaries #4's context)** — the in-tree count of account-gated operations dispatching as IMPLEMENTED_WITH_LIMITS is **121** after the PostTerminalConnectionTokens move to held (the ledger line "163 = 122 account-gated + 41 test helpers + 1 file upload" double-counted the move: the correct decomposition is **163 = 121 + 41 + 1**). The family TABLE itself (`ACCOUNT_GATED_FAMILIES`, 40 families) is unchanged; the drift is only in this document's arithmetic.
+
+2. **The approval-tier ledger ("235 STRIPE_CONFIGURATION_WRITE (CONFIRM) · 76 FINANCIAL_IRREVERSIBLE_OR_REVERSAL (STRONG_CONFIRM) · 40 FINANCIAL_CREATE (STRONG_CONFIRM) · 1 CUSTOMER_COMMUNICATION (CONFIRM)")** — those four numbers sum to 352, but the dispatchable-write total is 347. Recomputed from operations.json × overlay at 2d18a42, the true tier ledger of the 347 dispatchable writes is **231 STRIPE_CONFIGURATION_WRITE · 75 FINANCIAL_IRREVERSIBLE_OR_REVERSAL · 40 FINANCIAL_CREATE · 1 CUSTOMER_COMMUNICATION = 347** (the table apparently included five of the override-held writes). On the wire this is **232 CONFIRM-tier · 115 STRONG_CONFIRM-tier**.
+
+**The anti-drift law (landed with P26-A):** the census battery now asserts the per-tier counts, so neither ledger can drift from the artifacts silently again.

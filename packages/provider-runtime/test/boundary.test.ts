@@ -169,7 +169,17 @@ describe('architectural boundary: @payswap/provider-runtime', () => {
   it('the manifest law: zero runtime dependencies, devDependencies are exactly the toolchain', () => {
     const manifest = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8'));
     expect(manifest.dependencies).toBeUndefined();
-    expect(Object.keys(manifest.devDependencies ?? {}).sort()).toEqual(['typescript', 'vitest']);
+    // P26-0: the toolchain grows @types/node — the P24-1 transports use the
+    // node globals (URLSearchParams/AbortSignal/URL) and the batteries use
+    // node:crypto/node:url, which the P1 ambient-shim approach could never
+    // cover (globals cannot be ambient-declared without colliding with the
+    // hoisted @types/node in workspace runs — the hermetic CI gate has been
+    // red since P24-1 for exactly this reason). Real types ARE toolchain.
+    expect(Object.keys(manifest.devDependencies ?? {}).sort()).toEqual([
+      '@types/node',
+      'typescript',
+      'vitest',
+    ]);
     expect(manifest.private).toBe(true);
     expect(manifest.type).toBe('module');
     expect(manifest.exports['.']).toBe('./src/index.ts');
