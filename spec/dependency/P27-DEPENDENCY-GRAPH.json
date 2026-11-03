@@ -4,98 +4,116 @@
   "title": "Stripe U2/U3, Connect, Global Payouts, African PSP access, and the PaySwap node network",
   "source": {
     "operator_order": "2026-11-03 conversation: evaluate PaymentIntent and Payment Link as economic transfers; discover valid multi-provider/multi-node routes; enable Africa-facing Stripe/Paystack pathways; configure U2/U3, Stripe Connect, Global Payouts, and remaining Stripe operations.",
-    "gap_matrix": "spec/productization/P27-0-GAP-MATRIX-2026-11-03.md",
+    "gap_matrix": "spec/productization/P27-0-GAP-MATRIX-2026-11-03.md (§12 = the P27-0 acceptance appendix)",
     "prior_wave": "P26 CLOSED at main base 5ca077e1b3e3c25897b605e683a4e7da27277cb1; see spec/dependency/P26-DEPENDENCY-GRAPH.json and docs/productization-evidence/P26-ACCEPTANCE-RECORD-2026-11-03.md."
   },
   "registration_commit_base": "5ca077e1b3e3c25897b605e683a4e7da27277cb1",
   "proposal_branch": "p27/stripe-connect-global-payouts-africa-network",
-  "policy": "PROPOSAL ONLY. Resident-TL must re-verify every requirement against source, current provider documentation, actual operator-account entitlements, tests and CI; accept the architecture ADR and graph before implementation. No live-mode activation, unapproved P2P, disguised merchant payment links, bypass through multiple nodes, or credential handling outside the host-side secret broker.",
+  "architecture": {
+    "adr": "docs/architecture-governance/adr/ADR-0020-p27-multi-provider-capability-network.md (ACCEPTED at P27-0)",
+    "new_invariant": "INV-30 — route decomposition, distribution, relabeling or hop-chaining never changes a transaction's purpose classification, regulatory eligibility or provider-permission status (spec/architecture/invariants.json + INVARIANTS.md)",
+    "capability_matrix": "spec/productization/P27-0-CAPABILITY-AND-ELIGIBILITY-MATRIX-2026-11-03.md",
+    "operator_run_card": "docs/productization-evidence/P27-OPERATOR-RUN-CARD-2026-11-03.md"
+  },
+  "policy": "ACCEPTED at P27-0 (2026-11-03) after the resident-TL source verification (every gap-matrix §1 row verified against the tree; the recorded batteries re-run EXACT: provider-runtime 35f/529t+5sk · desktop 80f+2sk/696t+2sk · app 66f/776t · the scoped tsc trio 0/0/0 · architecture 0 · oxlint 0; three station catches C-1..C-3 fixed). No live-mode activation, no unapproved P2P, no disguised merchant payment links, no bypass through multiple nodes, no credential handling outside the host-side secret broker. LIVE stays refused under INV-25; ADR-0019's activation bundle is the named prerequisite set for any live release.",
   "work_orders": [
     {
       "id": "P27-0",
       "owner": "resident-TL",
-      "status": "PROPOSED",
+      "status": "COMPLETE",
+      "accepted_at": "2026-11-03T12:30:00Z",
       "depends_on": [],
       "lane_scope": [
-        "Source-verify P26 base, current U1/U2/U3, Stripe catalogue 634/644 state, Connect, account-link/session REAUTH gates, Stripe Global Payouts entitlement/API, Paystack transfers, Flutterwave/MTN MoMo, route-compiler and multi-node execution seams.",
-        "Reconcile stale P26-A/B/C/D PENDING labels in spec/dependency/work-orders.md against P26-DEPENDENCY-GRAPH.json and P26-ACCEPTANCE-RECORD-2026-11-03.md.",
-        "Produce accepted ADR-0020 (or next verified available ADR number), current country/product capability matrix, purpose/regulatory eligibility table, exact operator prerequisites, dependency graph and lane ownership.",
-        "Separate PaymentIntent/Payment Link economic value transfer from provider product and regulated activity classification; Global Payouts P2P must be separately entitled and licensed.",
-        "Define node enrolment/attestation, provider-evidenced capability offers, bounded multi-hop graph search, per-leg custody/funding/authorization/reconciliation, privacy and no-bypass controls."
+        "The three-lane source audit (Stripe lane · Africa providers · route architecture) — every §1 registration row verified against the tree at db1693d/5ca077e.",
+        "ADR-0020 accepted (the multi-provider capability network: D1 three-plane transaction semantics · D2 INV-30 · D3 typed classification before discovery · D4 product separation · D5 node enrollment/offers · D6 bounded search + hard gates + simplest-eligible-route · D7 the per-leg saga under ADR-0016 D13 · D8 custody = regulated activity · D9 least disclosure · D10 dated evidence · D11 key-ready/exit-2/OPERATOR_GATED · D12 file-disjoint lanes).",
+        "INV-30 registered in spec/architecture/invariants.json + spec/architecture/INVARIANTS.md (architecture:check 0 violations after).",
+        "spec/productization/P27-0-CAPABILITY-AND-ELIGIBILITY-MATRIX-2026-11-03.md — the retrieval-dated research record (V1-V7 verified · K1 DISCREPANT: Ghana GHS/SWIFT is H2 27 on the 2026-11-03 page, not Q4 2026 · K2 unconfirmed · K3/K4 paystack.com unreachable at station, mandatory lane re-verification) + the country×product matrix + the purpose/regulatory eligibility table.",
+        "docs/productization-evidence/P27-OPERATOR-RUN-CARD-2026-11-03.md — the exact operator actions (U2/U3 platform app + secret channel, Connect decisions, Global Payouts entitlement, Paystack per-country accounts, the standing Stripe sandbox re-supply).",
+        "The P26 work-order catalog reconciliation (P26-A/B/C/D PENDING → COMPLETE with commits; the P26 CLOSED section recorded) + the gap-matrix §12 acceptance appendix + the batteries re-run EXACT + the three station catches fixed (C-1 the FACTS artifact regenerated 634/10; C-2 the read-back-routes historical comment corrected to 631/347; C-3 the run-card path casing)."
+      ],
+      "evidence": [
+        "spec/productization/P27-0-GAP-MATRIX-2026-11-03.md#12-p27-0-acceptance-appendix-resident-tl-2026-11-03",
+        "docs/architecture-governance/adr/ADR-0020-p27-multi-provider-capability-network.md",
+        "spec/productization/P27-0-CAPABILITY-AND-ELIGIBILITY-MATRIX-2026-11-03.md",
+        "docs/productization-evidence/P27-OPERATOR-RUN-CARD-2026-11-03.md",
+        "spec/architecture/invariants.json#INV-30"
       ]
     },
     {
       "id": "P27-A",
       "owner": "worker-1",
-      "status": "BLOCKED",
-      "depends_on": [
-        "P27-0"
-      ],
+      "status": "ACTIVE",
+      "dispatched_at": "2026-11-03",
+      "depends_on": ["P27-0"],
+      "file_ownership": "provider-runtime/src/adapters/stripe/{declaration.ts (U2/U3 rows), oauth-state.ts} + NEW provider-runtime/src/adapters/stripe/connect-*.ts + desktop/src/host/payswap/connections/ stripe U2/U3 members + desktop/src/host/payswap/stripe/ connect growth + the payswap-app U2/U3 surfaces + their tests. The shared files (execution-lane-composition.ts, capability-bridge.ts, probe-contracts.ts) belong to P27-E.",
       "lane_scope": [
         "Stripe U2 delegated OAuth and U3 Connect platform/connected-account setup using current Stripe APIs, system-browser auth, host-side secrets, verified account identity, hosted onboarding, capability requirements, webhooks, account context, actions and reconciliation.",
-        "Stripe Connect charge/transfer/payout models with platform, seller, merchant-of-record, refund/dispute and liability semantics explicitly reviewed.",
-        "Sandbox end-to-end tests; LIVE remains refused under INV-25."
+        "Stripe Connect charge/transfer/payout models with platform, seller, merchant-of-record, refund/dispute and liability semantics explicitly reviewed against ADR-0020 D4 (no Connect-is-P2P; INV-30).",
+        "The account-link/session operations dispatch at the existing REAUTH tier (ADR-0018) for onboarding flows.",
+        "Sandbox end-to-end tests (key-ready, exit 2 without operator credentials); LIVE remains refused under INV-25."
       ]
     },
     {
       "id": "P27-B",
       "owner": "worker-2",
-      "status": "BLOCKED",
-      "depends_on": [
-        "P27-0"
-      ],
+      "status": "ACTIVE",
+      "dispatched_at": "2026-11-03",
+      "depends_on": ["P27-0"],
+      "file_ownership": "NEW provider-runtime/src/adapters/stripe/catalogue/payouts-*.ts + the Global-Payouts recipient/product files + the capability definitions for the product slice + scripts/p27/ payouts harness. Disjoint from P27-A's oauth/connect files inside adapters/stripe/ (ADR-0020 D12).",
       "lane_scope": [
-        "Dedicated Stripe Global Payouts product and entitlement slice; do not alias ordinary Stripe payouts or Connect transfers.",
+        "Dedicated Stripe Global Payouts product and entitlement slice; do not alias ordinary Stripe payouts or Connect transfers (ADR-0020 D4).",
         "Treasury/financial-account prerequisites, recipient creation and hosted forms, third-party payout execution, country/method/amount/FX/fee eligibility, events, status retrieval and reconciliation.",
-        "Fail closed unless eligible origin country, product entitlement, funding and required licences/Stripe approvals are proven."
+        "Fail closed unless eligible origin country (GA UK/US per the 2026-11-03 research; private preview otherwise), product entitlement, funding and required licences/Stripe approvals are proven; the Ghana corridor stays a conditional opportunity (K1: H2 27 on the dated page).",
+        "Key-ready harness with exit-2 law; every country/method fact encoded only after live-doc re-verification (ADR-0020 D10)."
       ]
     },
     {
       "id": "P27-C",
       "owner": "worker-3",
-      "status": "BLOCKED",
-      "depends_on": [
-        "P27-0"
-      ],
+      "status": "ACTIVE",
+      "dispatched_at": "2026-11-03",
+      "depends_on": ["P27-0"],
+      "file_ownership": "provider-runtime/src/adapters/paystack/** (recipient/collect/webhook/transfer growth) + packages/merchant/src/kes-receiving.ts + the Paystack app surfaces. The route-planning corridor pins belong to P27-E.",
       "lane_scope": [
-        "Paystack Africa connection and local collection/recipient/payout vertical slices: Ghana bank and mobile-money, Kenya, Nigeria and South Africa where account entitlements and current country/method documentation confirm support.",
-        "Hosted onboarding/payment links, recipient validation, transfer OTP/finalize, webhook verification, transfer read-back, idempotency and reconciliation.",
-        "Re-audit Flutterwave and MTN MoMo; implement only capability slices with real valid credentials and provider evidence."
+        "Paystack Africa connection and local collection/recipient/payout vertical slices: Ghana bank and mobile-money, Kenya, Nigeria and South Africa ONLY where live-doc re-verification (K3/K4 — the docs were unreachable at the P27-0 station) and the actual account entitlements confirm support.",
+        "Recipient types encoded as dated evidence observations (ghipss/mobile_money/nuban/basa/kepss per the re-verified docs; the Bank-of-Ghana exclusion), recipient validation, transfer OTP/finalize wiring in the product lane, webhook verification, transfer read-back, idempotency and reconciliation.",
+        "The Africa Extended Network → Paystack onboarding links (the verified paystack.com/stripe/* URLs) and local business connection journeys.",
+        "Re-audit Flutterwave and MTN MoMo; implement only capability slices with real valid credentials and provider evidence (Flutterwave stays read-only until its own ADR amendment)."
       ]
     },
     {
       "id": "P27-D",
       "owner": "worker-4",
-      "status": "BLOCKED",
-      "depends_on": [
-        "P27-0"
-      ],
+      "status": "ACTIVE",
+      "dispatched_at": "2026-11-03 (behind the station's 3-concurrent-worker bound; starts when the first slot frees)",
+      "depends_on": ["P27-0"],
+      "file_ownership": "NEW packages/node-network/ (intelligence layer; pins/ports per ADR-0009 D2) + capability/src/node-*.ts (the offer chain) + route-planning/src/{ports.ts, pins/capability.ts, search-budget.ts, hard-gates.ts} extensions + route-compiler/src/shapes.ts growth (one new shape, ADR-gated). The desktop composite-act files extend only if P27-E decides the P22 artifact cannot express per-leg scoped approvals (ADR-0020 D7).",
       "lane_scope": [
-        "Multi-node identity/enrolment, signed and expiring capability offers bound to accountable legal principals and real provider connected instances.",
-        "Bounded graph search over typed provider-operation edges; compare direct/native, composed and multi-node paths after hard policy/country/method/funding gates.",
-        "Multi-leg saga orchestration with one immutable route digest and separate per-leg authorization, idempotency, evidence and reconciliation; privacy minimization, revocation, retries and compensation."
+        "Multi-node identity/enrollment, signed and expiring capability offers bound to accountable legal principals and real ACTIVE provider connected instances (ADR-0020 D5; a self-asserted node list is a discovery input, never provider evidence).",
+        "Bounded graph search over typed provider-operation edges; compare direct/native, composed and multi-node paths after hard policy/country/method/funding/purpose gates (ADR-0020 D6; INV-30 at the eligibility gates).",
+        "Multi-leg saga orchestration with one immutable route digest and separate per-leg authorization, idempotency, evidence and reconciliation (ADR-0020 D7; UNKNOWN stops dependents, INV-04); privacy minimization, revocation, retries and documented compensation.",
+        "The no-bypass battery: typed refusals for relabeled P2P, pass-through merchant routing, purpose/party concealment, split/chain evasion (INV-30's enforcement path)."
       ]
     },
     {
       "id": "P27-E",
       "owner": "resident-TL",
       "status": "BLOCKED",
-      "depends_on": [
-        "P27-A",
-        "P27-B",
-        "P27-C",
-        "P27-D"
-      ],
+      "depends_on": ["P27-A", "P27-B", "P27-C", "P27-D"],
       "lane_scope": [
-        "Merged-tree integration, exact-package tests, typecheck, architecture, lint, CI, route and desktop/web integration journeys.",
+        "Merged-tree integration, exact-package tests, the scoped tsc trio, architecture, lint, CI, route and desktop/web integration journeys.",
         "Real Sandbox evidence where credentials and product entitlements are supplied; no fixture promotion and no live activation.",
+        "The shared-file integrations: execution-lane-composition.ts, connections/capability-bridge.ts, connections/probe-contracts.ts, route-planning/src/pins/corridor.ts, MODULE-OWNERSHIP.yaml.",
         "Update FEATURE-MAP, JOURNEY-MAP, current-state, acceptance record, work-orders catalog and evidence bundle; record all operator-gated and product-preview limitations."
       ]
     }
   ],
   "frontier_after_registration": [
-    "P27-0"
+    "P27-A",
+    "P27-B",
+    "P27-C",
+    "P27-D"
   ],
   "closure_policy": "P27 cannot close on operation counts or synthetic route compilation alone. Each enabled journey must have current product/country eligibility, account entitlement and provider-evidenced capabilities; real Sandbox end-to-end state change/read-back where available; no secret leakage; per-leg approvals and reconciliation; and honest exclusions for every unsupported or operator-gated corridor. Any LIVE launch requires a separate operator order, completion of ADR-0019 activation prerequisites and independent live certification.",
-  "wave_status": "PROPOSED — proposal branch and handoff created; resident-TL/operator acceptance required. No Stripe platform, Connect or Global Payouts account has been configured by this registration."
+  "wave_status": "ACCEPTED AND IN FLIGHT — P27-0 complete (ADR-0020 + INV-30 + the capability matrix + the operator run card + the P26 catalog reconciliation + the batteries re-run EXACT + three station catches fixed); P27-A/B/C/D dispatched file-disjoint; P27-E waits on all four. No Stripe platform, Connect or Global Payouts account has been configured by repository changes; the real runs are the operator's standing actions (the run card is the interface)."
 }

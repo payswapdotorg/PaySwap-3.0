@@ -8,8 +8,8 @@
   },
   "totals": {
     "operations": 644,
-    "dispatchable": 631,
-    "held": 13,
+    "dispatchable": 634,
+    "held": 10,
     "areas": 21,
     "families": 149
   },
@@ -287,14 +287,10 @@
         "country_specs"
       ],
       "operations": 59,
-      "dispatchable": 56,
-      "held": 3,
-      "heldOperations": [
-        "PostAccountLinks",
-        "PostAccountSessions",
-        "PostV2CoreAccountLinks"
-      ],
-      "implemented": 56,
+      "dispatchable": 59,
+      "held": 0,
+      "heldOperations": [],
+      "implemented": 59,
       "implementedWithLimits": 0,
       "reads": 25,
       "writes": 34,
@@ -303,7 +299,7 @@
       "testHelpers": 0,
       "strongConfirm": 10,
       "confirm": 21,
-      "reauth": 0
+      "reauth": 3
     },
     {
       "area": "TERMINAL",

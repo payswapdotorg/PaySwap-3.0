@@ -4,8 +4,8 @@
  * Handoff §4.3: every state-changing operation pairs with the catalogue
  * operation that verifies its effect (the frozen StripePreparedAction carries
  * it as readBackOperationId). P24 reviewed 18 routes by hand for the 22
- * implemented writes; the P25 full-coverage flip (638 dispatchable
- * operations, 353 of them writes) makes hand-listing unmaintainable — the
+ * implemented writes; the P25 full-coverage flip (631 dispatchable
+ * operations, 347 of them writes) makes hand-listing unmaintainable — the
  * routes are now DERIVED from the pinned inventory's path geometry, with the
  * reviewed P24 table kept as the override where review diverged from the
  * rule, and explicit reviewed nulls for one-shot surfaces.
