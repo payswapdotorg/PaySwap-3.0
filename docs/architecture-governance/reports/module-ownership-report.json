@@ -20,7 +20,7 @@
       "R4-cycle": 1,
       "R6-cross-package-relative": 26
     },
-    "unresolved_external_specifiers": 372
+    "unresolved_external_specifiers": 374
   },
   "packages": [
     {
@@ -558,7 +558,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 5
+          "occurrences": 7
         },
         {
           "source": "packages/execution-graph",
@@ -637,7 +637,7 @@
       "dependencies": [
         {
           "target": "packages/capability",
-          "occurrences": 5
+          "occurrences": 7
         },
         {
           "target": "packages/client",
@@ -673,7 +673,7 @@
         },
         {
           "target": "packages/provider-runtime",
-          "occurrences": 37
+          "occurrences": 38
         },
         {
           "target": "packages/route-compiler",
@@ -681,7 +681,7 @@
         },
         {
           "target": "packages/route-planning",
-          "occurrences": 23
+          "occurrences": 26
         },
         {
           "target": "packages/rpc",
@@ -1126,7 +1126,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 37
+          "occurrences": 38
         },
         {
           "source": "packages/payswap-app",
@@ -1187,7 +1187,7 @@
       "dependents": [
         {
           "source": "packages/desktop",
-          "occurrences": 23
+          "occurrences": 26
         },
         {
           "source": "packages/payswap-app",
@@ -1745,6 +1745,34 @@
           "line": 60,
           "kind": "import",
           "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/desktop/src/renderer/src/routePlanningNodeNetwork.ts",
+          "line": 59,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/capability/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/capability",
+          "specifier": "@payswap/capability",
+          "file": "packages/desktop/src/renderer/src/routePlanningNodeNetwork.ts",
+          "line": 60,
+          "kind": "import",
+          "typeOnly": true,
           "classification": "workspace",
           "targetFile": "packages/capability/src/index.ts",
           "deepImport": false,
@@ -2522,7 +2550,7 @@
           "crossPackageRelative": true
         }
       ],
-      "occurrences_total": 37,
+      "occurrences_total": 38,
       "occurrences_capped": true
     },
     {
@@ -2742,6 +2770,20 @@
           "sourcePkg": "packages/desktop",
           "targetPkg": "packages/route-planning",
           "specifier": "@payswap/route-planning",
+          "file": "packages/desktop/src/renderer/src/routePlanningNodeNetwork.ts",
+          "line": 58,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/route-planning/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-planning",
+          "specifier": "@payswap/route-planning",
           "file": "packages/desktop/test/payswap/chain-from-bridge.test.ts",
           "line": 56,
           "kind": "import",
@@ -2762,6 +2804,34 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/route-planning/src/pins/corridor.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-planning",
+          "specifier": "@payswap/route-planning",
+          "file": "packages/desktop/test/payswap/node-network-composition.test.ts",
+          "line": 36,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "workspace",
+          "targetFile": "packages/route-planning/src/index.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": false
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/node-network-fixtures.ts",
+          "file": "packages/desktop/test/payswap/node-network-composition.test.ts",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/node-network-fixtures.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -2891,51 +2961,9 @@
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/route-planning",
-          "specifier": "../../../route-planning/test/fixtures.ts",
-          "file": "packages/desktop/test/payswap/p23-no-bypass.test.ts",
-          "line": 62,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/route-planning/test/fixtures.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/route-planning",
-          "specifier": "@payswap/route-planning",
-          "file": "packages/desktop/test/payswap/p23-opportunity-emergence.test.ts",
-          "line": 11,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "workspace",
-          "targetFile": "packages/route-planning/src/index.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": false
-        },
-        {
-          "sourcePkg": "packages/desktop",
-          "targetPkg": "packages/route-planning",
-          "specifier": "../../../route-planning/test/no-route-fixtures.ts",
-          "file": "packages/desktop/test/payswap/p23-opportunity-emergence.test.ts",
-          "line": 19,
-          "kind": "import",
-          "typeOnly": false,
-          "classification": "relative",
-          "targetFile": "packages/route-planning/test/no-route-fixtures.ts",
-          "deepImport": false,
-          "deepImportReason": null,
-          "crossPackageRelative": true
         }
       ],
-      "occurrences_total": 23,
+      "occurrences_total": 26,
       "occurrences_capped": true
     },
     {
@@ -5001,7 +5029,7 @@
       "severity": "error",
       "sourcePkg": "packages/desktop",
       "targetPkg": "packages/provider-runtime",
-      "detail": "37 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "38 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
         {
           "sourcePkg": "packages/desktop",
@@ -5284,7 +5312,7 @@
           "crossPackageRelative": true
         }
       ],
-      "occurrences_total": 37,
+      "occurrences_total": 38,
       "occurrences_capped": true
     },
     {
@@ -5372,7 +5400,7 @@
       "severity": "error",
       "sourcePkg": "packages/desktop",
       "targetPkg": "packages/route-planning",
-      "detail": "10 relative/alias import(s) cross the package boundary instead of using the package name",
+      "detail": "11 relative/alias import(s) cross the package boundary instead of using the package name",
       "occurrences": [
         {
           "sourcePkg": "packages/desktop",
@@ -5384,6 +5412,20 @@
           "typeOnly": false,
           "classification": "relative",
           "targetFile": "packages/route-planning/src/pins/corridor.ts",
+          "deepImport": false,
+          "deepImportReason": null,
+          "crossPackageRelative": true
+        },
+        {
+          "sourcePkg": "packages/desktop",
+          "targetPkg": "packages/route-planning",
+          "specifier": "../../../route-planning/test/node-network-fixtures.ts",
+          "file": "packages/desktop/test/payswap/node-network-composition.test.ts",
+          "line": 41,
+          "kind": "import",
+          "typeOnly": false,
+          "classification": "relative",
+          "targetFile": "packages/route-planning/test/node-network-fixtures.ts",
           "deepImport": false,
           "deepImportReason": null,
           "crossPackageRelative": true
@@ -7630,6 +7672,11 @@
       "line": 7
     },
     {
+      "file": "packages/desktop/test/payswap/node-network-composition.test.ts",
+      "specifier": "vitest",
+      "line": 22
+    },
+    {
       "file": "packages/desktop/test/payswap/onchain-corridor-chain.test.ts",
       "specifier": "vitest",
       "line": 28
@@ -7688,11 +7735,6 @@
       "file": "packages/desktop/test/payswap/p23-journey-emergence.test.ts",
       "specifier": "vitest",
       "line": 39
-    },
-    {
-      "file": "packages/desktop/test/payswap/p23-no-bypass.test.ts",
-      "specifier": "vitest",
-      "line": 35
     }
   ],
   "example_hints_without_packages": [
