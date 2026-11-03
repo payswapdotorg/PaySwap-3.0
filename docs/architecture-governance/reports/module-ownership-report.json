@@ -20,7 +20,7 @@
       "R4-cycle": 1,
       "R6-cross-package-relative": 27
     },
-    "unresolved_external_specifiers": 375
+    "unresolved_external_specifiers": 376
   },
   "packages": [
     {
@@ -7651,6 +7651,11 @@
       "line": 16
     },
     {
+      "file": "packages/desktop/test/payswap/connect-plane-composition.test.ts",
+      "specifier": "vitest",
+      "line": 15
+    },
+    {
       "file": "packages/desktop/test/payswap/connect-platform-gates.test.ts",
       "specifier": "vitest",
       "line": 18
@@ -7814,11 +7819,6 @@
       "file": "packages/desktop/test/payswap/p23-cdp-seeder.test.ts",
       "specifier": "vitest",
       "line": 29
-    },
-    {
-      "file": "packages/desktop/test/payswap/p23-journey-emergence.test.ts",
-      "specifier": "vitest",
-      "line": 39
     }
   ],
   "example_hints_without_packages": [
