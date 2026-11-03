@@ -212,14 +212,15 @@ describe("architectural boundary: @payswap/node-network (the intelligence leaf l
   });
 
   it("the exact census (P27-D lane landing; re-pin = disclosed deviation, ADR-0009 D9)", () => {
-    // CENSUS (P27-D second batch, 2026-11-03 — the core offer machinery):
-    // 9 src modules (canonical, errors, classification, enrollment,
-    // attestation, offer, offer-verification [the 400-line file-law split],
-    // registry, index) and 6 test suites (boundary, classification,
-    // enrollment, attestation, offer, registry) + the fixtures helper and
-    // the node.d.ts shim (8 all-test .ts files).
-    expect(sourceFiles.length).toBe(9);
-    expect(testFiles.length).toBe(6);
-    expect(allTestFiles.length).toBe(8);
+    // CENSUS (P27-D third batch, 2026-11-03 — the saga + disclosure
+    // machinery): 12 src modules (canonical, errors, classification,
+    // enrollment, attestation, offer, offer-verification [the 400-line
+    // file-law split], registry, saga, saga-run, disclosure, index) and 9
+    // test suites (boundary, classification, enrollment, attestation,
+    // offer, registry, saga, saga-run, disclosure) + the fixtures helper
+    // and the node.d.ts shim (11 all-test .ts files).
+    expect(sourceFiles.length).toBe(12);
+    expect(testFiles.length).toBe(9);
+    expect(allTestFiles.length).toBe(11);
   });
 });
