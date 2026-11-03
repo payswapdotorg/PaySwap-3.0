@@ -51,7 +51,10 @@ import type { StripePreparedActionExecutor } from "../../src/host/payswap/stripe
 import { createStripePreparedActionExecutor } from "../../src/host/payswap/stripe/prepared-action-executor.js";
 import { createInMemoryStripePreparedActionStore } from "../../src/host/payswap/stripe/prepared-action-store.js";
 import { StripeRakPermissionBinding } from "../../src/host/payswap/connections/stripe-rak-permissions.js";
-import { pinnedCatalogueReleaseIdentity } from "../../src/host/payswap/connections/stripe-api-version-state.js";
+import {
+  pinnedCatalogueReleaseIdentity,
+  pinnedCatalogueRequestApiVersion,
+} from "../../src/host/payswap/connections/stripe-api-version-state.js";
 import {
   FAKE_RAK_TEST_KEY,
   accountContextResolverOver,
@@ -267,8 +270,17 @@ let wiredIdSeq = 0;
  * REAL host planes (the RAK binding over the real census with the
  * REAL overlay permission-rule strings, the per-connection API-version
  * state, the verified-evidence account context, the seal).
+ *
+ * The P26-C wire-proof option: `migrateRequestApiVersion: true` runs
+ * the PUBLIC migration verb (legacy pin → catalogue pin) on the wired
+ * connection BEFORE the flow, so a battery can prove the endive header
+ * on the wire for a migrated connection while the default fixture
+ * (option absent) keeps proving the legacy basil pin.
  */
-export async function realWiredExecutor(answer: FetchAnswer | "REJECT" | "TIMEOUT"): Promise<{
+export async function realWiredExecutor(
+  answer: FetchAnswer | "REJECT" | "TIMEOUT",
+  options?: { readonly migrateRequestApiVersion?: boolean },
+): Promise<{
   readonly executor: StripePreparedActionExecutor;
   readonly store: ReturnType<typeof createInMemoryStripePreparedActionStore>;
   readonly calls: CapturedFetch[];
@@ -277,6 +289,15 @@ export async function realWiredExecutor(answer: FetchAnswer | "REJECT" | "TIMEOU
   const world = await executorWorld({
     materialByConnection: new Map<string, unknown>([[CONN, { apiKey: FAKE_RAK_TEST_KEY }]]),
   });
+  if (options?.migrateRequestApiVersion === true) {
+    const migration = await world.apiVersion.migrateRequestApiVersion({
+      connectionId: CONN,
+      targetApiVersion: pinnedCatalogueRequestApiVersion(),
+    });
+    if (!migration.ok) {
+      throw new Error(`fixture migration failed: ${migration.refusal.kind}`);
+    }
+  }
   // The permission binding over the REAL census (the declared scopes are
   // the REAL overlay rule strings — 'customers: Read'/'customers: Write').
   const permissions = new StripeRakPermissionBinding({

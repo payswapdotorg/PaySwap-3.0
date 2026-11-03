@@ -200,6 +200,20 @@ describe("the per-task domain tools (intent + permission filtered, capped)", () 
     });
   });
 
+  it("the autoWalk opt-in is offered ONLY on paginated list reads (P26-C)", async () => {
+    const { registry } = await loadedRegistry({ intentText: "products" });
+    const list = registry.resolve("stripe.resources.products.list") as StripeRegisteredTool;
+    const listSchema = list.inputSchema as { properties: Record<string, { type?: string }> };
+    // The paginated list tool offers the bounded auto-walk opt-in.
+    expect(listSchema.properties.autoWalk).toMatchObject({ type: "boolean" });
+    expect(String(listSchema.properties.autoWalk?.description)).toContain("10 pages");
+    // The non-paginated get tool does NOT offer it (the schema is closed).
+    const get = registry.resolve("stripe.resources.products.get") as StripeRegisteredTool;
+    const getSchema = get.inputSchema as { properties: Record<string, unknown> };
+    expect("autoWalk" in getSchema.properties).toBe(false);
+    expect(getSchema.additionalProperties).toBe(false);
+  });
+
   it("isRegistrableReadFact: each filter is load-bearing", () => {
     const account = ACCOUNT;
     expect(isRegistrableReadFact(fact({}), account)).toBe(true);

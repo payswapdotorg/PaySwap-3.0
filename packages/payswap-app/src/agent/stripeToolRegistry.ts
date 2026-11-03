@@ -35,6 +35,10 @@ import type {
   StripeToolCataloguePort,
 } from "./stripeToolCataloguePort.js";
 import {
+  STRIPE_TOOL_AUTO_WALK_ARGUMENT_NAME,
+  STRIPE_TOOL_AUTO_WALK_ARGUMENT_SCHEMA,
+} from "./stripeToolAutoWalk.js";
+import {
   DESCRIBE_OPERATION_INPUT,
   DISCOVER_CAPABILITIES_INPUT,
   PREPARE_ACTION_INPUT,
@@ -368,7 +372,12 @@ export function createStripeToolRegistry(
   };
 }
 
-/** The read tool's input schema: path params + bounded list options. */
+/**
+ * The read tool's input schema: path params + bounded list options. The
+ * paginated list tools additionally offer the P26-C opt-in `autoWalk`
+ * boolean (the bounded page-walking affordance — offered ONLY where the
+ * census fact says listPaginated; non-paginated reads reject it).
+ */
 function readToolInputSchema(fact: StripeOperationFactPin): Readonly<Record<string, unknown>> {
   const properties: Record<string, unknown> = {};
   for (const param of fact.pathParams) {
@@ -377,6 +386,7 @@ function readToolInputSchema(fact: StripeOperationFactPin): Readonly<Record<stri
   if (fact.listPaginated) {
     properties.limit = { type: "integer", minimum: 1, maximum: 100, description: "Page size (1-100)." };
     properties.starting_after = { type: "string", description: "Pagination cursor from a previous page." };
+    properties[STRIPE_TOOL_AUTO_WALK_ARGUMENT_NAME] = STRIPE_TOOL_AUTO_WALK_ARGUMENT_SCHEMA;
   }
   return Object.freeze({
     type: "object",
