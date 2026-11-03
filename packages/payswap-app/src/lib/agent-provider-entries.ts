@@ -128,7 +128,45 @@ export const AGENT_PROVIDER_SETUP_ENTRIES: readonly AgentProviderSetupEntry[] = 
     cardLine:
       "Observe payments through your own Paystack business account: a test-mode secret key (sk_test_…) entered through the host-side credential broker — never in chat — and verified by a read-only transactions probe. The connection's scope stays read-only; the corridor's Kenya bank-transfer payout lane derives its own sandbox grant from the same sealed test key at dispatch time (never a connection-scope growth).",
     cardActionLabel: "Connect Paystack — own-store (test mode)",
-    qualifiers: [],
+    qualifiers: [
+      // (P27-C, ADR-0020 D4) The local-collection journey — the SAME
+      // connection form and use case (the same sealed test key; the
+      // collection grant derives at dispatch inside the seal, never a
+      // connection-scope growth). A qualifier phrasing only routes the
+      // intent, so the journey stays a live path through the existing
+      // host form — never a dead button.
+      {
+        phrases: ["collection", "payment page", "hosted page", "checkout"],
+        form: "SCOPED_API_CREDENTIAL",
+        useCaseRef: "own-store-test-mode",
+        cardTitle: "Paystack — local collection (test mode)",
+        cardLine:
+          "Collect through Paystack's hosted payment pages: transaction initialization and verification are implemented on the provider plane (test mode), each deriving its own sandbox grant at dispatch from the same sealed test key. A collection request is a payment request the customer still authorizes on the provider's hosted page — it is never money movement by itself, and the journey is the genuine-commerce product (a remittance/P2P or unclassified purpose is refused).",
+        cardActionLabel: "Connect Paystack — local collection (test mode)",
+      },
+      // (P27-C, ADR-0020 D10/D11) The Africa local-rails journey — the
+      // per-country business connection + the Extended Network onboarding
+      // links. The recipient/payout facts stay K3/K4-gated: nothing
+      // unverified is ever encoded or dispatched, and the card says so.
+      {
+        phrases: [
+          "africa",
+          "ghana",
+          "kenya",
+          "nigeria",
+          "south africa",
+          "mobile money",
+          "recipient",
+          "bank transfer",
+        ],
+        form: "SCOPED_API_CREDENTIAL",
+        useCaseRef: "own-store-test-mode",
+        cardTitle: "Paystack — Africa local rails (per-country business)",
+        cardLine:
+          "Connect each participating business's own Paystack account per country (Ghana, Kenya, Nigeria, South Africa — the markets Stripe lists under its Extended Network, with onboarding links on the connections card). The typed recipient and bank/mobile-money payout lanes are implemented on the provider plane, but no recipient-type availability fact is encoded until the live-doc re-verification and the real-account probe land their dated observations — every recipient create honestly refuses until then.",
+        cardActionLabel: "Connect Paystack — Africa local rails",
+      },
+    ],
   },
   {
     providerId: "stellar:testnet",
