@@ -190,6 +190,12 @@
       "statement": "Frozen architecture changes require ADR + dependency-graph + state updates.",
       "status": "documented-not-expressible",
       "notes": "Process constraint on governance workflow; partially witnessed by git history and spec/adr/, not statically checkable in-tree."
+    },
+    {
+      "id": "INV-30",
+      "statement": "Route decomposition, distribution, relabeling or hop-chaining never changes a transaction's purpose classification, regulatory eligibility or provider-permission status.",
+      "status": "documented-not-expressible",
+      "notes": "Registered by ADR-0020 (P27-0, 2026-11-03). The three-plane transaction semantics law (economic intent / provider operations / regulatory classification) with the most-restrictive-classification rule over intent and every leg. Enforcement path: the route compiler's hard eligibility gates and the P27-D no-bypass battery (typed refusals for relabeled P2P, pass-through merchant routing, purpose or party concealment, split/chain evasion); package-level tests land with P27-D and promotion to machine-checked follows the registry's automation-bridge rule (the INV-12/INV-21 precedent)."
     }
   ]
 }

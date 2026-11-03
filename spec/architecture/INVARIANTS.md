@@ -31,3 +31,4 @@ A violation blocks merge or release.
 27. Domain contracts do not import UI/framework/runtime implementation details.
 28. Work Orders are pairwise-disjoint.
 29. Frozen architecture changes require ADR + dependency-graph + state updates.
+30. Route decomposition, distribution, relabeling or hop-chaining never changes a transaction's purpose classification, regulatory eligibility or provider-permission status.

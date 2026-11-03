@@ -12,12 +12,23 @@
   },
   "max_concurrent_workers": 3,
   "worker_lanes": {
-    "worker-1": "platform-lineage-and-economic-kernel",
-    "worker-2": "financial-authority-and-trust-security",
-    "worker-3": "migration-experience-and-integrations"
+    "worker-1": "p27-a-stripe-u2-u3-connect",
+    "worker-2": "p27-b-stripe-global-payouts",
+    "worker-3": "p27-c-paystack-africa",
+    "worker-4": "p27-d-node-network"
   },
-  "frontier": [],
-  "active_work_orders": [],
+  "frontier": [
+    "P27-A",
+    "P27-B",
+    "P27-C",
+    "P27-D"
+  ],
+  "active_work_orders": [
+    { "id": "P27-A", "owner": "worker-1", "status": "ACTIVE", "dispatched_at": "2026-11-03" },
+    { "id": "P27-B", "owner": "worker-2", "status": "ACTIVE", "dispatched_at": "2026-11-03" },
+    { "id": "P27-C", "owner": "worker-3", "status": "ACTIVE", "dispatched_at": "2026-11-03" },
+    { "id": "P27-D", "owner": "worker-4", "status": "ACTIVE", "dispatched_at": "2026-11-03", "note": "queued behind the station's 3-concurrent-worker bound" }
+  ],
   "completed_work_orders": [
     {
       "id": "P0-W1",
@@ -1263,6 +1274,12 @@
       "owner": "resident-TL",
       "accepted_at": "2026-11-03T02:30:00Z",
       "record": "The takeover wave closed: the merged-tree batteries green at the tip (provider-runtime 35f/529t+5sk · desktop 80f/696t+2sk · tsc 0/0/0 · app 66f/776t · architecture 0/0 · oxlint 0) + the JOURNEY-MAP §13 / FEATURE-MAP P26 row + the acceptance record (docs/productization-evidence/P26-ACCEPTANCE-RECORD-2026-11-03.md — the six caught-and-fixed defects incl. the P26-A v2-twin catch and the push-protection fix) + the graph/state closure + PUSH + the bundle archive. The carry-forwards named: the attachment plane, the response-surface secrets sweep, ADR-0019's live activation bundle, the official-MCP lane, the re-pin path, the live substrate runtime + the Electron CDP receipts, the webhook-journey extension, the app re-auth gesture's wiring-level UI test. The frontier returns to EMPTY."
+    },
+    {
+      "id": "P27-0",
+      "owner": "resident-TL",
+      "accepted_at": "2026-11-03T12:30:00Z",
+      "record": "The P27 wave accepted at the architecture gate: the three-lane source audit (every gap-matrix §1 row verified against the tree at db1693d/5ca077e — 644 pinned / 634 dispatchable / held ten / tier ledger 232-115-3 / U1 CONFIGURED / U2+U3 UNCONFIGURED with their exact missing operator configuration / INV-25 at eight mechanical layers / Paystack read-only + the 4-operation transfer lane with no recipient plane / Flutterwave read-only by law / MTN MoMo declaration-only / the corridor compiler with custody/authorization lineage / the P22 composite act) + the batteries re-run EXACT (provider-runtime 35f/529t+5sk · desktop 80f+2sk/696t+2sk · app 66f/776t · the scoped tsc trio host/test-check/mirror-check 0/0/0 · provider-runtime hermetic tsc 0 · architecture 0 violations · oxlint 0 errors) + THREE STATION CATCHES fixed (C-1 the dashboard-parity FACTS artifact regenerated 631/13/0 → 634/10/3; C-2 the read-back-routes.ts historical comment corrected to the true P25 ledger 631/347; C-3 the P26 run-card cd path casing) + ADR-0020 accepted (the multi-provider capability network: D1 the three-plane transaction semantics · D2 INV-30 the non-laundering invariant — registered in invariants.json + INVARIANTS.md · D3 typed classification before discovery · D4 product separation · D5 node enrollment and signed expiring offers · D6 bounded search + hard gates before ranking + the simplest-eligible-route preference · D7 the per-leg saga under the ADR-0016 D13 discipline · D8 custody legs are regulated activity · D9 least disclosure · D10 dated evidence never flags · D11 key-ready/exit-2/OPERATOR_GATED · D12 file-disjoint lane ownership) + the capability-and-eligibility matrix (retrieval-dated 2026-11-03: Global Payouts requires Treasury, GA origins UK+US, private preview by request; the Extended Network → Paystack links verified; K1 DISCREPANT — Ghana GHS/SWIFT is H2 27 on the dated page, not the registration's Q4 2026; K2 unconfirmed; K3/K4 paystack.com unreachable at the station — the lanes must re-verify before encoding) + the P27 operator run card + the P26 work-order catalog reconciliation (P26-A/B/C/D PENDING → COMPLETE with commits; the P26 CLOSED section recorded). The frontier is P27-A ∥ P27-B ∥ P27-C ∥ P27-D (file-disjoint per ADR-0020 D12; three concurrent workers at the station, P27-D queued); P27-E is the TL integration and closure."
     }
   ],
   "policies": {
@@ -1837,7 +1854,13 @@
       "actor": "resident-TL",
       "action": "P26_D_CLOSED",
       "detail": "The takeover wave closed on the operator's order: the REAUTH tier made honest (ADR-0018 — 634/644 dispatchable, the held ten are the secrets law, the security model only strengthened), the Dashboard mapped end-to-end (the reproducible parity matrix: 644/149/21, the 19 Dashboard-only classes cited, never scraped), the version migration real and default-preserving (basil until the operator orders the flip), the real-Sandbox tier runnable on key re-supply (the run card is the interface; exit 2 verified live). The takeover defects: D-1/D-2/D-4 fixed, D-3 corrected with the anti-drift law, D-5 superseded by the acceptance record, D-6 the standing operator action. The frontier returns to EMPTY; the next wave is the operator's to name."
+    },
+    {
+      "ts": "2026-11-03T12:30:00Z",
+      "actor": "resident-TL",
+      "action": "P27_0_REGISTERED",
+      "detail": "The operator's P27 order taken as the wave after the resident-TL source verification of the registration (branch p27/stripe-connect-global-payouts-africa-network, base 5ca077e — the gap matrix, dependency graph and work orders verified row by row; draft PR #8 pending this acceptance). ADR-0020 accepted; INV-30 registered (invariants.json + INVARIANTS.md, architecture:check 0 after); the capability matrix and the operator run card landed; the P26 work-order catalog reconciled (the stale PENDING labels the registration itself flagged — DONE, no completed work reopened); three station catches fixed at registration (the regenerated FACTS artifact 634/10, the corrected historical comment 631/347, the run-card path casing). The external-research record: Ghana GHS/SWIFT = H2 27 on the 2026-11-03 availability page (the registration's Q4 2026 claim DISCREPANT — recorded, the corridor stays a conditional opportunity); no Ghana stablecoin-wallet payout row found (K2); paystack.com unreachable at the station (K3/K4 — P27-C must re-verify against live docs and the actual account before encoding any recipient type or country fact). The batteries re-run EXACT at the acceptance commit. The frontier: P27-A ∥ P27-B ∥ P27-C ∥ P27-D, dispatched file-disjoint per ADR-0020 D12; P27-E waits on all four. No external Stripe or Paystack account has been configured by any repository change; the real runs are the operator's standing actions (the run card is the interface); LIVE stays refused under INV-25."
     }
   ],
-  "last_tl_action_at": "2026-11-03T02:30:00Z"
+  "last_tl_action_at": "2026-11-03T12:30:00Z"
 }

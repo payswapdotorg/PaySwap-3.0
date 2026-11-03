@@ -18,7 +18,7 @@ export STRIPE_SANDBOX_WRITES_ENABLED=1   # only if the write journey may run
 ## The run (one command, four gates)
 
 ```bash
-cd /home/z/payswap-3.0
+cd /home/z/PaySwap-3.0
 source /home/z/my-project/secrets/payment-providers.env
 A1_RECEIPT_PATH=docs/productization-evidence/p26-b-a1-catalogue-real-sandbox-RECEIPT-<date>.json \
   npx tsx scripts/p26/a1-catalogue-real-sandbox-journey.ts
