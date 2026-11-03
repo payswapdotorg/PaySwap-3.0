@@ -28,8 +28,10 @@
     {
       "id": "P26-A",
       "owner": "resident-TL",
-      "status": "PENDING",
-      "depends_on": ["P26-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P26-0"
+      ],
       "lane_scope": [
         "packages/provider-runtime/src/adapters/stripe/catalogue/overlay.ts (the D4 un-hold: PostAccountLinks/PostAccountSessions/PostV2CoreAccountLinks dispatchable at REAUTH; the held ten stay held)",
         "packages/provider-runtime/test/adapters/stripe-catalogue-census.test.ts (the ledger rewrite: 634/10, per-tier assertions — the anti-drift law)",
@@ -43,8 +45,10 @@
     {
       "id": "P26-B",
       "owner": "resident-TL",
-      "status": "PENDING",
-      "depends_on": ["P26-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P26-0"
+      ],
       "lane_scope": [
         "scripts/p26/ (NEW — the key-ready real-Sandbox harness family: the catalogue read journey, the two-phase write journey with read-back, the API-version A/B, the conversation-composition-over-real-Stripe tier, the re-auth proof journey)",
         "packages/provider-runtime/test/adapters/stripe-sandbox-harness.test.ts (the TIER 2 expansion for the 634-dispatchable ledger)",
@@ -55,8 +59,10 @@
     {
       "id": "P26-C",
       "owner": "resident-TL",
-      "status": "PENDING",
-      "depends_on": ["P26-0"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P26-0"
+      ],
       "lane_scope": [
         "packages/desktop/src/host/payswap/connections/stripe-api-version-state.ts (the tested per-connection migration verb: 2025-08-27.basil → 2026-09-30.endive, explicit, reversible, default unchanged — ADR-0017 D2's law made real)",
         "packages/payswap-app/src/agent/stripeToolRuntime.ts + the read tool schema (the bounded auto-walk pagination affordance — G11 closed as UX; the model-driven path stays)",
@@ -66,8 +72,12 @@
     {
       "id": "P26-D",
       "owner": "resident-TL",
-      "status": "PENDING",
-      "depends_on": ["P26-A", "P26-B", "P26-C"],
+      "status": "COMPLETE",
+      "depends_on": [
+        "P26-A",
+        "P26-B",
+        "P26-C"
+      ],
       "lane_scope": [
         "the merged-tree batteries at the tip (provider-runtime + desktop 3x scoped tsc + payswap-app + architecture 0/0/0 + oxlint 0 + CI green on all gates including the two the takeover fixed)",
         "spec/productization/JOURNEY-MAP.md §13 (the P26 journeys with the honest tier split) + spec/productization/FEATURE-MAP.md (the P26 row)",
@@ -76,6 +86,19 @@
       ]
     }
   ],
-  "frontier_after_registration": ["P26-A", "P26-B", "P26-C"],
-  "closure_policy": "P26 closes only when P26-A/B/C/D are accepted on main with their batteries green at the tip AND the Dashboard parity matrix is committed with its facts artifact reproducible AND every real-Sandbox tier that ran is evidenced by a machine-verified secret-free receipt AND every real tier that did NOT run is recorded as the standing operator action in the acceptance record's verdict — never a silent pass, never a scripted receipt renamed live. No test-count-only closure."
+  "frontier_after_registration": [],
+  "closure_policy": "P26 closes only when P26-A/B/C/D are accepted on main with their batteries green at the tip AND the Dashboard parity matrix is committed with its facts artifact reproducible AND every real-Sandbox tier that ran is evidenced by a machine-verified secret-free receipt AND every real tier that did NOT run is recorded as the standing operator action in the acceptance record's verdict — never a silent pass, never a scripted receipt renamed live. No test-count-only closure.",
+  "wave_status": "CLOSED — 634/644 (98.4%) dispatchable (the re-auth un-hold; held ten = the secrets law) · the Dashboard mapped (644/149/21, reproducible) · the version migration real and default-preserving · the real-Sandbox harness key-ready with the operator run card · carry-forwards: the attachment plane, the secrets sweep, ADR-0019's live activation bundle, the official-MCP lane, the re-pin path, the live substrate runtime + CDP receipts",
+  "closure": {
+    "closed_at": "2026-11-03T02:30:00Z",
+    "commits": [
+      "741ebea (P26-0)",
+      "b303c2c (merge P26-C: bb1beef + 1a2ef88)",
+      "9b86547 (P26-A)",
+      "49856da (P26-B)",
+      "the closure commit (P26-D)"
+    ],
+    "gates": "provider-runtime 35f/529t+5sk · desktop tsc 0/0/0 + 80f/696t+2sk · payswap-app 66f/776t · architecture 0/0 · oxlint 0 errors",
+    "acceptance_record": "docs/productization-evidence/P26-ACCEPTANCE-RECORD-2026-11-03.md"
+  }
 }

@@ -16,11 +16,7 @@
     "worker-2": "financial-authority-and-trust-security",
     "worker-3": "migration-experience-and-integrations"
   },
-  "frontier": [
-    "P26-A",
-    "P26-B",
-    "P26-C"
-  ],
+  "frontier": [],
   "active_work_orders": [],
   "completed_work_orders": [
     {
@@ -1247,6 +1243,26 @@
       "owner": "resident-TL",
       "accepted_at": "2026-11-03T00:45:00Z",
       "record": "The takeover registration: the operator's P26 order taken as the wave (real Sandbox parity, the Dashboard map, the user-facing gaps — without weakening the security model). The takeover verification re-ran every battery at the station against base 2d18a42 (provider-runtime 35f/528t+5sk · desktop tsc 0/0/0 + 676t+2sk · payswap-app 764t — all exact) and pulled the CI picture from the API (25/27 green; the two failures diagnosed): SIX TAKEOVER DEFECTS recorded in spec/productization/P26-0-GAP-MATRIX-2026-11-03.md — D-1 the hermetic provider-runtime tsc gate RED since P24-1 (the recorded 'tsc 0' claims were the workspace program; the P1 ambient shim never covered the P24-1 node globals/crypto — FIXED at registration: the @types/node toolchain dependency, the retired shim, the amended boundary law, hermetic tsc 0 with the battery unchanged) · D-2 the governance report-drift gate RED (the committed module-ownership report stale by +3,312/-1,067 — FIXED: regenerated and committed) · D-3 the P25-0 audit's two arithmetic drifts (121 account-gated in-tree, not 122; the true tier ledger 231 CONF / 75+40 STRONG / 1 COMM = 347, not the audit's 352-summing table — corrected by the appended appendix; per-tier census assertions land with P26-A) · D-4 work-orders.md three waves behind (the P24-D 'OPEN' heading reconciled to its 2026-11-01 closure; the P25 orders recorded retroactively) · D-5 no P24/P25 acceptance records exist (recorded; P26 writes the classic record) · D-6 NO Stripe key at any operator store (the P14-era key died with the prior station — the P26-B harnesses ship key-ready, the real runs are the standing operator action). The registration lands: the gap matrix + ADR-0018 (the re-authentication flow — the three held REAUTH-class operations un-hold behind a host-minted, digest-scoped, single-use 10-minute fresh-credential proof) + ADR-0019 (the live-mode readiness framework — specification ONLY, activation never implied; INV-25 stands) + THE DASHBOARD PARITY MATRIX (the Dashboard's capability surface from Stripe's own docs joined to the totality-checked census partition — scripts/p26/dashboard-parity-facts.ts → p26-0-dashboard-parity-FACTS-2026-11-03.json: 644 ops / 149 families / 21 areas; the Dashboard-only surfaces enumerated with citations, never scraping) + the P26-DEPENDENCY-GRAPH + this state registration. The frontier is P26-A ∥ P26-B ∥ P26-C (file-disjoint); P26-D waits on all three."
+    },
+    {
+      "id": "P26-A",
+      "owner": "resident-TL",
+      "accepted_at": "2026-11-03T02:00:00Z",
+      "acceptance_commit": "9b86547",
+      "record": "ADR-0018 end-to-end: the un-hold (631→634 dispatchable, 13→10 held — STRIPE_REAUTH_FLOW_OPERATIONS) + THE CATCH (PostV2CoreAccountLinks classified CONFIRM at P25, masked by the hold — the REAUTH_LAW_PATH_PREFIXES fix, census-pinned) + the per-tier anti-drift law (CONFIRM 232 · STRONG 115 · REAUTH 3 = 350 writes) + reauthentication.ts (the fresh-credential proof: same-account live probe, digest-scoped, single-use, 10-minute, consumed-before-dispatch, INV-25 at two edges, secret-scan on every write) + the executor REAUTH gate (uncomposed plane refuses honestly — the tier never degrades) + the material-carrying member (both drift laws re-pinned) + the app REAUTH card step (the chat-refusal law unchanged). Batteries: provider-runtime 529t+5sk · desktop 696t+2sk (+11) · tsc 0/0/0 · app 776t · oxlint 0 · architecture 0/0."
+    },
+    {
+      "id": "P26-B",
+      "owner": "resident-TL",
+      "accepted_at": "2026-11-03T02:10:00Z",
+      "acceptance_commit": "49856da",
+      "record": "The key-ready real-Sandbox harness lane: scripts/p26/a1-catalogue-real-sandbox-journey.ts (G1 the read journey · G2 the API-version A/B — the P26-C evidence path · G3 the double-gated write journey with the derived read-back · G4 the re-auth probe law) under the receipt law (env-only key, secret-scan refuse-to-emit, exit 2 verified live) + the operator run card (docs/productization-evidence/P26-OPERATOR-RUN-CARD-2026-11-03.md). THE HONEST BOUNDARY: no key at any operator store (D-6) — the real runs are the standing operator action; the tier marker stays OPERATOR_GATED."
+    },
+    {
+      "id": "P26-D",
+      "owner": "resident-TL",
+      "accepted_at": "2026-11-03T02:30:00Z",
+      "record": "The takeover wave closed: the merged-tree batteries green at the tip (provider-runtime 35f/529t+5sk · desktop 80f/696t+2sk · tsc 0/0/0 · app 66f/776t · architecture 0/0 · oxlint 0) + the JOURNEY-MAP §13 / FEATURE-MAP P26 row + the acceptance record (docs/productization-evidence/P26-ACCEPTANCE-RECORD-2026-11-03.md — the six caught-and-fixed defects incl. the P26-A v2-twin catch and the push-protection fix) + the graph/state closure + PUSH + the bundle archive. The carry-forwards named: the attachment plane, the response-surface secrets sweep, ADR-0019's live activation bundle, the official-MCP lane, the re-pin path, the live substrate runtime + the Electron CDP receipts, the webhook-journey extension, the app re-auth gesture's wiring-level UI test. The frontier returns to EMPTY."
     }
   ],
   "policies": {
@@ -1815,7 +1831,13 @@
       "actor": "resident-TL",
       "action": "P26_0_REGISTERED",
       "detail": "The takeover wave registered: the operator's P26 order (session web-e7311ad6) taken after the independent verification of the P25 state (every battery re-run exact; the CI API picture pulled; six takeover defects found, two fixed at registration — the hermetic provider-runtime tsc gate and the governance report-drift gate are GREEN again). The gap matrix carries the six requirement families and the six defects with evidence at 2d18a42. ADR-0018 (the re-authentication flow) and ADR-0019 (the live-mode readiness framework, specification-only) accepted at P26-0. The Dashboard parity matrix committed with its reproducible facts artifact (644/149/21, totality-checked). Base 2d18a42 re-verified at dispatch — no intervening commits. The frontier is P26-A (the re-authentication lane) ∥ P26-B (the real-Sandbox harness lane) ∥ P26-C (the version-migration + auto-walk lane); P26-D is the closure. The honest boundary: no Stripe key exists at the station (D-6) — the real-Sandbox runs stay OPERATOR_GATED on the key re-supply; the harnesses themselves are this wave's deliverable."
+    },
+    {
+      "ts": "2026-11-03T02:30:00Z",
+      "actor": "resident-TL",
+      "action": "P26_D_CLOSED",
+      "detail": "The takeover wave closed on the operator's order: the REAUTH tier made honest (ADR-0018 — 634/644 dispatchable, the held ten are the secrets law, the security model only strengthened), the Dashboard mapped end-to-end (the reproducible parity matrix: 644/149/21, the 19 Dashboard-only classes cited, never scraped), the version migration real and default-preserving (basil until the operator orders the flip), the real-Sandbox tier runnable on key re-supply (the run card is the interface; exit 2 verified live). The takeover defects: D-1/D-2/D-4 fixed, D-3 corrected with the anti-drift law, D-5 superseded by the acceptance record, D-6 the standing operator action. The frontier returns to EMPTY; the next wave is the operator's to name."
     }
   ],
-  "last_tl_action_at": "2026-11-03T00:45:00Z"
+  "last_tl_action_at": "2026-11-03T02:30:00Z"
 }
